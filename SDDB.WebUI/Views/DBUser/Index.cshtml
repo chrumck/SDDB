@@ -1,0 +1,170 @@
+﻿@model SDDB.Domain.Entities.DBUser
+@{
+    ViewBag.Title = "SDDB Users";
+}
+
+<!------- MainView ------->
+<div class="container-fluid" id="MainView">
+    <div class="btn-group margin-bottom-2px">
+        <button class="btn btn-default" id="BtnCreate">Create</button>
+        <button class="btn btn-primary" id="BtnEdit">Edit</button>
+        <button class="btn btn-danger" id="BtnDelete">Delete</button>
+    </div>
+    <div class="btn-group margin-bottom-2px">
+        <button class="btn btn-warning" id="BtnEditRoles">DB Roles</button>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading text-center" style="font-size:130%">
+            <strong>SDDB User Accounts</strong>
+        </div>
+        <table class="table table-striped" id="TableMain">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Last Name</th>
+                    <th>First Name</th>
+                    <th>SDDB Login</th>
+                    <th>SDDB User Email <br />(used for notifications)</th>
+                    <th>LDAP Authenticated</th>
+                </tr>
+            </thead>
+            <tbody class="selectable"></tbody>
+        </table>
+    </div>
+</div>
+
+<!------- EditFormView ------->
+<div class="container-fluid hide" id="EditFormView">
+    <div class="row">
+        <div class="col-xs-6">
+            <h3 id="EditFormLabel">Create/Edit SDDB User</h3>
+        </div>
+        <div class="col-xs-6">
+            <h3><button class="btn btn-default pull-right" type="button" id="EditFormBtnBack">Cancel</button></h3>
+        </div>
+    </div>
+    <div class="well">
+        <form class="form-horizontal" role="form" id="EditForm">
+            <div class="form-group">
+                @Html.LabelFor(x => x.Id, "SDDB User assigned to:", new { @class = "control-label col-sm-2" })
+                <div class="col-sm-10">
+                    @Html.TextBoxFor(x => x.Id, new { @class = "form-control modifiable", placeholder = "Person" })
+                    @Html.ValidationMessageFor(x => x.Id)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(x => x.UserName, "SDDB User Name", new { @class = "control-label col-sm-2" })
+                <div class="col-sm-10">
+                    @Html.TextBoxFor(x => x.UserName, new { @class = "form-control modifiable", placeholder = "SDDB User Name" })
+                    @Html.ValidationMessageFor(x => x.UserName)
+                </div>
+            </div>    
+            <div class="form-group">
+                @Html.LabelFor(x => x.Email, "Notification Email", new { @class = "control-label col-sm-2" })
+                <div class="col-sm-10">
+                    @Html.TextBoxFor(x => x.Email, new { @class = "form-control modifiable", placeholder = "Notification Email" })
+                    @Html.ValidationMessageFor(x => x.Email)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(x => x.LDAPAuthenticated, "Is LDAP Authenticated", new { @class = "control-label col-sm-2" })
+                <div class="col-sm-1">
+                    @Html.CheckBoxFor(x => x.LDAPAuthenticated, new { @class = "modifiable" })
+                </div>
+                <div class="col-sm-9">
+                    <p>
+                        <em>If LDAP authenticated: User name to match<br />LDAP account (password not required) </em>
+                    </p>
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(x => x.Password, "New Paswword", new { @class = "control-label col-sm-2" })
+                <div class="col-sm-10">
+                    @Html.PasswordFor(x => x.Password, new { @class = "form-control modifiable", placeholder = "New Password" })
+                    @Html.ValidationMessageFor(x => x.Password)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(x => x.PasswordConf, "Confirm Paswword", new { @class = "control-label col-sm-2" })
+                <div class="col-sm-10">
+                    @Html.PasswordFor(x => x.PasswordConf, new { @class = "form-control modifiable", placeholder = "Confirm Password" })
+                    @Html.ValidationMessageFor(x => x.PasswordConf)
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-6">
+                    <button class="btn btn-default" type="button" id="EditFormBtnCancel">Cancel</button>
+                </div>
+                <div class="col-xs-6">
+                    <button class="btn btn-success pull-right" type="button" id="EditFormBtnOk">
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<!------- DBRolesView ------->
+<div class="container-fluid hide" id="DBRolesView">
+    <div class="row">
+        <div class="col-xs-12 col-sm-5">
+            <h3 id="DBRolesViewLabel">Add/Remove User Roles</h3>
+        </div>
+        <div class="col-xs-9 col-sm-4">
+            <div class="panel panel-warning margin-top-10px">
+                <div class="panel-heading text-center" style="font-weight:bold" id="DBRolesViewPanel"> </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <h3><button class="btn btn-default pull-right" type="button" id="DBRolesViewBtnBack">Cancel</button></h3>
+        </div>
+    </div>
+    <div class="well">
+        <div class="row">
+            <div class="col-xs-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading" style="font-weight:bold">Add</div>
+                    <table class="table table-striped" id="TableDBRolesAdd">
+                        <thead class="hide"></thead>
+                        <tbody class="selectable"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading" style="font-weight:bold">Remove</div>
+                    <table class="table table-striped" id="TableDBRolesRemove">
+                        <thead class="hide"></thead>
+                        <tbody class="selectable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6">
+                <button class="btn btn-default" type="button" id="DBRolesViewBtnCancel">Cancel</button>
+            </div>
+            <div class="col-xs-6">
+                <button class="btn btn-success pull-right" type="button" id="DBRolesViewBtnOk">
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/DataTables")
+    @Scripts.Render("~/bundles/jquery-ui")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/magicsuggest")
+    <script src="~/Scripts/SDDB/SDDBUser.js"></script>
+}
+
+@section CSS {
+    @Styles.Render("~/bundles/DataTables-CSS")
+    @Styles.Render("~/bundles/jquery-ui-CSS")
+    @Styles.Render("~/bundles/magicsuggest-css")
+}

@@ -1,0 +1,434 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2AC2CA4F-1EDF-4A72-A950-2BAF0EAD958D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SDDB.Domain</RootNamespace>
+    <AssemblyName>SDDB.Domain</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Mehdime.Entity">
+      <HintPath>..\packages\Mehdime.Entity.1.0.0\lib\Mehdime.Entity.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Owin">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin">
+      <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security">
+      <HintPath>..\packages\Microsoft.Owin.Security.3.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Cookies">
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.3.0.1\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OAuth">
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.3.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data, Version=6.9.6.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MySql.Data.6.9.6\lib\net45\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data.Entity.EF6, Version=6.9.6.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MySql.Data.Entity.6.9.6\lib\net45\MySql.Data.Entity.EF6.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Abstract_Entities\IDbEntity.cs" />
+    <Compile Include="Abstract_Infrastructure\ILogger.cs" />
+    <Compile Include="Abstract_Services\IAppRoleManager.cs" />
+    <Compile Include="Abstract_Services\IAppUserManager.cs" />
+    <Compile Include="Concrete_DbContexts\EFDbContext.cs" />
+    <Compile Include="Concrete_Entities\AssemblyExt.cs" />
+    <Compile Include="Concrete_Entities\AssemblyDb.cs" />
+    <Compile Include="Concrete_Entities\Location.cs" />
+    <Compile Include="Concrete_Entities\LocationType.cs" />
+    <Compile Include="Concrete_Entities\ComponentStatus.cs" />
+    <Compile Include="Concrete_Entities\AssemblyStatus.cs" />
+    <Compile Include="Concrete_Entities\AssemblyModel.cs" />
+    <Compile Include="Concrete_Entities\ComponentType.cs" />
+    <Compile Include="Concrete_Entities\DBResult.cs" />
+    <Compile Include="Concrete_Entities\AssemblyType.cs" />
+    <Compile Include="Concrete_Entities\DocumentType.cs" />
+    <Compile Include="Concrete_Entities\Document.cs" />
+    <Compile Include="Concrete_Entities\PersonGroup.cs" />
+    <Compile Include="Concrete_Entities\Project.cs" />
+    <Compile Include="Concrete_Entities\DBUser.cs" />
+    <Compile Include="Concrete_Entities\DBRole.cs" />
+    <Compile Include="Concrete_Entities\Person.cs" />
+    <Compile Include="Concrete_Entities\_SessionSettings.cs" />
+    <Compile Include="Concrete_Infrastructure\CustomDataAnnotations.cs" />
+    <Compile Include="Concrete_Infrastructure\CustomHelpers.cs" />
+    <Compile Include="Concrete_Services\AssemblyModelService.cs" />
+    <Compile Include="Concrete_Services\AssemblyDbService.cs" />
+    <Compile Include="Concrete_Services\LocationService.cs" />
+    <Compile Include="Concrete_Services\LocationTypeService.cs" />
+    <Compile Include="Concrete_Services\ComponentStatusService.cs" />
+    <Compile Include="Concrete_Services\AssemblyStatusService.cs" />
+    <Compile Include="Concrete_Services\ComponentTypeService.cs" />
+    <Compile Include="Concrete_Services\AssemblyTypeService.cs" />
+    <Compile Include="Concrete_Services\PersonGroupService.cs" />
+    <Compile Include="Concrete_Services\_AppRoleManager.cs" />
+    <Compile Include="Concrete_Services\_AppUserManager.cs" />
+    <Compile Include="Concrete_Services\_DBLogger.cs" />
+    <Compile Include="Concrete_Services\DBUserService.cs" />
+    <Compile Include="Concrete_Services\DocumentTypeService.cs" />
+    <Compile Include="Concrete_Services\PersonService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Concrete_Services\DocumentService.cs" />
+    <Compile Include="Concrete_Services\ProjectService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Concrete_Services\_ServiceTemplate.cs" />
+    <Compile Include="Migrations\201505071653325_initialCreate.cs" />
+    <Compile Include="Migrations\201505071653325_initialCreate.Designer.cs">
+      <DependentUpon>201505071653325_initialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505072234395_UpdatePerson.cs" />
+    <Compile Include="Migrations\201505072234395_UpdatePerson.Designer.cs">
+      <DependentUpon>201505072234395_UpdatePerson.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505072253304_UpdatePerson2.cs" />
+    <Compile Include="Migrations\201505072253304_UpdatePerson2.Designer.cs">
+      <DependentUpon>201505072253304_UpdatePerson2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505072312491_UpdatePerson3.cs" />
+    <Compile Include="Migrations\201505072312491_UpdatePerson3.Designer.cs">
+      <DependentUpon>201505072312491_UpdatePerson3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505072323159_UpdatePerson4.cs" />
+    <Compile Include="Migrations\201505072323159_UpdatePerson4.Designer.cs">
+      <DependentUpon>201505072323159_UpdatePerson4.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505081710062_UpdatePerson5.cs" />
+    <Compile Include="Migrations\201505081710062_UpdatePerson5.Designer.cs">
+      <DependentUpon>201505081710062_UpdatePerson5.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505081725420_UpdatePerson6.cs" />
+    <Compile Include="Migrations\201505081725420_UpdatePerson6.Designer.cs">
+      <DependentUpon>201505081725420_UpdatePerson6.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505132219495_updateDBResult1.cs" />
+    <Compile Include="Migrations\201505132219495_updateDBResult1.Designer.cs">
+      <DependentUpon>201505132219495_updateDBResult1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505140024277_updateDBResult2.cs" />
+    <Compile Include="Migrations\201505140024277_updateDBResult2.Designer.cs">
+      <DependentUpon>201505140024277_updateDBResult2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505140434387_updateDBResult3.cs" />
+    <Compile Include="Migrations\201505140434387_updateDBResult3.Designer.cs">
+      <DependentUpon>201505140434387_updateDBResult3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505142018178_updatePerson7.cs" />
+    <Compile Include="Migrations\201505142018178_updatePerson7.Designer.cs">
+      <DependentUpon>201505142018178_updatePerson7.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505170528393_Projects0.cs" />
+    <Compile Include="Migrations\201505170528393_Projects0.Designer.cs">
+      <DependentUpon>201505170528393_Projects0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505192156214_Projects1.cs" />
+    <Compile Include="Migrations\201505192156214_Projects1.Designer.cs">
+      <DependentUpon>201505192156214_Projects1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505192324501_Projects2.cs" />
+    <Compile Include="Migrations\201505192324501_Projects2.Designer.cs">
+      <DependentUpon>201505192324501_Projects2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505200428367_project3.cs" />
+    <Compile Include="Migrations\201505200428367_project3.Designer.cs">
+      <DependentUpon>201505200428367_project3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505200435411_project4.cs" />
+    <Compile Include="Migrations\201505200435411_project4.Designer.cs">
+      <DependentUpon>201505200435411_project4.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505251836322_Document0.cs" />
+    <Compile Include="Migrations\201505251836322_Document0.Designer.cs">
+      <DependentUpon>201505251836322_Document0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505300029083_AssyStatus0.cs" />
+    <Compile Include="Migrations\201505300029083_AssyStatus0.Designer.cs">
+      <DependentUpon>201505300029083_AssyStatus0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505300107401_CompStatus0.cs" />
+    <Compile Include="Migrations\201505300107401_CompStatus0.Designer.cs">
+      <DependentUpon>201505300107401_CompStatus0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505301656568_AssyModel0.cs" />
+    <Compile Include="Migrations\201505301656568_AssyModel0.Designer.cs">
+      <DependentUpon>201505301656568_AssyModel0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505301742486_AssyModel1.cs" />
+    <Compile Include="Migrations\201505301742486_AssyModel1.Designer.cs">
+      <DependentUpon>201505301742486_AssyModel1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505302329437_LocationType0.cs" />
+    <Compile Include="Migrations\201505302329437_LocationType0.Designer.cs">
+      <DependentUpon>201505302329437_LocationType0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505310607270_Company0.cs" />
+    <Compile Include="Migrations\201505310607270_Company0.Designer.cs">
+      <DependentUpon>201505310607270_Company0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505311818520_Company1.cs" />
+    <Compile Include="Migrations\201505311818520_Company1.Designer.cs">
+      <DependentUpon>201505311818520_Company1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506010516028_Document1.cs" />
+    <Compile Include="Migrations\201506010516028_Document1.Designer.cs">
+      <DependentUpon>201506010516028_Document1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506020537075_person8.cs" />
+    <Compile Include="Migrations\201506020537075_person8.Designer.cs">
+      <DependentUpon>201506020537075_person8.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506021936227_CompanyToPersonGroup0.cs" />
+    <Compile Include="Migrations\201506021936227_CompanyToPersonGroup0.Designer.cs">
+      <DependentUpon>201506021936227_CompanyToPersonGroup0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506031659581_PersonGroup1.cs" />
+    <Compile Include="Migrations\201506031659581_PersonGroup1.Designer.cs">
+      <DependentUpon>201506031659581_PersonGroup1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506041840278_Location0.cs" />
+    <Compile Include="Migrations\201506041840278_Location0.Designer.cs">
+      <DependentUpon>201506041840278_Location0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506042129461_Location1.cs" />
+    <Compile Include="Migrations\201506042129461_Location1.Designer.cs">
+      <DependentUpon>201506042129461_Location1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506042142113_Location2.cs" />
+    <Compile Include="Migrations\201506042142113_Location2.Designer.cs">
+      <DependentUpon>201506042142113_Location2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506042307457_Location3.cs" />
+    <Compile Include="Migrations\201506042307457_Location3.Designer.cs">
+      <DependentUpon>201506042307457_Location3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506052021282_Assembly0.cs" />
+    <Compile Include="Migrations\201506052021282_Assembly0.Designer.cs">
+      <DependentUpon>201506052021282_Assembly0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506052037452_Assembly1.cs" />
+    <Compile Include="Migrations\201506052037452_Assembly1.Designer.cs">
+      <DependentUpon>201506052037452_Assembly1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506052202545_Assembly2.cs" />
+    <Compile Include="Migrations\201506052202545_Assembly2.Designer.cs">
+      <DependentUpon>201506052202545_Assembly2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506052213525_Assembly3.cs" />
+    <Compile Include="Migrations\201506052213525_Assembly3.Designer.cs">
+      <DependentUpon>201506052213525_Assembly3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201505071653325_initialCreate.resx">
+      <DependentUpon>201505071653325_initialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505072234395_UpdatePerson.resx">
+      <DependentUpon>201505072234395_UpdatePerson.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505072253304_UpdatePerson2.resx">
+      <DependentUpon>201505072253304_UpdatePerson2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505072312491_UpdatePerson3.resx">
+      <DependentUpon>201505072312491_UpdatePerson3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505072323159_UpdatePerson4.resx">
+      <DependentUpon>201505072323159_UpdatePerson4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505081710062_UpdatePerson5.resx">
+      <DependentUpon>201505081710062_UpdatePerson5.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505081725420_UpdatePerson6.resx">
+      <DependentUpon>201505081725420_UpdatePerson6.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505132219495_updateDBResult1.resx">
+      <DependentUpon>201505132219495_updateDBResult1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505140024277_updateDBResult2.resx">
+      <DependentUpon>201505140024277_updateDBResult2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505140434387_updateDBResult3.resx">
+      <DependentUpon>201505140434387_updateDBResult3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505142018178_updatePerson7.resx">
+      <DependentUpon>201505142018178_updatePerson7.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505170528393_Projects0.resx">
+      <DependentUpon>201505170528393_Projects0.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505192156214_Projects1.resx">
+      <DependentUpon>201505192156214_Projects1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505192324501_Projects2.resx">
+      <DependentUpon>201505192324501_Projects2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505200428367_project3.resx">
+      <DependentUpon>201505200428367_project3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505200435411_project4.resx">
+      <DependentUpon>201505200435411_project4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505251836322_Document0.resx">
+      <DependentUpon>201505251836322_Document0.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505300029083_AssyStatus0.resx">
+      <DependentUpon>201505300029083_AssyStatus0.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505300107401_CompStatus0.resx">
+      <DependentUpon>201505300107401_CompStatus0.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505301656568_AssyModel0.resx">
+      <DependentUpon>201505301656568_AssyModel0.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505301742486_AssyModel1.resx">
+      <DependentUpon>201505301742486_AssyModel1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505302329437_LocationType0.resx">
+      <DependentUpon>201505302329437_LocationType0.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505310607270_Company0.resx">
+      <DependentUpon>201505310607270_Company0.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505311818520_Company1.resx">
+      <DependentUpon>201505311818520_Company1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506010516028_Document1.resx">
+      <DependentUpon>201506010516028_Document1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506020537075_person8.resx">
+      <DependentUpon>201506020537075_person8.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506021936227_CompanyToPersonGroup0.resx">
+      <DependentUpon>201506021936227_CompanyToPersonGroup0.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506031659581_PersonGroup1.resx">
+      <DependentUpon>201506031659581_PersonGroup1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506041840278_Location0.resx">
+      <DependentUpon>201506041840278_Location0.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506042129461_Location1.resx">
+      <DependentUpon>201506042129461_Location1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506042142113_Location2.resx">
+      <DependentUpon>201506042142113_Location2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506042307457_Location3.resx">
+      <DependentUpon>201506042307457_Location3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506052021282_Assembly0.resx">
+      <DependentUpon>201506052021282_Assembly0.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506052037452_Assembly1.resx">
+      <DependentUpon>201506052037452_Assembly1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506052202545_Assembly2.resx">
+      <DependentUpon>201506052202545_Assembly2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506052213525_Assembly3.resx">
+      <DependentUpon>201506052213525_Assembly3.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

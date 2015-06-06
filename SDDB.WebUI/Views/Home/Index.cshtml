@@ -1,0 +1,93 @@
+﻿@{
+    ViewBag.Title = "SDDB Home";
+}
+
+<div class="container-fluid">
+    <h2 class="text-center">Welcome to SDDB</h2>
+    <div class="well">
+        <div class="row">
+            <div class="col-sm-12 col-md-6">
+
+                <div class="panel panel-success">
+                    <div class="panel-heading"> Common Tasks</div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-6 text-center">
+                                <a class="btn btn-success btn-lg btn-block margin-bottom-2px" href=# role="button">Your Activity</a>
+                            </div>
+                            <div class="col-sm-6 text-center">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (User.IsInRole("_DBPowerUser"))
+                {
+                    <div class="panel panel-tdo-info">
+                        <div class="panel-heading"> Project Management</div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-6 text-center">
+                                    <a class="btn btn-tdo-info btn-lg btn-block margin-bottom-2px" href="@Url.Action("Index","Document",null)" role="button">Documents</a>
+                                    <a class="btn btn-tdo-info btn-lg btn-block margin-bottom-2px" href="@Url.Action("Index","Location",null)" role="button">Locations</a>
+                                </div>
+                                <div class="col-sm-6 text-center">
+                                    <a class="btn btn-tdo-info btn-lg btn-block margin-bottom-2px" href=# role="button">Components</a>
+                                    <a class="btn btn-tdo-info btn-lg btn-block margin-bottom-2px" href="@Url.Action("Index","Assembly",null)" role="button">Assemblies</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+
+            </div>
+            <div class="col-sm-12 col-md-6">
+
+                @if (User.IsInRole("_DBManager"))
+                {
+                    <div class="panel panel-warning">
+                        <div class="panel-heading"> SDDB Setup</div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-6 text-center">
+                                    <a class="btn btn-warning btn-lg btn-block margin-bottom-2px" href="@Url.Action("Index","Project",null)" role="button">Projects</a>
+                                </div>
+                                <div class="col-sm-6 text-center">
+                                    <a class="btn btn-warning btn-lg btn-block margin-bottom-2px" href="@Url.Action("Index","Person",null)" role="button">Persons</a>
+                                    <a class="btn btn-warning btn-lg btn-block margin-bottom-2px" href="@Url.Action("Index","PersonGroup",null)" role="button">Person Groups</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (User.IsInRole("_DBAdmin"))
+                {
+                    <div class="panel panel-info">
+                        <div class="panel-heading"> SDDB Administration </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-6 text-center">
+                                    <a class="btn btn-tdo-primary btn-lg btn-block margin-bottom-2px" href="@Url.Action("Index","DBUser",null)" role="button">SDDB Users</a>
+                                    <a class="btn btn-tdo-primary btn-lg btn-block margin-bottom-2px" href="@Url.Action("Index","DocumentType",null)" role="button">Document Types</a>
+                                    <a class="btn btn-tdo-primary btn-lg btn-block margin-bottom-2px" href="@Url.Action("Index","LocationType",null)" role="button">Location Types</a>
+                                </div>
+                                <div class="col-sm-6 text-center">
+                                    <a class="btn btn-primary btn-lg btn-block margin-bottom-2px" href="@Url.Action("Index","ComponentType",null)" role="button">Component Types</a>
+                                    <a class="btn btn-primary btn-lg btn-block margin-bottom-2px" href="@Url.Action("Index","ComponentModel",null)" role="button">Component Models</a>
+                                    <a class="btn btn-primary btn-lg btn-block margin-bottom-2px" href="@Url.Action("Index","ComponentStatus",null)" role="button">Component Statuses</a>
+                                    <a class="btn btn-primary btn-lg btn-block margin-bottom-2px" href="@Url.Action("Index","AssemblyType",null)" role="button">Assembly Types</a>
+                                    <a class="btn btn-primary btn-lg btn-block margin-bottom-2px" href="@Url.Action("Index","AssemblyModel",null)" role="button">Assembly Models</a>
+                                    <a class="btn btn-primary btn-lg btn-block margin-bottom-2px" href="@Url.Action("Index","AssemblyStatus",null)" role="button">Assembly Statuses</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,280 @@
+﻿@model SDDB.Domain.Entities.AssemblyModel
+
+@{
+    ViewBag.Title = "Assembly Models";
+}
+
+<!------- MainView ------->
+<div class="container-fluid" id="MainView">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="btn-group margin-bottom-2px">
+                <button class="btn btn-default" id="BtnCreate">Create</button>
+                <button class="btn btn-primary" id="BtnEdit">Edit</button>
+                <button class="btn btn-danger" id="BtnDelete">Delete</button>
+            </div>
+
+            <div class="pull-right">
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Options <span class="caret"></span></button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a href=# id="dropdownId1">Show Primary Columns</a></li>
+                        <li><a href=# id="dropdownId2">Show Secondary Columns</a></li>
+                        <li><a href=# id="dropdownId3">Show Tertiary Columns</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-primary" id="PanelTableMain">
+        <div class="panel-heading text-center" style="font-size:130%">
+            <strong>Assembly Models</strong>
+            <div class="pull-right">
+                <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="100" data-onstyle="warning" data-on="Deleted Shown" data-off="Show Deleted">
+            </div>
+        </div>
+        <table class="table table-striped" id="TableMain">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Model Name</th>
+                    <th>Alternate Name</th>
+                    <th>Attr.01 Type</th><th>Attr.01 Descr</th>
+                    <th>Attr.02 Type</th><th>Attr.02 Descr</th>
+                    <th>Attr.03 Type</th><th>Attr.03 Descr</th>
+                    <th>Attr.04 Type</th><th>Attr.04 Descr</th>
+                    <th>Attr.05 Type</th><th>Attr.05 Descr</th>
+                    <th>Attr.06 Type</th><th>Attr.06 Descr</th>
+                    <th>Attr.07 Type</th><th>Attr.07 Descr</th>
+                    <th>Attr.08 Type</th><th>Attr.08 Descr</th>
+                    <th>Attr.09 Type</th><th>Attr.09 Descr</th>
+                    <th>Attr.10 Type</th><th>Attr.10 Descr</th>
+                    <th>Comments</th>
+                    <th>Is Active</th>
+                </tr>
+            </thead>
+            <tbody class="selectable"></tbody>
+        </table>
+    </div>
+</div>
+
+<!------- EditFormView ------->
+<div class="container-fluid hide" id="EditFormView">
+    <div class="row">
+        <div class="col-xs-6">
+            <h3 id="EditFormLabel">Create/Edit Assembly Model</h3>
+        </div>
+        <div class="col-xs-6">
+            <h3><button class="btn btn-default pull-right" type="button" id="EditFormBtnBack">Cancel</button></h3>
+        </div>
+    </div>
+    <div class="well">
+        <form class="form-horizontal" role="form" id="EditForm">
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssyModelName, "Model Name", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssyModelName, new { @class = "form-control modifiable", placeholder = "Assy. Model Name" })
+                            @Html.ValidationMessageFor(x => x.AssyModelName)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssyModelAltName, "Alternate Name", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssyModelAltName, new { @class = "form-control modifiable", placeholder = "Assy. Model Alternate Name" })
+                            @Html.ValidationMessageFor(x => x.AssyModelAltName)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Comments, "Comments", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextAreaFor(x => x.Comments, 3, 10, new { @class = "form-control modifiable", placeholder = "Comments" })
+                            @Html.ValidationMessageFor(x => x.Comments)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr01Type, "Attr.01 Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.DropDownListFor(x => x.Attr01Type, new SelectList(Enum.GetValues(typeof(SDDB.Domain.Entities.MAttrTypes))), new { @class = "form-control modifiable" })
+                            @Html.ValidationMessageFor(x => x.Attr01Type)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr01Desc, "Description", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Attr01Desc, new { @class = "form-control modifiable", placeholder = "Attr.01 Description" })
+                            @Html.ValidationMessageFor(x => x.Attr01Desc)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr02Type, "Attr.02 Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.DropDownListFor(x => x.Attr02Type, new SelectList(Enum.GetValues(typeof(SDDB.Domain.Entities.MAttrTypes))), new { @class = "form-control modifiable" })
+                            @Html.ValidationMessageFor(x => x.Attr02Type)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr02Desc, "Description", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Attr02Desc, new { @class = "form-control modifiable", placeholder = "Attr.02 Description" })
+                            @Html.ValidationMessageFor(x => x.Attr02Desc)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr03Type, "Attr.03 Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.DropDownListFor(x => x.Attr03Type, new SelectList(Enum.GetValues(typeof(SDDB.Domain.Entities.MAttrTypes))), new { @class = "form-control modifiable" })
+                            @Html.ValidationMessageFor(x => x.Attr03Type)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr03Desc, "Description", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Attr03Desc, new { @class = "form-control modifiable", placeholder = "Attr.03 Description" })
+                            @Html.ValidationMessageFor(x => x.Attr03Desc)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr04Type, "Attr.04 Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.DropDownListFor(x => x.Attr04Type, new SelectList(Enum.GetValues(typeof(SDDB.Domain.Entities.MAttrTypes))), new { @class = "form-control modifiable" })
+                            @Html.ValidationMessageFor(x => x.Attr04Type)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr04Desc, "Description", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Attr04Desc, new { @class = "form-control modifiable", placeholder = "Attr.04 Description" })
+                            @Html.ValidationMessageFor(x => x.Attr04Desc)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr05Type, "Attr.05 Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.DropDownListFor(x => x.Attr05Type, new SelectList(Enum.GetValues(typeof(SDDB.Domain.Entities.MAttrTypes))), new { @class = "form-control modifiable" })
+                            @Html.ValidationMessageFor(x => x.Attr05Type)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr05Desc, "Description", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Attr05Desc, new { @class = "form-control modifiable", placeholder = "Attr.05 Description" })
+                            @Html.ValidationMessageFor(x => x.Attr05Desc)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr06Type, "Attr.06 Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.DropDownListFor(x => x.Attr06Type, new SelectList(Enum.GetValues(typeof(SDDB.Domain.Entities.MAttrTypes))), new { @class = "form-control modifiable" })
+                            @Html.ValidationMessageFor(x => x.Attr06Type)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr06Desc, "Description", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Attr06Desc, new { @class = "form-control modifiable", placeholder = "Attr.06 Description" })
+                            @Html.ValidationMessageFor(x => x.Attr06Desc)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr07Type, "Attr.07 Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.DropDownListFor(x => x.Attr07Type, new SelectList(Enum.GetValues(typeof(SDDB.Domain.Entities.MAttrTypes))), new { @class = "form-control modifiable" })
+                            @Html.ValidationMessageFor(x => x.Attr07Type)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr07Desc, "Description", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Attr07Desc, new { @class = "form-control modifiable", placeholder = "Attr.07 Description" })
+                            @Html.ValidationMessageFor(x => x.Attr07Desc)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr08Type, "Attr.08 Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.DropDownListFor(x => x.Attr08Type, new SelectList(Enum.GetValues(typeof(SDDB.Domain.Entities.MAttrTypes))), new { @class = "form-control modifiable" })
+                            @Html.ValidationMessageFor(x => x.Attr08Type)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr08Desc, "Description", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Attr08Desc, new { @class = "form-control modifiable", placeholder = "Attr.08 Description" })
+                            @Html.ValidationMessageFor(x => x.Attr08Desc)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr09Type, "Attr.09 Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.DropDownListFor(x => x.Attr09Type, new SelectList(Enum.GetValues(typeof(SDDB.Domain.Entities.MAttrTypes))), new { @class = "form-control modifiable" })
+                            @Html.ValidationMessageFor(x => x.Attr09Type)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr09Desc, "Description", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Attr09Desc, new { @class = "form-control modifiable", placeholder = "Attr.09 Description" })
+                            @Html.ValidationMessageFor(x => x.Attr09Desc)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr10Type, "Attr.10 Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.DropDownListFor(x => x.Attr10Type, new SelectList(Enum.GetValues(typeof(SDDB.Domain.Entities.MAttrTypes))), new { @class = "form-control modifiable" })
+                            @Html.ValidationMessageFor(x => x.Attr10Type)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr10Desc, "Description", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Attr10Desc, new { @class = "form-control modifiable", placeholder = "Attr.10 Description" })
+                            @Html.ValidationMessageFor(x => x.Attr10Desc)
+                        </div>
+                    </div>
+                    <div class="form-group hide" id="EditFormGroupIsActive">
+                        <div class="col-sm-10 col-sm-offset-2">
+                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "modifiable" }) &nbsp;&nbsp;
+                            @Html.LabelFor(x => x.IsActive, "Is Active") &nbsp;&nbsp; <em>(Marking as 'Active' un-deletes record.)</em>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <div class="col-xs-6">
+                    <button class="btn btn-default" type="button" id="EditFormBtnCancel">Cancel</button>
+                </div>
+                <div class="col-xs-6">
+                    <button class="btn btn-success pull-right" type="button" id="EditFormBtnOk">
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/DataTables")
+    @Scripts.Render("~/bundles/jquery-ui")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/bootstrap-toggle")
+    @Scripts.Render("~/bundles/magicsuggest")
+    <script src="~/Scripts/SDDB/AssemblyModel.js"></script>
+}
+
+@section CSS {
+    @Styles.Render("~/bundles/DataTables-CSS")
+    @Styles.Render("~/bundles/jquery-ui-CSS")
+    @Styles.Render("~/bundles/bootstrap-toggle-CSS")
+    @Styles.Render("~/bundles/magicsuggest-css")
+}

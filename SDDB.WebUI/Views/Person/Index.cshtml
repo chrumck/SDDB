@@ -1,0 +1,333 @@
+﻿@model SDDB.Domain.Entities.Person
+@{
+    ViewBag.Title = "Persons";
+}
+
+<!------- MainView ------->
+<div class="container-fluid" id="MainView">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="btn-group margin-bottom-2px">
+                <button class="btn btn-default" id="BtnCreate">Create</button>
+                <button class="btn btn-primary" id="BtnEdit">Edit</button>
+                <button class="btn btn-danger" id="BtnDelete">Delete</button>
+            </div>
+
+            <div class="btn-group margin-bottom-2px">
+                <button class="btn btn-success" id="BtnEditPrsProj">Projects</button>
+                <button class="btn btn-warning" id="BtnEditPersonGroups">Prs. Groups</button>
+            </div>
+
+            <div class="pull-right">
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Options <span class="caret"></span></button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a href=# id="dropdownId1">Show Person Data</a></li>
+                        <li><a href=# id="dropdownId2">Show Employee Data</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-primary" id="PanelTableMain">
+        <div class="panel-heading text-center" style="font-size:130%">
+            <strong>Persons</strong>
+            <div class="pull-right">
+                <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="100" data-onstyle="warning" data-on="Deleted Shown" data-off="Show Deleted">
+            </div>
+
+        </div>
+        <table class="table table-striped" id="TableMain">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Last Name</th>
+                    <th>First Name</th>
+                    <th>Initials</th>
+                    <th>Phone</th>
+                    <th>Mobile Phone</th>
+                    <th>Email</th>
+                    <th>Comments</th>
+                    <th>Is Active</th>
+                    <th>Is Current Employee</th>
+                    <th>Employee Position</th>
+                    <th>Is Salaried</th>
+                    <th>Employee Start</th>
+                    <th>Employee End</th>
+                    <th>Employee Details</th>
+                </tr>
+            </thead>
+            <tbody class="selectable"></tbody>
+        </table>
+    </div>
+</div>
+
+<!------- EditFormView ------->
+<div class="container-fluid hide" id="EditFormView">
+    <div class="row">
+        <div class="col-xs-6">
+            <h3 id="EditFormLabel">Create/Edit Person</h3>
+        </div>
+        <div class="col-xs-6">
+            <h3><button class="btn btn-default pull-right" type="button" id="EditFormBtnBack">Cancel</button></h3>
+        </div>
+    </div>
+    <div class="well">
+        <form class="form-horizontal" role="form" id="EditForm">
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.FirstName, "First Name", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.FirstName, new { @class = "form-control modifiable", placeholder = "First Name" })
+                            @Html.ValidationMessageFor(x => x.FirstName)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LastName, "Last Name", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.LastName, new { @class = "form-control modifiable", placeholder = "Last Name" })
+                            @Html.ValidationMessageFor(x => x.LastName)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Initials, "Initials", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Initials, new { @class = "form-control modifiable", placeholder = "Initials" })
+                            @Html.ValidationMessageFor(x => x.Initials)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Phone, "Phone", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Phone, new { @class = "form-control modifiable", placeholder = "Phone" })
+                            @Html.ValidationMessageFor(x => x.Phone)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.PhoneMobile, "Mobile Phone", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.PhoneMobile, new { @class = "form-control modifiable", placeholder = "Mobile Phone" })
+                            @Html.ValidationMessageFor(x => x.PhoneMobile)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Email, "Email", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Email, new { @class = "form-control modifiable", placeholder = "Email" })
+                            @Html.ValidationMessageFor(x => x.Email)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Comments, "Comments", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextAreaFor(x => x.Comments, 3, 10, new { @class = "form-control modifiable", placeholder = "Comments" })
+                            @Html.ValidationMessageFor(x => x.Comments)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <div class="col-sm-10 col-sm-offset-2">
+                            @Html.CheckBoxFor(x => x.IsCurrentEmployee, new { @class = "modifiable" }) &nbsp;&nbsp;
+                            @Html.LabelFor(x => x.IsCurrentEmployee, "Is Current Employee")
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.EmployeePosition, "Empl. Position", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.EmployeePosition, new { @class = "form-control modifiable", placeholder = "Employee Position" })
+                            @Html.ValidationMessageFor(x => x.EmployeePosition)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-10 col-sm-offset-2">
+                            @Html.CheckBoxFor(x => x.IsSalaried, new { @class = "modifiable" }) &nbsp;&nbsp;
+                            @Html.LabelFor(x => x.IsSalaried, "Is Salaried")
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.EmployeeStart, "Start Date", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.EmployeeStart, new { @class = "form-control modifiable datepicker", placeholder = "Employee Start Date" })
+                            @Html.ValidationMessageFor(x => x.EmployeeStart)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.EmployeeEnd, "End Date", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.EmployeeEnd, new { @class = "form-control modifiable datepicker", placeholder = "Employee End Date" })
+                            @Html.ValidationMessageFor(x => x.EmployeeEnd)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.EmployeeDetails, "Empl. Details", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextAreaFor(x => x.EmployeeDetails, 3, 10, new { @class = "form-control modifiable", placeholder = "Employee Details" })
+                            @Html.ValidationMessageFor(x => x.EmployeeDetails)
+                        </div>
+                    </div>
+                    <div class="form-group hide" id="EditFormGroupIsActive">
+                        <div class="col-sm-10 col-sm-offset-2">
+                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "modifiable" }) &nbsp;&nbsp;
+                            @Html.LabelFor(x => x.IsActive, "Is Active") &nbsp;&nbsp; <em>(Marking as 'Active' un-deletes record.)</em>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-xs-6">
+                    <button class="btn btn-default" type="button" id="EditFormBtnCancel">Cancel</button>
+                </div>
+                <div class="col-xs-6">
+                    <button class="btn btn-success pull-right" type="button" id="EditFormBtnOk">
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!------- PrsProjView ------->
+<div class="container-fluid hide" id="PrsProjView">
+    <div class="row">
+        <div class="col-xs-12 col-sm-5">
+            <h3 id="PrsProjViewLabel">Add/Remove Person Projects</h3>
+        </div>
+        <div class="col-xs-9 col-sm-4">
+            <div class="panel panel-warning margin-top-10px">
+                <div class="panel-heading text-center" style="font-weight:bold" id="PrsProjViewPanel"> </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <h3><button class="btn btn-default pull-right" type="button" id="PrsProjViewBtnBack">Cancel</button></h3>
+        </div>
+    </div>
+    <div class="well">
+        <div class="row">
+            <div class="col-xs-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading" style="font-weight:bold">Add</div>
+                    <table class="table table-striped" id="TableProjectsAdd">
+                        <thead class="hide">
+                            <tr>
+                                <th>ID</th>
+                                <th>Project Name</th>
+                                <th>Project Code</th>
+                            </tr>
+                        </thead>
+                        <tbody class="selectable"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading" style="font-weight:bold">Remove</div>
+                    <table class="table table-striped" id="TableProjectsRemove">
+                        <thead class="hide">
+                            <tr>
+                                <th>ID</th>
+                                <th>Project Name</th>
+                                <th>Project Code</th>
+                            </tr>
+                        </thead>
+                        <tbody class="selectable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6">
+                <button class="btn btn-default" type="button" id="PrsProjViewBtnCancel">Cancel</button>
+            </div>
+            <div class="col-xs-6">
+                <button class="btn btn-success pull-right" type="button" id="PrsProjViewBtnOk">
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!------- PersonGroupsView ------->
+<div class="container-fluid hide" id="PersonGroupsView">
+    <div class="row">
+        <div class="col-xs-12 col-sm-5">
+            <h3 id="PersonGroupsViewLabel">Add/Remove Person Groups</h3>
+        </div>
+        <div class="col-xs-9 col-sm-4">
+            <div class="panel panel-warning margin-top-10px">
+                <div class="panel-heading text-center" style="font-weight:bold" id="PersonGroupsViewPanel"> </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <h3><button class="btn btn-default pull-right" type="button" id="PersonGroupsViewBtnBack">Cancel</button></h3>
+        </div>
+    </div>
+    <div class="well">
+        <div class="row">
+            <div class="col-xs-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading" style="font-weight:bold">Add</div>
+                    <table class="table table-striped" id="TablePersonGroupsAdd">
+                        <thead class="hide">
+                            <tr>
+                                <th>ID</th>
+                                <th>Group Name</th>
+                                <th>Alt. Name</th>
+                            </tr>
+                        </thead>
+                        <tbody class="selectable"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading" style="font-weight:bold">Remove</div>
+                    <table class="table table-striped" id="TablePersonGroupsRemove">
+                        <thead class="hide">
+                            <tr>
+                                <th>ID</th>
+                                <th>Group Name</th>
+                                <th>Alt. Name</th>
+                            </tr>
+                        </thead>
+                        <tbody class="selectable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6">
+                <button class="btn btn-default" type="button" id="PersonGroupsViewBtnCancel">Cancel</button>
+            </div>
+            <div class="col-xs-6">
+                <button class="btn btn-success pull-right" type="button" id="PersonGroupsViewBtnOk">
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/DataTables")
+    @Scripts.Render("~/bundles/jquery-ui")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/bootstrap-toggle")
+    <script src="~/Scripts/SDDB/Person.js"></script>
+}
+
+@section CSS {
+    @Styles.Render("~/bundles/DataTables-CSS")
+    @Styles.Render("~/bundles/jquery-ui-CSS")
+    @Styles.Render("~/bundles/bootstrap-toggle-CSS")
+}
+

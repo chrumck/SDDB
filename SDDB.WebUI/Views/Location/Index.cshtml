@@ -1,0 +1,272 @@
+﻿@model SDDB.Domain.Entities.Location
+@{
+    ViewBag.Title = "Locations";
+}
+
+<!------- MainView ------->
+<div class="container-fluid" id="MainView">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="btn-group margin-bottom-2px">
+                <button class="btn btn-default" id="BtnCreate">Create</button>
+                <button class="btn btn-primary" id="BtnEdit">Edit</button>
+                <button class="btn btn-danger" id="BtnDelete">Delete</button>
+            </div>
+
+            <div class="btn-group margin-bottom-2px">
+                <div id="MsFilterByProject" placeholder="Select Project"></div>
+            </div>
+
+            <div class="pull-right">
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Options <span class="caret"></span></button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a href=# id="dropdownId1">Show Primary Columns</a></li>
+                        <li><a href=# id="dropdownId2">Show Secondary Columns</a></li>
+                        <li><a href=# id="dropdownId3">Show Tertiary Columns</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-primary" id="PanelTableMain">
+        <div class="panel-heading text-center" style="font-size:130%">
+            <strong>Locations</strong>
+            <div class="pull-right">
+                <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="100" data-onstyle="warning" data-on="Deleted Shown" data-off="Show Deleted">
+            </div>
+        </div>
+        <table class="table table-striped" id="TableMain">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Alternate Name</th>
+                    <th>Type</th>
+                    <th>Project</th>
+                    <th>Contact Prs.</th>
+                    <th>Address</th>
+                    <th>City</th>
+                    <th>ZIP</th>
+                    <th>State</th>
+                    <th>Country</th>
+                    <th>Position X</th>
+                    <th>Position Y</th>
+                    <th>Position Z</th>
+                    <th>Stationing</th>
+                    <th>CoA Req'd</th>
+                    <th>RoE Req'd</th>
+                    <th>Access Info</th>
+                    <th>Comments</th>
+                    <th>Is Active</th>
+                    <th>LocationType_Id</th>
+                    <th>AssignedToProject_Id</th>
+                    <th>ContactPerson_Id</th>
+                </tr>
+            </thead>
+            <tbody class="selectable"></tbody>
+        </table>
+    </div>
+</div>
+
+<!------- EditFormView ------->
+<div class="container-fluid hide" id="EditFormView">
+    <div class="row">
+        <div class="col-xs-6">
+            <h3 id="EditFormLabel">Create/Edit Location</h3>
+        </div>
+        <div class="col-xs-6">
+            <h3><button class="btn btn-default pull-right" type="button" id="EditFormBtnBack">Cancel</button></h3>
+        </div>
+    </div>
+    <div class="well">
+        <form class="form-horizontal" role="form" id="EditForm">
+            
+            <div class="row" id="CreateMultipleRow">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="CreateMultiple">Multiple</label>
+                        <div class="col-sm-10">
+                            <input class="form-control input-tdo-info"
+                                   data-val="true" data-val-number="The field must be a number."
+                                   data-val-range="The field must be between 1 and 100." data-val-range-max="100" data-val-range-min="1"
+                                   id="CreateMultiple" name="CreateMultiple" placeholder="Create Multiple" type="number" value="">
+                            <span class="field-validation-valid" data-valmsg-for="CreateMultiple" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LocName, "Name", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.LocName, new { @class = "form-control modifiable", placeholder = "Location Name" })
+                            @Html.ValidationMessageFor(x => x.LocName)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LocAltName, "Alternate Name", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.LocAltName, new { @class = "form-control modifiable", placeholder = "Location Alternate Name" })
+                            @Html.ValidationMessageFor(x => x.LocAltName)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LocationType_Id, "Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.LocationType_Id, new { @class = "form-control modifiable", placeholder = "Location Type" })
+                            @Html.ValidationMessageFor(x => x.LocationType_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssignedToProject_Id, "Project", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssignedToProject_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Project" })
+                            @Html.ValidationMessageFor(x => x.AssignedToProject_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.ContactPerson_Id, "Contact Prs.", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.ContactPerson_Id, new { @class = "form-control modifiable", placeholder = "Contact Person" })
+                            @Html.ValidationMessageFor(x => x.ContactPerson_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Address, "Address", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Address, new { @class = "form-control modifiable", placeholder = "Location Address" })
+                            @Html.ValidationMessageFor(x => x.Address)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.City, "City", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.City, new { @class = "form-control modifiable", placeholder = "City" })
+                            @Html.ValidationMessageFor(x => x.City)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.ZIP, "ZIP", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.ZIP, new { @class = "form-control modifiable", placeholder = "Postal Code" })
+                            @Html.ValidationMessageFor(x => x.ZIP)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.State, "State", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.State, new { @class = "form-control modifiable", placeholder = "State or Province" })
+                            @Html.ValidationMessageFor(x => x.State)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Country, "Country", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Country, new { @class = "form-control modifiable", placeholder = "Country" })
+                            @Html.ValidationMessageFor(x => x.Country)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LocX, "X", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.LocX, new { @class = "form-control modifiable", placeholder = "Position X" })
+                            @Html.ValidationMessageFor(x => x.LocX)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LocY, "Y", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.LocY, new { @class = "form-control modifiable", placeholder = "Position Y" })
+                            @Html.ValidationMessageFor(x => x.LocY)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LocZ, "Z", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.LocZ, new { @class = "form-control modifiable", placeholder = "Position Z" })
+                            @Html.ValidationMessageFor(x => x.LocZ)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LocStationing, "Stationing", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.LocStationing, new { @class = "form-control modifiable", placeholder = "Loc. Stationing" })
+                            @Html.ValidationMessageFor(x => x.LocStationing)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-10 col-sm-offset-2">
+                            @Html.CheckBoxFor(x => x.CertOfApprReqd, new { @class = "modifiable" }) &nbsp;&nbsp;
+                            @Html.LabelFor(x => x.CertOfApprReqd, "Certificate of Approval Req'd")
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-10 col-sm-offset-2">
+                            @Html.CheckBoxFor(x => x.RightOfEntryReqd, new { @class = "modifiable" }) &nbsp;&nbsp;
+                            @Html.LabelFor(x => x.RightOfEntryReqd, "Right of Entry Req'd")
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AccessInfo, "Access Info", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextAreaFor(x => x.AccessInfo, 3, 10, new { @class = "form-control modifiable", placeholder = "Access Information" })
+                            @Html.ValidationMessageFor(x => x.AccessInfo)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Comments, "Comments", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextAreaFor(x => x.Comments, 3, 10, new { @class = "form-control modifiable", placeholder = "Comments" })
+                            @Html.ValidationMessageFor(x => x.Comments)
+                        </div>
+                    </div>
+                    <div class="form-group hide" id="EditFormGroupIsActive">
+                        <div class="col-sm-10 col-sm-offset-2">
+                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "modifiable" }) &nbsp;&nbsp;
+                            @Html.LabelFor(x => x.IsActive, "Is Active") &nbsp;&nbsp; <em>(Marking as 'Active' un-deletes record.)</em>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <div class="col-xs-6">
+                    <button class="btn btn-default" type="button" id="EditFormBtnCancel">Cancel</button>
+                </div>
+                <div class="col-xs-6">
+                    <button class="btn btn-success pull-right" type="button" id="EditFormBtnOk">
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/DataTables")
+    @Scripts.Render("~/bundles/jquery-ui")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/bootstrap-toggle")
+    @Scripts.Render("~/bundles/magicsuggest")
+    <script src="~/Scripts/SDDB/Location.js"></script>
+}
+
+@section CSS {
+    @Styles.Render("~/bundles/DataTables-CSS")
+    @Styles.Render("~/bundles/jquery-ui-CSS")
+    @Styles.Render("~/bundles/bootstrap-toggle-CSS")
+    @Styles.Render("~/bundles/magicsuggest-css")
+}
+
+

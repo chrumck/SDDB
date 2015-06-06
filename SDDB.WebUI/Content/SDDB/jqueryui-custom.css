@@ -1,0 +1,3 @@
+﻿/*selectable colors*/
+.selectable .ui-selecting[class~="ui-selectee"] { background: #FECA40; }
+.selectable .ui-selected[class~="ui-selectee"] { background: #F39814; color: white; }

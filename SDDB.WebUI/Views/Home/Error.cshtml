@@ -1,0 +1,36 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="~/Images/SolDataIcon.png">
+    <title>Server Error</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link href="~/Content/SDDB/Site.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="well">
+            
+                <div class="alert alert-danger">
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <h2>Oops, Something went wrong!</h2>
+                            <h4>This error has been recorded. Contact SDDB Admin to help resolve the issue.</h4>
+                            <a class="btn btn-danger btn-lg" href="@Url.Action("Index","Home",null)" role="button">Return to Main View</a>
+                        </div>
+                    </div>
+            
+            </div>
+        </div>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+</body>
+</html>
