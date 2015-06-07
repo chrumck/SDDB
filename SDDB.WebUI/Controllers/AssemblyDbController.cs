@@ -3,7 +3,7 @@
 namespace SDDB.WebUI.Controllers
 {
     [Authorize]
-    public class AssemblyController : Controller
+    public class AssemblyDbController : Controller
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 

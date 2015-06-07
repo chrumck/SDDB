@@ -117,7 +117,7 @@ $(document).ready(function () {
             { data: "AssyTypeName", name: "AssyTypeName" },//4  
             { data: "AssyStatusName", name: "AssyStatusName" },//5
             { data: "AssyModelName", name: "AssyModelName" },//6
-            { data: "AssignedToProject", render: function (data, type, full, meta) { return data.ProjectName }, name: "AssignedToProject" }, //7
+            { data: "AssignedToProject", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject" }, //7
             //------------------------------------------------second set of columns
             { data: "AssyGlobalX", name: "AssyGlobalX" },//8
             { data: "AssyGlobalY", name: "AssyGlobalY" },//9

@@ -35,6 +35,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.AssyGlobalX, x.AssyGlobalY, x.AssyGlobalZ, x.AssyLocalXDesign, x.AssyLocalYDesign, x.AssyLocalZDesign,
                 x.AssyLocalXAsBuilt, x.AssyLocalYAsBuilt, x.AssyLocalZAsBuilt, x.AssyStationing, x.AssyLength, x.AssyReadingIntervalSecs,
                 x.IsReference , x.TechnicalDetails, x.PowerSupplyDetails, x.HSEDetails, x.Comments, x.IsActive,
+                x.AssemblyExt.Attr01,x.AssemblyExt.Attr02,x.AssemblyExt.Attr03,x.AssemblyExt.Attr04,x.AssemblyExt.Attr05,
+                x.AssemblyExt.Attr06,x.AssemblyExt.Attr07,x.AssemblyExt.Attr08,x.AssemblyExt.Attr09,x.AssemblyExt.Attr10,
                 x.AssemblyType_Id, x.AssemblyStatus_Id, x.AssemblyModel_Id, x.AssignedToProject_Id
             });
 
@@ -42,28 +44,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             return Json(new { data }, JsonRequestBehavior.AllowGet);
         }
-
-        // GET: /AssemblyDbSrv/GetByProjectIds
-        [HttpPost]
-        [DBSrvAuth("Assembly_View")]
-        public async Task<ActionResult> GetByProjectIds(string[] projectIds, bool getActive = true)
-        {
-            var data = (await assemblyService.GetByProjectAsync(UserId, projectIds, getActive).ConfigureAwait(false)).Select(x => new
-            {
-                x.Id, x.AssyName, x.AssyAltName, x.AssyAltName2, 
-                x.AssemblyType.AssyTypeName, x.AssemblyStatus.AssyStatusName, x.AssemblyModel.AssyModelName,
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                x.AssyGlobalX, x.AssyGlobalY, x.AssyGlobalZ, x.AssyLocalXDesign, x.AssyLocalYDesign, x.AssyLocalZDesign,
-                x.AssyLocalXAsBuilt, x.AssyLocalYAsBuilt, x.AssyLocalZAsBuilt, x.AssyStationing, x.AssyLength, x.AssyReadingIntervalSecs,
-                x.IsReference , x.TechnicalDetails, x.PowerSupplyDetails, x.HSEDetails, x.Comments, x.IsActive,
-                x.AssemblyType_Id, x.AssemblyStatus_Id, x.AssemblyModel_Id, x.AssignedToProject_Id
-            });
-
-            ViewBag.ServiceName = "AssemblyDbService.GetByProjectAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
-        }
-
+        
         // GET: /AssemblyDbSrv/GetByIds
         [HttpPost]
         [DBSrvAuth("Assembly_View")]
@@ -76,6 +57,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.AssyGlobalX, x.AssyGlobalY, x.AssyGlobalZ, x.AssyLocalXDesign, x.AssyLocalYDesign, x.AssyLocalZDesign,
                 x.AssyLocalXAsBuilt, x.AssyLocalYAsBuilt, x.AssyLocalZAsBuilt, x.AssyStationing, x.AssyLength, x.AssyReadingIntervalSecs,
                 x.IsReference , x.TechnicalDetails, x.PowerSupplyDetails, x.HSEDetails, x.Comments, x.IsActive,
+                x.AssemblyExt.Attr01,x.AssemblyExt.Attr02,x.AssemblyExt.Attr03,x.AssemblyExt.Attr04,x.AssemblyExt.Attr05,
+                x.AssemblyExt.Attr06,x.AssemblyExt.Attr07,x.AssemblyExt.Attr08,x.AssemblyExt.Attr09,x.AssemblyExt.Attr10,
                 x.AssemblyType_Id, x.AssemblyStatus_Id, x.AssemblyModel_Id, x.AssignedToProject_Id
             });
 
@@ -83,6 +66,53 @@ namespace SDDB.WebUI.ControllersSrv
 
             return Json( data , JsonRequestBehavior.AllowGet);
         }
+
+        // GET: /AssemblyDbSrv/GetByProjectIds
+        [HttpPost]
+        [DBSrvAuth("Assembly_View")]
+        public async Task<ActionResult> GetByProjectIds(string[] projectIds = null, bool getActive = true)
+        {
+            var data = (await assemblyService.GetByProjectAsync(UserId, projectIds, getActive).ConfigureAwait(false)).Select(x => new
+            {
+                x.Id, x.AssyName, x.AssyAltName, x.AssyAltName2, 
+                x.AssemblyType.AssyTypeName, x.AssemblyStatus.AssyStatusName, x.AssemblyModel.AssyModelName,
+                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
+                x.AssyGlobalX, x.AssyGlobalY, x.AssyGlobalZ, x.AssyLocalXDesign, x.AssyLocalYDesign, x.AssyLocalZDesign,
+                x.AssyLocalXAsBuilt, x.AssyLocalYAsBuilt, x.AssyLocalZAsBuilt, x.AssyStationing, x.AssyLength, x.AssyReadingIntervalSecs,
+                x.IsReference , x.TechnicalDetails, x.PowerSupplyDetails, x.HSEDetails, x.Comments, x.IsActive,
+                x.AssemblyExt.Attr01,x.AssemblyExt.Attr02,x.AssemblyExt.Attr03,x.AssemblyExt.Attr04,x.AssemblyExt.Attr05,
+                x.AssemblyExt.Attr06,x.AssemblyExt.Attr07,x.AssemblyExt.Attr08,x.AssemblyExt.Attr09,x.AssemblyExt.Attr10,
+                x.AssemblyType_Id, x.AssemblyStatus_Id, x.AssemblyModel_Id, x.AssignedToProject_Id
+            });
+
+            ViewBag.ServiceName = "AssemblyDbService.GetByProjectAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+
+            return Json(new { data }, JsonRequestBehavior.AllowGet);
+        }
+
+        // GET: /AssemblyDbSrv/GetByModelIds
+        [HttpPost]
+        [DBSrvAuth("Assembly_View")]
+        public async Task<ActionResult> GetByModelIds(string[] projectIds = null, string[] modelIds = null, bool getActive = true)
+        {
+            var data = (await assemblyService.GetByModelAsync(UserId, projectIds, modelIds, getActive).ConfigureAwait(false)).Select(x => new
+            {
+                x.Id, x.AssyName, x.AssyAltName, x.AssyAltName2, 
+                x.AssemblyType.AssyTypeName, x.AssemblyStatus.AssyStatusName, x.AssemblyModel.AssyModelName,
+                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
+                x.AssyGlobalX, x.AssyGlobalY, x.AssyGlobalZ, x.AssyLocalXDesign, x.AssyLocalYDesign, x.AssyLocalZDesign,
+                x.AssyLocalXAsBuilt, x.AssyLocalYAsBuilt, x.AssyLocalZAsBuilt, x.AssyStationing, x.AssyLength, x.AssyReadingIntervalSecs,
+                x.IsReference , x.TechnicalDetails, x.PowerSupplyDetails, x.HSEDetails, x.Comments, x.IsActive,
+                x.AssemblyExt.Attr01,x.AssemblyExt.Attr02,x.AssemblyExt.Attr03,x.AssemblyExt.Attr04,x.AssemblyExt.Attr05,
+                x.AssemblyExt.Attr06,x.AssemblyExt.Attr07,x.AssemblyExt.Attr08,x.AssemblyExt.Attr09,x.AssemblyExt.Attr10,
+                x.AssemblyType_Id, x.AssemblyStatus_Id, x.AssemblyModel_Id, x.AssignedToProject_Id
+            });
+
+            ViewBag.ServiceName = "AssemblyDbService.GetByProjectAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+
+            return Json(new { data }, JsonRequestBehavior.AllowGet);
+        }
+
 
         // GET: /AssemblyDbSrv/Lookup
         public async Task<ActionResult> Lookup(string query = "", bool getActive = true)

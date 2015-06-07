@@ -76,14 +76,15 @@ function ShowModalAJAXFail(xhr, status, error) {
 }
 
 //Refresh main table from AJAX
-function RefreshTable(table, url, getActive, httpType, projectIds) {
+function RefreshTable(table, url, getActive, httpType, projectIds, modelIds) {
 
     getActive = (typeof getActive !== "undefined" && getActive == false) ? false : true;
     httpType = (typeof httpType !== "undefined") ? httpType : "GET";
     projectIds = (typeof projectIds !== "undefined") ? projectIds : [];
+    modelIds = (typeof modelIds !== "undefined") ? modelIds : [];
 
     $.ajax({
-        type: httpType, url: url, timeout: 20000, data: { getActive: getActive, projectIds: projectIds }, dataType: "json",
+        type: httpType, url: url, timeout: 20000, data: { getActive: getActive, projectIds: projectIds, modelIds: modelIds }, dataType: "json",
         beforeSend: function () {
             table.clear().search("").draw();
             $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });

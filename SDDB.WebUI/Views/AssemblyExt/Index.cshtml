@@ -1,0 +1,230 @@
+﻿@model SDDB.Domain.Entities.AssemblyDb
+@{
+    ViewBag.Title = "Assemblies Extended";
+}
+
+<!------- MainView ------->
+<div class="container-fluid" id="MainView">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="btn-group margin-bottom-2px">
+                <button class="btn btn-primary" id="BtnEdit" disabled>Edit</button>
+            </div>
+            
+            <div class="btn-group margin-bottom-2px">
+                <div id="MsFilterByModel" placeholder="Select Model"></div>
+            </div>
+
+            <div class="btn-group margin-bottom-2px">
+                <div id="MsFilterByProject" placeholder="Select Project"></div>
+            </div>
+
+            <div class="pull-right">
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Options <span class="caret"></span></button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a href=# id="dropdownId1">Show 1st Columns</a></li>
+                        <li><a href=# id="dropdownId2">Show 2nd Columns</a></li>
+                        <li><a href=# id="dropdownId3">Show 3rd Columns</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-primary" id="PanelTableMain">
+        <div class="panel-heading text-center" style="font-size:130%">
+            <strong>Assemblies Extended</strong>
+            <div class="pull-right">
+                <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="100" data-onstyle="warning" data-on="Deleted Shown" data-off="Show Deleted">
+            </div>
+        </div>
+        <table class="table table-striped" id="TableMain">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    
+                    <th>Name</th>
+                    <th>Alt. Name</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Project</th>
+                    <th id= "thAttr01">Attr01</th>
+                    <th id ="thAttr02">Attr02</th>
+                    <th id ="thAttr03">Attr03</th>
+                    <th id ="thAttr04">Attr04</th>
+                    <th id ="thAttr05">Attr05</th>
+                    <th id ="thAttr06">Attr06</th>
+                    <th id ="thAttr07">Attr07</th>
+                    <th id ="thAttr08">Attr08</th>
+                    <th id ="thAttr09">Attr09</th>
+                    <th id ="thAttr10">Attr10</th>
+                    <th>AssemblyType_Id</th>
+                    <th>AssemblyStatus_Id</th>
+                    <th>AssignedToProject_Id</th>
+                </tr>
+            </thead>
+            <tbody class="selectable"></tbody>
+        </table>
+    </div>
+</div>
+
+<!------- EditFormView ------->
+<div class="container-fluid hide" id="EditFormView">
+    <div class="row">
+        <div class="col-xs-6">
+            <h3 id="EditFormLabel">Edit Extended</h3>
+        </div>
+        <div class="col-xs-6">
+            <h3><button class="btn btn-default pull-right" type="button" id="EditFormBtnBack">Cancel</button></h3>
+        </div>
+    </div>
+    <div class="well">
+        <form class="form-horizontal" role="form" id="EditForm">
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssyName, "Name", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssyName, new { @class = "form-control modifiable", placeholder = "Assembly Name" })
+                            @Html.ValidationMessageFor(x => x.AssyName)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssyAltName, "Alternate Name", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssyAltName, new { @class = "form-control modifiable", placeholder = "Assembly Alternate Name" })
+                            @Html.ValidationMessageFor(x => x.AssyAltName)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssemblyType_Id, "Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssemblyType_Id, new { @class = "form-control modifiable", placeholder = "Assembly Type"})
+                            @Html.ValidationMessageFor(x => x.AssemblyType_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssemblyStatus_Id, "Status", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssemblyStatus_Id, new { @class = "form-control modifiable", placeholder = "Assembly Status"})
+                            @Html.ValidationMessageFor(x => x.AssemblyStatus_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssignedToProject_Id, "Project", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssignedToProject_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Project"})
+                            @Html.ValidationMessageFor(x => x.AssignedToProject_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssemblyExt.Attr01, "Attr01", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssemblyExt.Attr01, new { @class = "form-control modifiable", placeholder = "Attr01" })
+                            @Html.ValidationMessageFor(x => x.AssemblyExt.Attr01)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssemblyExt.Attr02, "Attr02", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssemblyExt.Attr02, new { @class = "form-control modifiable", placeholder = "Attr02" })
+                            @Html.ValidationMessageFor(x => x.AssemblyExt.Attr02)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssemblyExt.Attr03, "Attr03", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssemblyExt.Attr03, new { @class = "form-control modifiable", placeholder = "Attr03" })
+                            @Html.ValidationMessageFor(x => x.AssemblyExt.Attr03)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssemblyExt.Attr04, "Attr04", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssemblyExt.Attr04, new { @class = "form-control modifiable", placeholder = "Attr04" })
+                            @Html.ValidationMessageFor(x => x.AssemblyExt.Attr04)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssemblyExt.Attr05, "Attr05", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssemblyExt.Attr05, new { @class = "form-control modifiable", placeholder = "Attr05" })
+                            @Html.ValidationMessageFor(x => x.AssemblyExt.Attr05)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssemblyExt.Attr06, "Attr06", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssemblyExt.Attr06, new { @class = "form-control modifiable", placeholder = "Attr06" })
+                            @Html.ValidationMessageFor(x => x.AssemblyExt.Attr06)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssemblyExt.Attr07, "Attr07", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssemblyExt.Attr07, new { @class = "form-control modifiable", placeholder = "Attr07" })
+                            @Html.ValidationMessageFor(x => x.AssemblyExt.Attr07)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssemblyExt.Attr08, "Attr08", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssemblyExt.Attr08, new { @class = "form-control modifiable", placeholder = "Attr08" })
+                            @Html.ValidationMessageFor(x => x.AssemblyExt.Attr08)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssemblyExt.Attr09, "Attr09", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssemblyExt.Attr09, new { @class = "form-control modifiable", placeholder = "Attr09" })
+                            @Html.ValidationMessageFor(x => x.AssemblyExt.Attr09)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssemblyExt.Attr10, "Attr10", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssemblyExt.Attr10, new { @class = "form-control modifiable", placeholder = "Attr10" })
+                            @Html.ValidationMessageFor(x => x.AssemblyExt.Attr10)
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <div class="col-xs-6">
+                    <button class="btn btn-default" type="button" id="EditFormBtnCancel">Cancel</button>
+                </div>
+                <div class="col-xs-6">
+                    <button class="btn btn-success pull-right" type="button" id="EditFormBtnOk">
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/DataTables")
+    @Scripts.Render("~/bundles/jquery-ui")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/bootstrap-toggle")
+    @Scripts.Render("~/bundles/magicsuggest")
+    <script src="~/Scripts/SDDB/AssemblyExt.js"></script>
+}
+
+@section CSS {
+    @Styles.Render("~/bundles/DataTables-CSS")
+    @Styles.Render("~/bundles/jquery-ui-CSS")
+    @Styles.Render("~/bundles/bootstrap-toggle-CSS")
+    @Styles.Render("~/bundles/magicsuggest-css")
+}
+

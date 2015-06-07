@@ -24,6 +24,11 @@ textarea,
     max-width: 640px;
 }
 
+/*DataTables tweaks*/
+div.dataTables_filter input[type=search] {
+	width: 10em;
+}
+
 /*magicsuggest custom*/
 .ms-ctn-disabled .ms-sel-item[class ~= "ms-sel-text"],
 .ms-ctn-disabled .ms-sel-item[class ~= "ms-sel-text"]:hover {
@@ -56,3 +61,26 @@ input[type="checkbox"].input-validation-error {
 .validation-summary-valid {
     display: none;
 }
+
+/*selectable ui-selected only */
+.selectable .ui-selected[class ~= "odd"] { background: #F39814; color: white; }
+.selectable .ui-selected[class ~= "even"] { background: #F39814; color: white; }
+
+/* custom margins */
+.margin-bottom-2px {
+  margin-bottom:2px;
+}
+
+.margin-top-2px {
+  margin-top:2px;
+}
+
+.margin-top-10px {
+  margin-top:10px;
+}
+
+/* ModalWait modal */
+#ModalWait .modal-dialog {
+    width: 280px;
+}
+
