@@ -76,6 +76,31 @@ namespace SDDB.Domain.Entities
         [StringLength(64)]
         public string Attr10Desc { get; set; }
 
+        public MAttrTypes Attr11Type { get; set; }
+
+        [StringLength(64)]
+        public string Attr11Desc { get; set; }
+
+        public MAttrTypes Attr12Type { get; set; }
+
+        [StringLength(64)]
+        public string Attr12Desc { get; set; }
+
+        public MAttrTypes Attr13Type { get; set; }
+
+        [StringLength(64)]
+        public string Attr13Desc { get; set; }
+
+        public MAttrTypes Attr14Type { get; set; }
+
+        [StringLength(64)]
+        public string Attr14Desc { get; set; }
+
+        public MAttrTypes Attr15Type { get; set; }
+
+        [StringLength(64)]
+        public string Attr15Desc { get; set; }
+
         [Column(TypeName = "text")] [StringLength(65535)]
         public string Comments { get; set; }
 

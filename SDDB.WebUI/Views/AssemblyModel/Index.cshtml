@@ -19,9 +19,11 @@
                 <div class="dropdown">
                     <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Options <span class="caret"></span></button>
                     <ul class="dropdown-menu dropdown-menu-right">
-                        <li><a href=# id="dropdownId1">Show Primary Columns</a></li>
-                        <li><a href=# id="dropdownId2">Show Secondary Columns</a></li>
-                        <li><a href=# id="dropdownId3">Show Tertiary Columns</a></li>
+                        <li><a href=# id="dropdownId1">Show 1st Columns</a></li>
+                        <li><a href=# id="dropdownId2">Show 2nd Columns</a></li>
+                        <li><a href=# id="dropdownId3">Show 3rd Columns</a></li>
+                        <li><a href=# id="dropdownId4">Show 4th Columns</a></li>
+                        <li><a href=# id="dropdownId5">Show 5th Columns</a></li>
                     </ul>
                 </div>
             </div>
@@ -51,6 +53,11 @@
                     <th>Attr.08 Type</th><th>Attr.08 Descr</th>
                     <th>Attr.09 Type</th><th>Attr.09 Descr</th>
                     <th>Attr.10 Type</th><th>Attr.10 Descr</th>
+                    <th>Attr.11 Type</th><th>Attr.11 Descr</th>
+                    <th>Attr.12 Type</th><th>Attr.12 Descr</th>
+                    <th>Attr.13 Type</th><th>Attr.13 Descr</th>
+                    <th>Attr.14 Type</th><th>Attr.14 Descr</th>
+                    <th>Attr.15 Type</th><th>Attr.15 Descr</th>
                     <th>Comments</th>
                     <th>Is Active</th>
                 </tr>
@@ -104,7 +111,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.Attr01Desc, "Description", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.Attr01Desc, "Attr.01 Desc", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.Attr01Desc, new { @class = "form-control modifiable", placeholder = "Attr.01 Description" })
                             @Html.ValidationMessageFor(x => x.Attr01Desc)
@@ -118,7 +125,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.Attr02Desc, "Description", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.Attr02Desc, "Attr.02 Desc", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.Attr02Desc, new { @class = "form-control modifiable", placeholder = "Attr.02 Description" })
                             @Html.ValidationMessageFor(x => x.Attr02Desc)
@@ -132,7 +139,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.Attr03Desc, "Description", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.Attr03Desc, "Attr.03 Desc", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.Attr03Desc, new { @class = "form-control modifiable", placeholder = "Attr.03 Description" })
                             @Html.ValidationMessageFor(x => x.Attr03Desc)
@@ -146,15 +153,12 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.Attr04Desc, "Description", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.Attr04Desc, "Attr.04 Desc", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.Attr04Desc, new { @class = "form-control modifiable", placeholder = "Attr.04 Description" })
                             @Html.ValidationMessageFor(x => x.Attr04Desc)
                         </div>
                     </div>
-                </div>
-
-                <div class="col-md-6">
                     <div class="form-group">
                         @Html.LabelFor(x => x.Attr05Type, "Attr.05 Type", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
@@ -163,7 +167,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.Attr05Desc, "Description", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.Attr05Desc, "Attr.05 Desc", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.Attr05Desc, new { @class = "form-control modifiable", placeholder = "Attr.05 Description" })
                             @Html.ValidationMessageFor(x => x.Attr05Desc)
@@ -177,7 +181,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.Attr06Desc, "Description", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.Attr06Desc, "Attr.06 Desc", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.Attr06Desc, new { @class = "form-control modifiable", placeholder = "Attr.06 Description" })
                             @Html.ValidationMessageFor(x => x.Attr06Desc)
@@ -191,12 +195,15 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.Attr07Desc, "Description", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.Attr07Desc, "Attr.07 Desc", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.Attr07Desc, new { @class = "form-control modifiable", placeholder = "Attr.07 Description" })
                             @Html.ValidationMessageFor(x => x.Attr07Desc)
                         </div>
                     </div>
+                </div>
+
+                <div class="col-md-6">
                     <div class="form-group">
                         @Html.LabelFor(x => x.Attr08Type, "Attr.08 Type", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
@@ -205,7 +212,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.Attr08Desc, "Description", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.Attr08Desc, "Attr.08 Desc", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.Attr08Desc, new { @class = "form-control modifiable", placeholder = "Attr.08 Description" })
                             @Html.ValidationMessageFor(x => x.Attr08Desc)
@@ -219,7 +226,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.Attr09Desc, "Description", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.Attr09Desc, "Attr.09 Desc", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.Attr09Desc, new { @class = "form-control modifiable", placeholder = "Attr.09 Description" })
                             @Html.ValidationMessageFor(x => x.Attr09Desc)
@@ -233,10 +240,80 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.Attr10Desc, "Description", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.Attr10Desc, "Attr.10 Desc", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.Attr10Desc, new { @class = "form-control modifiable", placeholder = "Attr.10 Description" })
                             @Html.ValidationMessageFor(x => x.Attr10Desc)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr11Type, "Attr.11 Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.DropDownListFor(x => x.Attr11Type, new SelectList(Enum.GetValues(typeof(SDDB.Domain.Entities.MAttrTypes))), new { @class = "form-control modifiable" })
+                            @Html.ValidationMessageFor(x => x.Attr11Type)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr11Desc, "Attr.11 Desc", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Attr11Desc, new { @class = "form-control modifiable", placeholder = "Attr.11 Description" })
+                            @Html.ValidationMessageFor(x => x.Attr11Desc)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr12Type, "Attr.12 Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.DropDownListFor(x => x.Attr12Type, new SelectList(Enum.GetValues(typeof(SDDB.Domain.Entities.MAttrTypes))), new { @class = "form-control modifiable" })
+                            @Html.ValidationMessageFor(x => x.Attr12Type)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr12Desc, "Attr.12 Desc", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Attr12Desc, new { @class = "form-control modifiable", placeholder = "Attr.12 Description" })
+                            @Html.ValidationMessageFor(x => x.Attr12Desc)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr13Type, "Attr.13 Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.DropDownListFor(x => x.Attr13Type, new SelectList(Enum.GetValues(typeof(SDDB.Domain.Entities.MAttrTypes))), new { @class = "form-control modifiable" })
+                            @Html.ValidationMessageFor(x => x.Attr13Type)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr13Desc, "Attr.13 Desc", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Attr13Desc, new { @class = "form-control modifiable", placeholder = "Attr.13 Description" })
+                            @Html.ValidationMessageFor(x => x.Attr13Desc)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr14Type, "Attr.14 Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.DropDownListFor(x => x.Attr14Type, new SelectList(Enum.GetValues(typeof(SDDB.Domain.Entities.MAttrTypes))), new { @class = "form-control modifiable" })
+                            @Html.ValidationMessageFor(x => x.Attr14Type)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr14Desc, "Attr.14 Desc", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Attr14Desc, new { @class = "form-control modifiable", placeholder = "Attr.14 Description" })
+                            @Html.ValidationMessageFor(x => x.Attr14Desc)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr15Type, "Attr.15 Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.DropDownListFor(x => x.Attr15Type, new SelectList(Enum.GetValues(typeof(SDDB.Domain.Entities.MAttrTypes))), new { @class = "form-control modifiable" })
+                            @Html.ValidationMessageFor(x => x.Attr15Type)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Attr15Desc, "Attr.15 Desc", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Attr15Desc, new { @class = "form-control modifiable", placeholder = "Attr.15 Description" })
+                            @Html.ValidationMessageFor(x => x.Attr15Desc)
                         </div>
                     </div>
                     <div class="form-group hide" id="EditFormGroupIsActive">

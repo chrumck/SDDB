@@ -306,6 +306,10 @@
     <Compile Include="Migrations\201506052213525_Assembly3.Designer.cs">
       <DependentUpon>201506052213525_Assembly3.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201506072257490_AssyModel2.cs" />
+    <Compile Include="Migrations\201506072257490_AssyModel2.Designer.cs">
+      <DependentUpon>201506072257490_AssyModel2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -421,6 +425,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201506052213525_Assembly3.resx">
       <DependentUpon>201506052213525_Assembly3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506072257490_AssyModel2.resx">
+      <DependentUpon>201506072257490_AssyModel2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

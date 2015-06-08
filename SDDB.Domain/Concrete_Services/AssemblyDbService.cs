@@ -285,6 +285,70 @@ namespace SDDB.Domain.Services
             };
         }
 
+        //-----------------------------------------------------------------------------------------------------------------------
+        
+        // Create and Update records given in [] - AssemblyExt
+        public virtual async Task<DBResult> EditExtAsync(AssemblyExt[] records)
+        {
+            var errorMessage = "";
+            using (var dbContextScope = contextScopeFac.Create())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    foreach (var record in records)
+                    {
+                        var dbEntry = await dbContext.AssemblyExts.FindAsync(record.Id).ConfigureAwait(false);
+                        if (dbEntry == null)
+                        {
+                            if (await dbContext.AssemblyDbs.FindAsync(record.Id).ConfigureAwait(false) == null)
+                                errorMessage += String.Format("Assembly with id={0} not found.\n", record.Id);
+                            else
+                                dbContext.AssemblyExts.Add(record);
+                        }
+                        else
+                        {
+                            var excludedProperties = new string[] { "Id", "TSP" };
+                            var properties = typeof(AssemblyExt).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+                            foreach (var property in properties)
+                            {
+                                if (property.GetMethod.IsVirtual) continue;
+                                if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
+                                if (excludedProperties.Contains(property.Name)) continue;
+
+                                if (record.PropIsModified(property.Name)) property.SetValue(dbEntry, property.GetValue(record));
+                            }
+                        }
+                    }
+                    for (int i = 1; i <= 10; i++)
+                    {
+                        try
+                        {
+                            await dbContext.SaveChangesAsync().ConfigureAwait(false);
+                            break;
+                        }
+                        catch (Exception e)
+                        {
+                            var message = e.GetBaseException().Message;
+                            if (i == 10 || !message.Contains("Deadlock found when trying to get lock"))
+                            {
+                                errorMessage += String.Format("Error saving records: {0}\n", message);
+                                break;
+                            }
+                        }
+                        await Task.Delay(200).ConfigureAwait(false);
+                    }
+                    trans.Complete();
+                }
+            }
+            if (errorMessage == "") return new DBResult();
+            else return new DBResult
+            {
+                StatusCode = HttpStatusCode.Conflict,
+                StatusDescription = "Errors deleting records:\n" + errorMessage
+            };
+        }
+
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers

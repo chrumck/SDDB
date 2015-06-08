@@ -37,6 +37,7 @@ namespace SDDB.WebUI.ControllersSrv
                 x.IsReference , x.TechnicalDetails, x.PowerSupplyDetails, x.HSEDetails, x.Comments, x.IsActive,
                 x.AssemblyExt.Attr01,x.AssemblyExt.Attr02,x.AssemblyExt.Attr03,x.AssemblyExt.Attr04,x.AssemblyExt.Attr05,
                 x.AssemblyExt.Attr06,x.AssemblyExt.Attr07,x.AssemblyExt.Attr08,x.AssemblyExt.Attr09,x.AssemblyExt.Attr10,
+                x.AssemblyExt.Attr11,x.AssemblyExt.Attr12,x.AssemblyExt.Attr13,x.AssemblyExt.Attr14,x.AssemblyExt.Attr15,
                 x.AssemblyType_Id, x.AssemblyStatus_Id, x.AssemblyModel_Id, x.AssignedToProject_Id
             });
 
@@ -59,6 +60,7 @@ namespace SDDB.WebUI.ControllersSrv
                 x.IsReference , x.TechnicalDetails, x.PowerSupplyDetails, x.HSEDetails, x.Comments, x.IsActive,
                 x.AssemblyExt.Attr01,x.AssemblyExt.Attr02,x.AssemblyExt.Attr03,x.AssemblyExt.Attr04,x.AssemblyExt.Attr05,
                 x.AssemblyExt.Attr06,x.AssemblyExt.Attr07,x.AssemblyExt.Attr08,x.AssemblyExt.Attr09,x.AssemblyExt.Attr10,
+                x.AssemblyExt.Attr11,x.AssemblyExt.Attr12,x.AssemblyExt.Attr13,x.AssemblyExt.Attr14,x.AssemblyExt.Attr15,
                 x.AssemblyType_Id, x.AssemblyStatus_Id, x.AssemblyModel_Id, x.AssignedToProject_Id
             });
 
@@ -82,6 +84,7 @@ namespace SDDB.WebUI.ControllersSrv
                 x.IsReference , x.TechnicalDetails, x.PowerSupplyDetails, x.HSEDetails, x.Comments, x.IsActive,
                 x.AssemblyExt.Attr01,x.AssemblyExt.Attr02,x.AssemblyExt.Attr03,x.AssemblyExt.Attr04,x.AssemblyExt.Attr05,
                 x.AssemblyExt.Attr06,x.AssemblyExt.Attr07,x.AssemblyExt.Attr08,x.AssemblyExt.Attr09,x.AssemblyExt.Attr10,
+                x.AssemblyExt.Attr11,x.AssemblyExt.Attr12,x.AssemblyExt.Attr13,x.AssemblyExt.Attr14,x.AssemblyExt.Attr15,
                 x.AssemblyType_Id, x.AssemblyStatus_Id, x.AssemblyModel_Id, x.AssignedToProject_Id
             });
 
@@ -105,6 +108,7 @@ namespace SDDB.WebUI.ControllersSrv
                 x.IsReference , x.TechnicalDetails, x.PowerSupplyDetails, x.HSEDetails, x.Comments, x.IsActive,
                 x.AssemblyExt.Attr01,x.AssemblyExt.Attr02,x.AssemblyExt.Attr03,x.AssemblyExt.Attr04,x.AssemblyExt.Attr05,
                 x.AssemblyExt.Attr06,x.AssemblyExt.Attr07,x.AssemblyExt.Attr08,x.AssemblyExt.Attr09,x.AssemblyExt.Attr10,
+                x.AssemblyExt.Attr11,x.AssemblyExt.Attr12,x.AssemblyExt.Attr13,x.AssemblyExt.Attr14,x.AssemblyExt.Attr15,
                 x.AssemblyType_Id, x.AssemblyStatus_Id, x.AssemblyModel_Id, x.AssignedToProject_Id
             });
 
@@ -156,6 +160,29 @@ namespace SDDB.WebUI.ControllersSrv
             var serviceResult = await assemblyService.DeleteAsync(ids).ConfigureAwait(false);
 
             ViewBag.ServiceName = "AssemblyDbService.DeleteAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.StatusDescription = serviceResult.StatusDescription;
+
+            if (serviceResult.StatusCode == HttpStatusCode.OK)
+            {
+                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                Response.StatusCode = (int)serviceResult.StatusCode;
+                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        // POST: /AssemblyDbSrv/EditExt
+        [HttpPost]
+        [DBSrvAuth("Assembly_Edit")]
+        public async Task<ActionResult> EditExt(AssemblyExt[] records)
+        {
+            var serviceResult = await assemblyService.EditExtAsync(records).ConfigureAwait(false);
+
+            ViewBag.ServiceName = "AssemblyDbService.EditExtAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)

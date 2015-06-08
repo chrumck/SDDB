@@ -49,6 +49,21 @@ namespace SDDB.Domain.Entities
         [StringLength(255)]
         public string Attr10 { get; set; }
 
+        [StringLength(255)]
+        public string Attr11 { get; set; }
+
+        [StringLength(255)]
+        public string Attr12 { get; set; }
+
+        [StringLength(255)]
+        public string Attr13 { get; set; }
+
+        [StringLength(255)]
+        public string Attr14 { get; set; }
+
+        [StringLength(255)]
+        public string Attr15 { get; set; }
+
         //TSP Column Wireup ---------------------------------------------------------------------------------------------------//
         [ConcurrencyCheck]
         [Column(TypeName = "timestamp")]

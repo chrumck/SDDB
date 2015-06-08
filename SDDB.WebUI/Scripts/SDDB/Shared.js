@@ -60,6 +60,18 @@ $("#ModalDeleteBtnOk").click(function () {
     DeleteRecords();
 });
 
+//ShowModalFail
+function ShowModalFail(label, body, bodyPre) {
+    label = (typeof label !== "undefined") ? label : "Undefined Error";
+    body = (typeof body !== "undefined") ? body : "";
+    bodyPre = (typeof bodyPre !== "undefined") ? bodyPre : "";
+  
+    $("#ModalInfoLabel").text(label);
+    $("#ModalInfoBody").html(body);
+    if (bodyPre != "") $("#ModalInfoBodyPre").text(bodyPre).show();
+    $("#ModalInfo").modal("show");
+}
+
 //ShowModalAJAXFail
 function ShowModalAJAXFail(xhr, status, error) {
     if (typeof xhr.responseJSON !== "undefined") {

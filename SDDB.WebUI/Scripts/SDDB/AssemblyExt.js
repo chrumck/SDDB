@@ -24,6 +24,7 @@ $(document).ready(function () {
         TableMain.columns([2, 3, 4, 5]).visible(true);
         TableMain.columns([6, 7, 8, 9, 10]).visible(false);
         TableMain.columns([11, 12, 13, 14, 15]).visible(false);
+        TableMain.columns([16, 17, 18, 19, 20]).visible(false);
     });
 
     //wire up dropdownId2
@@ -32,6 +33,7 @@ $(document).ready(function () {
         TableMain.columns([2, 3, 4, 5]).visible(false);
         TableMain.columns([6, 7, 8, 9, 10]).visible(true);
         TableMain.columns([11, 12, 13, 14, 15]).visible(false);
+        TableMain.columns([16, 17, 18, 19, 20]).visible(false);
     });
 
     //wire up dropdownId3
@@ -40,6 +42,16 @@ $(document).ready(function () {
         TableMain.columns([2, 3, 4, 5]).visible(false);
         TableMain.columns([6, 7, 8, 9, 10]).visible(false);
         TableMain.columns([11, 12, 13, 14, 15]).visible(true);
+        TableMain.columns([16, 17, 18, 19, 20]).visible(false);
+    });
+
+    //wire up dropdownId4
+    $("#dropdownId4").click(function (event) {
+        event.preventDefault();
+        TableMain.columns([2, 3, 4, 5]).visible(false);
+        TableMain.columns([6, 7, 8, 9, 10]).visible(false);
+        TableMain.columns([11, 12, 13, 14, 15]).visible(false);
+        TableMain.columns([16, 17, 18, 19, 20]).visible(true);
     });
 
     //Initialize MagicSuggest msFilterByProject
@@ -68,6 +80,8 @@ $(document).ready(function () {
         },
         style: "min-width: 240px;"
     });
+
+    //wire up MsFilterByModel event selectionchange
     $(MsFilterByModel).on('selectionchange', function (e, m) {
         var test = this.getValue().length;
         if (this.getValue().length == 0) {
@@ -80,6 +94,7 @@ $(document).ready(function () {
             "POST", MsFilterByProject.getValue(), MsFilterByModel.getValue());
         MsFilterByProject.enable();
         $("#BtnEdit").prop("disabled", false);
+        UpdateViewsForModel();
         }
     });
 
@@ -105,11 +120,6 @@ $(document).ready(function () {
 
     //TableMain AssemblyDbs
     TableMain = $("#TableMain").DataTable({
-        //ajax: {
-        //    //url: "/AssemblyDbSrv/GetByModelIds",
-        //    //type: "POST",
-        //    //data: { getActive: ($("#ChBoxShowDeleted").prop("checked")) ? false : true }
-        //},
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "AssyName", name: "AssyName" },//1
@@ -130,14 +140,20 @@ $(document).ready(function () {
             { data: "Attr08", name: "Attr08" },//13
             { data: "Attr09", name: "Attr09" },//14
             { data: "Attr10", name: "Attr10" },//15
+            //------------------------------------------------fourth set of columns
+            { data: "Attr11", name: "Attr11" },//16
+            { data: "Attr12", name: "Attr12" },//17
+            { data: "Attr13", name: "Attr13" },//18
+            { data: "Attr14", name: "Attr14" },//19
+            { data: "Attr15", name: "Attr15" },//20
             //------------------------------------------------never visible
-            { data: "AssemblyType_Id", name: "AssemblyType_Id" },//16
-            { data: "AssemblyStatus_Id", name: "AssemblyStatus_Id" },//17
-            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//18
+            { data: "AssemblyType_Id", name: "AssemblyType_Id" },//21
+            { data: "AssemblyStatus_Id", name: "AssemblyStatus_Id" },//22
+            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//23
         ],
         columnDefs: [
-            { targets: [0, 16, 17, 18], visible: false }, // - never show
-            { targets: [0, 16, 17, 18], searchable: false },  //"orderable": false, "visible": false
+            { targets: [0, 21, 22, 23], visible: false }, // - never show
+            { targets: [0, 21, 22, 23], searchable: false },  //"orderable": false, "visible": false
             { targets: [2, 3, 5], className: "hidden-xs hidden-sm" }, // - first set of columns
             { targets: [], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
 
@@ -147,7 +163,11 @@ $(document).ready(function () {
 
             { targets: [11, 12, 13, 14, 15], visible: false }, // - third set of columns - to toggle with options
             { targets: [12, 13], className: "hidden-xs hidden-sm" }, // - third set of columns
-            { targets: [14, 15], className: "hidden-xs hidden-sm hidden-md" } // - third set of columns
+            { targets: [14, 15], className: "hidden-xs hidden-sm hidden-md" }, // - third set of columns
+
+            { targets: [16, 17, 18, 19, 20], visible: false }, // - fourth set of columns - to toggle with options
+            { targets: [17, 18], className: "hidden-xs hidden-sm" }, // - fourth set of columns
+            { targets: [19, 20], className: "hidden-xs hidden-sm hidden-md" } // - fourth set of columns
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
@@ -165,21 +185,16 @@ $(document).ready(function () {
     $(".modifiable").change(function () { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
-    AddToMSArray(MagicSuggests, "AssemblyType_Id", "/AssemblyTypeSrv/Lookup", 1);
-    AddToMSArray(MagicSuggests, "AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup", 1);
-    AddToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        IsCreate = false;
         $("#MainView").removeClass("hide");
         $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
     });
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
-        MsValidate(MagicSuggests);
-        if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
+        if (FormIsValid("EditForm", false) ) SubmitEdits();
     });
 
 
@@ -188,10 +203,8 @@ $(document).ready(function () {
 //--------------------------------------Global Properties------------------------------------//
 
 var TableMain = {};
-var IsCreate = false;
 var MsFilterByProject = {};
 var MsFilterByModel = {};
-var MagicSuggests = [];
 var CurrRecord = {};
 
 //--------------------------------------Main Methods---------------------------------------//
@@ -220,6 +233,11 @@ function FillFormForEdit() {
             CurrRecord.Attr08 = data[0].Attr08;
             CurrRecord.Attr09 = data[0].Attr09;
             CurrRecord.Attr10 = data[0].Attr10;
+            CurrRecord.Attr11 = data[0].Attr11;
+            CurrRecord.Attr12 = data[0].Attr12;
+            CurrRecord.Attr13 = data[0].Attr13;
+            CurrRecord.Attr14 = data[0].Attr14;
+            CurrRecord.Attr15 = data[0].Attr15;
             CurrRecord.AssemblyType_Id = data[0].AssemblyType_Id;
             CurrRecord.AssemblyStatus_Id = data[0].AssemblyStatus_Id;
             CurrRecord.AssignedToProject_Id = data[0].AssignedToProject_Id;
@@ -238,6 +256,11 @@ function FillFormForEdit() {
                 if (FormInput.Attr08 != dbEntry.Attr08) FormInput.Attr08 = "_VARIES_";
                 if (FormInput.Attr09 != dbEntry.Attr09) FormInput.Attr09 = "_VARIES_";
                 if (FormInput.Attr10 != dbEntry.Attr10) FormInput.Attr10 = "_VARIES_";
+                if (FormInput.Attr11 != dbEntry.Attr11) FormInput.Attr11 = "_VARIES_";
+                if (FormInput.Attr12 != dbEntry.Attr12) FormInput.Attr12 = "_VARIES_";
+                if (FormInput.Attr13 != dbEntry.Attr13) FormInput.Attr13 = "_VARIES_";
+                if (FormInput.Attr14 != dbEntry.Attr14) FormInput.Attr14 = "_VARIES_";
+                if (FormInput.Attr15 != dbEntry.Attr15) FormInput.Attr15 = "_VARIES_";
 
                 if (FormInput.AssemblyType_Id != dbEntry.AssemblyType_Id) { FormInput.AssemblyType_Id = "_VARIES_"; FormInput.AssyTypeName = "_VARIES_"; }
                 else FormInput.AssyTypeName = dbEntry.AssyTypeName;
@@ -247,32 +270,34 @@ function FillFormForEdit() {
                 else FormInput.AssignedToProject = dbEntry.AssignedToProject.ProjectName + " " + dbEntry.AssignedToProject.ProjectCode;
             });
 
-            ClearFormInputs("EditForm", MagicSuggests);
+            ClearFormInputs("EditForm");
 
             $("#AssyName").val(FormInput.AssyName);
             $("#AssyAltName").val(FormInput.AssyAltName);
-            $("#AssemblyExt_Attr01").val(FormInput.Attr01);
-            $("#AssemblyExt_Attr02").val(FormInput.Attr02);
-            $("#AssemblyExt_Attr03").val(FormInput.Attr03);
-            $("#AssemblyExt_Attr04").val(FormInput.Attr04);
-            $("#AssemblyExt_Attr05").val(FormInput.Attr05);
-            $("#AssemblyExt_Attr06").val(FormInput.Attr06);
-            $("#AssemblyExt_Attr07").val(FormInput.Attr07);
-            $("#AssemblyExt_Attr08").val(FormInput.Attr08);
-            $("#AssemblyExt_Attr09").val(FormInput.Attr09);
-            $("#AssemblyExt_Attr10").val(FormInput.Attr10);
-
-            if (FormInput.AssemblyType_Id != null) MagicSuggests[0].addToSelection([{ id: FormInput.AssemblyType_Id, name: FormInput.AssyTypeName }], true);
-            if (FormInput.AssemblyStatus_Id != null) MagicSuggests[1].addToSelection([{ id: FormInput.AssemblyStatus_Id, name: FormInput.AssyStatusName }], true);
-            if (FormInput.AssignedToProject_Id != null) MagicSuggests[2].addToSelection([{ id: FormInput.AssignedToProject_Id, name: FormInput.AssignedToProject }], true);
+            $("#AssyTypeName").val(FormInput.AssyTypeName);
+            $("#AssyStatusName").val(FormInput.AssyStatusName);
+            $("#AssignedToProject").val(FormInput.AssignedToProject);
+            $("#Attr01").val(FormInput.Attr01);
+            $("#Attr02").val(FormInput.Attr02);
+            $("#Attr03").val(FormInput.Attr03);
+            $("#Attr04").val(FormInput.Attr04);
+            $("#Attr05").val(FormInput.Attr05);
+            $("#Attr06").val(FormInput.Attr06);
+            $("#Attr07").val(FormInput.Attr07);
+            $("#Attr08").val(FormInput.Attr08);
+            $("#Attr09").val(FormInput.Attr09);
+            $("#Attr10").val(FormInput.Attr10);
+            $("#Attr11").val(FormInput.Attr11);
+            $("#Attr12").val(FormInput.Attr12);
+            $("#Attr13").val(FormInput.Attr13);
+            $("#Attr14").val(FormInput.Attr14);
+            $("#Attr15").val(FormInput.Attr15);
 
             if (data.length == 1) {
                 $("[data-val-dbisunique]").prop("disabled", false);
-                DisableUniqueMs(MagicSuggests, false);
             }
             else {
                 $("[data-val-dbisunique]").prop("disabled", true);
-                DisableUniqueMs(MagicSuggests, true);
             }
 
             $("#MainView").addClass("hide");
@@ -289,40 +314,28 @@ function SubmitEdits() {
         if ($(this).data("ismodified")) modifiedProperties.push($(this).prop("id"));
     });
 
-    $.each(MagicSuggests, function (i, ms) {
-        if (ms.isModified == true) modifiedProperties.push(ms.id);
-    });
-
     var editRecords = [];
     var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-
-    var magicResults = [];
-    $.each(MagicSuggests, function (i, ms) {
-        var msValue = (ms.getSelection().length != 0) ? (ms.getSelection())[0].id : null;
-        magicResults.push(msValue);
-    });
 
     $.each(ids, function (i, id) {
         var editRecord = {};
         editRecord.Id = id;
                
-        editRecord.AssyName = ($("#AssyName").data("ismodified")) ? $("#AssyName").val() : CurrRecord.AssyName;
-        editRecord.AssyAltName = ($("#AssyAltName").data("ismodified")) ? $("#AssyAltName").val() : CurrRecord.AssyAltName;
-        editRecord.AssemblyExt = {};
-        editRecord.AssemblyExt.Attr01 = ($("#AssemblyExt_Attr01").data("ismodified")) ? $("#AssemblyExt_Attr01").val() : CurrRecord.Attr01;
-        editRecord.AssemblyExt.Attr02 = ($("#AssemblyExt_Attr02").data("ismodified")) ? $("#AssemblyExt_Attr02").val() : CurrRecord.Attr02;
-        editRecord.AssemblyExt.Attr03 = ($("#AssemblyExt_Attr03").data("ismodified")) ? $("#AssemblyExt_Attr03").val() : CurrRecord.Attr03;
-        editRecord.AssemblyExt.Attr04 = ($("#AssemblyExt_Attr04").data("ismodified")) ? $("#AssemblyExt_Attr04").val() : CurrRecord.Attr04;
-        editRecord.AssemblyExt.Attr05 = ($("#AssemblyExt_Attr05").data("ismodified")) ? $("#AssemblyExt_Attr05").val() : CurrRecord.Attr05;
-        editRecord.AssemblyExt.Attr06 = ($("#AssemblyExt_Attr06").data("ismodified")) ? $("#AssemblyExt_Attr06").val() : CurrRecord.Attr06;
-        editRecord.AssemblyExt.Attr07 = ($("#AssemblyExt_Attr07").data("ismodified")) ? $("#AssemblyExt_Attr07").val() : CurrRecord.Attr07;
-        editRecord.AssemblyExt.Attr08 = ($("#AssemblyExt_Attr08").data("ismodified")) ? $("#AssemblyExt_Attr08").val() : CurrRecord.Attr08;
-        editRecord.AssemblyExt.Attr09 = ($("#AssemblyExt_Attr09").data("ismodified")) ? $("#AssemblyExt_Attr09").val() : CurrRecord.Attr09;
-        editRecord.AssemblyExt.Attr10 = ($("#AssemblyExt_Attr10").data("ismodified")) ? $("#AssemblyExt_Attr10").val() : CurrRecord.Attr10;
-
-        editRecord.AssemblyType_Id = (MagicSuggests[0].isModified) ? magicResults[0] : CurrRecord.AssemblyType_Id;
-        editRecord.AssemblyStatus_Id = (MagicSuggests[1].isModified) ? magicResults[1] : CurrRecord.AssemblyStatus_Id;
-        editRecord.AssignedToProject_Id = (MagicSuggests[2].isModified) ? magicResults[2] : CurrRecord.AssignedToProject_Id;
+        editRecord.Attr01 = ($("#Attr01").data("ismodified")) ? $("#Attr01").val() : CurrRecord.Attr01;
+        editRecord.Attr02 = ($("#Attr02").data("ismodified")) ? $("#Attr02").val() : CurrRecord.Attr02;
+        editRecord.Attr03 = ($("#Attr03").data("ismodified")) ? $("#Attr03").val() : CurrRecord.Attr03;
+        editRecord.Attr04 = ($("#Attr04").data("ismodified")) ? $("#Attr04").val() : CurrRecord.Attr04;
+        editRecord.Attr05 = ($("#Attr05").data("ismodified")) ? $("#Attr05").val() : CurrRecord.Attr05;
+        editRecord.Attr06 = ($("#Attr06").data("ismodified")) ? $("#Attr06").val() : CurrRecord.Attr06;
+        editRecord.Attr07 = ($("#Attr07").data("ismodified")) ? $("#Attr07").val() : CurrRecord.Attr07;
+        editRecord.Attr08 = ($("#Attr08").data("ismodified")) ? $("#Attr08").val() : CurrRecord.Attr08;
+        editRecord.Attr09 = ($("#Attr09").data("ismodified")) ? $("#Attr09").val() : CurrRecord.Attr09;
+        editRecord.Attr10 = ($("#Attr10").data("ismodified")) ? $("#Attr10").val() : CurrRecord.Attr10;
+        editRecord.Attr11 = ($("#Attr11").data("ismodified")) ? $("#Attr11").val() : CurrRecord.Attr11;
+        editRecord.Attr12 = ($("#Attr12").data("ismodified")) ? $("#Attr12").val() : CurrRecord.Attr12;
+        editRecord.Attr13 = ($("#Attr13").data("ismodified")) ? $("#Attr13").val() : CurrRecord.Attr13;
+        editRecord.Attr14 = ($("#Attr14").data("ismodified")) ? $("#Attr14").val() : CurrRecord.Attr14;
+        editRecord.Attr15 = ($("#Attr15").data("ismodified")) ? $("#Attr15").val() : CurrRecord.Attr15;
 
         editRecord.ModifiedProperties = modifiedProperties;
 
@@ -330,20 +343,79 @@ function SubmitEdits() {
     });
 
     $.ajax({
-        type: "POST", url: "/AssemblyDbSrv/Edit", timeout: 20000, data: { records: editRecords }, dataType: "json",
+        type: "POST", url: "/AssemblyDbSrv/EditExt", timeout: 20000, data: { records: editRecords }, dataType: "json",
         beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
             RefreshTable(TableMain, "/AssemblyDbSrv/GetByModelIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
                 "POST", MsFilterByProject.getValue(), MsFilterByModel.getValue());
-            IsCreate = false;
             $("#MainView").removeClass("hide");
             $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
         })
-        .fail(function (xhr, status, error) {
-            ShowModalAJAXFail(xhr, status, error);
-        });
+        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+}
+
+function UpdateViewsForModel() {
+    var modelId = MsFilterByModel.getValue();
+    var dataString = { val:"true", valLength:"The field must be a string with a maximum length of 255.", valLengthMax: "255" };
+    $.ajax({
+        type: "POST", url: "/AssemblyModelSrv/GetByIds", timeout: 20000, data: { ids: [modelId] }, dataType: "json",
+        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+    })
+        .always(function () { $("#ModalWait").modal("hide"); })
+        .done(function (data) {
+            for (var prop in data[0]) {
+                if (prop.indexOf("Attr") != -1 && prop.indexOf("Desc") != -1) {
+                    var attrName = prop.slice(prop.indexOf("Attr"), 6);
+                    $(TableMain.column(attrName + ":name").header()).text(data[0][prop]);
+                    $("label[for=" + attrName + "]").text(data[0][prop]);
+                    $("#" + attrName).prop("placeholder",data[0][prop]);
+                }
+                if (prop.indexOf("Attr") != -1 && prop.indexOf("Type") != -1) {
+                    var attrName = prop.slice(prop.indexOf("Attr"), 6);
+
+                    var test = $("#" + attrName).data();
+                    for (var dataProp in $("#" + attrName).data()) {
+                        $("#" + attrName).removeAttr("data-" + dataProp);
+                    }
+                    $("#FrmGrp" + attrName).removeClass("hide");
+                    $("#" + attrName).removeData();
+
+                    switch (data[0][prop]) {
+                        case "NotUsed":
+                            $("#FrmGrp" + attrName).addClass("hide");
+                            break;
+                        case "String":
+                            $("#" + attrName).attr({
+                                "data-val": "true",
+                                "data-val-length": "The field must be a string with a maximum length of 255.",
+                                "data-val-length-max": "255"
+                            });
+                            break;
+                        case "Int":
+                            $("#" + attrName).attr({
+                                "data-val": "true",
+                                "data-val-number": "The field must be a number.", //introduce custom unobtrusive for int
+                            });
+                            break;
+                        case "Decimal":
+                            $("#" + attrName).attr({
+                                "data-val": "true",
+                                "data-val-number": "The field must be a number.",
+                            });
+                            break;
+                        case "DateTime":
+                            break;
+                        case "Bool":
+                            break;
+                    }
+                }
+            }
+            $.validator.unobtrusive.parse("#EditForm")
+        })
+        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+
 }
 
 //---------------------------------------Helper Methods--------------------------------------//
