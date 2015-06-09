@@ -33,6 +33,13 @@ namespace SDDB.WebUI
             //magicsuggest
             bundles.Add(new ScriptBundle("~/bundles/magicsuggest").Include("~/Scripts/MagicSuggest/magicsuggest.js"));
             bundles.Add(new StyleBundle("~/bundles/magicsuggest-css").Include("~/Content/MagicSuggest/magicsuggest.css"));
+
+            //moment.js
+            bundles.Add(new ScriptBundle("~/bundles/moment").Include("~/Scripts/moment.js"));
+
+            //bootstrap-datetimepicker
+            bundles.Add(new ScriptBundle("~/bundles/bootstrap-datetimepicker").Include("~/Scripts/bootstrap-datetimepicker.js"));
+            bundles.Add(new StyleBundle("~/bundles/bootstrap-datetimepicker-CSS").Include("~/Content/bootstrap-datetimepicker.css"));
         }
     }
 }

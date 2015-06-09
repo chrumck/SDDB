@@ -4,6 +4,8 @@ using System.Web.Mvc;
 
 namespace SDDB.Domain.Infrastructure
 {
+    //DBIsUnique---------------------------------------------------------------------------------------------------------------//
+    
     public class DBIsUniqueAttribute : ValidationAttribute, IClientValidatable
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
@@ -19,4 +21,55 @@ namespace SDDB.Domain.Infrastructure
             yield return rule;
         }
     }
+
+    //DBIsInteger--------------------------------------------------------------------------------------------------------------//
+    
+    public class DBIsIntegerAttribute : ValidationAttribute, IClientValidatable
+    {
+        public DBIsIntegerAttribute() : base("{0} is not an integer.") { }
+
+
+        protected override ValidationResult IsValid( object value, ValidationContext validationContext)
+        {
+            int output; 
+            if (value != null && !int.TryParse(value.ToString(), out output))
+                    return new ValidationResult( FormatErrorMessage(validationContext.DisplayName));
+            else
+                return ValidationResult.Success;
+        }
+
+        public IEnumerable<ModelClientValidationRule> GetClientValidationRules(ModelMetadata metadata, ControllerContext context)
+        {
+            var rule = new ModelClientValidationRule();
+            rule.ErrorMessage = FormatErrorMessage(metadata.GetDisplayName());
+            rule.ValidationType = "dbisinteger";
+            yield return rule;
+        }
+    }
+
+    //DBIsBool-----------------------------------------------------------------------------------------------------------------//
+    
+    public class DBIsBoolAttribute : ValidationAttribute, IClientValidatable
+    {
+        public DBIsBoolAttribute() : base("{0} is has to be 'true' or 'false'.") { }
+
+
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            bool output;
+            if (value != null && !bool.TryParse(value.ToString(), out output))
+                return new ValidationResult(FormatErrorMessage(validationContext.DisplayName));
+            else
+                return ValidationResult.Success;
+        }
+
+        public IEnumerable<ModelClientValidationRule> GetClientValidationRules(ModelMetadata metadata, ControllerContext context)
+        {
+            var rule = new ModelClientValidationRule();
+            rule.ErrorMessage = FormatErrorMessage(metadata.GetDisplayName());
+            rule.ValidationType = "dbisbool";
+            yield return rule;
+        }
+    }
+
 }

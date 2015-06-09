@@ -83,18 +83,19 @@ $(document).ready(function () {
 
     //wire up MsFilterByModel event selectionchange
     $(MsFilterByModel).on('selectionchange', function (e, m) {
-        var test = this.getValue().length;
         if (this.getValue().length == 0) {
             MsFilterByProject.disable(); MsFilterByProject.clear(true);
             $("#BtnEdit").prop("disabled", true);
             TableMain.clear().search("").draw();
         }
         else {
-        RefreshTable(TableMain, "/AssemblyDbSrv/GetByModelIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
-            "POST", MsFilterByProject.getValue(), MsFilterByModel.getValue());
-        MsFilterByProject.enable();
-        $("#BtnEdit").prop("disabled", false);
-        UpdateViewsForModel();
+            RefreshTable(TableMain, "/AssemblyDbSrv/GetByModelIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+                "POST", MsFilterByProject.getValue(), MsFilterByModel.getValue());
+            MsFilterByProject.enable();
+            $("#BtnEdit").prop("disabled", false);
+            $("#EditFormLabel").text("Edit " + MsFilterByModel.getSelection()[0].name);
+
+            UpdateViewsForModel();
         }
     });
 
@@ -206,6 +207,7 @@ var TableMain = {};
 var MsFilterByProject = {};
 var MsFilterByModel = {};
 var CurrRecord = {};
+var DatePickers = [];
 
 //--------------------------------------Main Methods---------------------------------------//
 
@@ -271,6 +273,7 @@ function FillFormForEdit() {
             });
 
             ClearFormInputs("EditForm");
+
 
             $("#AssyName").val(FormInput.AssyName);
             $("#AssyAltName").val(FormInput.AssyAltName);
@@ -356,6 +359,7 @@ function SubmitEdits() {
         .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
 }
 
+//Pulls Model Information and formats edit form and column names
 function UpdateViewsForModel() {
     var modelId = MsFilterByModel.getValue();
     var dataString = { val:"true", valLength:"The field must be a string with a maximum length of 255.", valLengthMax: "255" };
@@ -367,51 +371,67 @@ function UpdateViewsForModel() {
         .done(function (data) {
             for (var prop in data[0]) {
                 if (prop.indexOf("Attr") != -1 && prop.indexOf("Desc") != -1) {
+
                     var attrName = prop.slice(prop.indexOf("Attr"), 6);
+
                     $(TableMain.column(attrName + ":name").header()).text(data[0][prop]);
                     $("label[for=" + attrName + "]").text(data[0][prop]);
                     $("#" + attrName).prop("placeholder",data[0][prop]);
                 }
                 if (prop.indexOf("Attr") != -1 && prop.indexOf("Type") != -1) {
-                    var attrName = prop.slice(prop.indexOf("Attr"), 6);
 
-                    var test = $("#" + attrName).data();
-                    for (var dataProp in $("#" + attrName).data()) {
-                        $("#" + attrName).removeAttr("data-" + dataProp);
-                    }
+                    var attrName = prop.slice(prop.indexOf("Attr"), 6);
+                    var $targetEl = $("#" + attrName);
+                    var attrsToRemove = "";
+
+                    $.each($targetEl[0].attributes, function (i, attrib) {
+                        if (typeof attrib !== "undefined" && attrib.name.indexOf("data-val") == 0) {
+                            attrsToRemove += (attrsToRemove == "") ? attrib.name : " " + attrib.name;
+                        }
+                    });
+
+                    var picker = $targetEl.data("DateTimePicker"); if (typeof picker !== "undefined") picker.destroy();
+
                     $("#FrmGrp" + attrName).removeClass("hide");
-                    $("#" + attrName).removeData();
 
                     switch (data[0][prop]) {
                         case "NotUsed":
                             $("#FrmGrp" + attrName).addClass("hide");
                             break;
                         case "String":
-                            $("#" + attrName).attr({
+                            $targetEl.removeAttr(attrsToRemove).attr({
                                 "data-val": "true",
                                 "data-val-length": "The field must be a string with a maximum length of 255.",
                                 "data-val-length-max": "255"
                             });
                             break;
                         case "Int":
-                            $("#" + attrName).attr({
+                            $targetEl.removeAttr(attrsToRemove).attr({
                                 "data-val": "true",
-                                "data-val-number": "The field must be a number.", //introduce custom unobtrusive for int
+                                "data-val-dbisinteger": "The field must be an integer."
                             });
                             break;
                         case "Decimal":
-                            $("#" + attrName).attr({
+                            $targetEl.removeAttr(attrsToRemove).attr({
                                 "data-val": "true",
-                                "data-val-number": "The field must be a number.",
+                                "data-val-number": "The field must be a number." 
                             });
                             break;
                         case "DateTime":
+                            $targetEl.removeAttr(attrsToRemove);
+                            $targetEl.datetimepicker({ format: "YYYY-MM-DD HH:mm" });
+                            $targetEl.on("dp.change", function (e) { $(this).data("ismodified", true); });
                             break;
                         case "Bool":
+                            $targetEl.removeAttr(attrsToRemove).attr({
+                                "data-val": "true",
+                                "data-val-dbisbool": "The field must be 'true' or 'false'."
+                            });
                             break;
                     }
                 }
             }
+            $("#EditForm").removeData("validator"); $("#EditForm").removeData('unobtrusiveValidation');
             $.validator.unobtrusive.parse("#EditForm")
         })
         .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });

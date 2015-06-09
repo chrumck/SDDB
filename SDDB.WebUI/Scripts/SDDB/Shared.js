@@ -1,7 +1,9 @@
-﻿/// <reference path="../modernizr-2.8.3.js" />
+﻿/// <reference path="../jquery-2.1.3.js" />
+/// <reference path="../jquery-2.1.3.intellisense.js" />
+/// <reference path="../jquery.validate.js" />
+/// <reference path="../jquery.validate.unobtrusive.js" />
+/// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
-
-
 
 //---------------------------------------Global Settings-------------------------------------//
 
@@ -10,6 +12,25 @@ $(document).ready(function () {
     $.ajaxSetup({ cache: false });
 
 });
+
+//----------------------------------Custom Unobtrusive Validation----------------------------//
+
+//client validation for dbisinteger
+$.validator.unobtrusive.adapters.addBool("dbisinteger");
+$.validator.addMethod("dbisinteger", function (value, element, valParams) {
+    if (value != "" && value == parseInt(value, 10)) return true;
+    else return false;
+});
+
+//client validation for dbisbool
+$.validator.unobtrusive.adapters.addBool("dbisbool");
+$.validator.addMethod("dbisbool", function (value, element, valParams) {
+    if (value != "" && (value.toLowerCase() == "true" || value.toLowerCase() == "false")) return true;
+    else return false;
+});
+
+
+
 
 //---------------------------------------Modal Dialogs---------------------------------------//
 
