@@ -403,6 +403,7 @@
     <Content Include="Scripts\respond.matchmedia.addListener.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.min.js" />
     <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\SDDB\Component.js" />
     <Content Include="Scripts\SDDB\AssemblyExt.js" />
     <Content Include="Scripts\SDDB\ComponentModel.js" />
     <Content Include="Scripts\SDDB\AssemblyModel.js" />
@@ -430,6 +431,7 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\InitialDBSetup.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="ControllersSrv\ComponentSrvController.cs" />
     <Compile Include="ControllersSrv\ComponentModelSrvController.cs" />
     <Compile Include="ControllersSrv\AssemblyModelSrvController.cs" />
     <Compile Include="ControllersSrv\AssemblyDbSrvController.cs" />
@@ -450,6 +452,7 @@
     <Compile Include="ControllersSrv\ProjectSrvController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controllers\ComponentController.cs" />
     <Compile Include="Controllers\AssemblyExtController.cs" />
     <Compile Include="Controllers\ComponentModelController.cs" />
     <Compile Include="Controllers\AssemblyModelController.cs" />
@@ -504,6 +507,7 @@
     <Content Include="Views\AssemblyDb\Index.cshtml" />
     <Content Include="Views\AssemblyExt\Index.cshtml" />
     <Content Include="Views\ComponentModel\Index.cshtml" />
+    <Content Include="Views\Component\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

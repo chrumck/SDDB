@@ -153,7 +153,6 @@ namespace SDDB.Domain.Services
                         if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
                     }
                 }
-
                 return records;
             }
         }
@@ -167,6 +166,25 @@ namespace SDDB.Domain.Services
                 return dbContext.Locations
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
                     (x.LocName.Contains(query) || x.LocAltName.Contains(query) || x.LocStationing.ToString().Contains(query))).ToListAsync();
+            }
+        }
+
+        //find by query and project
+        public virtual async Task<List<Location>> LookupByProjAsync(string userId, string[] projectIds = null, string query = "", bool getActive = true)
+        {
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+                if (projectIds == null || projectIds.Length == 0) projectIds = await dbContext.Projects.Where(x => x.ProjectPersons
+                    .Select(y => y.Id).Contains(userId)).Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+                
+
+                var records = await dbContext.Locations.Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) &&
+                    x.IsActive == getActive && projectIds.Contains(x.AssignedToProject_Id) &&
+                    (x.LocName.Contains(query) || x.LocAltName.Contains(query) || x.LocStationing.ToString().Contains(query))).ToListAsync();
+
+                return records;
             }
         }
 

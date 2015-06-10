@@ -121,12 +121,12 @@ namespace SDDB.WebUI.ControllersSrv
             return Json(new { data }, JsonRequestBehavior.AllowGet);
         }
 
-        // GET: /AssemblyDbSrv/GetByTypeIds
+        // GET: /AssemblyDbSrv/GetByTypeLocIds
         [HttpPost]
         [DBSrvAuth("Assembly_View")]
-        public async Task<ActionResult> GetByTypeIds(string[] projectIds = null, string[] typeIds = null, bool getActive = true)
+        public async Task<ActionResult> GetByTypeLocIds(string[] projectIds = null, string[] typeIds = null, string[] locIds = null, bool getActive = true)
         {
-            var data = (await assemblyService.GetByTypeAsync(UserId, projectIds, typeIds, getActive).ConfigureAwait(false)).Select(x => new
+            var data = (await assemblyService.GetByTypeLocAsync(UserId, projectIds, typeIds, locIds, getActive).ConfigureAwait(false)).Select(x => new
             {
                 x.Id, x.AssyName, x.AssyAltName, x.AssyAltName2, 
                 x.AssemblyType.AssyTypeName, x.AssemblyStatus.AssyStatusName, x.AssemblyModel.AssyModelName,
@@ -141,7 +141,7 @@ namespace SDDB.WebUI.ControllersSrv
                 x.AssemblyType_Id, x.AssemblyStatus_Id, x.AssemblyModel_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id
             });
 
-            ViewBag.ServiceName = "AssemblyDbService.GetByProjectAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "AssemblyDbService.GetByTypeLocAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(new { data }, JsonRequestBehavior.AllowGet);
         }
@@ -155,7 +155,21 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "AssemblyDbService.LookupAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(records.OrderBy(x => x.AssyName)
-                .Select(x => new { id = x.Id, name = x.AssyName + " " + x.AssyAltName }), JsonRequestBehavior.AllowGet);
+                .Select(x => new { id = x.Id, name = x.AssyName }), JsonRequestBehavior.AllowGet);
+        }
+
+        // GET: /AssemblyDbSrv/LookupByProj
+        public async Task<ActionResult> LookupByProj(string projectIds = null, string query = "", bool getActive = true)
+        {
+            string[] projectIdsArray = null;
+            if (projectIds != null && projectIds != "") projectIdsArray = projectIds.Split(',');
+
+            var records = await assemblyService.LookupByProjAsync(UserId, projectIdsArray, query, getActive).ConfigureAwait(false);
+
+            ViewBag.ServiceName = "AssemblyDbService.LookupByProjAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+
+            return Json(records.OrderBy(x => x.AssyName)
+                .Select(x => new { id = x.Id, name = x.AssyName }), JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------

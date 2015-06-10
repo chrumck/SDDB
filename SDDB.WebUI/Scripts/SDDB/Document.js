@@ -45,17 +45,6 @@ $(document).ready(function () {
         TableMain.columns([7, 8, 9, 10, 11]).visible(true);
     });
 
-    //Initialize MagicSuggest msFilterByProject
-    MsFilterByProject = $("#MsFilterByProject").magicSuggest({
-        data: "/ProjectSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
-        },
-        style: "min-width: 240px;"
-    });
-    $(MsFilterByProject).on('selectionchange', function (e, m) { RefreshMainView(); });
-
     //Initialize MagicSuggest MsFilterByType
     MsFilterByType = $("#MsFilterByType").magicSuggest({
         data: "/DocumentTypeSrv/Lookup",
@@ -66,6 +55,17 @@ $(document).ready(function () {
         style: "min-width: 240px;"
     });
     $(MsFilterByType).on('selectionchange', function (e, m) { RefreshMainView(); });
+
+    //Initialize MagicSuggest msFilterByProject
+    MsFilterByProject = $("#MsFilterByProject").magicSuggest({
+        data: "/ProjectSrv/Lookup",
+        allowFreeEntries: false,
+        ajaxConfig: {
+            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
+        },
+        style: "min-width: 240px;"
+    });
+    $(MsFilterByProject).on('selectionchange', function (e, m) { RefreshMainView(); });
 
 
     //---------------------------------------DataTables------------

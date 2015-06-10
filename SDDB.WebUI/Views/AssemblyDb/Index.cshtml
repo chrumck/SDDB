@@ -15,10 +15,13 @@
             </div>
 
             <div class="btn-group margin-bottom-2px">
+                <div id="MsFilterByType" placeholder="Select Type"></div>
+            </div>
+            <div class="btn-group margin-bottom-2px">
                 <div id="MsFilterByProject" placeholder="Select Project"></div>
             </div>
             <div class="btn-group margin-bottom-2px">
-                <div id="MsFilterByType" placeholder="Select Type"></div>
+                <div id="MsFilterByLoc" placeholder="Select Location"></div>
             </div>
 
             <div class="pull-right">
@@ -76,6 +79,7 @@
                     <th>AssemblyStatus_Id</th>
                     <th>AssemblyModel_Id</th>
                     <th>AssignedToProject_Id</th>
+                    <th>AssignedToLocation_Id</th>
                 </tr>
             </thead>
             <tbody class="selectable"></tbody>
@@ -329,9 +333,3 @@
     @Styles.Render("~/bundles/bootstrap-toggle-CSS")
     @Styles.Render("~/bundles/magicsuggest-css")
 }
-
-
-
-
-
-

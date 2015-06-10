@@ -109,7 +109,21 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "LocationService.LookupAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(records.OrderBy(x => x.LocName)
-                .Select(x => new { id = x.Id, name = x.LocName + " " + x.LocAltName }), JsonRequestBehavior.AllowGet);
+                .Select(x => new { id = x.Id, name = x.LocName }), JsonRequestBehavior.AllowGet);
+        }
+
+        // GET: /LocationSrv/LookupByProj
+        public async Task<ActionResult> LookupByProj(string projectIds = null, string query = "", bool getActive = true)
+        {
+            string[] projectIdsArray = null;
+            if (projectIds != null && projectIds != "") projectIdsArray = projectIds.Split(',');
+
+            var records = await locationService.LookupByProjAsync(UserId, projectIdsArray, query, getActive).ConfigureAwait(false);
+
+            ViewBag.ServiceName = "LocationService.LookupByProjAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+
+            return Json(records.OrderBy(x => x.LocName)
+                .Select(x => new { id = x.Id, name = x.LocName}), JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------

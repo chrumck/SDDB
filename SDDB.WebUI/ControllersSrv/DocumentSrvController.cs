@@ -100,7 +100,7 @@ namespace SDDB.WebUI.ControllersSrv
                 x.DocumentType_Id,x.AuthorPerson_Id,x.ReviewerPerson_Id,x.AssignedToProject_Id,x.RelatesToAssyType_Id,x.RelatesToCompType_Id, 
             });
 
-            ViewBag.ServiceName = "DocumentService.GetByProjectAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "DocumentService.GetByTypeAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(new { data }, JsonRequestBehavior.AllowGet);
         }

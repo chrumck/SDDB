@@ -57,7 +57,7 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonGroupService.LookupAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(records.OrderBy(x => x.PrsGroupName)
-                .Select(x => new { id = x.Id, name = x.PrsGroupName+ " " + x.PrsGroupAltName}), JsonRequestBehavior.AllowGet);
+                .Select(x => new { id = x.Id, name = x.PrsGroupName}), JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------

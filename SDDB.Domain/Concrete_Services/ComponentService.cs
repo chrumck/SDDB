@@ -39,7 +39,8 @@ namespace SDDB.Domain.Services
                 var records = await dbContext.Components
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive)
                     .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
-                    .Include( x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt).ToListAsync().ConfigureAwait(false);
+                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.AssignedToAssemblyDb.AssemblyType).Include(x => x.ComponentExt)
+                    .ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
                 {
@@ -68,7 +69,8 @@ namespace SDDB.Domain.Services
                 var records = await dbContext.Components
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive && ids.Contains(x.Id))
                     .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt).ToListAsync().ConfigureAwait(false);
+                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.AssignedToAssemblyDb.AssemblyType).Include(x => x.ComponentExt)
+                    .ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
                 {
@@ -102,7 +104,8 @@ namespace SDDB.Domain.Services
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive
                         && projectIds.Contains(x.AssignedToProject_Id))
                     .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt).ToListAsync().ConfigureAwait(false);
+                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.AssignedToAssemblyDb.AssemblyType).Include(x => x.ComponentExt)
+                    .ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
                 {
@@ -138,7 +141,8 @@ namespace SDDB.Domain.Services
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive
                         && projectIds.Contains(x.AssignedToProject_Id) && modelIds.Contains(x.ComponentModel_Id))
                     .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt).ToListAsync().ConfigureAwait(false);
+                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.AssignedToAssemblyDb.AssemblyType).Include(x => x.ComponentExt)
+                    .ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
                 {
@@ -158,7 +162,47 @@ namespace SDDB.Domain.Services
             }
         }
 
-        
+        //get by projectIds, typeIds and assyIds
+        public virtual async Task<List<Component>> GetByTypeAssyAsync(string userId,
+            string[] projectIds = null, string[] typeIds = null, string[] assyIds = null, bool getActive = true)
+        {
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+                projectIds = projectIds ?? await dbContext.Projects.Where(x => x.ProjectPersons.Select(y => y.Id).Contains(userId)).Select(x => x.Id)
+                    .ToArrayAsync().ConfigureAwait(false);
+
+                typeIds = typeIds ?? await dbContext.ComponentTypes.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+
+                assyIds = assyIds ?? await dbContext.AssemblyDbs.Where(x => projectIds.Contains(x.AssignedToProject_Id)).Select(x => x.Id)
+                    .ToArrayAsync().ConfigureAwait(false);
+
+                var records = await dbContext.Components
+                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive
+                        && projectIds.Contains(x.AssignedToProject_Id) && typeIds.Contains(x.ComponentType_Id) && assyIds.Contains(x.AssignedToAssemblyDb_Id)) 
+                    .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
+                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.AssignedToAssemblyDb.AssemblyType).Include(x => x.ComponentExt)
+                    .ToListAsync().ConfigureAwait(false);
+
+                foreach (var record in records)
+                {
+                    var excludedProperties = new string[] { "Id", "TSP" };
+                    var properties = typeof(Component).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+                    foreach (var property in properties)
+                    {
+                        if (!property.GetMethod.IsVirtual) continue;
+                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
+                        if (excludedProperties.Contains(property.Name)) continue;
+
+                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
+                    }
+                }
+
+                return records;
+            }
+        }
+                        
         //find by query
         public virtual Task<List<Component>> LookupAsync(string userId, string query = "", bool getActive = true)
         {
@@ -168,6 +212,24 @@ namespace SDDB.Domain.Services
                 return dbContext.Components
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
                     (x.CompName.Contains(query) || x.CompAltName.Contains(query) || x.CompAltName2.Contains(query))).ToListAsync();
+            }
+        }
+
+        //find by query and project
+        public virtual async Task<List<Component>> LookupByProjAsync(string userId, string[] projectIds = null, string query = "", bool getActive = true)
+        {
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+                if (projectIds == null || projectIds.Length == 0) projectIds = await dbContext.Projects.Where(x => x.ProjectPersons
+                    .Select(y => y.Id).Contains(userId)).Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+
+                var records =  await dbContext.Components.Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) &&
+                    x.IsActive == getActive && projectIds.Contains(x.AssignedToProject_Id) &&
+                    (x.CompName.Contains(query) || x.CompAltName.Contains(query) || x.CompAltName2.Contains(query))).ToListAsync();
+                
+                return records;
             }
         }
 

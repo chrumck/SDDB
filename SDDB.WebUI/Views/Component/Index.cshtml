@@ -1,6 +1,6 @@
-﻿@model SDDB.Domain.Entities.Location
+﻿@model SDDB.Domain.Entities.Component
 @{
-    ViewBag.Title = "Locations";
+    ViewBag.Title = "Components";
 }
 
 <!------- MainView ------->
@@ -20,7 +20,9 @@
             <div class="btn-group margin-bottom-2px">
                 <div id="MsFilterByProject" placeholder="Select Project"></div>
             </div>
-                
+            <div class="btn-group margin-bottom-2px">
+                <div id="MsFilterByAssy" placeholder="Select Assembly"></div>
+            </div>
 
             <div class="pull-right">
                 <div class="dropdown">
@@ -29,6 +31,7 @@
                         <li><a href=# id="dropdownId1">Show 1st Columns</a></li>
                         <li><a href=# id="dropdownId2">Show 2nd Columns</a></li>
                         <li><a href=# id="dropdownId3">Show 3rd Columns</a></li>
+                        <li><a href=# id="dropdownId4">Show 4th Columns</a></li>
                     </ul>
                 </div>
             </div>
@@ -37,7 +40,7 @@
 
     <div class="panel panel-primary" id="PanelTableMain">
         <div class="panel-heading text-center" style="font-size:130%">
-            <strong>Locations</strong>
+            <strong>Components</strong>
             <div class="pull-right">
                 <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="100" data-onstyle="warning" data-on="Deleted Shown" data-off="Show Deleted" disabled>
             </div>
@@ -48,26 +51,22 @@
                     <th>ID</th>
                     <th>Name</th>
                     <th>Alternate Name</th>
+                    <th>2nd. Alt. Name</th>
                     <th>Type</th>
+                    <th>Status</th>
+                    <th>Model</th>
                     <th>Project</th>
-                    <th>Contact Prs.</th>
-                    <th>Address</th>
-                    <th>City</th>
-                    <th>ZIP</th>
-                    <th>State</th>
-                    <th>Country</th>
-                    <th>Position X</th>
-                    <th>Position Y</th>
-                    <th>Position Z</th>
-                    <th>Stationing</th>
-                    <th>CoA Req'd</th>
-                    <th>RoE Req'd</th>
-                    <th>Access Info</th>
+                    <th>Assembly</th>
+                    <th>Position in Assy</th>
+                    <th>Program Addr</th>
+                    <th>Calib. Reqd</th>
                     <th>Comments</th>
                     <th>Is Active</th>
-                    <th>LocationType_Id</th>
+                    <th>ComponentType_Id</th>
+                    <th>ComponentStatus_Id</th>
+                    <th>ComponentModel_Id</th>
                     <th>AssignedToProject_Id</th>
-                    <th>ContactPerson_Id</th>
+                    <th>AssignedToAssemblyDb_Id</th>
                 </tr>
             </thead>
             <tbody class="selectable"></tbody>
@@ -79,7 +78,7 @@
 <div class="container-fluid hide" id="EditFormView">
     <div class="row">
         <div class="col-xs-6">
-            <h3 id="EditFormLabel">Create/Edit Location</h3>
+            <h3 id="EditFormLabel">Create/Edit Component</h3>
         </div>
         <div class="col-xs-6">
             <h3><button class="btn btn-default pull-right" type="button" id="EditFormBtnBack">Cancel</button></h3>
@@ -87,7 +86,7 @@
     </div>
     <div class="well">
         <form class="form-horizontal" role="form" id="EditForm">
-            
+
             <div class="row" id="CreateMultipleRow">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -107,26 +106,50 @@
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        @Html.LabelFor(x => x.LocName, "Name", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.CompName, "Name", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.LocName, new { @class = "form-control modifiable", placeholder = "Location Name" })
-                            @Html.ValidationMessageFor(x => x.LocName)
+                            @Html.TextBoxFor(x => x.CompName, new { @class = "form-control modifiable", placeholder = "Component Name" })
+                            @Html.ValidationMessageFor(x => x.CompName)
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.LocAltName, "Alternate Name", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.CompAltName, "Alternate Name", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.LocAltName, new { @class = "form-control modifiable", placeholder = "Location Alternate Name" })
-                            @Html.ValidationMessageFor(x => x.LocAltName)
+                            @Html.TextBoxFor(x => x.CompAltName, new { @class = "form-control modifiable", placeholder = "Component Alternate Name" })
+                            @Html.ValidationMessageFor(x => x.CompAltName)
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.LocationType_Id, "Type", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.CompAltName2, "AltName 2", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.LocationType_Id, new { @class = "form-control modifiable", placeholder = "Location Type" })
-                            @Html.ValidationMessageFor(x => x.LocationType_Id)
+                            @Html.TextBoxFor(x => x.CompAltName2, new { @class = "form-control modifiable", placeholder = "2nd Alternate Name" })
+                            @Html.ValidationMessageFor(x => x.CompAltName2)
                         </div>
                     </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.ComponentType_Id, "Type", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.ComponentType_Id, new { @class = "form-control modifiable", placeholder = "Component Type" })
+                            @Html.ValidationMessageFor(x => x.ComponentType_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.ComponentStatus_Id, "Status", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.ComponentStatus_Id, new { @class = "form-control modifiable", placeholder = "Component Status" })
+                            @Html.ValidationMessageFor(x => x.ComponentStatus_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.ComponentModel_Id, "Model", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.ComponentModel_Id, new { @class = "form-control modifiable", placeholder = "Component Model" })
+                            @Html.ValidationMessageFor(x => x.ComponentModel_Id)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
                     <div class="form-group">
                         @Html.LabelFor(x => x.AssignedToProject_Id, "Project", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
@@ -135,95 +158,30 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.ContactPerson_Id, "Contact Prs.", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.AssignedToAssemblyDb_Id, "Assembly", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.ContactPerson_Id, new { @class = "form-control modifiable", placeholder = "Contact Person" })
-                            @Html.ValidationMessageFor(x => x.ContactPerson_Id)
+                            @Html.TextBoxFor(x => x.AssignedToAssemblyDb_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Assembly" })
+                            @Html.ValidationMessageFor(x => x.AssignedToAssemblyDb_Id)
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.Address, "Address", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.PositionInAssy, "Pos. in Assy", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.Address, new { @class = "form-control modifiable", placeholder = "Location Address" })
-                            @Html.ValidationMessageFor(x => x.Address)
+                            @Html.TextBoxFor(x => x.PositionInAssy, new { @class = "form-control modifiable", placeholder = "Position in Assembly" })
+                            @Html.ValidationMessageFor(x => x.PositionInAssy)
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.City, "City", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.ProgramAddress, "Prog. Address", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.City, new { @class = "form-control modifiable", placeholder = "City" })
-                            @Html.ValidationMessageFor(x => x.City)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.ZIP, "ZIP", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.ZIP, new { @class = "form-control modifiable", placeholder = "Postal Code" })
-                            @Html.ValidationMessageFor(x => x.ZIP)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.State, "State", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.State, new { @class = "form-control modifiable", placeholder = "State or Province" })
-                            @Html.ValidationMessageFor(x => x.State)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.Country, "Country", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.Country, new { @class = "form-control modifiable", placeholder = "Country" })
-                            @Html.ValidationMessageFor(x => x.Country)
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.LocX, "X", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.LocX, new { @class = "form-control modifiable", placeholder = "Position X" })
-                            @Html.ValidationMessageFor(x => x.LocX)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.LocY, "Y", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.LocY, new { @class = "form-control modifiable", placeholder = "Position Y" })
-                            @Html.ValidationMessageFor(x => x.LocY)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.LocZ, "Z", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.LocZ, new { @class = "form-control modifiable", placeholder = "Position Z" })
-                            @Html.ValidationMessageFor(x => x.LocZ)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.LocStationing, "Stationing", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.LocStationing, new { @class = "form-control modifiable", placeholder = "Loc. Stationing" })
-                            @Html.ValidationMessageFor(x => x.LocStationing)
+                            @Html.TextBoxFor(x => x.ProgramAddress, new { @class = "form-control modifiable", placeholder = "Program Address" })
+                            @Html.ValidationMessageFor(x => x.ProgramAddress)
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-sm-10 col-sm-offset-2">
-                            @Html.CheckBoxFor(x => x.CertOfApprReqd, new { @class = "modifiable" }) &nbsp;&nbsp;
-                            @Html.LabelFor(x => x.CertOfApprReqd, "Certificate of Approval Req'd")
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-10 col-sm-offset-2">
-                            @Html.CheckBoxFor(x => x.RightOfEntryReqd, new { @class = "modifiable" }) &nbsp;&nbsp;
-                            @Html.LabelFor(x => x.RightOfEntryReqd, "Right of Entry Req'd")
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.AccessInfo, "Access Info", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextAreaFor(x => x.AccessInfo, 3, 10, new { @class = "form-control modifiable", placeholder = "Access Information" })
-                            @Html.ValidationMessageFor(x => x.AccessInfo)
+                            @Html.CheckBoxFor(x => x.CalibrationReqd, new { @class = "modifiable" }) &nbsp;&nbsp;
+                            @Html.LabelFor(x => x.CalibrationReqd, "Calibration Required")
                         </div>
                     </div>
                     <div class="form-group">
@@ -262,7 +220,7 @@
     @Scripts.Render("~/bundles/jquery-ui")
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
-    <script src="~/Scripts/SDDB/Location.js"></script>
+    <script src="~/Scripts/SDDB/Component.js"></script>
 }
 
 @section CSS {
@@ -271,5 +229,11 @@
     @Styles.Render("~/bundles/bootstrap-toggle-CSS")
     @Styles.Render("~/bundles/magicsuggest-css")
 }
+
+
+
+
+
+
 
 

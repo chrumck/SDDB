@@ -162,8 +162,9 @@ namespace SDDB.Domain.Services
             }
         }
 
-        //get by projectIds and typeIds
-        public virtual async Task<List<AssemblyDb>> GetByTypeAsync(string userId, string[] projectIds = null, string[] typeIds = null, bool getActive = true)
+        //get by projectIds, typeIds and locIds
+        public virtual async Task<List<AssemblyDb>> GetByTypeLocAsync(string userId,
+            string[] projectIds = null, string[] typeIds = null, string[] locIds = null, bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
@@ -174,9 +175,12 @@ namespace SDDB.Domain.Services
 
                 typeIds = typeIds ?? await dbContext.AssemblyTypes.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
 
+                locIds = locIds ?? await dbContext.Locations.Where(x => projectIds.Contains(x.AssignedToProject_Id)).Select(x => x.Id)
+                    .ToArrayAsync().ConfigureAwait(false);
+
                 var records = await dbContext.AssemblyDbs
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive
-                        && projectIds.Contains(x.AssignedToProject_Id) && typeIds.Contains(x.AssemblyType_Id))
+                        && projectIds.Contains(x.AssignedToProject_Id) && typeIds.Contains(x.AssemblyType_Id) && locIds.Contains(x.AssignedToLocation_Id)) 
                     .Include(x => x.AssemblyType).Include(x => x.AssemblyStatus).Include(x => x.AssemblyModel).Include(x => x.AssignedToProject)
                     .Include(x => x.AssignedToLocation).Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssemblyExt)
                     .ToListAsync().ConfigureAwait(false);
@@ -211,6 +215,24 @@ namespace SDDB.Domain.Services
             }
         }
 
+        //find by query and project
+        public virtual async Task<List<AssemblyDb>> LookupByProjAsync(string userId, string[] projectIds = null, string query = "", bool getActive = true)
+        {
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+                if (projectIds == null || projectIds.Length == 0) projectIds = await dbContext.Projects.Where(x => x.ProjectPersons
+                    .Select(y => y.Id).Contains(userId)).Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+                
+                var records = await dbContext.AssemblyDbs.Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) &&
+                    x.IsActive == getActive && projectIds.Contains(x.AssignedToProject_Id) &&
+                    (x.AssyName.Contains(query) || x.AssyAltName.Contains(query) || x.AssyAltName2.Contains(query))).ToListAsync();
+                
+                return records;
+            }
+        }
+        
         //-----------------------------------------------------------------------------------------------------------------------
 
         // Create and Update records given in []
