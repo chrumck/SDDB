@@ -15,7 +15,7 @@ using SDDB.Domain.Infrastructure;
 
 namespace SDDB.Domain.Services
 {
-    public class AssemblyDbService
+    public class ComponentService
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
@@ -23,7 +23,7 @@ namespace SDDB.Domain.Services
 
         //Constructors---------------------------------------------------------------------------------------------------------//
 
-        public AssemblyDbService(IDbContextScopeFactory contextScopeFac)
+        public ComponentService(IDbContextScopeFactory contextScopeFac)
         {
             this.contextScopeFac = contextScopeFac;
         }
@@ -31,21 +31,20 @@ namespace SDDB.Domain.Services
         //Methods--------------------------------------------------------------------------------------------------------------//
 
         //get all 
-        public virtual async Task<List<AssemblyDb>> GetAsync(string userId, bool getActive = true)
+        public virtual async Task<List<Component>> GetAsync(string userId, bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                var records = await dbContext.AssemblyDbs
+                var records = await dbContext.Components
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive)
-                    .Include(x => x.AssemblyType).Include(x => x.AssemblyStatus).Include(x => x.AssemblyModel).Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToLocation).Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssemblyExt)
-                    .ToListAsync().ConfigureAwait(false);
+                    .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
+                    .Include( x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt).ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
                 {
                     var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(AssemblyDb).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+                    var properties = typeof(Component).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
                     foreach (var property in properties)
                     {
                         if (!property.GetMethod.IsVirtual) continue;
@@ -61,21 +60,20 @@ namespace SDDB.Domain.Services
         }
 
         //get by ids
-        public virtual async Task<List<AssemblyDb>> GetAsync(string userId, string[] ids, bool getActive = true)
+        public virtual async Task<List<Component>> GetAsync(string userId, string[] ids, bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                var records = await dbContext.AssemblyDbs
+                var records = await dbContext.Components
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive && ids.Contains(x.Id))
-                    .Include(x => x.AssemblyType).Include(x => x.AssemblyStatus).Include(x => x.AssemblyModel).Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToLocation).Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssemblyExt)
-                    .ToListAsync().ConfigureAwait(false);
+                    .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
+                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt).ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
                 {
                     var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(AssemblyDb).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+                    var properties = typeof(Component).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
                     foreach (var property in properties)
                     {
                         if (!property.GetMethod.IsVirtual) continue;
@@ -91,7 +89,7 @@ namespace SDDB.Domain.Services
         }
 
         //get by projectIds 
-        public virtual async Task<List<AssemblyDb>> GetByProjectAsync(string userId, string[] projectIds = null, bool getActive = true)
+        public virtual async Task<List<Component>> GetByProjectAsync(string userId, string[] projectIds = null, bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
@@ -100,17 +98,16 @@ namespace SDDB.Domain.Services
                 projectIds = projectIds ?? await dbContext.Projects.Where(x => x.ProjectPersons.Select(y => y.Id).Contains(userId)).Select(x => x.Id)
                     .ToArrayAsync().ConfigureAwait(false);
 
-                var records = await dbContext.AssemblyDbs
+                var records = await dbContext.Components
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive
                         && projectIds.Contains(x.AssignedToProject_Id))
-                    .Include(x => x.AssemblyType).Include(x => x.AssemblyStatus).Include(x => x.AssemblyModel).Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToLocation).Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssemblyExt)
-                    .ToListAsync().ConfigureAwait(false);
+                    .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
+                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt).ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
                 {
                     var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(AssemblyDb).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+                    var properties = typeof(Component).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
                     foreach (var property in properties)
                     {
                         if (!property.GetMethod.IsVirtual) continue;
@@ -126,7 +123,7 @@ namespace SDDB.Domain.Services
         }
 
         //get by projectIds and modelIds
-        public virtual async Task<List<AssemblyDb>> GetByModelAsync(string userId, string[] projectIds = null, string[] modelIds = null, bool getActive = true)
+        public virtual async Task<List<Component>> GetByModelAsync(string userId, string[] projectIds = null, string[] modelIds = null, bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
@@ -135,19 +132,18 @@ namespace SDDB.Domain.Services
                 projectIds = projectIds ?? await dbContext.Projects.Where(x => x.ProjectPersons.Select(y => y.Id).Contains(userId)).Select(x => x.Id)
                     .ToArrayAsync().ConfigureAwait(false);
 
-                modelIds = modelIds ?? await dbContext.AssemblyModels.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+                modelIds = modelIds ?? await dbContext.ComponentModels.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
 
-                var records = await dbContext.AssemblyDbs
+                var records = await dbContext.Components
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive
-                        && projectIds.Contains(x.AssignedToProject_Id) && modelIds.Contains(x.AssemblyModel_Id))
-                    .Include(x => x.AssemblyType).Include(x => x.AssemblyStatus).Include(x => x.AssemblyModel).Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToLocation).Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssemblyExt)
-                    .ToListAsync().ConfigureAwait(false);
+                        && projectIds.Contains(x.AssignedToProject_Id) && modelIds.Contains(x.ComponentModel_Id))
+                    .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
+                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt).ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
                 {
                     var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(AssemblyDb).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+                    var properties = typeof(Component).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
                     foreach (var property in properties)
                     {
                         if (!property.GetMethod.IsVirtual) continue;
@@ -163,21 +159,21 @@ namespace SDDB.Domain.Services
         }
         
         //find by query
-        public virtual Task<List<AssemblyDb>> LookupAsync(string userId, string query = "", bool getActive = true)
+        public virtual Task<List<Component>> LookupAsync(string userId, string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.AssemblyDbs
+                return dbContext.Components
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
-                    (x.AssyName.Contains(query) || x.AssyAltName.Contains(query) || x.AssyAltName2.Contains(query))).ToListAsync();
+                    (x.CompName.Contains(query) || x.CompAltName.Contains(query) || x.CompAltName2.Contains(query))).ToListAsync();
             }
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
 
         // Create and Update records given in []
-        public virtual async Task<DBResult> EditAsync(AssemblyDb[] records)
+        public virtual async Task<DBResult> EditAsync(Component[] records)
         {
             using (var dbContextScope = contextScopeFac.Create())
             {
@@ -186,7 +182,7 @@ namespace SDDB.Domain.Services
                 {
                     var newEntries = 1;  foreach (var record in records)
                     {
-                        var dbEntry = await dbContext.AssemblyDbs.FindAsync(record.Id).ConfigureAwait(false);
+                        var dbEntry = await dbContext.Components.FindAsync(record.Id).ConfigureAwait(false);
                         if (dbEntry == null)
                         {
                             record.Id = Guid.NewGuid().ToString();
@@ -194,19 +190,19 @@ namespace SDDB.Domain.Services
                             if (newEntries > 1)
                             {
                                 var excludedProperties = new string[] { "Id", "TSP" };
-                                var properties = typeof(AssemblyDb).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+                                var properties = typeof(Component).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
                                 foreach (var property in properties)
                                 {
                                     if (property.GetCustomAttributes(typeof(DBIsUniqueAttribute), false).FirstOrDefault() == null) continue;
                                     property.SetValue(record, property.GetValue(record) + String.Format("_{0:HHmm}_{1:D3}",DateTime.Now,newEntries));
                                 }
                             }
-                            dbContext.AssemblyDbs.Add(record); newEntries++;
+                            dbContext.Components.Add(record); newEntries++;
                         }
                         else
                         {
                             var excludedProperties = new string[] { "Id", "TSP" };
-                            var properties = typeof(AssemblyDb).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+                            var properties = typeof(Component).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
                             foreach (var property in properties)
                             {
                                 if (property.GetMethod.IsVirtual) continue;
@@ -251,7 +247,7 @@ namespace SDDB.Domain.Services
                 {
                     foreach (var id in ids)
                     {
-                        var dbEntry = await dbContext.AssemblyDbs.FindAsync(id).ConfigureAwait(false);
+                        var dbEntry = await dbContext.Components.FindAsync(id).ConfigureAwait(false);
                         if (dbEntry != null)
                         {
                             dbEntry.IsActive = false;
@@ -291,8 +287,8 @@ namespace SDDB.Domain.Services
 
         //-----------------------------------------------------------------------------------------------------------------------
         
-        // Create and Update records given in [] - AssemblyExt
-        public virtual async Task<DBResult> EditExtAsync(AssemblyExt[] records)
+        // Create and Update records given in [] - ComponentExt
+        public virtual async Task<DBResult> EditExtAsync(ComponentExt[] records)
         {
             var errorMessage = "";
             using (var dbContextScope = contextScopeFac.Create())
@@ -302,18 +298,18 @@ namespace SDDB.Domain.Services
                 {
                     foreach (var record in records)
                     {
-                        var dbEntry = await dbContext.AssemblyExts.FindAsync(record.Id).ConfigureAwait(false);
+                        var dbEntry = await dbContext.ComponentExts.FindAsync(record.Id).ConfigureAwait(false);
                         if (dbEntry == null)
                         {
-                            if (await dbContext.AssemblyDbs.FindAsync(record.Id).ConfigureAwait(false) == null)
-                                errorMessage += String.Format("Assembly with id={0} not found.\n", record.Id);
+                            if (await dbContext.Components.FindAsync(record.Id).ConfigureAwait(false) == null)
+                                errorMessage += String.Format("Component with id={0} not found.\n", record.Id);
                             else
-                                dbContext.AssemblyExts.Add(record);
+                                dbContext.ComponentExts.Add(record);
                         }
                         else
                         {
                             var excludedProperties = new string[] { "Id", "TSP" };
-                            var properties = typeof(AssemblyExt).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+                            var properties = typeof(ComponentExt).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
                             foreach (var property in properties)
                             {
                                 if (property.GetMethod.IsVirtual) continue;

@@ -50,6 +50,7 @@
                     <th>Status</th>
                     <th>Model</th>
                     <th>Project</th>
+                    <th>Location</th>
                     <th>Global X</th>
                     <th>Global Y</th>
                     <th>Global Z</th>
@@ -157,6 +158,13 @@
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.AssignedToProject_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Project" })
                             @Html.ValidationMessageFor(x => x.AssignedToProject_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssignedToLocation_Id, "Location", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssignedToLocation_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Location" })
+                            @Html.ValidationMessageFor(x => x.AssignedToLocation_Id)
                         </div>
                     </div>
                     <div class="form-group">

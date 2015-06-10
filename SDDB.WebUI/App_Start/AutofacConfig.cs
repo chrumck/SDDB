@@ -60,7 +60,8 @@ namespace SDDB.WebUI
             builder.RegisterType<AssemblyTypeService>().AsSelf().InstancePerDependency();
             builder.RegisterType<AssemblyModelService>().AsSelf().InstancePerDependency();
             builder.RegisterType<AssemblyStatusService>().AsSelf().InstancePerDependency();
-            
+
+            builder.RegisterType<ComponentModelService>().AsSelf().InstancePerDependency();
             builder.RegisterType<ComponentTypeService>().AsSelf().InstancePerDependency();
             builder.RegisterType<ComponentStatusService>().AsSelf().InstancePerDependency();
 

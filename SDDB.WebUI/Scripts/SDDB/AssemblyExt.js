@@ -418,9 +418,12 @@ function UpdateViewsForModel() {
                             });
                             break;
                         case "DateTime":
-                            $targetEl.removeAttr(attrsToRemove);
-                            $targetEl.datetimepicker({ format: "YYYY-MM-DD HH:mm" });
-                            $targetEl.on("dp.change", function (e) { $(this).data("ismodified", true); });
+                            $targetEl.removeAttr(attrsToRemove).attr({
+                                "data-val": "true",
+                                "data-val-dbisdatetimeiso": "The field must have YYYY-MM-DD HH:mm format."
+                            });
+                            $targetEl.datetimepicker({ format: "YYYY-MM-DD HH:mm" })
+                                .on("dp.change", function (e) { $(this).data("ismodified", true); });
                             break;
                         case "Bool":
                             $targetEl.removeAttr(attrsToRemove).attr({

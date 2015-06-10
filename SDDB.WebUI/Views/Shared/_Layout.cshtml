@@ -6,9 +6,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title</title>
-    @Styles.Render("~/Content/css")
+
     @Scripts.Render("~/bundles/modernizr")
-    <link href="~/Content/SDDB/Site.css" rel="stylesheet" />
+    @Styles.Render("~/Content/css")
+    <link href="/Content/SDDB/Site.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -112,11 +113,15 @@
         </div>
     </footer>
 
+    <!----------------Scripts and CSS----------->
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/jqueryval")
     @Scripts.Render("~/bundles/bootstrap")
-    <script src="~/Scripts/SDDB/Shared.js"></script>
+    @Scripts.Render("~/bundles/moment")
+    <script src="/Scripts/SDDB/Shared.js"></script>
+
     @RenderSection("scripts", required: false)
+
     @RenderSection("CSS", required: false)
 </body>
 </html>

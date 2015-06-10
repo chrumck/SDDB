@@ -18,18 +18,30 @@ $(document).ready(function () {
 //client validation for dbisinteger
 $.validator.unobtrusive.adapters.addBool("dbisinteger");
 $.validator.addMethod("dbisinteger", function (value, element, valParams) {
-    if (value != "" && value == parseInt(value, 10)) return true;
-    else return false;
+    if (value) return value == parseInt(value, 10);
+    return true;
 });
 
 //client validation for dbisbool
 $.validator.unobtrusive.adapters.addBool("dbisbool");
 $.validator.addMethod("dbisbool", function (value, element, valParams) {
-    if (value != "" && (value.toLowerCase() == "true" || value.toLowerCase() == "false")) return true;
-    else return false;
+    if (value) return (value.toLowerCase() == "true" || value.toLowerCase() == "false");
+    return true;
 });
 
+//client validation for dbdateiso
+$.validator.unobtrusive.adapters.addBool("dbisdateiso");
+$.validator.addMethod("dbisdateiso", function (value, element, valParams) {
+    if (value) return moment(value, "YYYY-MM-DD").isValid();
+    return true;
+});
 
+//client validation for dbdatetimeiso
+$.validator.unobtrusive.adapters.addBool("dbisdatetimeiso");
+$.validator.addMethod("dbisdatetimeiso", function (value, element, valParams) {
+    if (value) return moment(value, "YYYY-MM-DD HH:mm").isValid();
+    return true;
+});
 
 
 //---------------------------------------Modal Dialogs---------------------------------------//

@@ -120,8 +120,11 @@
     <Compile Include="Abstract_Services\IAppRoleManager.cs" />
     <Compile Include="Abstract_Services\IAppUserManager.cs" />
     <Compile Include="Concrete_DbContexts\EFDbContext.cs" />
+    <Compile Include="Concrete_Entities\ComponentExt.cs" />
+    <Compile Include="Concrete_Entities\Component.cs" />
     <Compile Include="Concrete_Entities\AssemblyExt.cs" />
     <Compile Include="Concrete_Entities\AssemblyDb.cs" />
+    <Compile Include="Concrete_Entities\ComponentModel.cs" />
     <Compile Include="Concrete_Entities\Location.cs" />
     <Compile Include="Concrete_Entities\LocationType.cs" />
     <Compile Include="Concrete_Entities\ComponentStatus.cs" />
@@ -140,6 +143,8 @@
     <Compile Include="Concrete_Entities\_SessionSettings.cs" />
     <Compile Include="Concrete_Infrastructure\CustomDataAnnotations.cs" />
     <Compile Include="Concrete_Infrastructure\CustomHelpers.cs" />
+    <Compile Include="Concrete_Services\ComponentService.cs" />
+    <Compile Include="Concrete_Services\ComponentModelService.cs" />
     <Compile Include="Concrete_Services\AssemblyModelService.cs" />
     <Compile Include="Concrete_Services\AssemblyDbService.cs" />
     <Compile Include="Concrete_Services\LocationService.cs" />
@@ -310,6 +315,22 @@
     <Compile Include="Migrations\201506072257490_AssyModel2.Designer.cs">
       <DependentUpon>201506072257490_AssyModel2.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201506092039444_person9.cs" />
+    <Compile Include="Migrations\201506092039444_person9.Designer.cs">
+      <DependentUpon>201506092039444_person9.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506092140059_ComponentModel0.cs" />
+    <Compile Include="Migrations\201506092140059_ComponentModel0.Designer.cs">
+      <DependentUpon>201506092140059_ComponentModel0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506092248314_Component0.cs" />
+    <Compile Include="Migrations\201506092248314_Component0.Designer.cs">
+      <DependentUpon>201506092248314_Component0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506092319262_Assembly4.cs" />
+    <Compile Include="Migrations\201506092319262_Assembly4.Designer.cs">
+      <DependentUpon>201506092319262_Assembly4.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -428,6 +449,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201506072257490_AssyModel2.resx">
       <DependentUpon>201506072257490_AssyModel2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506092039444_person9.resx">
+      <DependentUpon>201506092039444_person9.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506092140059_ComponentModel0.resx">
+      <DependentUpon>201506092140059_ComponentModel0.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506092248314_Component0.resx">
+      <DependentUpon>201506092248314_Component0.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506092319262_Assembly4.resx">
+      <DependentUpon>201506092319262_Assembly4.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

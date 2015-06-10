@@ -123,7 +123,8 @@ $(document).ready(function () {
     $(".modifiable").change(function () { $(this).data("ismodified", true); });
 
     //Enable DatePicker
-    $(".datepicker").datepicker({ changeMonth: true, changeYear: true, dateFormat: "yy-mm-dd" });
+    $(".datepicker").datetimepicker({ format: "YYYY-MM-DD" })
+        .on("dp.change", function (e) { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
 

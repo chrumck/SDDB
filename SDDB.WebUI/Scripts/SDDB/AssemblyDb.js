@@ -37,7 +37,7 @@ $(document).ready(function () {
         TableMain.columns([2, 3, 4, 5, 6, 7]).visible(true);
         TableMain.columns([8, 9, 10, 11, 12, 13]).visible(false);
         TableMain.columns([14, 15, 16, 17, 18, 19]).visible(false);
-        TableMain.columns([20, 21, 22, 23, 24]).visible(false);
+        TableMain.columns([20, 21, 22, 23, 24, 25]).visible(false);
     });
 
     //wire up dropdownId2
@@ -46,7 +46,7 @@ $(document).ready(function () {
         TableMain.columns([2, 3, 4, 5, 6, 7]).visible(false);
         TableMain.columns([8, 9, 10, 11, 12, 13]).visible(true);
         TableMain.columns([14, 15, 16, 17, 18, 19]).visible(false);
-        TableMain.columns([20, 21, 22, 23, 24]).visible(false);
+        TableMain.columns([20, 21, 22, 23, 24, 25]).visible(false);
     });
 
     //wire up dropdownId3
@@ -55,7 +55,7 @@ $(document).ready(function () {
         TableMain.columns([2, 3, 4, 5, 6, 7]).visible(false);
         TableMain.columns([8, 9, 10, 11, 12, 13]).visible(false);
         TableMain.columns([14, 15, 16, 17, 18, 19]).visible(true);
-        TableMain.columns([20, 21, 22, 23, 24]).visible(false);
+        TableMain.columns([20, 21, 22, 23, 24, 25]).visible(false);
     });
 
     //wire up dropdownId4
@@ -64,7 +64,7 @@ $(document).ready(function () {
         TableMain.columns([2, 3, 4, 5, 6, 7]).visible(false);
         TableMain.columns([8, 9, 10, 11, 12, 13]).visible(false);
         TableMain.columns([14, 15, 16, 17, 18, 19]).visible(false);
-        TableMain.columns([20, 21, 22, 23, 24]).visible(true);
+        TableMain.columns([20, 21, 22, 23, 24, 25]).visible(true);
     });
 
     //Initialize MagicSuggest msFilterByProject
@@ -119,35 +119,37 @@ $(document).ready(function () {
             { data: "AssyModelName", name: "AssyModelName" },//6
             { data: "AssignedToProject", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject" }, //7
             //------------------------------------------------second set of columns
-            { data: "AssyGlobalX", name: "AssyGlobalX" },//8
-            { data: "AssyGlobalY", name: "AssyGlobalY" },//9
-            { data: "AssyGlobalZ", name: "AssyGlobalZ" },//10
-            { data: "AssyLocalXDesign", name: "AssyLocalXDesign" },//11
-            { data: "AssyLocalYDesign", name: "AssyLocalYDesign" },//12
-            { data: "AssyLocalZDesign", name: "AssyLocalZDesign" },//13
+            { data: "AssignedToLocation", render: function (data, type, full, meta) { return data.LocName + " - " + data.LocTypeName }, name: "AssignedToLocation" }, //8
+            { data: "AssyGlobalX", name: "AssyGlobalX" },//9
+            { data: "AssyGlobalY", name: "AssyGlobalY" },//10
+            { data: "AssyGlobalZ", name: "AssyGlobalZ" },//11
+            { data: "AssyLocalXDesign", name: "AssyLocalXDesign" },//12
+            { data: "AssyLocalYDesign", name: "AssyLocalYDesign" },//13
             //------------------------------------------------third set of columns
-            { data: "AssyLocalXAsBuilt", name: "AssyLocalXAsBuilt" },//14
-            { data: "AssyLocalYAsBuilt", name: "AssyLocalYAsBuilt" },//15
-            { data: "AssyLocalZAsBuilt", name: "AssyLocalZAsBuilt" },//16
-            { data: "AssyStationing", name: "AssyStationing" },//17
-            { data: "AssyLength", name: "AssyLength" },//18
-            { data: "AssyReadingIntervalSecs", name: "AssyReadingIntervalSecs" },//19
+            { data: "AssyLocalZDesign", name: "AssyLocalZDesign" },//14
+            { data: "AssyLocalXAsBuilt", name: "AssyLocalXAsBuilt" },//15
+            { data: "AssyLocalYAsBuilt", name: "AssyLocalYAsBuilt" },//16
+            { data: "AssyLocalZAsBuilt", name: "AssyLocalZAsBuilt" },//17
+            { data: "AssyStationing", name: "AssyStationing" },//18
+            { data: "AssyLength", name: "AssyLength" },//19
             //------------------------------------------------Fourth set of columns
-            { data: "IsReference", name: "IsReference" },//20
-            { data: "TechnicalDetails", name: "TechnicalDetails" },//21
-            { data: "PowerSupplyDetails", name: "PowerSupplyDetails" },//22
-            { data: "HSEDetails", name: "HSEDetails" },//23
-            { data: "Comments", name: "Comments" },//24
+            { data: "AssyReadingIntervalSecs", name: "AssyReadingIntervalSecs" },//20
+            { data: "IsReference", name: "IsReference" },//21
+            { data: "TechnicalDetails", name: "TechnicalDetails" },//22
+            { data: "PowerSupplyDetails", name: "PowerSupplyDetails" },//23
+            { data: "HSEDetails", name: "HSEDetails" },//24
+            { data: "Comments", name: "Comments" },//25
             //------------------------------------------------never visible
-            { data: "IsActive", name: "IsActive" },//25
-            { data: "AssemblyType_Id", name: "AssemblyType_Id" },//26
-            { data: "AssemblyStatus_Id", name: "AssemblyStatus_Id" },//27
-            { data: "AssemblyModel_Id", name: "AssemblyModel_Id" },//28
-            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//29
+            { data: "IsActive", name: "IsActive" },//26
+            { data: "AssemblyType_Id", name: "AssemblyType_Id" },//27
+            { data: "AssemblyStatus_Id", name: "AssemblyStatus_Id" },//28
+            { data: "AssemblyModel_Id", name: "AssemblyModel_Id" },//29
+            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//30
+            { data: "AssignedToLocation_Id", name: "AssignedToLocation_Id" }//31
         ],
         columnDefs: [
-            { targets: [0, 25, 26, 27, 28, 29], visible: false }, // - never show
-            { targets: [0, 20, 25, 26, 27, 28, 29], searchable: false },  //"orderable": false, "visible": false
+            { targets: [0, 26, 27, 28, 29, 30, 31], visible: false }, // - never show
+            { targets: [0, 21, 26, 27, 28, 29, 30, 31], searchable: false },  //"orderable": false, "visible": false
             { targets: [2, 3, 4], className: "hidden-xs hidden-sm" }, // - first set of columns
             { targets: [6, 7], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
 
@@ -159,9 +161,9 @@ $(document).ready(function () {
             { targets: [18, 19], className: "hidden-xs hidden-sm" }, // - third set of columns
             { targets: [14, 15, 16], className: "hidden-xs hidden-sm hidden-md" }, // - third set of columns
 
-            { targets: [20, 21, 22, 23, 24], visible: false }, // - fourth set of columns - to toggle with options
+            { targets: [20, 21, 22, 23, 24, 25], visible: false }, // - fourth set of columns - to toggle with options
             { targets: [21, 22, 23], className: "hidden-xs hidden-sm" }, // - fourth set of columns
-            { targets: [24,], className: "hidden-xs hidden-sm hidden-md" } // - fourth set of columns
+            { targets: [24, 25], className: "hidden-xs hidden-sm hidden-md" } // - fourth set of columns
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
@@ -183,6 +185,7 @@ $(document).ready(function () {
     AddToMSArray(MagicSuggests, "AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup", 1);
     AddToMSArray(MagicSuggests, "AssemblyModel_Id", "/AssemblyModelSrv/Lookup", 1);
     AddToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    AddToMSArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/Lookup", 1);
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
@@ -264,6 +267,7 @@ function FillFormForEdit() {
             CurrRecord.AssemblyStatus_Id = data[0].AssemblyStatus_Id;
             CurrRecord.AssemblyModel_Id = data[0].AssemblyModel_Id;
             CurrRecord.AssignedToProject_Id = data[0].AssignedToProject_Id;
+            CurrRecord.AssignedToLocation_Id = data[0].AssignedToLocation_Id;
             
             var FormInput = $.extend(true, {}, CurrRecord);
             $.each(data, function (i, dbEntry) {
@@ -297,6 +301,8 @@ function FillFormForEdit() {
                 else FormInput.AssyModelName = dbEntry.AssyModelName;
                 if (FormInput.AssignedToProject_Id != dbEntry.AssignedToProject_Id) { FormInput.AssignedToProject_Id = "_VARIES_"; FormInput.AssignedToProject = "_VARIES_"; }
                 else FormInput.AssignedToProject = dbEntry.AssignedToProject.ProjectName + " " + dbEntry.AssignedToProject.ProjectCode;
+                if (FormInput.AssignedToLocation_Id != dbEntry.AssignedToLocation_Id) { FormInput.AssignedToLocation_Id = "_VARIES_"; FormInput.AssignedToLocation = "_VARIES_"; }
+                else FormInput.AssignedToLocation = dbEntry.AssignedToLocation.LocName;
             });
 
             ClearFormInputs("EditForm", MagicSuggests);
@@ -328,6 +334,7 @@ function FillFormForEdit() {
             if (FormInput.AssemblyStatus_Id != null) MagicSuggests[1].addToSelection([{ id: FormInput.AssemblyStatus_Id, name: FormInput.AssyStatusName }], true);
             if (FormInput.AssemblyModel_Id != null) MagicSuggests[2].addToSelection([{ id: FormInput.AssemblyModel_Id, name: FormInput.AssyModelName }], true);
             if (FormInput.AssignedToProject_Id != null) MagicSuggests[3].addToSelection([{ id: FormInput.AssignedToProject_Id, name: FormInput.AssignedToProject }], true);
+            if (FormInput.AssignedToLocation_Id != null) MagicSuggests[4].addToSelection([{ id: FormInput.AssignedToLocation_Id, name: FormInput.AssignedToLocation }], true);
 
 
             if (data.length == 1) {
@@ -401,6 +408,7 @@ function SubmitEdits() {
         editRecord.AssemblyStatus_Id = (MagicSuggests[1].isModified) ? magicResults[1] : CurrRecord.AssemblyStatus_Id;
         editRecord.AssemblyModel_Id = (MagicSuggests[2].isModified) ? magicResults[2] : CurrRecord.AssemblyModel_Id;
         editRecord.AssignedToProject_Id = (MagicSuggests[3].isModified) ? magicResults[3] : CurrRecord.AssignedToProject_Id;
+        editRecord.AssignedToLocation_Id = (MagicSuggests[4].isModified) ? magicResults[4] : CurrRecord.AssignedToLocation_Id;
 
         editRecord.ModifiedProperties = modifiedProperties;
 

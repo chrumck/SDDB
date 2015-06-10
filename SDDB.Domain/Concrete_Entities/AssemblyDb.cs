@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 using SDDB.Domain.Abstract;
 using SDDB.Domain.Infrastructure;
+using System.Collections.Generic;
 
 namespace SDDB.Domain.Entities
 {
@@ -47,6 +48,11 @@ namespace SDDB.Domain.Entities
         [StringLength(40)]
         [ForeignKey("AssignedToProject")]
         public string AssignedToProject_Id { get; set; }
+
+        [Required(ErrorMessage = "Location field is required")]
+        [StringLength(40)]
+        [ForeignKey("AssignedToLocation")]
+        public string AssignedToLocation_Id { get; set; }
 
         [Required(ErrorMessage = "Assy. Global Coord's are required")]
         public decimal AssyGlobalX { get; set; }
@@ -115,13 +121,22 @@ namespace SDDB.Domain.Entities
         public virtual AssemblyStatus AssemblyStatus { get; set; }
         public virtual AssemblyModel AssemblyModel { get; set; }
         public virtual Project AssignedToProject { get; set; }
+        public virtual Location AssignedToLocation { get; set; }
         
         public virtual AssemblyExt AssemblyExt { get; set; }
+
+        [InverseProperty("AssignedToAssemblyDb")]
+        public virtual ICollection<Component> AssemblyComponents { get; set; }
 
         //many to many
         
 
         //Constructors---------------------------------------------------------------------------------------------------------//
+
+        public AssemblyDb()
+        {
+            this.AssemblyComponents = new HashSet<Component>();
+        }
 
         
         //Non-persisten Properties---------------------------------------------------------------------------------------------//
