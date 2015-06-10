@@ -76,10 +76,20 @@ $(document).ready(function () {
         },
         style: "min-width: 240px;"
     });
-    $(MsFilterByProject).on('selectionchange', function (e, m) {
-        RefreshTable(TableMain, "/AssemblyDbSrv/GetByProjectIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
-            "POST", MsFilterByProject.getValue());
+    $(MsFilterByProject).on('selectionchange', function (e, m) { RefreshMainView(); });
+
+    //Initialize MagicSuggest MsFilterByType
+    MsFilterByType = $("#MsFilterByType").magicSuggest({
+        data: "/AssemblyTypeSrv/Lookup",
+        allowFreeEntries: false,
+        ajaxConfig: {
+            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
+        },
+        style: "min-width: 240px;"
     });
+    $(MsFilterByType).on('selectionchange', function (e, m) { RefreshMainView(); });
+
+
 
 
     //---------------------------------------DataTables------------
@@ -97,17 +107,11 @@ $(document).ready(function () {
         if (($(this).prop("checked")) ? false : true)
             $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
         else $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
-        RefreshTable(TableMain, "/AssemblyDbSrv/GetByProjectIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
-            "POST", MsFilterByProject.getValue());
+        RefreshMainView();
     });
 
     //TableMain AssemblyDbs
     TableMain = $("#TableMain").DataTable({
-        ajax: {
-            url: "/AssemblyDbSrv/GetByProjectIds",
-            type: "POST",
-            data: { getActive: ($("#ChBoxShowDeleted").prop("checked")) ? false : true }
-        },
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "AssyName", name: "AssyName" },//1
@@ -207,7 +211,7 @@ $(document).ready(function () {
 
 var TableMain = {};
 var IsCreate = false;
-var MsFilterByProject = {};
+var MsFilterByProject = {}; var MsFilterByType = {};
 var MagicSuggests = [];
 var CurrRecord = {};
 
@@ -421,8 +425,7 @@ function SubmitEdits() {
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
-            RefreshTable(TableMain, "/AssemblyDbSrv/GetByProjectIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
-                "POST", MsFilterByProject.getValue());;
+            RefreshMainView();
             IsCreate = false;
             $("#MainView").removeClass("hide");
             $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
@@ -440,12 +443,24 @@ function DeleteRecords() {
         beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function () {
-            RefreshTable(TableMain, "/AssemblyDbSrv/GetByProjectIds",
-                ($("#ChBoxShowDeleted").prop("checked")) ? false : true, "POST", MsFilterByProject.getValue());
-        })
+        .done(function () { RefreshMainView(); })
         .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
 }
+
+//refresh view after magicsuggest update
+function RefreshMainView() {
+    if (MsFilterByType.getValue().length == 0 && MsFilterByProject.getValue().length == 0) {
+        $("#ChBoxShowDeleted").bootstrapToggle("disable")
+        TableMain.clear().search("").draw();
+    }
+    else {
+        RefreshTable(TableMain, "/AssemblyDbSrv/GetByTypeIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+            "POST", MsFilterByProject.getValue(), [], MsFilterByType.getValue());
+        $("#ChBoxShowDeleted").bootstrapToggle("enable")
+    }
+
+}
+
 
 //---------------------------------------Helper Methods--------------------------------------//
 

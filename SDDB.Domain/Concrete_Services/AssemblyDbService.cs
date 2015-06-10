@@ -161,6 +161,43 @@ namespace SDDB.Domain.Services
                 return records;
             }
         }
+
+        //get by projectIds and typeIds
+        public virtual async Task<List<AssemblyDb>> GetByTypeAsync(string userId, string[] projectIds = null, string[] typeIds = null, bool getActive = true)
+        {
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+                projectIds = projectIds ?? await dbContext.Projects.Where(x => x.ProjectPersons.Select(y => y.Id).Contains(userId)).Select(x => x.Id)
+                    .ToArrayAsync().ConfigureAwait(false);
+
+                typeIds = typeIds ?? await dbContext.AssemblyTypes.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+
+                var records = await dbContext.AssemblyDbs
+                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive
+                        && projectIds.Contains(x.AssignedToProject_Id) && typeIds.Contains(x.AssemblyType_Id))
+                    .Include(x => x.AssemblyType).Include(x => x.AssemblyStatus).Include(x => x.AssemblyModel).Include(x => x.AssignedToProject)
+                    .Include(x => x.AssignedToLocation).Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssemblyExt)
+                    .ToListAsync().ConfigureAwait(false);
+
+                foreach (var record in records)
+                {
+                    var excludedProperties = new string[] { "Id", "TSP" };
+                    var properties = typeof(AssemblyDb).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+                    foreach (var property in properties)
+                    {
+                        if (!property.GetMethod.IsVirtual) continue;
+                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
+                        if (excludedProperties.Contains(property.Name)) continue;
+
+                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
+                    }
+                }
+
+                return records;
+            }
+        }
         
         //find by query
         public virtual Task<List<AssemblyDb>> LookupAsync(string userId, string query = "", bool getActive = true)

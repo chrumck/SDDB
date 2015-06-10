@@ -157,6 +157,7 @@ namespace SDDB.Domain.Services
                 return records;
             }
         }
+
         
         //find by query
         public virtual Task<List<Component>> LookupAsync(string userId, string query = "", bool getActive = true)

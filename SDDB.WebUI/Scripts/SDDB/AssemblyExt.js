@@ -85,14 +85,14 @@ $(document).ready(function () {
     $(MsFilterByModel).on('selectionchange', function (e, m) {
         if (this.getValue().length == 0) {
             MsFilterByProject.disable(); MsFilterByProject.clear(true);
-            $("#BtnEdit").prop("disabled", true);
+            $("#ChBoxShowDeleted").bootstrapToggle("disable")
             TableMain.clear().search("").draw();
         }
         else {
             RefreshTable(TableMain, "/AssemblyDbSrv/GetByModelIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
                 "POST", MsFilterByProject.getValue(), MsFilterByModel.getValue());
             MsFilterByProject.enable();
-            $("#BtnEdit").prop("disabled", false);
+            $("#ChBoxShowDeleted").bootstrapToggle("enable")
             $("#EditFormLabel").text("Edit " + MsFilterByModel.getSelection()[0].name);
 
             UpdateViewsForModel();
