@@ -403,6 +403,7 @@
     <Content Include="Scripts\respond.matchmedia.addListener.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.min.js" />
     <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\SDDB\ComponentExt.js" />
     <Content Include="Scripts\SDDB\Component.js" />
     <Content Include="Scripts\SDDB\AssemblyExt.js" />
     <Content Include="Scripts\SDDB\ComponentModel.js" />
@@ -452,6 +453,7 @@
     <Compile Include="ControllersSrv\ProjectSrvController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controllers\ComponentExtController.cs" />
     <Compile Include="Controllers\ComponentController.cs" />
     <Compile Include="Controllers\AssemblyExtController.cs" />
     <Compile Include="Controllers\ComponentModelController.cs" />
@@ -508,6 +510,7 @@
     <Content Include="Views\AssemblyExt\Index.cshtml" />
     <Content Include="Views\ComponentModel\Index.cshtml" />
     <Content Include="Views\Component\Index.cshtml" />
+    <Content Include="Views\ComponentExt\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

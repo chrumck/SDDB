@@ -90,15 +90,15 @@ table.dataTable thead .sorting_desc:after {
 	font-family: 'Glyphicons Halflings';
 	opacity: 0.5;
 }
-/*table.dataTable thead .sorting:after {
+table.dataTable thead .sorting:after {
 	opacity: 0.2;
-	content: "\e150";*/ /* sort */
+	content: "\e150"; /* sort */
 }
-/*table.dataTable thead .sorting_asc:after {
-	content: "\e155";*/ /* sort-by-attributes */
+table.dataTable thead .sorting_asc:after {
+	content: "\e155"; /* sort-by-attributes */
 }
-/*table.dataTable thead .sorting_desc:after {
-	content: "\e156";*/ /* sort-by-attributes-alt */
+table.dataTable thead .sorting_desc:after {
+	content: "\e156"; /* sort-by-attributes-alt */
 }
 div.dataTables_scrollBody table.dataTable thead .sorting:after,
 div.dataTables_scrollBody table.dataTable thead .sorting_asc:after,

@@ -1,3 +1,7 @@
-﻿/*selectable colors*/
+﻿/*selectable ui-selected only */
+.selectable .ui-selected[class ~= "odd"] { background: #F39814; color: white; }
+.selectable .ui-selected[class ~= "even"] { background: #F39814; color: white; }
+
+/*selectable colors*/
 .selectable .ui-selecting[class~="ui-selectee"] { background: #FECA40; }
 .selectable .ui-selected[class~="ui-selectee"] { background: #F39814; color: white; }

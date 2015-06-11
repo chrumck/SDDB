@@ -66,10 +66,12 @@ $(document).ready(function () {
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
-        dom: "<lf<t>p>",
         language: {
             search: "",
             lengthMenu: "_MENU_",
+            info: "_START_ - _END_ of _TOTAL_",
+            infoEmpty: "",
+            infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
     });
@@ -120,10 +122,12 @@ $(document).ready(function () {
             { data: "Name", name: "Name" }
         ],
         bAutoWidth: false,
-        dom: "<lf<t>p>",
         language: {
             search: "",
             lengthMenu: "_MENU_",
+            info: "_START_ - _END_ of _TOTAL_",
+            infoEmpty: "",
+            infoFiltered:"(filtered)",
             paginate: { previous: "", next: "" }
         },
         pageLength: 100
@@ -135,10 +139,12 @@ $(document).ready(function () {
             { data: "Name", name: "Name" }
         ],
         bAutoWidth: false,
-        dom: "<lf<t>p>",
         language: {
             search: "",
             lengthMenu: "_MENU_",
+            info: "_START_ - _END_ of _TOTAL_",
+            infoEmpty: "",
+            infoFiltered:"(filtered)",
             paginate: { previous: "", next: "" }
         },
         pageLength: 100

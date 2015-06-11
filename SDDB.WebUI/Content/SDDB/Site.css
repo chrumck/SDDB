@@ -62,10 +62,6 @@ input[type="checkbox"].input-validation-error {
     display: none;
 }
 
-/*selectable ui-selected only */
-.selectable .ui-selected[class ~= "odd"] { background: #F39814; color: white; }
-.selectable .ui-selected[class ~= "even"] { background: #F39814; color: white; }
-
 /* custom margins */
 .margin-bottom-2px {
   margin-bottom:2px;

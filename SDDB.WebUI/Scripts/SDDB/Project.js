@@ -74,10 +74,12 @@ $(document).ready(function () {
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
-        dom: "<lf<t>p>",
         language: {
             search: "",
             lengthMenu: "_MENU_",
+            info: "_START_ - _END_ of _TOTAL_",
+            infoEmpty: "",
+            infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
     });

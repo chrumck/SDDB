@@ -110,6 +110,9 @@ namespace SDDB.Domain.Entities
         [InverseProperty("GroupManagers")]
         public virtual ICollection<PersonGroup> ManagedGroups { get; set; }
 
+        [InverseProperty("LogEntryPersons")]
+        public virtual ICollection<PersonLogEntry> PersonLogEntrys { get; set; }
+
         //Constructors---------------------------------------------------------------------------------------------------------//
 
         public Person()
@@ -122,6 +125,7 @@ namespace SDDB.Domain.Entities
             this.PersonProjects = new HashSet<Project>();
             this.PersonGroups = new HashSet<PersonGroup>();
             this.ManagedGroups = new HashSet<PersonGroup>();
+            this.PersonLogEntrys = new HashSet<PersonLogEntry>();
         }
 
         //Non-persisten Properties---------------------------------------------------------------------------------------------//

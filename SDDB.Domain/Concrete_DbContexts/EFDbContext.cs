@@ -17,9 +17,14 @@ namespace SDDB.Domain.DbContexts
         //Fields and Properties---------------------------------------------------
 
         public virtual DbSet<DBResult> DBResults { get; set; }
+        
         public virtual DbSet<Person> Persons { get; set; }
-        public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<PersonGroup> PersonGroups { get; set; }
+        public virtual DbSet<PersonActivityType> PersonActivityTypes { get; set; }
+        public virtual DbSet<PersonLogEntry> PersonLogEntrys { get; set; }
+        
+        public virtual DbSet<Project> Projects { get; set; }
+        public virtual DbSet<ProjectEvent> ProjectEvents { get; set; }
         
         public virtual DbSet<Document> Documents { get; set; }
         public virtual DbSet<DocumentType> DocumentTypes { get; set; }
@@ -32,13 +37,14 @@ namespace SDDB.Domain.DbContexts
         public virtual DbSet<AssemblyType> AssemblyTypes { get; set; }
         public virtual DbSet<AssemblyModel> AssemblyModels { get; set; }
         public virtual DbSet<AssemblyStatus> AssemblyStatuss { get; set; }
+        public virtual DbSet<AssemblyLogEntry> AssemblyLogEntrys { get; set; }
 
         public virtual DbSet<Component> Components { get; set; }
         public virtual DbSet<ComponentExt> ComponentExts { get; set; }
         public virtual DbSet<ComponentType> ComponentTypes { get; set; }
-        public virtual DbSet<ComponentStatus> ComponentStatuss { get; set; }
         public virtual DbSet<ComponentModel> ComponentModels { get; set; }
-        
+        public virtual DbSet<ComponentStatus> ComponentStatuss { get; set; }
+        public virtual DbSet<ComponentLogEntry> ComponentLogEntrys { get; set; }
 
         //Constructors-------------------------------------------------------------
 

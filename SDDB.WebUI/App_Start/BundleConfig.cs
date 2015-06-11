@@ -20,7 +20,7 @@ namespace SDDB.WebUI
 
             //DataTables
             bundles.Add(new ScriptBundle("~/bundles/DataTables").Include("~/Scripts/DataTables/jquery.dataTables.js", "~/Scripts/DataTables/dataTables.bootstrap.js"));
-            bundles.Add(new StyleBundle("~/bundles/DataTables-CSS").Include("~/Content/DataTables/css/jquery.dataTables.css", "~/Content/DataTables/css/dataTables.bootstrap.css"));
+            bundles.Add(new StyleBundle("~/bundles/DataTables-CSS").Include("~/Content/DataTables/css/dataTables.bootstrap.css"));
 
             //jqueryUI
             bundles.Add(new ScriptBundle("~/bundles/jquery-ui").Include("~/Scripts/jquery-ui-{version}.js"));

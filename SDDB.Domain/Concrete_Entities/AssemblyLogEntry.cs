@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 using SDDB.Domain.Abstract;
 using SDDB.Domain.Infrastructure;
+using System.Collections.Generic;
 
 namespace SDDB.Domain.Entities
 {
-    [Table("AssemblyDbs")]
-    public class AssemblyDb : IDbEntity
+    [Table("AssemblyLogEntrys")]
+    public class AssemblyLogEntry : IDbEntity
     {
         //Entity Framework Properties------------------------------------------------------------------------------------------//
 
@@ -18,31 +18,28 @@ namespace SDDB.Domain.Entities
         [StringLength(40)]
         public string Id { get; set; }
 
-        [Required(ErrorMessage = "Assy. Name field is required")]
-        [DBIsUnique] [Index(IsUnique = true)]
-        [StringLength(255)]
-        public string AssyName { get; set; }
-
-        [DBIsUnique] [Index(IsUnique = true)]
-        [StringLength(255)]
-        public string AssyAltName { get; set; }
-
-        [StringLength(255)]
-        public string AssyAltName2 { get; set; }
-
-        [Required( ErrorMessage = "Assy. Type field is required")]
+        [Required(ErrorMessage = "Assy field is required")]
         [StringLength(40)]
-        [ForeignKey("AssemblyType")]
-        public string AssemblyType_Id { get; set; }
+        [ForeignKey("AssemblyDb")]
+        public string AssemblyDb_Id { get; set; }
+        
+        [Required(ErrorMessage = "Person field is required")]
+        [StringLength(40)]
+        [ForeignKey("Person")]
+        public string Person_Id { get; set; }
+
+        [StringLength(40)]
+        [ForeignKey("AssignedToPersonLogEntry")]
+        public string AssignedToPersonLogEntry_Id { get; set; }
+
+        [Required(ErrorMessage = "Entry Date field is required")]
+        [DBIsDateTimeISO] [StringLength(64)]
+        public string LogEntryDate { get; set; }
 
         [Required(ErrorMessage = "Assy. Status field is required")]
         [StringLength(40)]
         [ForeignKey("AssemblyStatus")]
         public string AssemblyStatus_Id { get; set; }
-
-        [StringLength(40)]
-        [ForeignKey("AssemblyModel")]
-        public string AssemblyModel_Id { get; set; }
 
         [Required(ErrorMessage = "Project field is required")]
         [StringLength(40)]
@@ -79,21 +76,6 @@ namespace SDDB.Domain.Entities
 
         public decimal? AssyLength { get; set; }
 
-        public decimal? AssyReadingIntervalSecs { get; set; }
-
-        [Required]
-        [DefaultValue(false)]
-        public bool IsReference { get; set; }
-               
-        [Column(TypeName = "text")] [StringLength(65535)]
-        public string TechnicalDetails { get; set; }
-
-        [Column(TypeName = "text")] [StringLength(65535)]
-        public string PowerSupplyDetails { get; set; }
-
-        [Column(TypeName = "text")] [StringLength(65535)]
-        public string HSEDetails { get; set; }
-
         [Column(TypeName = "text")] [StringLength(65535)]
         public string Comments { get; set; }
 
@@ -117,32 +99,22 @@ namespace SDDB.Domain.Entities
         //one to one
         
         //one to many
-        public virtual AssemblyType AssemblyType { get; set; }
+        public virtual AssemblyDb AssemblyDb { get; set; }
+        public virtual Person Person { get; set; }
+        public virtual PersonLogEntry AssignedToPersonLogEntry { get; set; }
+        
         public virtual AssemblyStatus AssemblyStatus { get; set; }
-        public virtual AssemblyModel AssemblyModel { get; set; }
         public virtual Project AssignedToProject { get; set; }
         public virtual Location AssignedToLocation { get; set; }
-        
-        public virtual AssemblyExt AssemblyExt { get; set; }
+       
 
-        [InverseProperty("AssignedToAssemblyDb")]
-        public virtual ICollection<Component> AssemblyComponents { get; set; }
-
-        [InverseProperty("AssemblyDb")]
-        public virtual ICollection<AssemblyLogEntry> AssemblyLogEntrys { get; set; }
 
         //many to many
         
 
         //Constructors---------------------------------------------------------------------------------------------------------//
 
-        public AssemblyDb()
-        {
-            this.AssemblyComponents = new HashSet<Component>();
-            this.AssemblyLogEntrys = new HashSet<AssemblyLogEntry>();
-        }
-
-        
+                
         //Non-persisten Properties---------------------------------------------------------------------------------------------//
 
         [NotMapped]
