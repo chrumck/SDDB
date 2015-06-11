@@ -121,7 +121,7 @@ function ShowModalAJAXFail(xhr, status, error) {
 }
 
 //Refresh main table from AJAX
-function RefreshTable(table, url, getActive, httpType, projectIds, modelIds, typeIds, locIds) {
+function RefreshTable(table, url, getActive, httpType, projectIds, modelIds, typeIds, locIds, assyIds) {
 
     getActive = (typeof getActive !== "undefined" && getActive == false) ? false : true;
     httpType = (typeof httpType !== "undefined") ? httpType : "GET";
@@ -129,10 +129,11 @@ function RefreshTable(table, url, getActive, httpType, projectIds, modelIds, typ
     modelIds = (typeof modelIds !== "undefined") ? modelIds : [];
     typeIds = (typeof typeIds !== "undefined") ? typeIds : [];
     locIds = (typeof locIds !== "undefined") ? locIds : [];
+    assyIds = (typeof assyIds !== "undefined") ? assyIds : [];
 
     $.ajax({
         type: httpType, url: url, timeout: 20000,
-        data: { getActive: getActive, projectIds: projectIds, modelIds: modelIds, typeIds: typeIds, locIds: locIds },
+        data: { getActive: getActive, projectIds: projectIds, modelIds: modelIds, typeIds: typeIds, locIds: locIds, assyIds: assyIds },
         dataType: "json",
         beforeSend: function () {
             table.clear().search("").draw();

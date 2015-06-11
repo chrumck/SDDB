@@ -87,11 +87,7 @@ $(document).ready(function () {
         },
         style: "min-width: 240px;"
     });
-    $(MsFilterByProject).on('selectionchange', function (e, m) {
-        if (this.getValue().length == 0) { MsFilterByLoc.disable(); MsFilterByLoc.clear(true); }
-        else MsFilterByLoc.enable();
-        RefreshMainView();
-    });
+    $(MsFilterByProject).on('selectionchange', function (e, m) { RefreshMainView(); });
 
     //Initialize MagicSuggest MsFilterByLoc
     MsFilterByLoc = $("#MsFilterByLoc").magicSuggest({
@@ -104,7 +100,6 @@ $(document).ready(function () {
         style: "min-width: 240px;"
     });
     $(MsFilterByLoc).on('selectionchange', function (e, m) { RefreshMainView(); });
-    MsFilterByLoc.disable();
 
 
     //---------------------------------------DataTables------------

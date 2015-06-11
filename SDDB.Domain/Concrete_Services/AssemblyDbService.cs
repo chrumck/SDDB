@@ -211,7 +211,8 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.AssemblyDbs
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
-                    (x.AssyName.Contains(query) || x.AssyAltName.Contains(query) || x.AssyAltName2.Contains(query))).ToListAsync();
+                    (x.AssyName.Contains(query) || x.AssyAltName.Contains(query) || x.AssyAltName2.Contains(query)))
+                    .Include(x => x.AssignedToProject).ToListAsync();
             }
         }
 
@@ -227,7 +228,8 @@ namespace SDDB.Domain.Services
                 
                 var records = await dbContext.AssemblyDbs.Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) &&
                     x.IsActive == getActive && projectIds.Contains(x.AssignedToProject_Id) &&
-                    (x.AssyName.Contains(query) || x.AssyAltName.Contains(query) || x.AssyAltName2.Contains(query))).ToListAsync();
+                    (x.AssyName.Contains(query) || x.AssyAltName.Contains(query) || x.AssyAltName2.Contains(query)))
+                    .Include(x => x.AssignedToProject).ToListAsync();
                 
                 return records;
             }

@@ -165,7 +165,8 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.Locations
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
-                    (x.LocName.Contains(query) || x.LocAltName.Contains(query) || x.LocStationing.ToString().Contains(query))).ToListAsync();
+                    (x.LocName.Contains(query) || x.LocAltName.Contains(query) || x.LocStationing.ToString().Contains(query)))
+                    .Include(x => x.AssignedToProject).ToListAsync();
             }
         }
 
@@ -182,7 +183,8 @@ namespace SDDB.Domain.Services
 
                 var records = await dbContext.Locations.Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) &&
                     x.IsActive == getActive && projectIds.Contains(x.AssignedToProject_Id) &&
-                    (x.LocName.Contains(query) || x.LocAltName.Contains(query) || x.LocStationing.ToString().Contains(query))).ToListAsync();
+                    (x.LocName.Contains(query) || x.LocAltName.Contains(query) || x.LocStationing.ToString().Contains(query)))
+                    .Include(x => x.AssignedToProject).ToListAsync();
 
                 return records;
             }

@@ -39,7 +39,7 @@ namespace SDDB.Domain.Services
                 var records = await dbContext.Components
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive)
                     .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.AssignedToAssemblyDb.AssemblyType).Include(x => x.ComponentExt)
+                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt)
                     .ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
@@ -69,7 +69,7 @@ namespace SDDB.Domain.Services
                 var records = await dbContext.Components
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive && ids.Contains(x.Id))
                     .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.AssignedToAssemblyDb.AssemblyType).Include(x => x.ComponentExt)
+                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt)
                     .ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
@@ -104,7 +104,7 @@ namespace SDDB.Domain.Services
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive
                         && projectIds.Contains(x.AssignedToProject_Id))
                     .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.AssignedToAssemblyDb.AssemblyType).Include(x => x.ComponentExt)
+                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt)
                     .ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
@@ -141,7 +141,7 @@ namespace SDDB.Domain.Services
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive
                         && projectIds.Contains(x.AssignedToProject_Id) && modelIds.Contains(x.ComponentModel_Id))
                     .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.AssignedToAssemblyDb.AssemblyType).Include(x => x.ComponentExt)
+                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt)
                     .ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
@@ -175,15 +175,27 @@ namespace SDDB.Domain.Services
 
                 typeIds = typeIds ?? await dbContext.ComponentTypes.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
 
-                assyIds = assyIds ?? await dbContext.AssemblyDbs.Where(x => projectIds.Contains(x.AssignedToProject_Id)).Select(x => x.Id)
-                    .ToArrayAsync().ConfigureAwait(false);
+                List<Component> records = null;
+                if (assyIds == null || assyIds.Length == 0)
+                {
+                    records = await dbContext.Components
+                        .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive
+                            && projectIds.Contains(x.AssignedToProject_Id) && typeIds.Contains(x.ComponentType_Id))
+                        .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
+                        .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt)
+                        .ToListAsync().ConfigureAwait(false);
+                }
+                else
+                {
+                    records = await dbContext.Components
+                        .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive
+                            && projectIds.Contains(x.AssignedToProject_Id) && typeIds.Contains(x.ComponentType_Id) && assyIds.Contains(x.AssignedToAssemblyDb_Id))
+                        .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
+                        .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt)
+                        .ToListAsync().ConfigureAwait(false);
+                }
 
-                var records = await dbContext.Components
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive
-                        && projectIds.Contains(x.AssignedToProject_Id) && typeIds.Contains(x.ComponentType_Id) && assyIds.Contains(x.AssignedToAssemblyDb_Id)) 
-                    .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.AssignedToAssemblyDb.AssemblyType).Include(x => x.ComponentExt)
-                    .ToListAsync().ConfigureAwait(false);
+                
 
                 foreach (var record in records)
                 {
