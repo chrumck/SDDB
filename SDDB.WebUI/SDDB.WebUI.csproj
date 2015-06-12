@@ -409,6 +409,8 @@
     <Content Include="Scripts\SDDB\ComponentModel.js" />
     <Content Include="Scripts\SDDB\AssemblyModel.js" />
     <Content Include="Scripts\SDDB\AssemblyDb.js" />
+    <Content Include="Scripts\SDDB\ProjectEvent.js" />
+    <Content Include="Scripts\SDDB\PersonActivityType.js" />
     <Content Include="Scripts\SDDB\Location.js" />
     <Content Include="Scripts\SDDB\LocationType.js" />
     <Content Include="Scripts\SDDB\ComponentStatus.js" />
@@ -436,6 +438,8 @@
     <Compile Include="ControllersSrv\ComponentModelSrvController.cs" />
     <Compile Include="ControllersSrv\AssemblyModelSrvController.cs" />
     <Compile Include="ControllersSrv\AssemblyDbSrvController.cs" />
+    <Compile Include="ControllersSrv\ProjectEventSrvController.cs" />
+    <Compile Include="ControllersSrv\PersonActivityTypeSrvController.cs" />
     <Compile Include="ControllersSrv\LocationSrvController.cs" />
     <Compile Include="ControllersSrv\_BaseSrvCtrl.cs" />
     <Compile Include="ControllersSrv\LocationTypeSrvController.cs" />
@@ -459,6 +463,8 @@
     <Compile Include="Controllers\ComponentModelController.cs" />
     <Compile Include="Controllers\AssemblyModelController.cs" />
     <Compile Include="Controllers\AssemblyDbController.cs" />
+    <Compile Include="Controllers\ProjectEventController.cs" />
+    <Compile Include="Controllers\PersonActivityTypeController.cs" />
     <Compile Include="Controllers\LocationController.cs" />
     <Compile Include="Controllers\LocationTypeController.cs" />
     <Compile Include="Controllers\ComponentStatusController.cs" />
@@ -511,6 +517,8 @@
     <Content Include="Views\ComponentModel\Index.cshtml" />
     <Content Include="Views\Component\Index.cshtml" />
     <Content Include="Views\ComponentExt\Index.cshtml" />
+    <Content Include="Views\PersonActivityType\Index.cshtml" />
+    <Content Include="Views\ProjectEvent\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

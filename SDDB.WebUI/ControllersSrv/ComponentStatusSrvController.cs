@@ -55,7 +55,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var records = await compStatusService.LookupAsync(query, getActive).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "CompStatusService.LookupAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "ComponentStatusService.LookupAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(records.OrderBy(x => x.CompStatusName)
                 .Select(x => new { id = x.Id, name = x.CompStatusName }), JsonRequestBehavior.AllowGet);

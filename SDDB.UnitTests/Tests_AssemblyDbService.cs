@@ -501,10 +501,20 @@ namespace SDDB.UnitTests
 
             var assemblyIds = new string[] { "dummyId1", "DummyId2" };
 
+            var compDbEntry1 = new Component { Id = "compDummyId1", CompName = "Name1", CompAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var compDbEntries = (new List<Component> { compDbEntry1 }).AsQueryable();
+            var mockCompDbSet = new Mock<DbSet<Component>>();
+            mockCompDbSet.As<IDbAsyncEnumerable<Component>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Component>(compDbEntries.GetEnumerator()));
+            mockCompDbSet.As<IQueryable<Component>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<Component>(compDbEntries.Provider));
+            mockCompDbSet.As<IQueryable<Component>>().Setup(m => m.Expression).Returns(compDbEntries.Expression);
+            mockCompDbSet.As<IQueryable<Component>>().Setup(m => m.ElementType).Returns(compDbEntries.ElementType);
+            mockCompDbSet.As<IQueryable<Component>>().Setup(m => m.GetEnumerator()).Returns(compDbEntries.GetEnumerator());
+            mockEfDbContext.Setup(x => x.Components).Returns(mockCompDbSet.Object);
+
             var dbEntry = new AssemblyDb { IsActive = true };
             mockEfDbContext.Setup(x => x.AssemblyDbs.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
             mockEfDbContext.Setup(x => x.AssemblyDbs.FindAsync("dummyId2")).Returns(Task.FromResult<AssemblyDb>(null));
-
+            
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
 
             var assemblyService = new AssemblyDbService(mockDbContextScopeFac.Object);
@@ -534,6 +544,16 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var assemblyIds = new string[] { "dummyId1" };
+
+            var compDbEntry1 = new Component { Id = "compDummyId1", CompName = "Name1", CompAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var compDbEntries = (new List<Component> { compDbEntry1 }).AsQueryable();
+            var mockCompDbSet = new Mock<DbSet<Component>>();
+            mockCompDbSet.As<IDbAsyncEnumerable<Component>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Component>(compDbEntries.GetEnumerator()));
+            mockCompDbSet.As<IQueryable<Component>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<Component>(compDbEntries.Provider));
+            mockCompDbSet.As<IQueryable<Component>>().Setup(m => m.Expression).Returns(compDbEntries.Expression);
+            mockCompDbSet.As<IQueryable<Component>>().Setup(m => m.ElementType).Returns(compDbEntries.ElementType);
+            mockCompDbSet.As<IQueryable<Component>>().Setup(m => m.GetEnumerator()).Returns(compDbEntries.GetEnumerator());
+            mockEfDbContext.Setup(x => x.Components).Returns(mockCompDbSet.Object);
 
             var dbEntry = new AssemblyDb { IsActive = true };
             mockEfDbContext.Setup(x => x.AssemblyDbs.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));

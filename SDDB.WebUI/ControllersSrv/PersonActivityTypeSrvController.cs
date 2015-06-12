@@ -9,68 +9,68 @@ using SDDB.WebUI.Infrastructure;
 
 namespace SDDB.WebUI.ControllersSrv
 {
-    public class AssemblyStatusSrvController : BaseSrvCtrl
+    public class PersonActivityTypeSrvController : BaseSrvCtrl
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
-        private AssemblyStatusService assyStatusService;
+        private PersonActivityTypeService prsActivityTypeService;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
-        public AssemblyStatusSrvController(AssemblyStatusService assyStatusService)
+        public PersonActivityTypeSrvController(PersonActivityTypeService prsActivityTypeService)
         {
-            this.assyStatusService = assyStatusService;
+            this.prsActivityTypeService = prsActivityTypeService;
         }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
-        // GET: /AssemblyStatusSrv/Get
-        [DBSrvAuth("AssemblyStatus_View")]
+        // GET: /PersonActivityTypeSrv/Get
+        [DBSrvAuth("PersonActivityType_View")]
         public async Task<ActionResult> Get(bool getActive = true)
         {
-            var data = (await assyStatusService.GetAsync(getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.AssyStatusName, x.AssyStatusAltName, x.Comments, x.IsActive
+            var data = (await prsActivityTypeService.GetAsync(getActive).ConfigureAwait(false)).Select(x => new {
+                x.Id, x.ActivityTypeName, x.ActivityTypeAltName, x.Comments, x.IsActive
             });
 
-            ViewBag.ServiceName = "AssemblyStatusService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "PersonActivityTypeService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(new { data }, JsonRequestBehavior.AllowGet);
         }
 
-        // GET: /AssemblyStatusSrv/GetByIds
+        // GET: /PersonActivityTypeSrv/GetByIds
         [HttpPost]
-        [DBSrvAuth("AssemblyStatus_View")]
+        [DBSrvAuth("PersonActivityType_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
-            var data = (await assyStatusService.GetAsync(ids, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.AssyStatusName, x.AssyStatusAltName, x.Comments, x.IsActive
+            var data = (await prsActivityTypeService.GetAsync(ids, getActive).ConfigureAwait(false)).Select(x => new {
+                x.Id, x.ActivityTypeName, x.ActivityTypeAltName, x.Comments, x.IsActive
             });
 
-            ViewBag.ServiceName = "AssemblyStatusService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "PersonActivityTypeService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json( data , JsonRequestBehavior.AllowGet);
         }
 
-        // GET: /AssemblyStatusSrv/Lookup
+        // GET: /PersonActivityTypeSrv/Lookup
         public async Task<ActionResult> Lookup(string query = "", bool getActive = true)
         {
-            var records = await assyStatusService.LookupAsync(query, getActive).ConfigureAwait(false);
+            var records = await prsActivityTypeService.LookupAsync(query, getActive).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "AssemblyStatusService.LookupAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "PersonActivityTypeService.LookupAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(records.OrderBy(x => x.AssyStatusName)
-                .Select(x => new { id = x.Id, name = x.AssyStatusName }), JsonRequestBehavior.AllowGet);
+            return Json(records.OrderBy(x => x.ActivityTypeName)
+                .Select(x => new { id = x.Id, name = x.ActivityTypeName }), JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
 
-        // POST: /AssemblyStatusSrv/Edit
+        // POST: /PersonActivityTypeSrv/Edit
         [HttpPost]
-        [DBSrvAuth("AssemblyStatus_Edit")]
-        public async Task<ActionResult> Edit(AssemblyStatus[] records)
+        [DBSrvAuth("PersonActivityType_Edit")]
+        public async Task<ActionResult> Edit(PersonActivityType[] records)
         {
-            var serviceResult = await assyStatusService.EditAsync(records).ConfigureAwait(false);
+            var serviceResult = await prsActivityTypeService.EditAsync(records).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "AssemblyStatusService.EditAsync"; ViewBag.StatusCode = serviceResult.StatusCode; 
+            ViewBag.ServiceName = "PersonActivityTypeService.EditAsync"; ViewBag.StatusCode = serviceResult.StatusCode; 
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
@@ -84,14 +84,14 @@ namespace SDDB.WebUI.ControllersSrv
             }
         }
 
-        // POST: /AssemblyStatusSrv/Delete
+        // POST: /PersonActivityTypeSrv/Delete
         [HttpPost]
-        [DBSrvAuth("AssemblyStatus_Edit")]
+        [DBSrvAuth("PersonActivityType_Edit")]
         public async Task<ActionResult> Delete(string[] ids)
         {
-            var serviceResult = await assyStatusService.DeleteAsync(ids).ConfigureAwait(false);
+            var serviceResult = await prsActivityTypeService.DeleteAsync(ids).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "AssemblyStatusService.DeleteAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.ServiceName = "PersonActivityTypeService.DeleteAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)

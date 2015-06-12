@@ -152,7 +152,9 @@
     <Compile Include="Concrete_Services\ComponentModelService.cs" />
     <Compile Include="Concrete_Services\AssemblyModelService.cs" />
     <Compile Include="Concrete_Services\AssemblyDbService.cs" />
+    <Compile Include="Concrete_Services\ProjectEventService.cs" />
     <Compile Include="Concrete_Services\LocationService.cs" />
+    <Compile Include="Concrete_Services\PersonActivityTypeService.cs" />
     <Compile Include="Concrete_Services\LocationTypeService.cs" />
     <Compile Include="Concrete_Services\ComponentStatusService.cs" />
     <Compile Include="Concrete_Services\AssemblyStatusService.cs" />

@@ -270,7 +270,13 @@ namespace SDDB.Domain.Services
                         var dbEntry = await dbContext.Locations.FindAsync(id).ConfigureAwait(false);
                         if (dbEntry != null)
                         {
+                            //tasks prior to desactivating: check if assemblies assigned to location
+                            if ((await dbContext.AssemblyDbs.Where(x => x.IsActive == true && x.AssignedToLocation_Id == id).CountAsync().ConfigureAwait(false)) > 0)
+                                errorMessage += string.Format("Location {0} not deleted, it has assemblies assigned to it\n", dbEntry.LocName);
+                            else
+                            {
                             dbEntry.IsActive = false;
+                            }
                         }
                         else
                         {

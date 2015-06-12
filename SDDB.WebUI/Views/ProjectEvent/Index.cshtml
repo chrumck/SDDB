@@ -1,0 +1,165 @@
+﻿@model SDDB.Domain.Entities.ProjectEvent
+@{
+    ViewBag.Title = "Project Events";
+}
+
+<!------- MainView ------->
+<div class="container-fluid" id="MainView">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="btn-group margin-bottom-2px">
+                <button class="btn btn-default" id="BtnCreate">Create</button>
+                <button class="btn btn-primary" id="BtnEdit">Edit</button>
+                <button class="btn btn-danger" id="BtnDelete">Delete</button>
+            </div>
+
+            <div class="btn-group margin-bottom-2px">
+                <div id="MsFilterByProject" placeholder="Select Project"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-primary" id="PanelTableMain">
+        <div class="panel-heading text-center" style="font-size:130%">
+            <strong>Project Events</strong>
+            <div class="pull-right">
+                <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="100" data-onstyle="warning" data-on="Deleted Shown" data-off="Show Deleted" disabled>
+            </div>
+        </div>
+        <table class="table table-striped" id="TableMain">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Event Name</th>
+                    <th>Alternate Name</th>
+                    <th>Project</th>
+                    <th>Created</th>
+                    <th>Created By</th>
+                    <th>Closed</th>
+                    <th>Closed By</th>
+                    <th>Comments</th>
+                    <th>Is Active</th>
+                    <th>AssignedToProject_Id</th>
+                </tr>
+            </thead>
+            <tbody class="selectable"></tbody>
+        </table>
+    </div>
+</div>
+
+<!------- EditFormView ------->
+<div class="container-fluid hide" id="EditFormView">
+    <div class="row">
+        <div class="col-xs-6">
+            <h3 id="EditFormLabel">Create/Edit Project Event</h3>
+        </div>
+        <div class="col-xs-6">
+            <h3><button class="btn btn-default pull-right" type="button" id="EditFormBtnBack">Cancel</button></h3>
+        </div>
+    </div>
+    <div class="well">
+        <form class="form-horizontal" role="form" id="EditForm">
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.EventName, "Name", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.EventName, new { @class = "form-control modifiable", placeholder = "Event Name" })
+                            @Html.ValidationMessageFor(x => x.EventName)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.EventAltName, "Alternate Name", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.EventAltName, new { @class = "form-control modifiable", placeholder = "Alternate Name" })
+                            @Html.ValidationMessageFor(x => x.EventAltName)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssignedToProject_Id, "Project", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssignedToProject_Id, new { @class = "form-control modifiable", placeholder = "Assigned To Project" })
+                            @Html.ValidationMessageFor(x => x.AssignedToProject_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.EventCreated, "Event Created", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.EventCreated, new { @class = "form-control modifiable", placeholder = "Date Created" })
+                            @Html.ValidationMessageFor(x => x.EventCreated)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.CreatedByPerson_Id, "Created By", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.CreatedByPerson_Id, new { @class = "form-control modifiable", placeholder = "Created By" })
+                            @Html.ValidationMessageFor(x => x.CreatedByPerson_Id)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.EventClosed, "Event Closed", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.EventClosed, new { @class = "form-control modifiable", placeholder = "Date Closed" })
+                            @Html.ValidationMessageFor(x => x.EventClosed)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.ClosedByPerson_Id, "Closed By", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.ClosedByPerson_Id, new { @class = "form-control modifiable", placeholder = "Closed By" })
+                            @Html.ValidationMessageFor(x => x.ClosedByPerson_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Comments, "Comments", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextAreaFor(x => x.Comments, 3, 10, new { @class = "form-control modifiable", placeholder = "Comments" })
+                            @Html.ValidationMessageFor(x => x.Comments)
+                        </div>
+                    </div>
+                    <div class="form-group hide" id="EditFormGroupIsActive">
+                        <div class="col-sm-10 col-sm-offset-2">
+                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "modifiable" }) &nbsp;&nbsp;
+                            @Html.LabelFor(x => x.IsActive, "Is Active") &nbsp;&nbsp; <em>(Marking as 'Active' un-deletes record.)</em>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <div class="col-xs-6">
+                    <button class="btn btn-default" type="button" id="EditFormBtnCancel">Cancel</button>
+                </div>
+                <div class="col-xs-6">
+                    <button class="btn btn-success pull-right" type="button" id="EditFormBtnOk">
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/DataTables")
+    @Scripts.Render("~/bundles/jquery-ui")
+    @Scripts.Render("~/bundles/bootstrap-toggle")
+    @Scripts.Render("~/bundles/magicsuggest")
+    @Scripts.Render("~/bundles/bootstrap-datetimepicker")
+    <script src="~/Scripts/SDDB/ProjectEvent.js"></script>
+}
+
+@section CSS {
+    @Styles.Render("~/bundles/DataTables-CSS")
+    @Styles.Render("~/bundles/jquery-ui-CSS")
+    @Styles.Render("~/bundles/bootstrap-toggle-CSS")
+    @Styles.Render("~/bundles/magicsuggest-css")
+    @Styles.Render("~/bundles/bootstrap-datetimepicker-CSS")
+}
+

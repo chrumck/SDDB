@@ -76,7 +76,7 @@ namespace SDDB.Domain.Infrastructure
 
     public class DBIsDateISOAttribute : ValidationAttribute, IClientValidatable
     {
-        public DBIsDateISOAttribute() : base("{0} has to be in 'YYYY-MM-DD' format.") { }
+        public DBIsDateISOAttribute() : base("{0} has to be in 'yyyy-MM-dd' format.") { }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
@@ -100,12 +100,12 @@ namespace SDDB.Domain.Infrastructure
 
     public class DBIsDateTimeISOAttribute : ValidationAttribute, IClientValidatable
     {
-        public DBIsDateTimeISOAttribute() : base("{0} has to be in 'YYYY-MM-dd HH:mm' format.") { }
+        public DBIsDateTimeISOAttribute() : base("{0} has to be in 'yyyy-MM-dd HH:mm' format.") { }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             DateTime output;
-            if (value != null && !DateTime.TryParseExact(value.ToString(), "YYYY-MM-DD HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out output))
+            if (value != null && !DateTime.TryParseExact(value.ToString(), "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out output))
                 return new ValidationResult(FormatErrorMessage(validationContext.DisplayName));
             else
                 return ValidationResult.Success;

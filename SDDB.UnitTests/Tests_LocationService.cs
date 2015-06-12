@@ -501,6 +501,16 @@ namespace SDDB.UnitTests
 
             var locationIds = new string[] { "dummyId1", "DummyId2" };
 
+            var assyDbEntry1 = new AssemblyDb { Id = "assyDummyId1", AssyName = "Name1", AssyAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
+            var mockAssyDbSet = new Mock<DbSet<AssemblyDb>>();
+            mockAssyDbSet.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
+            mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<AssemblyDb>(assyDbEntries.Provider));
+            mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.Expression).Returns(assyDbEntries.Expression);
+            mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.ElementType).Returns(assyDbEntries.ElementType);
+            mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
+            mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockAssyDbSet.Object);
+
             var dbEntry = new Location { IsActive = true };
             mockEfDbContext.Setup(x => x.Locations.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
             mockEfDbContext.Setup(x => x.Locations.FindAsync("dummyId2")).Returns(Task.FromResult<Location>(null));
@@ -534,6 +544,16 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var locationIds = new string[] { "dummyId1" };
+
+            var assyDbEntry1 = new AssemblyDb { Id = "assyDummyId1", AssyName = "Name1", AssyAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
+            var mockAssyDbSet = new Mock<DbSet<AssemblyDb>>();
+            mockAssyDbSet.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
+            mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<AssemblyDb>(assyDbEntries.Provider));
+            mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.Expression).Returns(assyDbEntries.Expression);
+            mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.ElementType).Returns(assyDbEntries.ElementType);
+            mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
+            mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockAssyDbSet.Object);
 
             var dbEntry = new Location { IsActive = true };
             mockEfDbContext.Setup(x => x.Locations.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));

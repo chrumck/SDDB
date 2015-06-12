@@ -327,7 +327,13 @@ namespace SDDB.Domain.Services
                         var dbEntry = await dbContext.AssemblyDbs.FindAsync(id).ConfigureAwait(false);
                         if (dbEntry != null)
                         {
-                            dbEntry.IsActive = false;
+                            //tasks prior to desactivating: check if components assigned to assembly
+                            if ((await dbContext.Components.Where(x => x.IsActive == true && x.AssignedToAssemblyDb_Id == id).CountAsync().ConfigureAwait(false)) > 0)
+                                errorMessage += string.Format("Assembly {0} not deleted, it has components assigned to it\n", dbEntry.AssyName);
+                            else
+                            {
+                                dbEntry.IsActive = false;
+                            }
                         }
                         else
                         {

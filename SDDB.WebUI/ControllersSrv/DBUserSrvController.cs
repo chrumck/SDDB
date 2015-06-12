@@ -34,7 +34,7 @@ namespace SDDB.WebUI.ControllersSrv
             var data = users.OrderBy(x => x.Person.LastName).Select(x => new {
                 x.Id, x.Person.LastName, x.Person.FirstName, x.UserName, x.Email, x.LDAPAuthenticated });
 
-            ViewBag.ServiceName = "dbUserService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "DBUserService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(new { data }, JsonRequestBehavior.AllowGet);
         }
@@ -49,7 +49,7 @@ namespace SDDB.WebUI.ControllersSrv
             var data = users.Where(x => ids.Contains((x.Id))).OrderBy(x => x.Person.LastName).Select(x => new {
                 x.Id, x.Person.LastName, x.Person.FirstName, x.UserName, x.Email, x.LDAPAuthenticated });
 
-            ViewBag.ServiceName = "dbUserService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "DBUserService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(data, JsonRequestBehavior.AllowGet);
         }
@@ -63,7 +63,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await dbUserService.EditAsync(records).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "dbUserService.EditAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.ServiceName = "DBUserService.EditAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
@@ -84,7 +84,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await dbUserService.DeleteAsync(ids).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "dbUserService.DeleteAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.ServiceName = "DBUserService.DeleteAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
@@ -107,7 +107,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var data = (await dbUserService.GetAllRolesAsync().ConfigureAwait(false)).Select(x => new { Name = x });
 
-            ViewBag.ServiceName = "dbUserService.GetAllRolesAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "DBUserService.GetAllRolesAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(new { data }, JsonRequestBehavior.AllowGet);
         }
@@ -118,7 +118,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var data = (await dbUserService.GetUserRolesAsync(id).ConfigureAwait(false)).Select(x => new { Name = x });
 
-            ViewBag.ServiceName = "dbUserService.GetUserRolesAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "DBUserService.GetUserRolesAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(new { data }, JsonRequestBehavior.AllowGet);
         }
@@ -129,7 +129,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var data = (await dbUserService.GetUserRolesNotAsync(id).ConfigureAwait(false)).Select(x => new { Name = x });
 
-            ViewBag.ServiceName = "dbUserService.GetUserRolesNotAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "DBUserService.GetUserRolesNotAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(new { data }, JsonRequestBehavior.AllowGet);
         }
@@ -141,7 +141,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await dbUserService.EditRolesAsync(ids, dbRoles, isAdd).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "dbUserService.EditRolesAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.ServiceName = "DBUserService.EditRolesAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)

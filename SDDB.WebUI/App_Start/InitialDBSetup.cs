@@ -21,8 +21,10 @@ namespace SDDB.WebUI
                 new DBRole {Name = "DBUser_View" }, new DBRole {Name = "DBUser_Edit" },
                 new DBRole {Name = "Person_View" },new DBRole {Name = "Person_Edit" },
                 new DBRole {Name = "PersonGroup_View" },new DBRole {Name = "PersonGroup_Edit" },
+                new DBRole {Name = "PersonActivityType_View" },new DBRole {Name = "PersonActivityType_Edit" },
                 
                 new DBRole {Name = "Project_View" },new DBRole {Name = "Project_Edit" },
+                new DBRole {Name = "ProjectEvent_View" },new DBRole {Name = "ProjectEvent_Edit" },
                 
                 new DBRole {Name = "Document_View" },new DBRole {Name = "Document_Edit" },
                 new DBRole {Name = "DocumentType_View" },new DBRole {Name = "DocumentType_Edit" },

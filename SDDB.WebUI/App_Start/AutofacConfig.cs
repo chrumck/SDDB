@@ -47,8 +47,10 @@ namespace SDDB.WebUI
             builder.RegisterType<DBUserService>().AsSelf().WithParameter("ldapAuthenticationEnabled", LDAPAuthenticationEnabled).InstancePerDependency();
             builder.RegisterType<PersonService>().AsSelf().InstancePerDependency();
             builder.RegisterType<PersonGroupService>().AsSelf().InstancePerDependency();
+            builder.RegisterType<PersonActivityTypeService>().AsSelf().InstancePerDependency();
             
             builder.RegisterType<ProjectService>().AsSelf().InstancePerDependency();
+            builder.RegisterType<ProjectEventService>().AsSelf().InstancePerDependency();
             
             builder.RegisterType<DocumentService>().AsSelf().InstancePerDependency();
             builder.RegisterType<DocumentTypeService>().AsSelf().InstancePerDependency();

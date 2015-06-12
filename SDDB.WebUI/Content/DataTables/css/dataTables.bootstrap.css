@@ -47,7 +47,7 @@ div.dataTables_paginate ul.pagination {
 	div.dataTables_filter,
 	div.dataTables_info,
 	div.dataTables_paginate {
-		text-align: center;
+		/*text-align: center;*/
 	}
 
 	div.DTTT {
