@@ -116,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Abstract_Entities\IDbEntity.cs" />
+    <Compile Include="Abstract_Infrastructure\IFileRepoService.cs" />
     <Compile Include="Abstract_Infrastructure\ILogger.cs" />
     <Compile Include="Abstract_Services\IAppRoleManager.cs" />
     <Compile Include="Abstract_Services\IAppUserManager.cs" />
@@ -148,6 +149,7 @@
     <Compile Include="Concrete_Entities\_SessionSettings.cs" />
     <Compile Include="Concrete_Infrastructure\CustomDataAnnotations.cs" />
     <Compile Include="Concrete_Infrastructure\CustomHelpers.cs" />
+    <Compile Include="Concrete_Services\_DBftpRepoService.cs" />
     <Compile Include="Concrete_Services\ComponentService.cs" />
     <Compile Include="Concrete_Services\ComponentModelService.cs" />
     <Compile Include="Concrete_Services\AssemblyModelService.cs" />
@@ -173,7 +175,6 @@
     <Compile Include="Concrete_Services\ProjectService.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Concrete_Services\_ServiceTemplate.cs" />
     <Compile Include="Migrations\201505071653325_initialCreate.cs" />
     <Compile Include="Migrations\201505071653325_initialCreate.Designer.cs">
       <DependentUpon>201505071653325_initialCreate.cs</DependentUpon>

@@ -75,7 +75,7 @@ function ShowModalNothingSelected() {
 
 //Show Modal Selected other than one row
 function ShowModalSelectOne() {
-    $("#ModalInfoLabel").text("Selected One");
+    $("#ModalInfoLabel").text("Selected One Row");
     $("#ModalInfoBody").text("Please select only one row.");
     $("#ModalInfoBodyPre").empty().hide();
     $("#ModalInfo").modal("show");

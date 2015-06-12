@@ -7,6 +7,14 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
+//--------------------------------------Global Properties------------------------------------//
+
+var TableMain = {};
+var IsCreate = false;
+var MsFilterByProject = {}; var MsFilterByType = {}; var MsFilterByAssy = {};
+var MagicSuggests = [];
+var CurrRecord = {};
+
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
@@ -56,7 +64,7 @@ $(document).ready(function () {
     });
     $(MsFilterByType).on('selectionchange', function (e, m) { RefreshMainView(); });
 
-    //Initialize MagicSuggest msFilterByProject
+    //Initialize MagicSuggest MsFilterByProject
     MsFilterByProject = $("#MsFilterByProject").magicSuggest({
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
@@ -78,8 +86,7 @@ $(document).ready(function () {
         style: "min-width: 240px;"
     });
     $(MsFilterByAssy).on('selectionchange', function (e, m) { RefreshMainView(); });
-
-
+        
     //---------------------------------------DataTables------------
 
     //Enable jqueryUI selectable
@@ -171,16 +178,26 @@ $(document).ready(function () {
         if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
     });
 
+    //--------------------------------------View Initialization------------------------------------//
 
+    if (typeof assyId !== "undefined" && assyId != "") {
+        $.ajax({
+            type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 20000,
+            data: { ids: [assyId], getActive: true }, dataType: "json",
+            beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+        })
+            .always(function () { $("#ModalWait").modal("hide"); })
+            .done(function (data) {
+                MsFilterByAssy.setSelection([{ id: data[0].Id, name: data[0].AssyName,  }]);
+            })
+            .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+    }
+
+
+
+    //--------------------------------End of execution at Start-----------
 });
 
-//--------------------------------------Global Properties------------------------------------//
-
-var TableMain = {};
-var IsCreate = false;
-var MsFilterByProject = {}; var MsFilterByType = {}; var MsFilterByAssy = {};
-var MagicSuggests = [];
-var CurrRecord = {};
 
 //--------------------------------------Main Methods---------------------------------------//
 

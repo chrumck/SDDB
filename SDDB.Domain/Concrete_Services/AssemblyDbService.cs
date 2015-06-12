@@ -55,7 +55,6 @@ namespace SDDB.Domain.Services
                         if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
                     }
                 }
-
                 return records;
             }
         }
@@ -223,8 +222,8 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.AssemblyDbs
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
-                    (x.AssyName.Contains(query) || x.AssyAltName.Contains(query) || x.AssyAltName2.Contains(query)))
-                    .Include(x => x.AssignedToProject).ToListAsync();
+                    (x.AssyName.Contains(query) || x.AssyAltName.Contains(query) || x.AssyAltName2.Contains(query) ||
+                    x.AssignedToProject.ProjectCode.Contains(query))).Include(x => x.AssignedToProject).ToListAsync();
             }
         }
 

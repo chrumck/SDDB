@@ -7,6 +7,14 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
+//--------------------------------------Global Properties------------------------------------//
+
+var TableMain = {};
+var IsCreate = false;
+var MagicSuggests = [];
+var CurrRecord = {};
+
+
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
@@ -29,6 +37,14 @@ $(document).ready(function () {
         var noOfRows = TableMain.rows(".ui-selected").data().length;
         if (noOfRows == 0) ShowModalNothingSelected();
         else ShowModalDelete(noOfRows);
+    });
+
+    //wire up dropdownId4
+    $("#dropdownId1").click(function (event) {
+        event.preventDefault();
+        var noOfRows = TableMain.rows(".ui-selected").data().length;
+        if (noOfRows != 1) ShowModalSelectOne();
+        else window.open("/Location?projectId=" + TableMain.cell(".ui-selected", "Id:name").data())
     });
 
     //---------------------------------------DataTables------------
@@ -105,14 +121,10 @@ $(document).ready(function () {
         if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
     });
 
+
+    //--------------------------------End of execution at Start-----------
 });
 
-//--------------------------------------Global Properties------------------------------------//
-
-var TableMain = {};
-var IsCreate = false;
-var MagicSuggests = [];
-var CurrRecord = {};
 
 //--------------------------------------Main Methods---------------------------------------//
 

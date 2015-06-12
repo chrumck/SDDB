@@ -13,8 +13,9 @@ namespace SDDB.WebUI.Controllers
 
         // GET: Document
         [Authorize(Roles = "Location_View")]
-        public ActionResult Index()
+        public ActionResult Index(string projectId = null)
         {
+            ViewBag.projectId = projectId;
             return View();
         }
 

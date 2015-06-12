@@ -7,6 +7,16 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
+
+//--------------------------------------Global Properties------------------------------------//
+
+var TableMain = {};
+var IsCreate = false;
+var MsFilterByProject = {}; var MsFilterByType = {};
+var MagicSuggests = [];
+var CurrRecord = {};
+
+
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
@@ -53,6 +63,14 @@ $(document).ready(function () {
         TableMain.columns([2, 3, 4, 5, 6, 7]).visible(false);
         TableMain.columns([8, 9, 10, 11, 12, 13]).visible(false);
         TableMain.columns([14, 15, 16, 17, 18]).visible(true);
+    });
+
+    //wire up dropdownId4
+    $("#dropdownId4").click(function (event) {
+        event.preventDefault();
+        var noOfRows = TableMain.rows(".ui-selected").data().length;
+        if (noOfRows != 1) ShowModalSelectOne();
+        else window.open("/AssemblyDb?locId=" + TableMain.cell(".ui-selected", "Id:name").data())
     });
 
     //Initialize MagicSuggest MsFilterByType
@@ -176,16 +194,25 @@ $(document).ready(function () {
         if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
     });
 
+    //--------------------------------------View Initialization------------------------------------//
 
+    if (typeof projectId !== "undefined" && projectId != "") {
+        $.ajax({
+            type: "POST", url: "/ProjectSrv/GetByIds", timeout: 20000,
+            data: { ids: [projectId], getActive: true }, dataType: "json",
+            beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+        })
+            .always(function () { $("#ModalWait").modal("hide"); })
+            .done(function (data) {
+                MsFilterByProject.setSelection([{ id: data[0].Id, name: data[0].ProjectName, }]);
+            })
+            .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+    }
+
+
+    //--------------------------------End of execution at Start-----------
 });
 
-//--------------------------------------Global Properties------------------------------------//
-
-var TableMain = {};
-var IsCreate = false;
-var MsFilterByProject = {}; var MsFilterByType = {};
-var MagicSuggests = [];
-var CurrRecord = {};
 
 //--------------------------------------Main Methods---------------------------------------//
 

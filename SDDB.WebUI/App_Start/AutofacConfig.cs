@@ -15,6 +15,7 @@ using SDDB.Domain.Entities;
 using SDDB.Domain.Services;
 using SDDB.Domain.Infrastructure;
 using SDDB.WebUI.Infrastructure;
+using System;
 
 namespace SDDB.WebUI
 {
@@ -28,6 +29,11 @@ namespace SDDB.WebUI
             var LDAPAuthenticationEnabled = bool.Parse(ConfigurationManager.AppSettings["LDAPAuthenticationEnabled"] ?? "false");
             var dbLoggingLevel = int.Parse(ConfigurationManager.AppSettings["dbLoggingLevel"] ?? "1");
             var procTooLongmSec = int.Parse(ConfigurationManager.AppSettings["procTooLongmSec"] ?? "0");
+            var ftpAddress = ConfigurationManager.AppSettings["ftpAddress"] ?? "";
+            var ftpUserName = ConfigurationManager.AppSettings["ftpUserName"] ?? "";
+            var ftpPwd = ConfigurationManager.AppSettings["ftpPwd"] ?? "";
+            var ftpIsSSL = bool.Parse(ConfigurationManager.AppSettings["ftpIsSSL"] ?? "false");
+            var ftpIsPassive = bool.Parse(ConfigurationManager.AppSettings["ftpIsPassive"] ?? "true");
 
             //register DB contexts
             builder.RegisterType<EFDbContext>().AsSelf().InstancePerDependency();
