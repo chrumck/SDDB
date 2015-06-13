@@ -67,29 +67,6 @@ namespace SDDB.WebUI.ControllersSrv
             return Json( data , JsonRequestBehavior.AllowGet);
         }
 
-        // GET: /ComponentSrv/GetByProjectIds
-        [HttpPost]
-        [DBSrvAuth("Component_View")]
-        public async Task<ActionResult> GetByProjectIds(string[] projectIds = null, bool getActive = true)
-        {
-            var data = (await componentService.GetByProjectAsync(UserId, projectIds, getActive).ConfigureAwait(false)).Select(x => new
-            {
-                x.Id, x.CompName, x.CompAltName, x.CompAltName2, 
-                x.ComponentType.CompTypeName, x.ComponentStatus.CompStatusName, x.ComponentModel.CompModelName,
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                AssignedToAssemblyDb = new { x.AssignedToAssemblyDb.AssyName, x.AssignedToAssemblyDb.AssyAltName },
-                x.PositionInAssy, x.ProgramAddress, x.CalibrationReqd, x.Comments, x.IsActive,
-                x.ComponentExt.Attr01,x.ComponentExt.Attr02,x.ComponentExt.Attr03,x.ComponentExt.Attr04,x.ComponentExt.Attr05,
-                x.ComponentExt.Attr06,x.ComponentExt.Attr07,x.ComponentExt.Attr08,x.ComponentExt.Attr09,x.ComponentExt.Attr10,
-                x.ComponentExt.Attr11,x.ComponentExt.Attr12,x.ComponentExt.Attr13,x.ComponentExt.Attr14,x.ComponentExt.Attr15,
-                x.ComponentType_Id, x.ComponentStatus_Id, x.ComponentModel_Id, x.AssignedToProject_Id, x.AssignedToAssemblyDb_Id
-            });
-
-            ViewBag.ServiceName = "ComponentService.GetByProjectAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
-        }
-
         // GET: /ComponentSrv/GetByModelIds
         [HttpPost]
         [DBSrvAuth("Component_View")]

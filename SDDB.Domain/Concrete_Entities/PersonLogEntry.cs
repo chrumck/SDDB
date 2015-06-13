@@ -22,20 +22,19 @@ namespace SDDB.Domain.Entities
         [DBIsDateTimeISO] [StringLength(64)]
         public string LogEntryDate { get; set; }
 
-        [Required(ErrorMessage = "Project field is required")]
-        [StringLength(40)]
-        [ForeignKey("AssignedToProject")]
-        public string AssignedToProject_Id { get; set; }
-                
-        [Required(ErrorMessage = "Location field is required")]
-        [StringLength(40)]
-        [ForeignKey("AssignedToLocation")]
-        public string AssignedToLocation_Id { get; set; }
-
         [Required(ErrorMessage = "Activity Type field is required")]
         [StringLength(40)]
         [ForeignKey("PersonActivityType")]
         public string PersonActivityType_Id { get; set; }
+
+        [Required(ErrorMessage = "Project field is required")]
+        [StringLength(40)]
+        [ForeignKey("AssignedToProject")]
+        public string AssignedToProject_Id { get; set; }
+
+        [StringLength(40)]
+        [ForeignKey("AssignedToLocation")]
+        public string AssignedToLocation_Id { get; set; }
 
         [Required(ErrorMessage = "Hours field is required")]
         public decimal PersonHours { get; set; }
@@ -68,22 +67,34 @@ namespace SDDB.Domain.Entities
         
         //one to many
 
+        public virtual PersonActivityType PersonActivityType { get; set; }
         public virtual Project AssignedToProject { get; set; }
         public virtual Location AssignedToLocation { get; set; }
-        public virtual PersonActivityType PersonActivityType { get; set; }
         public virtual ProjectEvent AssignedToProjectEvent { get; set; }
+
+        [InverseProperty("AssignedToPersonLogEntry")]
+        public virtual ICollection<ComponentLogEntry> ComponentLogEntrys { get; set; }
+
+        [InverseProperty("AssignedToPersonLogEntry")]
+        public virtual ICollection<AssemblyLogEntry> AssemblyLogEntrys { get; set; }
 
         //many to many
 
-        [InverseProperty("PersonLogEntrys")]
-        public virtual ICollection<Person> LogEntryPersons { get; set; }
+        [InverseProperty("PersonPrsLogEntrys")]
+        public virtual ICollection<Person> PrsLogEntryPersons { get; set; }
+
+        [InverseProperty("AssemblyDbPrsLogEntrys")]
+        public virtual ICollection<AssemblyDb> PrsLogEntryAssemblyDbs { get; set; }
 
 
         //Constructors---------------------------------------------------------------------------------------------------------//
 
         public PersonLogEntry()
         {
-            this.LogEntryPersons = new HashSet<Person>();
+            this.ComponentLogEntrys = new HashSet<ComponentLogEntry>();
+            this.AssemblyLogEntrys = new HashSet<AssemblyLogEntry>();
+            this.PrsLogEntryPersons = new HashSet<Person>();
+            this.PrsLogEntryAssemblyDbs = new HashSet<AssemblyDb>();
         }
 
         

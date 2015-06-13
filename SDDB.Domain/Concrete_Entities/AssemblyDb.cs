@@ -132,7 +132,9 @@ namespace SDDB.Domain.Entities
         public virtual ICollection<AssemblyLogEntry> AssemblyLogEntrys { get; set; }
 
         //many to many
-        
+
+        [InverseProperty("PrsLogEntryAssemblyDbs")]
+        public virtual ICollection<PersonLogEntry> AssemblyDbPrsLogEntrys { get; set; }
 
         //Constructors---------------------------------------------------------------------------------------------------------//
 
@@ -140,6 +142,7 @@ namespace SDDB.Domain.Entities
         {
             this.AssemblyComponents = new HashSet<Component>();
             this.AssemblyLogEntrys = new HashSet<AssemblyLogEntry>();
+            this.AssemblyDbPrsLogEntrys = new HashSet<PersonLogEntry>();
         }
 
         

@@ -63,27 +63,6 @@ namespace SDDB.WebUI.ControllersSrv
             return Json( data , JsonRequestBehavior.AllowGet);
         }
 
-        // GET: /DocumentSrv/GetByProjectIds
-        [HttpPost]
-        [DBSrvAuth("Document_View")]
-        public async Task<ActionResult> GetByProjectIds(string[] projectIds, bool getActive = true)
-        {
-            var data = (await docService.GetByProjectAsync(UserId, projectIds, getActive).ConfigureAwait(false)).Select(x => new
-            {
-                x.Id, x.DocName, x.DocAltName, x.DocumentType.DocTypeName, x.DocLastVersion, 
-                AuthorPerson = new { x.AuthorPerson.FirstName, x.AuthorPerson.LastName, x.AuthorPerson.Initials },
-                ReviewerPerson = new { x.ReviewerPerson.FirstName, x.ReviewerPerson.LastName, x.ReviewerPerson.Initials },
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                x.RelatesToAssyType.AssyTypeName, x.RelatesToCompType.CompTypeName, x.DocFilePath, 
-                x.Comments, x.IsActive,
-                x.DocumentType_Id,x.AuthorPerson_Id,x.ReviewerPerson_Id,x.AssignedToProject_Id,x.RelatesToAssyType_Id,x.RelatesToCompType_Id, 
-            });
-
-            ViewBag.ServiceName = "DocumentService.GetByProjectAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
-        }
-
          // GET: /DocumentSrv/GetByTypeIds
         [HttpPost]
         [DBSrvAuth("Document_View")]

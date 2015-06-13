@@ -88,40 +88,6 @@ namespace SDDB.Domain.Services
             }
         }
 
-        //get by projectIds 
-        public virtual async Task<List<Location>> GetByProjectAsync(string userId, string[] projectIds = null, bool getActive = true)
-        {
-            using (var dbContextScope = contextScopeFac.CreateReadOnly())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-
-                projectIds = projectIds ?? await dbContext.Projects.Where(x => x.ProjectPersons.Select(y => y.Id).Contains(userId)).Select(x => x.Id)
-                    .ToArrayAsync().ConfigureAwait(false);
-
-                var records = await dbContext.Locations
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive
-                        && projectIds.Contains(x.AssignedToProject_Id))
-                    .Include(x => x.LocationType).Include(x => x.AssignedToProject).Include(x => x.ContactPerson)
-                    .ToListAsync().ConfigureAwait(false);
-
-                foreach (var record in records)
-                {
-                    var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(Location).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                    foreach (var property in properties)
-                    {
-                        if (!property.GetMethod.IsVirtual) continue;
-                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                        if (excludedProperties.Contains(property.Name)) continue;
-
-                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
-                    }
-                }
-
-                return records;
-            }
-        }
-
         //get by projectIds and TypeIds
         public virtual async Task<List<Location>> GetByTypeAsync(string userId, string[] projectIds = null, string[] typeIds = null, bool getActive = true)
         {
@@ -129,14 +95,12 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
-                projectIds = projectIds ?? await dbContext.Projects.Where(x => x.ProjectPersons.Select(y => y.Id).Contains(userId)).Select(x => x.Id)
-                    .ToArrayAsync().ConfigureAwait(false);
-
-                typeIds = typeIds ?? await dbContext.LocationTypes.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
+                projectIds = projectIds ?? new string[] { }; typeIds = typeIds ?? new string[] { };
 
                 var records = await dbContext.Locations
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive
-                        && projectIds.Contains(x.AssignedToProject_Id) && typeIds.Contains(x.LocationType_Id))
+                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
+                        (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
+                        (typeIds.Count() == 0 || typeIds.Contains(x.LocationType_Id)))
                     .Include(x => x.LocationType).Include(x => x.AssignedToProject).Include(x => x.ContactPerson)
                     .ToListAsync().ConfigureAwait(false);
 
@@ -165,7 +129,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.Locations
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
-                    (x.LocName.Contains(query) || x.LocAltName.Contains(query) || x.LocStationing.ToString().Contains(query)))
+                        (x.LocName.Contains(query) || x.LocAltName.Contains(query) || x.LocStationing.ToString().Contains(query)))
                     .Include(x => x.AssignedToProject).ToListAsync();
             }
         }
@@ -177,13 +141,12 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
-                if (projectIds == null || projectIds.Length == 0) projectIds = await dbContext.Projects.Where(x => x.ProjectPersons
-                    .Select(y => y.Id).Contains(userId)).Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
-                
+                projectIds = projectIds ?? new string[] { };
 
-                var records = await dbContext.Locations.Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) &&
-                    x.IsActive == getActive && projectIds.Contains(x.AssignedToProject_Id) &&
-                    (x.LocName.Contains(query) || x.LocAltName.Contains(query) || x.LocStationing.ToString().Contains(query)))
+                var records = await dbContext.Locations
+                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
+                        (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
+                        (x.LocName.Contains(query) || x.LocAltName.Contains(query) || x.LocStationing.ToString().Contains(query)))
                     .Include(x => x.AssignedToProject).ToListAsync();
 
                 return records;

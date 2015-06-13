@@ -149,6 +149,7 @@
     <Compile Include="Concrete_Entities\_SessionSettings.cs" />
     <Compile Include="Concrete_Infrastructure\CustomDataAnnotations.cs" />
     <Compile Include="Concrete_Infrastructure\CustomHelpers.cs" />
+    <Compile Include="Concrete_Services\PersonLogEntryService.cs" />
     <Compile Include="Concrete_Services\_DBftpRepoService.cs" />
     <Compile Include="Concrete_Services\ComponentService.cs" />
     <Compile Include="Concrete_Services\ComponentModelService.cs" />
@@ -343,6 +344,10 @@
     <Compile Include="Migrations\201506112310047_LogEntry0.Designer.cs">
       <DependentUpon>201506112310047_LogEntry0.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201506130534408_Logentry1.cs" />
+    <Compile Include="Migrations\201506130534408_Logentry1.Designer.cs">
+      <DependentUpon>201506130534408_Logentry1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -476,6 +481,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201506112310047_LogEntry0.resx">
       <DependentUpon>201506112310047_LogEntry0.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506130534408_Logentry1.resx">
+      <DependentUpon>201506130534408_Logentry1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -61,26 +61,6 @@ namespace SDDB.WebUI.ControllersSrv
             return Json( data , JsonRequestBehavior.AllowGet);
         }
 
-        // GET: /LocationSrv/GetByProjectIds
-        [HttpPost]
-        [DBSrvAuth("Location_View")]
-        public async Task<ActionResult> GetByProjectIds(string[] projectIds = null, bool getActive = true)
-        {
-            var data = (await locationService.GetByProjectAsync(UserId, projectIds, getActive).ConfigureAwait(false)).Select(x => new
-            {
-                x.Id, x.LocName, x.LocAltName, x.LocationType.LocTypeName, 
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                ContactPerson = new { x.ContactPerson.FirstName, x.ContactPerson.LastName, x.ContactPerson.Initials },
-                x.Address, x.City, x.ZIP, x.State, x.Country, x.LocX, x.LocY, x.LocZ, x.LocStationing,
-                x.CertOfApprReqd, x.RightOfEntryReqd, x.AccessInfo ,x.Comments, x.IsActive,
-                x.LocationType_Id,x.AssignedToProject_Id, x.ContactPerson_Id
-            });
-
-            ViewBag.ServiceName = "LocationService.GetByProjectAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
-        }
-
         // GET: /LocationSrv/GetByTypeIds
         [HttpPost]
         [DBSrvAuth("Location_View")]

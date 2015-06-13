@@ -15,7 +15,7 @@ using SDDB.Domain.Infrastructure;
 
 namespace SDDB.Domain.Services
 {
-    public class ProjectEventService
+    public class PersonLogEntryService
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
@@ -23,7 +23,7 @@ namespace SDDB.Domain.Services
 
         //Constructors---------------------------------------------------------------------------------------------------------//
 
-        public ProjectEventService(IDbContextScopeFactory contextScopeFac)
+        public PersonLogEntryService(IDbContextScopeFactory contextScopeFac)
         {
             this.contextScopeFac = contextScopeFac;
         }
@@ -31,21 +31,24 @@ namespace SDDB.Domain.Services
         //Methods--------------------------------------------------------------------------------------------------------------//
 
         //get all 
-        public virtual async Task<List<ProjectEvent>> GetAsync(string userId, bool getActive = true)
+        public virtual async Task<List<PersonLogEntry>> GetAsync(string userId, bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 
-                var records = await dbContext.ProjectEvents
+                var records = await dbContext.PersonLogEntrys
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive)
-                    .Include( x => x.AssignedToProject).Include( x => x.CreatedByPerson).Include( x => x.ClosedByPerson)
+                    .Include(x => x.PersonActivityType).Include(x => x.AssignedToProject).Include(x => x.AssignedToLocation)
+                    .Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssignedToProjectEvent)
+                    .Include(x => x.ComponentLogEntrys).Include(x => x.AssemblyLogEntrys)
+                    .Include(x => x.PrsLogEntryPersons).Include(x => x.PrsLogEntryAssemblyDbs)
                     .ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
                 {
                     var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(ProjectEvent).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+                    var properties = typeof(PersonLogEntry).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
                     foreach (var property in properties)
                     {
                         if (!property.GetMethod.IsVirtual) continue;
@@ -55,27 +58,28 @@ namespace SDDB.Domain.Services
                         if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
                     }
                 }
-
                 return records;
             }
         }
 
         //get by ids
-        public virtual async Task<List<ProjectEvent>> GetAsync(string userId, string[] ids, bool getActive = true)
+        public virtual async Task<List<PersonLogEntry>> GetAsync(string userId, string[] ids, bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                
-                var records = await dbContext.ProjectEvents
+                var records = await dbContext.PersonLogEntrys
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive && ids.Contains(x.Id))
-                    .Include(x => x.AssignedToProject).Include(x => x.CreatedByPerson).Include(x => x.ClosedByPerson)
+                    .Include(x => x.PersonActivityType).Include(x => x.AssignedToProject).Include(x => x.AssignedToLocation)
+                    .Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssignedToProjectEvent)
+                    .Include(x => x.ComponentLogEntrys).Include(x => x.AssemblyLogEntrys)
+                    .Include(x => x.PrsLogEntryPersons).Include(x => x.PrsLogEntryAssemblyDbs)
                     .ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
                 {
                     var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(ProjectEvent).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+                    var properties = typeof(PersonLogEntry).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
                     foreach (var property in properties)
                     {
                         if (!property.GetMethod.IsVirtual) continue;
@@ -90,55 +94,83 @@ namespace SDDB.Domain.Services
             }
         }
 
-        //get by projectIds 
-        public virtual async Task<List<ProjectEvent>> GetByProjectAsync(string userId, string[] projectIds = null, bool getActive = true)
+        //get by projectIds, typeIds, startDate, endDate
+        public virtual async Task<List<PersonLogEntry>> GetByTypeLocAsync(string userId, string[] projectIds = null,
+            string[] typeIds = null, DateTime? startDate = null, DateTime? endDate = null, bool getActive = true)
+        {
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+                projectIds = projectIds ?? new string[] { }; typeIds = typeIds ?? new string[] { };
+                
+                var records = await dbContext.PersonLogEntrys
+                       .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
+                            (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
+                            (typeIds.Count() == 0 || typeIds.Contains(x.PersonActivityType_Id)) &&
+                            (startDate == null || DateTime.Parse(x.LogEntryDate) >= startDate) &&
+                            (endDate == null || DateTime.Parse(x.LogEntryDate) <= endDate)  )
+                       .Include(x => x.PersonActivityType).Include(x => x.AssignedToProject).Include(x => x.AssignedToLocation)
+                       .Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssignedToProjectEvent)
+                       .Include(x => x.ComponentLogEntrys).Include(x => x.AssemblyLogEntrys)
+                       .Include(x => x.PrsLogEntryPersons).Include(x => x.PrsLogEntryAssemblyDbs)
+                       .ToListAsync().ConfigureAwait(false);
+
+                foreach (var record in records)
+                {
+                    var excludedProperties = new string[] { "Id", "TSP" };
+                    var properties = typeof(PersonLogEntry).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+                    foreach (var property in properties)
+                    {
+                        if (!property.GetMethod.IsVirtual) continue;
+                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
+                        if (excludedProperties.Contains(property.Name)) continue;
+
+                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
+                    }
+                }
+
+                return records;
+            }
+        }
+        
+        //find by query
+        public virtual Task<List<PersonLogEntry>> LookupAsync(string userId, string query = "", bool getActive = true)
+        {
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+                return dbContext.PersonLogEntrys
+                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
+                        x.Comments.Contains(query))
+                    .Include(x => x.AssignedToProject).ToListAsync();
+            }
+        }
+
+        //find by query and project
+        public virtual async Task<List<PersonLogEntry>> LookupByProjAsync(string userId, string[] projectIds = null, string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 projectIds = projectIds ?? new string[] { };
-
-                var records = await dbContext.ProjectEvents
+                
+                var records = await dbContext.PersonLogEntrys
                     .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
-                        (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) )
-                    .Include(x => x.AssignedToProject).Include(x => x.CreatedByPerson).Include(x => x.ClosedByPerson)
-                    .ToListAsync().ConfigureAwait(false);
-
-                foreach (var record in records)
-                {
-                    var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(ProjectEvent).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                    foreach (var property in properties)
-                    {
-                        if (!property.GetMethod.IsVirtual) continue;
-                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                        if (excludedProperties.Contains(property.Name)) continue;
-
-                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
-                    }
-                }
-
+                        (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
+                        x.Comments.Contains(query))
+                    .Include(x => x.AssignedToProject).ToListAsync();
+                
                 return records;
             }
         }
-                        
-        //find by query
-        public virtual Task<List<ProjectEvent>> LookupAsync(string userId, string query = "", bool getActive = true)
-        {
-            using (var dbContextScope = contextScopeFac.CreateReadOnly())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.ProjectEvents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
-                    (x.EventName.Contains(query) || x.EventAltName.Contains(query))).ToListAsync();
-            }
-        }
-
+        
         //-----------------------------------------------------------------------------------------------------------------------
 
         // Create and Update records given in []
-        public virtual async Task<DBResult> EditAsync(ProjectEvent[] records)
+        public virtual async Task<DBResult> EditAsync(PersonLogEntry[] records)
         {
             using (var dbContextScope = contextScopeFac.Create())
             {
@@ -147,16 +179,17 @@ namespace SDDB.Domain.Services
                 {
                     foreach (var record in records)
                     {
-                        var dbEntry = await dbContext.ProjectEvents.FindAsync(record.Id).ConfigureAwait(false);
+                        var dbEntry = await dbContext.PersonLogEntrys.FindAsync(record.Id).ConfigureAwait(false);
                         if (dbEntry == null)
                         {
                             record.Id = Guid.NewGuid().ToString();
-                            dbContext.ProjectEvents.Add(record);
+                            dbContext.PersonLogEntrys.Add(record);
+                            
                         }
                         else
                         {
                             var excludedProperties = new string[] { "Id", "TSP" };
-                            var properties = typeof(ProjectEvent).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+                            var properties = typeof(PersonLogEntry).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
                             foreach (var property in properties)
                             {
                                 if (property.GetMethod.IsVirtual) continue;
@@ -201,13 +234,10 @@ namespace SDDB.Domain.Services
                 {
                     foreach (var id in ids)
                     {
-                        var dbEntry = await dbContext.ProjectEvents.FindAsync(id).ConfigureAwait(false);
+                        var dbEntry = await dbContext.PersonLogEntrys.FindAsync(id).ConfigureAwait(false);
                         if (dbEntry != null)
                         {
-                            if (String.IsNullOrEmpty(dbEntry.ClosedByPerson_Id) || String.IsNullOrEmpty(dbEntry.EventClosed))
-                                errorMessage += string.Format("Event {0} not deleted. Please close before deleting\n", dbEntry.EventName);
-                            else
-                                dbEntry.IsActive = false;
+                            dbEntry.IsActive = false;
                         }
                         else
                         {
@@ -241,7 +271,6 @@ namespace SDDB.Domain.Services
                 StatusDescription = "Errors deleting records:\n" + errorMessage
             };
         }
-
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
