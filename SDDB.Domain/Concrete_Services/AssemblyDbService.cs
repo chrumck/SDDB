@@ -37,7 +37,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 var records = await dbContext.AssemblyDbs
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive)
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive)
                     .Include(x => x.AssemblyType).Include(x => x.AssemblyStatus).Include(x => x.AssemblyModel).Include(x => x.AssignedToProject)
                     .Include(x => x.AssignedToLocation).Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssemblyExt)
                     .ToListAsync().ConfigureAwait(false);
@@ -66,7 +66,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 var records = await dbContext.AssemblyDbs
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive && ids.Contains(x.Id))
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive && ids.Contains(x.Id))
                     .Include(x => x.AssemblyType).Include(x => x.AssemblyStatus).Include(x => x.AssemblyModel).Include(x => x.AssignedToProject)
                     .Include(x => x.AssignedToLocation).Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssemblyExt)
                     .ToListAsync().ConfigureAwait(false);
@@ -99,7 +99,7 @@ namespace SDDB.Domain.Services
                 projectIds = projectIds ?? new string[] { }; modelIds = modelIds ?? new string[] { }; 
 
                 var records = await dbContext.AssemblyDbs
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         (modelIds.Count() == 0 || modelIds.Contains(x.AssemblyModel_Id)) )
                     .Include(x => x.AssemblyType).Include(x => x.AssemblyStatus).Include(x => x.AssemblyModel).Include(x => x.AssignedToProject)
@@ -135,7 +135,7 @@ namespace SDDB.Domain.Services
                 projectIds = projectIds ?? new string[] { }; typeIds = typeIds ?? new string[] { }; locIds = locIds ?? new string[] { };
 
                 var records = await dbContext.AssemblyDbs
-                        .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
+                        .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
                             (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                             (typeIds.Count() == 0 || typeIds.Contains(x.AssemblyType_Id)) &&
                             (locIds.Count() == 0 || locIds.Contains(x.AssignedToLocation_Id)))
@@ -168,7 +168,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.AssemblyDbs
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
                         (x.AssyName.Contains(query) || x.AssyAltName.Contains(query) || x.AssyAltName2.Contains(query) ||
                         x.AssignedToProject.ProjectCode.Contains(query)))
                     .Include(x => x.AssignedToProject).ToListAsync();
@@ -185,7 +185,7 @@ namespace SDDB.Domain.Services
                 projectIds = projectIds ?? new string[] { };
 
                 var records = await dbContext.AssemblyDbs
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         (x.AssyName.Contains(query) || x.AssyAltName.Contains(query) || x.AssyAltName2.Contains(query)))
                     .Include(x => x.AssignedToProject).ToListAsync();

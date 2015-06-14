@@ -403,6 +403,7 @@
     <Content Include="Scripts\respond.matchmedia.addListener.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.min.js" />
     <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\SDDB\PersonLogEntry.js" />
     <Content Include="Scripts\SDDB\ComponentExt.js" />
     <Content Include="Scripts\SDDB\Component.js" />
     <Content Include="Scripts\SDDB\AssemblyExt.js" />
@@ -434,6 +435,7 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\InitialDBSetup.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="ControllersSrv\PersonLogEntrySrvController.cs" />
     <Compile Include="ControllersSrv\ComponentSrvController.cs" />
     <Compile Include="ControllersSrv\ComponentModelSrvController.cs" />
     <Compile Include="ControllersSrv\AssemblyModelSrvController.cs" />
@@ -463,6 +465,7 @@
     <Compile Include="Controllers\ComponentModelController.cs" />
     <Compile Include="Controllers\AssemblyModelController.cs" />
     <Compile Include="Controllers\AssemblyDbController.cs" />
+    <Compile Include="Controllers\PersonLogEntryController.cs" />
     <Compile Include="Controllers\ProjectEventController.cs" />
     <Compile Include="Controllers\PersonActivityTypeController.cs" />
     <Compile Include="Controllers\LocationController.cs" />
@@ -519,6 +522,7 @@
     <Content Include="Views\ComponentExt\Index.cshtml" />
     <Content Include="Views\PersonActivityType\Index.cshtml" />
     <Content Include="Views\ProjectEvent\Index.cshtml" />
+    <Content Include="Views\PersonLogEntry\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

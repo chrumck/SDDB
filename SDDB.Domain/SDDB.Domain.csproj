@@ -348,6 +348,30 @@
     <Compile Include="Migrations\201506130534408_Logentry1.Designer.cs">
       <DependentUpon>201506130534408_Logentry1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201506131550573_LogEntry2.cs" />
+    <Compile Include="Migrations\201506131550573_LogEntry2.Designer.cs">
+      <DependentUpon>201506131550573_LogEntry2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506131828379_LogEntry3.cs" />
+    <Compile Include="Migrations\201506131828379_LogEntry3.Designer.cs">
+      <DependentUpon>201506131828379_LogEntry3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506140022104_LogEntry4.cs" />
+    <Compile Include="Migrations\201506140022104_LogEntry4.Designer.cs">
+      <DependentUpon>201506140022104_LogEntry4.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506140119334_LogEntry5.cs" />
+    <Compile Include="Migrations\201506140119334_LogEntry5.Designer.cs">
+      <DependentUpon>201506140119334_LogEntry5.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506140500421_ProjectEvent1.cs" />
+    <Compile Include="Migrations\201506140500421_ProjectEvent1.Designer.cs">
+      <DependentUpon>201506140500421_ProjectEvent1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201506140617308_Person10.cs" />
+    <Compile Include="Migrations\201506140617308_Person10.Designer.cs">
+      <DependentUpon>201506140617308_Person10.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -484,6 +508,24 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201506130534408_Logentry1.resx">
       <DependentUpon>201506130534408_Logentry1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506131550573_LogEntry2.resx">
+      <DependentUpon>201506131550573_LogEntry2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506131828379_LogEntry3.resx">
+      <DependentUpon>201506131828379_LogEntry3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506140022104_LogEntry4.resx">
+      <DependentUpon>201506140022104_LogEntry4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506140119334_LogEntry5.resx">
+      <DependentUpon>201506140119334_LogEntry5.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506140500421_ProjectEvent1.resx">
+      <DependentUpon>201506140500421_ProjectEvent1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506140617308_Person10.resx">
+      <DependentUpon>201506140617308_Person10.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

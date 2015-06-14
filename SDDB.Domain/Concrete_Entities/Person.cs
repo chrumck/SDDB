@@ -59,11 +59,11 @@ namespace SDDB.Domain.Entities
         [DefaultValue(false)]
         public bool IsSalaried { get; set; }
 
-        [DBIsDateISO] [StringLength(64)]
-        public string EmployeeStart { get; set; }
+        [DBIsDateISO] 
+        public DateTime? EmployeeStart { get; set; }
 
-        [DBIsDateISO] [StringLength(64)]
-        public string EmployeeEnd { get; set; }
+        [DBIsDateISO] 
+        public DateTime? EmployeeEnd { get; set; }
 
         [Column(TypeName = "text")] [StringLength(65535)]
         public string EmployeeDetails { get; set; }

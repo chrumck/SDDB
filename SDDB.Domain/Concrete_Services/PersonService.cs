@@ -129,7 +129,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 return dbContext.PersonGroups
-                    .Where(x => x.GroupManagers.Select(y => y.Id).Contains(userId)).SelectMany(x => x.GroupPersons)
+                    .Where(x => x.GroupManagers.Any(y => y.Id == userId)).SelectMany(x => x.GroupPersons)
                     .Distinct().Where(x => x.IsActive == getActive &&
                         (x.LastName.Contains(query) || x.FirstName.Contains(query) || x.Initials.Contains(query))).ToListAsync();
             }
@@ -265,7 +265,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 
                 return dbContext.Projects
-                    .Where(x => x.ProjectPersons.Select(y => y.Id).Contains(personId) && x.IsActive == true).ToListAsync();
+                    .Where(x => x.ProjectPersons.Any(y => y.Id == personId) && x.IsActive == true).ToListAsync();
             }
         }
 
@@ -277,7 +277,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 return dbContext.Projects
-                    .Where(x => !x.ProjectPersons.Select(y => y.Id).Contains(personId) && x.IsActive == true).ToListAsync();
+                    .Where(x => !x.ProjectPersons.Any(y => y.Id == personId) && x.IsActive == true).ToListAsync();
             }
         }
 
@@ -340,7 +340,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 return dbContext.PersonGroups
-                    .Where(x => x.GroupPersons.Select(y => y.Id).Contains(personId) && x.IsActive == true).ToListAsync();
+                    .Where(x => x.GroupPersons.Any(y => y.Id == personId) && x.IsActive == true).ToListAsync();
             }
         }
 
@@ -352,7 +352,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 return dbContext.PersonGroups
-                    .Where(x => !x.GroupPersons.Select(y => y.Id).Contains(personId) && x.IsActive == true).ToListAsync();
+                    .Where(x => !x.GroupPersons.Any(y => y.Id == personId) && x.IsActive == true).ToListAsync();
             }
         }
 
@@ -418,7 +418,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.PersonGroups
-                    .Where(x => x.GroupManagers.Select(y => y.Id).Contains(personId) && x.IsActive == true).ToListAsync();
+                    .Where(x => x.GroupManagers.Any(y => y.Id == personId) && x.IsActive == true).ToListAsync();
             }
         }
 
@@ -430,7 +430,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 return dbContext.PersonGroups
-                    .Where(x => !x.GroupManagers.Select(y => y.Id).Contains(personId) && x.IsActive == true).ToListAsync();
+                    .Where(x => !x.GroupManagers.Any(y => y.Id == personId) && x.IsActive == true).ToListAsync();
             }
         }
 

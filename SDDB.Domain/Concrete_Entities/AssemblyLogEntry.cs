@@ -28,13 +28,9 @@ namespace SDDB.Domain.Entities
         [ForeignKey("Person")]
         public string Person_Id { get; set; }
 
-        [StringLength(40)]
-        [ForeignKey("AssignedToPersonLogEntry")]
-        public string AssignedToPersonLogEntry_Id { get; set; }
-
         [Required(ErrorMessage = "Entry Date field is required")]
-        [DBIsDateTimeISO] [StringLength(64)]
-        public string LogEntryDate { get; set; }
+        [DBIsDateTimeISO]
+        public DateTime LogEntryDate { get; set; }
 
         [Required(ErrorMessage = "Assy. Status field is required")]
         [StringLength(40)]
@@ -101,7 +97,6 @@ namespace SDDB.Domain.Entities
         //one to many
         public virtual AssemblyDb AssemblyDb { get; set; }
         public virtual Person Person { get; set; }
-        public virtual PersonLogEntry AssignedToPersonLogEntry { get; set; }
         
         public virtual AssemblyStatus AssemblyStatus { get; set; }
         public virtual Project AssignedToProject { get; set; }

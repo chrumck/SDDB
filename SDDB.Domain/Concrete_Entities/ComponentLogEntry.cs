@@ -27,13 +27,9 @@ namespace SDDB.Domain.Entities
         [ForeignKey("Person")]
         public string Person_Id { get; set; }
 
-        [StringLength(40)]
-        [ForeignKey("AssignedToPersonLogEntry")]
-        public string AssignedToPersonLogEntry_Id { get; set; }
-
         [Required(ErrorMessage = "Entry Date field is required")]
-        [DBIsDateTimeISO] [StringLength(64)]
-        public string LogEntryDate { get; set; }
+        [DBIsDateTimeISO]
+        public DateTime LogEntryDate { get; set; }
                 
         [Required(ErrorMessage = "Comp. Status field is required")]
         [StringLength(40)]
@@ -74,7 +70,6 @@ namespace SDDB.Domain.Entities
         //one to many
         public virtual Component Component { get; set; }
         public virtual Person Person { get; set; }
-        public virtual PersonLogEntry AssignedToPersonLogEntry { get; set; }
 
         public virtual ComponentStatus ComponentStatus { get; set; }
         public virtual Project AssignedToProject { get; set; }

@@ -38,7 +38,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "ProjectEventService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return new DBJsonDateTimeISO { Data = new { data}, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // GET: /ProjectEventSrv/GetByIds
@@ -56,7 +56,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "ProjectEventService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json( data , JsonRequestBehavior.AllowGet);
+            return new DBJsonDateTimeISO { Data =  data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // GET: /ProjectEventSrv/GetByProjectIds
@@ -75,7 +75,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "ProjectEventService.GetByProjectAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return new DBJsonDateTimeISO { Data = new { data }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // GET: /ProjectEventSrv/Lookup
@@ -84,6 +84,20 @@ namespace SDDB.WebUI.ControllersSrv
             var records = await projectEventService.LookupAsync(UserId, query, getActive).ConfigureAwait(false);
 
             ViewBag.ServiceName = "ProjectEventService.LookupAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+
+            return Json(records.OrderBy(x => x.EventName)
+                .Select(x => new { id = x.Id, name = x.EventName }), JsonRequestBehavior.AllowGet);
+        }
+
+        // GET: /ProjectEventSrv/LookupByProj
+        public async Task<ActionResult> LookupByProj(string projectIds = null, string query = "", bool getActive = true)
+        {
+            string[] projectIdsArray = null;
+            if (projectIds != null && projectIds != "") projectIdsArray = projectIds.Split(',');
+
+            var records = await projectEventService.LookupByProjAsync(UserId, projectIdsArray, query, getActive).ConfigureAwait(false);
+
+            ViewBag.ServiceName = "ProjectEventService.LookupByProjAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(records.OrderBy(x => x.EventName)
                 .Select(x => new { id = x.Id, name = x.EventName }), JsonRequestBehavior.AllowGet);

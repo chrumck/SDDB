@@ -1,6 +1,6 @@
-﻿@model SDDB.Domain.Entities.ProjectEvent
+﻿@model SDDB.Domain.Entities.PersonLogEntry
 @{
-    ViewBag.Title = "Project Events";
+    ViewBag.Title = "Person Log Entries";
 }
 
 <!------- MainView ------->
@@ -15,32 +15,48 @@
             </div>
 
             <div class="btn-group margin-bottom-2px">
+                <input class="form-control input-tdo-warning" data-val="true" data-val-dbisdateiso="The field must have YYYY-MM-DD format."
+                       id="FilterDateStart" placeholder="Start Date" type="text" value="">
+            </div>
+            <div class="btn-group margin-bottom-2px">
+                <input class="form-control input-tdo-warning" data-val="true" data-val-dbisdateiso="The field must have YYYY-MM-DD format."
+                       id="FilterDateEnd" placeholder="End Date" type="text" value="">
+            </div>
+            <div class="btn-group margin-bottom-2px">
+                <div id="MsFilterByPerson" placeholder="Select Person"></div>
+            </div>
+            <div class="btn-group margin-bottom-2px">
+                <div id="MsFilterByType" placeholder="Select Type"></div>
+            </div>
+            <div class="btn-group margin-bottom-2px">
                 <div id="MsFilterByProject" placeholder="Select Project"></div>
             </div>
+
         </div>
     </div>
 
     <div class="panel panel-primary" id="PanelTableMain">
         <div class="panel-heading text-center" style="font-size:130%">
-            <strong>Project Events</strong>
+            <strong>Person Log Entries</strong>
             <div class="pull-right">
-                <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="100" data-onstyle="warning" data-on="Deleted Shown" data-off="Show Deleted" disabled>
+                <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="100" data-onstyle="warning" 
+                       data-on="Deleted Shown" data-off="Show Deleted" disabled>
             </div>
         </div>
         <table class="table table-striped" id="TableMain">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Event Name</th>
-                    <th>Alternate Name</th>
+                    <th>Entry Date</th>
+                    <th>Activity Type</th>
+                    <th>Man Hours</th>
                     <th>Project</th>
-                    <th>Created</th>
-                    <th>Created By</th>
-                    <th>Closed</th>
-                    <th>Closed By</th>
+                    <th>Event</th>
                     <th>Comments</th>
                     <th>Is Active</th>
+                    <th>PersonActivityType_Id</th>
                     <th>AssignedToProject_Id</th>
+                    <th>AssignedToProjectEvent_Id</th>
                 </tr>
             </thead>
             <tbody class="selectable"></tbody>
@@ -52,7 +68,7 @@
 <div class="container-fluid hide" id="EditFormView">
     <div class="row">
         <div class="col-xs-6">
-            <h3 id="EditFormLabel">Create/Edit Project Event</h3>
+            <h3 id="EditFormLabel">Create/Edit Person Log Entry</h3>
         </div>
         <div class="col-xs-6">
             <h3><button class="btn btn-default pull-right" type="button" id="EditFormBtnBack">Cancel</button></h3>
@@ -64,57 +80,42 @@
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        @Html.LabelFor(x => x.EventName, "Name", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.LogEntryDateTime, "DateTime", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.EventName, new { @class = "form-control modifiable", placeholder = "Event Name" })
-                            @Html.ValidationMessageFor(x => x.EventName)
+                            <input class="form-control modifiable" data-val="true" data-val-dbisdatetimeiso="The field has to be in 'yyyy-MM-dd HH:mm' format." 
+                                   data-val-required="Entry Date field is required" id="LogEntryDateTime" name="LogEntryDateTime" placeholder="Log Entry Date &amp; Time" value="" type="text">
+                            @Html.ValidationMessageFor(x => x.LogEntryDateTime)
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.EventAltName, "Alternate Name", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.PersonActivityType_Id, "Type", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.EventAltName, new { @class = "form-control modifiable", placeholder = "Alternate Name" })
-                            @Html.ValidationMessageFor(x => x.EventAltName)
+                            @Html.TextBoxFor(x => x.PersonActivityType_Id, new { @class = "form-control modifiable", placeholder = "Type of Activity" })
+                            @Html.ValidationMessageFor(x => x.PersonActivityType_Id)
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.AssignedToProject_Id, "Project", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.ManHours, "Man Hours", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.AssignedToProject_Id, new { @class = "form-control modifiable", placeholder = "Assigned To Project" })
-                            @Html.ValidationMessageFor(x => x.AssignedToProject_Id)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.EventCreated, "Event Created", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            <input class="form-control modifiable" data-val="true" data-val-dbisdatetimeiso="The field has to be in 'yyyy-MM-dd HH:mm' format."
-                                   data-val-required="Event Create Date is required" id="EventCreated" name="EventCreated" placeholder="Date Created" value="" type="text">
-                            @Html.ValidationMessageFor(x => x.EventCreated)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.CreatedByPerson_Id, "Created By", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.CreatedByPerson_Id, new { @class = "form-control modifiable", placeholder = "Created By" })
-                            @Html.ValidationMessageFor(x => x.CreatedByPerson_Id)
+                            @Html.TextBoxFor(x => x.ManHours, new { @class = "form-control modifiable", placeholder = "Man Hours" })
+                            @Html.ValidationMessageFor(x => x.ManHours)
                         </div>
                     </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        @Html.LabelFor(x => x.EventClosed, "Event Closed", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.AssignedToProject_Id, "Project", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
-                            <input class="form-control modifiable" data-val="true" data-val-dbisdatetimeiso="The field has to be in 'yyyy-MM-dd HH:mm' format."
-                                   id="EventClosed" name="EventClosed" placeholder="Date Closed" value="" type="text">
-                            @Html.ValidationMessageFor(x => x.EventClosed)
+                            @Html.TextBoxFor(x => x.AssignedToProject_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Project" })
+                            @Html.ValidationMessageFor(x => x.AssignedToProject_Id)
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.ClosedByPerson_Id, "Closed By", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.AssignedToProjectEvent_Id, "Event", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.ClosedByPerson_Id, new { @class = "form-control modifiable", placeholder = "Closed By" })
-                            @Html.ValidationMessageFor(x => x.ClosedByPerson_Id)
+                            @Html.TextBoxFor(x => x.AssignedToProjectEvent_Id, new { @class = "form-control modifiable", placeholder = "Assigned To Project Event" })
+                            @Html.ValidationMessageFor(x => x.AssignedToProjectEvent_Id)
                         </div>
                     </div>
                     <div class="form-group">
@@ -131,7 +132,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
             <div class="form-group">
@@ -154,7 +154,7 @@
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
     @Scripts.Render("~/bundles/bootstrap-datetimepicker")
-    <script src="~/Scripts/SDDB/ProjectEvent.js"></script>
+    <script src="~/Scripts/SDDB/PersonLogEntry.js"></script>
 }
 
 @section CSS {

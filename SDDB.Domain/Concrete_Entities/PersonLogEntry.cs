@@ -19,25 +19,21 @@ namespace SDDB.Domain.Entities
         public string Id { get; set; }
                 
         [Required(ErrorMessage = "Entry Date field is required")]
-        [DBIsDateTimeISO] [StringLength(64)]
-        public string LogEntryDate { get; set; }
+        [DBIsDateTimeISO] 
+        public DateTime LogEntryDateTime { get; set; }
 
         [Required(ErrorMessage = "Activity Type field is required")]
         [StringLength(40)]
         [ForeignKey("PersonActivityType")]
         public string PersonActivityType_Id { get; set; }
 
+        [Required(ErrorMessage = "Hours field is required")]
+        public decimal ManHours { get; set; }
+
         [Required(ErrorMessage = "Project field is required")]
         [StringLength(40)]
         [ForeignKey("AssignedToProject")]
         public string AssignedToProject_Id { get; set; }
-
-        [StringLength(40)]
-        [ForeignKey("AssignedToLocation")]
-        public string AssignedToLocation_Id { get; set; }
-
-        [Required(ErrorMessage = "Hours field is required")]
-        public decimal PersonHours { get; set; }
 
         [StringLength(40)]
         [ForeignKey("AssignedToProjectEvent")]
@@ -69,14 +65,7 @@ namespace SDDB.Domain.Entities
 
         public virtual PersonActivityType PersonActivityType { get; set; }
         public virtual Project AssignedToProject { get; set; }
-        public virtual Location AssignedToLocation { get; set; }
         public virtual ProjectEvent AssignedToProjectEvent { get; set; }
-
-        [InverseProperty("AssignedToPersonLogEntry")]
-        public virtual ICollection<ComponentLogEntry> ComponentLogEntrys { get; set; }
-
-        [InverseProperty("AssignedToPersonLogEntry")]
-        public virtual ICollection<AssemblyLogEntry> AssemblyLogEntrys { get; set; }
 
         //many to many
 
@@ -91,8 +80,6 @@ namespace SDDB.Domain.Entities
 
         public PersonLogEntry()
         {
-            this.ComponentLogEntrys = new HashSet<ComponentLogEntry>();
-            this.AssemblyLogEntrys = new HashSet<AssemblyLogEntry>();
             this.PrsLogEntryPersons = new HashSet<Person>();
             this.PrsLogEntryAssemblyDbs = new HashSet<AssemblyDb>();
         }

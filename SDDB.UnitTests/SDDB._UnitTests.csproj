@@ -124,6 +124,7 @@
     <Compile Include="Tests_ComponentModelService.cs" />
     <Compile Include="Tests_AssemblyModelService.cs" />
     <Compile Include="Tests_AssemblyDbService.cs" />
+    <Compile Include="Tests_PersonLogEntryService.cs" />
     <Compile Include="Tests_ProjectEventService.cs" />
     <Compile Include="Tests_PersonActivityService.cs" />
     <Compile Include="Tests_LocationService.cs" />

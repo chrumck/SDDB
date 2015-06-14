@@ -90,7 +90,7 @@ namespace SDDB.Domain.Services
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.PersonGroups.Where( x => x.GroupManagers.Select( y => y.Id).Contains(userId) && x.IsActive == getActive &&
+                return dbContext.PersonGroups.Where(x => x.GroupManagers.Any(y => y.Id == userId) && x.IsActive == getActive &&
                     (x.PrsGroupName.Contains(query) || x.PrsGroupAltName.Contains(query))).ToListAsync();
             }
         }

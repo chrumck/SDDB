@@ -292,3 +292,33 @@ input[class~=input-tdo-info]:-ms-input-placeholder {
     color: #81a9d1;
 }
 
+/*custom inputs*/
+input[class~=input-tdo-warning],
+textarea[class~=input-tdo-warning] {
+    color: #8f6f3d;
+    background-color: #fff1c9;
+    border-color: #e0c7b9;
+}
+
+input[class~=input-tdo-warning][class~=input-validation-error],
+textarea[class~=input-tdo-warning][class~=input-validation-error]
+{
+    border: 1px solid #b94a48;
+    background-color: #fee;
+}
+
+input[class~=input-tdo-warning]::-webkit-input-placeholder {
+    color: #c2a06b;
+}
+
+input[class~=input-tdo-warning]:-moz-placeholder {
+    color: #c2a06b;
+}
+
+input[class~=input-tdo-warning]::-moz-placeholder {
+    color: #c2a06b;
+}
+
+input[class~=input-tdo-warning]:-ms-input-placeholder {
+    color: #c2a06b;
+}

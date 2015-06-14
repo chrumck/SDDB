@@ -33,16 +33,16 @@ namespace SDDB.Domain.Entities
         public string AssignedToProject_Id { get; set; }
 
         [Required(ErrorMessage = "Event Create Date is required")]
-        [DBIsDateTimeISO] [StringLength(64)]
-        public string EventCreated { get; set; }
+        [DBIsDateTimeISO] 
+        public DateTime EventCreated { get; set; }
 
         [Required(ErrorMessage = "Created By Person field is required")]
         [StringLength(40)]
         [ForeignKey("CreatedByPerson")]
         public string CreatedByPerson_Id { get; set; }
 
-        [DBIsDateTimeISO] [StringLength(64)]
-        public string EventClosed { get; set; }
+        [DBIsDateTimeISO] 
+        public DateTime? EventClosed { get; set; }
 
         [StringLength(40)]
         [ForeignKey("ClosedByPerson")]

@@ -38,11 +38,8 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 
                 var records = await dbContext.PersonLogEntrys
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive)
-                    .Include(x => x.PersonActivityType).Include(x => x.AssignedToProject).Include(x => x.AssignedToLocation)
-                    .Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssignedToProjectEvent)
-                    .Include(x => x.ComponentLogEntrys).Include(x => x.AssemblyLogEntrys)
-                    .Include(x => x.PrsLogEntryPersons).Include(x => x.PrsLogEntryAssemblyDbs)
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive)
+                    .Include(x => x.PersonActivityType).Include(x => x.AssignedToProject).Include(x => x.AssignedToProjectEvent)
                     .ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
@@ -68,14 +65,12 @@ namespace SDDB.Domain.Services
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                var records = await dbContext.PersonLogEntrys
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive && ids.Contains(x.Id))
-                    .Include(x => x.PersonActivityType).Include(x => x.AssignedToProject).Include(x => x.AssignedToLocation)
-                    .Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssignedToProjectEvent)
-                    .Include(x => x.ComponentLogEntrys).Include(x => x.AssemblyLogEntrys)
-                    .Include(x => x.PrsLogEntryPersons).Include(x => x.PrsLogEntryAssemblyDbs)
-                    .ToListAsync().ConfigureAwait(false);
 
+                var records = await dbContext.PersonLogEntrys
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive && ids.Contains(x.Id))
+                    .Include(x => x.PersonActivityType).Include(x => x.AssignedToProject).Include(x => x.AssignedToProjectEvent)
+                    .ToListAsync().ConfigureAwait(false);
+                
                 foreach (var record in records)
                 {
                     var excludedProperties = new string[] { "Id", "TSP" };
@@ -94,26 +89,24 @@ namespace SDDB.Domain.Services
             }
         }
 
-        //get by projectIds, typeIds, startDate, endDate
-        public virtual async Task<List<PersonLogEntry>> GetByTypeLocAsync(string userId, string[] projectIds = null,
+        //get by personIds, projectIds, typeIds, startDate, endDate
+        public virtual async Task<List<PersonLogEntry>> GetByFiltersAsync(string userId, string[] personIds = null, string[] projectIds = null,
             string[] typeIds = null, DateTime? startDate = null, DateTime? endDate = null, bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
-                projectIds = projectIds ?? new string[] { }; typeIds = typeIds ?? new string[] { };
+                personIds = personIds ?? new string[] { }; projectIds = projectIds ?? new string[] { }; typeIds = typeIds ?? new string[] { };
                 
                 var records = await dbContext.PersonLogEntrys
-                       .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
+                       .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                            (personIds.Count() == 0 || x.PrsLogEntryPersons.Any(y => personIds.Contains(y.Id))) &&
                             (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                             (typeIds.Count() == 0 || typeIds.Contains(x.PersonActivityType_Id)) &&
-                            (startDate == null || DateTime.Parse(x.LogEntryDate) >= startDate) &&
-                            (endDate == null || DateTime.Parse(x.LogEntryDate) <= endDate)  )
-                       .Include(x => x.PersonActivityType).Include(x => x.AssignedToProject).Include(x => x.AssignedToLocation)
-                       .Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssignedToProjectEvent)
-                       .Include(x => x.ComponentLogEntrys).Include(x => x.AssemblyLogEntrys)
-                       .Include(x => x.PrsLogEntryPersons).Include(x => x.PrsLogEntryAssemblyDbs)
+                            (startDate == null || x.LogEntryDateTime >= startDate) &&
+                            (endDate == null || x.LogEntryDateTime <= endDate)  )
+                       .Include(x => x.PersonActivityType).Include(x => x.AssignedToProject).Include(x => x.AssignedToProjectEvent)
                        .ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
@@ -142,7 +135,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 return dbContext.PersonLogEntrys
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
                         x.Comments.Contains(query))
                     .Include(x => x.AssignedToProject).ToListAsync();
             }
@@ -158,7 +151,7 @@ namespace SDDB.Domain.Services
                 projectIds = projectIds ?? new string[] { };
                 
                 var records = await dbContext.PersonLogEntrys
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         x.Comments.Contains(query))
                     .Include(x => x.AssignedToProject).ToListAsync();

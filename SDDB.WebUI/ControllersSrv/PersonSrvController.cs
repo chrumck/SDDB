@@ -32,7 +32,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return new DBJsonResDate { Data = new { data }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return new DBJsonDateISO { Data = new { data }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // GET: /PersonSrv/GetByIds
@@ -44,7 +44,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
             
-            return new DBJsonResDate { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // GET: /PersonSrv/PersonsWoDBUser

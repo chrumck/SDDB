@@ -96,7 +96,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
-                return dbContext.Projects.Where(x => x.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
+                return dbContext.Projects.Where(x => x.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
                     (x.ProjectName.Contains(query) || x.ProjectAltName.Contains(query) || x.ProjectCode.Contains(query))).ToListAsync();
             }
         }

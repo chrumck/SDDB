@@ -80,8 +80,10 @@ namespace SDDB.Domain.Infrastructure
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            DateTime output;
-            if (value != null && !DateTime.TryParseExact(value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out output))
+
+            DateTime output; var formats = new string[] { "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH:mm:ss" };
+            if (value != null && !DateTime.TryParseExact(value.ToString(), formats, CultureInfo.InvariantCulture,
+                DateTimeStyles.None, out output) && output.TimeOfDay.Ticks != 0)
                 return new ValidationResult(FormatErrorMessage(validationContext.DisplayName));
             else
                 return ValidationResult.Success;
@@ -104,8 +106,8 @@ namespace SDDB.Domain.Infrastructure
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            DateTime output;
-            if (value != null && !DateTime.TryParseExact(value.ToString(), "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out output))
+            DateTime output; var formats = new string[] { "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH:mm:ss" };
+            if (value != null && !DateTime.TryParseExact(value.ToString(), formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out output))
                 return new ValidationResult(FormatErrorMessage(validationContext.DisplayName));
             else
                 return ValidationResult.Success;

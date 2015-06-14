@@ -38,7 +38,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 
                 var records = await dbContext.ProjectEvents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive)
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive)
                     .Include( x => x.AssignedToProject).Include( x => x.CreatedByPerson).Include( x => x.ClosedByPerson)
                     .ToListAsync().ConfigureAwait(false);
 
@@ -68,7 +68,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 
                 var records = await dbContext.ProjectEvents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive && ids.Contains(x.Id))
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive && ids.Contains(x.Id))
                     .Include(x => x.AssignedToProject).Include(x => x.CreatedByPerson).Include(x => x.ClosedByPerson)
                     .ToListAsync().ConfigureAwait(false);
 
@@ -100,7 +100,7 @@ namespace SDDB.Domain.Services
                 projectIds = projectIds ?? new string[] { };
 
                 var records = await dbContext.ProjectEvents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) )
                     .Include(x => x.AssignedToProject).Include(x => x.CreatedByPerson).Include(x => x.ClosedByPerson)
                     .ToListAsync().ConfigureAwait(false);
@@ -130,8 +130,26 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.ProjectEvents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
                     (x.EventName.Contains(query) || x.EventAltName.Contains(query))).ToListAsync();
+            }
+        }
+
+        //find by query and project
+        public virtual async Task<List<ProjectEvent>> LookupByProjAsync(string userId, string[] projectIds = null, string query = "", bool getActive = true)
+        {
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+                projectIds = projectIds ?? new string[] { };
+
+                var records = await dbContext.ProjectEvents
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                        (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
+                        (x.EventName.Contains(query) || x.EventAltName.Contains(query))).ToListAsync();
+
+                return records;
             }
         }
 
@@ -204,8 +222,8 @@ namespace SDDB.Domain.Services
                         var dbEntry = await dbContext.ProjectEvents.FindAsync(id).ConfigureAwait(false);
                         if (dbEntry != null)
                         {
-                            if (String.IsNullOrEmpty(dbEntry.ClosedByPerson_Id) || String.IsNullOrEmpty(dbEntry.EventClosed))
-                                errorMessage += string.Format("Event {0} not deleted. Please close before deleting\n", dbEntry.EventName);
+                            if (String.IsNullOrEmpty(dbEntry.ClosedByPerson_Id) || dbEntry.EventClosed == null)
+                                errorMessage += string.Format("Event {0} not deleted. Please close with date and person before deleting\n", dbEntry.EventName);
                             else
                                 dbEntry.IsActive = false;
                         }

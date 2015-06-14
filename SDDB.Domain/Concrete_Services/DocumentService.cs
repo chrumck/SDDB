@@ -38,7 +38,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 
                 var records = await dbContext.Documents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive)
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive)
                     .Include(x => x.DocumentType).Include(x => x.AuthorPerson).Include(x => x.ReviewerPerson).Include(x => x.AssignedToProject)
                     .Include(x => x.RelatesToAssyType).Include(x => x.RelatesToCompType)
                     .ToListAsync().ConfigureAwait(false);
@@ -69,7 +69,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 
                 var records = await dbContext.Documents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive && ids.Contains(x.Id))
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive && ids.Contains(x.Id))
                     .Include(x => x.DocumentType).Include(x => x.AuthorPerson).Include(x => x.ReviewerPerson).Include(x => x.AssignedToProject)
                     .Include(x => x.RelatesToAssyType).Include(x => x.RelatesToCompType)
                     .ToListAsync().ConfigureAwait(false);
@@ -102,7 +102,7 @@ namespace SDDB.Domain.Services
                 projectIds = projectIds ?? new string[] { }; typeIds = typeIds ?? new string[] { };
 
                 var records = await dbContext.Documents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         (typeIds.Count() == 0 || typeIds.Contains(x.DocumentType_Id)))
                     .Include(x => x.DocumentType).Include(x => x.AuthorPerson).Include(x => x.ReviewerPerson).Include(x => x.AssignedToProject)
@@ -134,7 +134,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.Documents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Select(y => y.Id).Contains(userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
                         (x.DocName.Contains(query) || x.DocAltName.Contains(query) || x.DocFilePath.Contains(query)))
                     .ToListAsync();
             }

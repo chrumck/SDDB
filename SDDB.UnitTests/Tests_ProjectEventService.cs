@@ -463,7 +463,7 @@ namespace SDDB.UnitTests
 
             var eventIds = new string[] { "dummyId1", "DummyId2" };
 
-            var dbEntry = new ProjectEvent { IsActive = true, EventClosed = "2015-10-10", ClosedByPerson_Id = "DummyId" };
+            var dbEntry = new ProjectEvent { IsActive = true, EventClosed = new DateTime(2015,10,10), ClosedByPerson_Id = "DummyId" };
             mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
             mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync("dummyId2")).Returns(Task.FromResult<ProjectEvent>(null));
 
@@ -497,7 +497,7 @@ namespace SDDB.UnitTests
 
             var eventIds = new string[] { "dummyId1" };
 
-            var dbEntry = new ProjectEvent { IsActive = true, EventClosed = "2015-10-10", ClosedByPerson_Id = "DummyId" };
+            var dbEntry = new ProjectEvent { IsActive = true, EventClosed = new DateTime(2015, 10, 10), ClosedByPerson_Id = "DummyId" };
             mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
 
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
@@ -530,7 +530,7 @@ namespace SDDB.UnitTests
 
             var eventIds = new string[] { "dummyId1" };
 
-            var dbEntry = new ProjectEvent { IsActive = true, EventName="Name", EventClosed = "2015-10-10" };
+            var dbEntry = new ProjectEvent { IsActive = true, EventName = "Name", EventClosed = new DateTime(2015, 10, 10) };
             mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
 
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
@@ -542,7 +542,7 @@ namespace SDDB.UnitTests
 
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("Event Name not deleted. Please close before deleting\n"));
+            Assert.IsTrue(serviceResult.StatusDescription.Contains("Event Name not deleted. Please close with date and person before deleting\n"));
             Assert.IsTrue(dbEntry.IsActive == true);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);

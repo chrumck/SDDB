@@ -121,7 +121,8 @@ function ShowModalAJAXFail(xhr, status, error) {
 }
 
 //Refresh main table from AJAX
-function RefreshTable(table, url, getActive, httpType, projectIds, modelIds, typeIds, locIds, assyIds) {
+function RefreshTable(table, url, getActive, httpType, projectIds, modelIds, typeIds,
+    locIds, assyIds, personIds, startDate, endDate) {
 
     getActive = (typeof getActive !== "undefined" && getActive == false) ? false : true;
     httpType = (typeof httpType !== "undefined") ? httpType : "GET";
@@ -130,10 +131,15 @@ function RefreshTable(table, url, getActive, httpType, projectIds, modelIds, typ
     typeIds = (typeof typeIds !== "undefined") ? typeIds : [];
     locIds = (typeof locIds !== "undefined") ? locIds : [];
     assyIds = (typeof assyIds !== "undefined") ? assyIds : [];
+    personIds = (typeof personIds !== "undefined") ? personIds : [];
+    startDate = (typeof startDate !== "undefined") ? startDate : {};
+    endDate = (typeof endDate !== "undefined") ? endDate : {};
 
     $.ajax({
         type: httpType, url: url, timeout: 20000,
-        data: { getActive: getActive, projectIds: projectIds, modelIds: modelIds, typeIds: typeIds, locIds: locIds, assyIds: assyIds },
+        data: {getActive: getActive, projectIds: projectIds, modelIds: modelIds, typeIds: typeIds,
+            locIds: locIds, assyIds: assyIds, personIds: personIds, startDate: startDate, endDate: endDate
+        },
         dataType: "json",
         beforeSend: function () {
             table.clear().search("").draw();
@@ -176,16 +182,20 @@ function ClearFormInputs(formId, msArray) {
 }
 
 //initialize MagicSuggest and add to MagicSuggest array
-function AddToMSArray(msArray, id, url, maxSelection, minChars) {
+function AddToMSArray(msArray, id, url, maxSelection, minChars, dataUrlParams, disabled) {
+
+    disabled = (typeof disabled !== "undefined" && disabled == false) ? false : true;
 
     var element = $("#" + id);
     var dataValRequired = $(element).attr("data-val-required");
     var dataValDbisunique = $(element).attr("data-val-dbisunique");
-
+        
     var ms = element.magicSuggest({
         invalidCls: "input-validation-error",
         data: url,
+        dataUrlParams: dataUrlParams,
         allowFreeEntries: false,
+        disabled: disabled,
         minChars: minChars,
         maxSelection: maxSelection,
         required: (typeof dataValRequired !== "undefined") ? true : false,
