@@ -48,6 +48,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Entry Date</th>
+                    <th>Entered By</th>
                     <th>Activity Type</th>
                     <th>Man Hours</th>
                     <th>Project</th>
@@ -88,7 +89,14 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.PersonActivityType_Id, "Type", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.EnteredByPerson_Id, "Entered By", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.EnteredByPerson_Id, new { @class = "form-control modifiable", placeholder = "Entered By Person" })
+                            @Html.ValidationMessageFor(x => x.EnteredByPerson_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.PersonActivityType_Id, "Activity", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.PersonActivityType_Id, new { @class = "form-control modifiable", placeholder = "Type of Activity" })
                             @Html.ValidationMessageFor(x => x.PersonActivityType_Id)
@@ -134,7 +142,53 @@
                 </div>
             </div>
 
-            <div class="form-group">
+            <div class="row">
+                <div class="col-xs-12">
+                    
+                    <button class="btn btn-default" type="button" id="EditFormBtnCancel">Add/Remove People</button>
+                    
+                    <button class="btn btn-success" type="button" id="EditFormBtnOk">
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    </button>
+                </div>
+            </div>
+
+            <div class="row" id="LogEntryPersonsView">
+                <div class="col-xs-12 col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="font-weight:bold">Add</div>
+                        <table class="table table-striped" id="TableLogEntryPersonsAdd">
+                            <thead class="hide">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Last Nme</th>
+                                    <th>First Name</th>
+                                    <th>Initials</th>
+                                </tr>
+                            </thead>
+                            <tbody class="selectable"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="font-weight:bold">Remove</div>
+                        <table class="table table-striped" id="TableLogEntryPersonsRemove">
+                            <thead class="hide">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Last Nme</th>
+                                    <th>First Name</th>
+                                    <th>Initials</th>
+                                </tr>
+                            </thead>
+                            <tbody class="selectable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
                 <div class="col-xs-6">
                     <button class="btn btn-default" type="button" id="EditFormBtnCancel">Cancel</button>
                 </div>
@@ -144,9 +198,12 @@
                     </button>
                 </div>
             </div>
+            
         </form>
     </div>
 </div>
+
+
 
 @section Scripts {
     @Scripts.Render("~/bundles/DataTables")

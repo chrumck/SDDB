@@ -24,8 +24,8 @@ namespace SDDB.Domain.Entities
 
         [Required(ErrorMessage = "Person field is required")]
         [StringLength(40)]
-        [ForeignKey("Person")]
-        public string Person_Id { get; set; }
+        [ForeignKey("EnteredByPerson")]
+        public string EnteredByPerson_Id { get; set; }
 
         [Required(ErrorMessage = "Entry Date field is required")]
         [DBIsDateTimeISO]
@@ -69,7 +69,7 @@ namespace SDDB.Domain.Entities
         
         //one to many
         public virtual Component Component { get; set; }
-        public virtual Person Person { get; set; }
+        public virtual Person EnteredByPerson { get; set; }
 
         public virtual ComponentStatus ComponentStatus { get; set; }
         public virtual Project AssignedToProject { get; set; }

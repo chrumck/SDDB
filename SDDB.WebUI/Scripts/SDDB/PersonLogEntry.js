@@ -105,22 +105,24 @@ $(document).ready(function () {
             { data: "Id", name: "Id" },//0
             { data: "LogEntryDateTime", name: "LogEntryDateTime" },//1
             //------------------------------------------------first set of columns
-            { data: "ActivityTypeName", name: "ActivityTypeName" },//2
-            { data: "ManHours", name: "ManHours" },//3
-            { data: "AssignedToProject", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject" }, //4
-            { data: "EventName", name: "EventName" },//5
-            { data: "Comments", name: "Comments" },//6
+            { data: "EnteredByPerson", render: function (data, type, full, meta) { return data.LastName + " " + data.Initials }, name: "EnteredByPerson" }, //2
+            { data: "ActivityTypeName", name: "ActivityTypeName" },//3
+            { data: "ManHours", name: "ManHours" },//4
+            { data: "AssignedToProject", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject" }, //5
+            { data: "EventName", name: "EventName" },//6
+            { data: "Comments", name: "Comments" },//7
             //------------------------------------------------never visible
-            { data: "IsActive", name: "IsActive" },//7
-            { data: "PersonActivityType_Id", name: "PersonActivityType_Id" },//8
-            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//9
-            { data: "AssignedToProjectEvent_Id", name: "AssignedToProjectEvent_Id" },//10
+            { data: "IsActive", name: "IsActive" },//8
+            { data: "EnteredByPerson_Id", name: "EnteredByPerson_Id" },//9
+            { data: "PersonActivityType_Id", name: "PersonActivityType_Id" },//10
+            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//11
+            { data: "AssignedToProjectEvent_Id", name: "AssignedToProjectEvent_Id" },//12
         ],
         columnDefs: [
-            { targets: [0, 7, 8, 9, 10], visible: false }, // - never show
-            { targets: [0, 1, 3, 7, 8, 9, 10], searchable: false },  //"orderable": false, "visible": false
+            { targets: [0, 8, 9, 10, 11, 12], visible: false }, // - never show
+            { targets: [0, 1, 4, 8, 9, 10, 11, 12], searchable: false },  //"orderable": false, "visible": false
             { targets: [3, 4, 5], className: "hidden-xs hidden-sm" }, // - first set of columns
-            { targets: [6], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
+            { targets: [6, 7], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
@@ -145,16 +147,18 @@ $(document).ready(function () {
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
+    AddToMSArray(MagicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
+
     AddToMSArray(MagicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1);
     
     AddToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
 
     AddToMSArray(MagicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
-        { projectIds: MagicSuggests[1].getValue });
+        { projectIds: MagicSuggests[2].getValue });
 
-    $(MagicSuggests[1]).on('selectionchange', function (e, m) {
-        if (this.getValue().length == 0) { MagicSuggests[2].disable(); MagicSuggests[2].clear(true); }
-        else { MagicSuggests[2].enable(); MagicSuggests[2].clear(true); }
+    $(MagicSuggests[2]).on('selectionchange', function (e, m) {
+        if (this.getValue().length == 0) { MagicSuggests[3].disable(); MagicSuggests[3].clear(true); }
+        else { MagicSuggests[3].enable(); MagicSuggests[3].clear(true); }
     });
     
 
@@ -204,7 +208,7 @@ function FillFormForCreate() {
     $("#EditFormLabel").text("Create Person Log Entry");
     $("[data-val-dbisunique]").prop("disabled", false);
     DisableUniqueMs(MagicSuggests, false);
-    MagicSuggests[2].disable();
+    MagicSuggests[3].disable();
     $(".modifiable").data("ismodified", true); SetMsAsModified(MagicSuggests, true);
     $("#EditFormGroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true)
     $("#MainView").addClass("hide");
@@ -229,6 +233,7 @@ function FillFormForEdit() {
             CurrRecord.ManHours = data[0].ManHours;
             CurrRecord.Comments = data[0].Comments;
             CurrRecord.IsActive = data[0].IsActive;
+            CurrRecord.EnteredByPerson_Id = data[0].EnteredByPerson_Id;
             CurrRecord.PersonActivityType_Id = data[0].PersonActivityType_Id;
             CurrRecord.AssignedToProject_Id = data[0].AssignedToProject_Id;
             CurrRecord.AssignedToProjectEvent_Id = data[0].AssignedToProjectEvent_Id;
@@ -240,6 +245,8 @@ function FillFormForEdit() {
                 if (FormInput.Comments != dbEntry.Comments) FormInput.Comments = "_VARIES_";
                 if (FormInput.IsActive != dbEntry.IsActive) FormInput.IsActive = "_VARIES_";
 
+                if (FormInput.EnteredByPerson_Id != dbEntry.EnteredByPerson_Id) { FormInput.EnteredByPerson_Id = "_VARIES_"; FormInput.EnteredByPerson = "_VARIES_"; }
+                else FormInput.EnteredByPerson = dbEntry.EnteredByPerson.FirstName + " " + dbEntry.EnteredByPerson.LastName + " " + dbEntry.EnteredByPerson.Initials;
                 if (FormInput.PersonActivityType_Id != dbEntry.PersonActivityType_Id) { FormInput.PersonActivityType_Id = "_VARIES_"; FormInput.ActivityTypeName = "_VARIES_"; }
                 else FormInput.ActivityTypeName = dbEntry.ActivityTypeName;
                 if (FormInput.AssignedToProject_Id != dbEntry.AssignedToProject_Id) { FormInput.AssignedToProject_Id = "_VARIES_"; FormInput.AssignedToProject = "_VARIES_"; }
@@ -256,9 +263,10 @@ function FillFormForEdit() {
             $("#Comments").val(FormInput.Comments);
             if (FormInput.IsActive == true) $("#IsActive").prop("checked", true);
 
-            if (FormInput.PersonActivityType_Id != null) MagicSuggests[0].addToSelection([{ id: FormInput.PersonActivityType_Id, name: FormInput.ActivityTypeName }], true);
-            if (FormInput.AssignedToProject_Id != null) MagicSuggests[1].addToSelection([{ id: FormInput.AssignedToProject_Id, name: FormInput.AssignedToProject }], true);
-            if (FormInput.AssignedToProjectEvent_Id != null) MagicSuggests[2].addToSelection([{ id: FormInput.AssignedToProjectEvent_Id, name: FormInput.EventName }], true);
+            if (FormInput.EnteredByPerson_Id != null) MagicSuggests[0].addToSelection([{ id: FormInput.EnteredByPerson_Id, name: FormInput.EnteredByPerson }], true);
+            if (FormInput.PersonActivityType_Id != null) MagicSuggests[1].addToSelection([{ id: FormInput.PersonActivityType_Id, name: FormInput.ActivityTypeName }], true);
+            if (FormInput.AssignedToProject_Id != null) MagicSuggests[2].addToSelection([{ id: FormInput.AssignedToProject_Id, name: FormInput.AssignedToProject }], true);
+            if (FormInput.AssignedToProjectEvent_Id != null) MagicSuggests[3].addToSelection([{ id: FormInput.AssignedToProjectEvent_Id, name: FormInput.EventName }], true);
 
             if (data.length == 1) {
                 $("[data-val-dbisunique]").prop("disabled", false);
@@ -305,9 +313,10 @@ function SubmitEdits() {
         editRecord.ManHours = ($("#ManHours").data("ismodified")) ? $("#ManHours").val() : CurrRecord.ManHours;
         editRecord.Comments = ($("#Comments").data("ismodified")) ? $("#Comments").val() : CurrRecord.Comments;
         editRecord.IsActive = ($("#IsActive").data("ismodified")) ? (($("#IsActive").prop("checked")) ? true : false) : CurrRecord.IsActive;
-        editRecord.PersonActivityType_Id = (MagicSuggests[0].isModified) ? magicResults[0] : CurrRecord.PersonActivityType_Id;
-        editRecord.AssignedToProject_Id = (MagicSuggests[1].isModified) ? magicResults[1] : CurrRecord.AssignedToProject_Id;
-        editRecord.AssignedToProjectEvent_Id = (MagicSuggests[2].isModified) ? magicResults[2] : CurrRecord.AssignedToProjectEvent_Id;
+        editRecord.EnteredByPerson_Id = (MagicSuggests[0].isModified) ? magicResults[0] : CurrRecord.EnteredByPerson_Id;
+        editRecord.PersonActivityType_Id = (MagicSuggests[1].isModified) ? magicResults[1] : CurrRecord.PersonActivityType_Id;
+        editRecord.AssignedToProject_Id = (MagicSuggests[2].isModified) ? magicResults[2] : CurrRecord.AssignedToProject_Id;
+        editRecord.AssignedToProjectEvent_Id = (MagicSuggests[3].isModified) ? magicResults[3] : CurrRecord.AssignedToProjectEvent_Id;
         
         editRecord.ModifiedProperties = modifiedProperties;
 

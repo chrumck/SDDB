@@ -99,6 +99,15 @@ namespace SDDB.Domain.Entities
         [InverseProperty("ContactPerson")]
         public virtual ICollection<Location> LocationsContact { get; set; }
 
+        [InverseProperty("EnteredByPerson")]
+        public virtual ICollection<PersonLogEntry> EnteredPrsLogEntrys { get; set; }
+
+        [InverseProperty("EnteredByPerson")]
+        public virtual ICollection<AssemblyLogEntry> EnteredAssyLogEntrys { get; set; }
+
+        [InverseProperty("EnteredByPerson")]
+        public virtual ICollection<ComponentLogEntry> EnteredCompLogEntrys { get; set; }
+
         //many to many
         
         [InverseProperty("ProjectPersons")]
@@ -113,7 +122,6 @@ namespace SDDB.Domain.Entities
         [InverseProperty("PrsLogEntryPersons")]
         public virtual ICollection<PersonLogEntry> PersonPrsLogEntrys { get; set; }
 
-
         //Constructors---------------------------------------------------------------------------------------------------------//
 
         public Person()
@@ -122,6 +130,9 @@ namespace SDDB.Domain.Entities
             this.DocumentsAuthor = new HashSet<Document>();
             this.DocumentsReviewer = new HashSet<Document>();
             this.LocationsContact = new HashSet<Location>();
+            this.EnteredPrsLogEntrys = new HashSet<PersonLogEntry>();
+            this.EnteredAssyLogEntrys = new HashSet<AssemblyLogEntry>();
+            this.EnteredCompLogEntrys = new HashSet<ComponentLogEntry>();
 
             this.PersonProjects = new HashSet<Project>();
             this.PersonGroups = new HashSet<PersonGroup>();

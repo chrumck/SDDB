@@ -9,7 +9,16 @@
 
 $(document).ready(function () {
 
+    //disable AJAX caching
     $.ajaxSetup({ cache: false });
+    
+    //Enable jqueryUI selectable
+    if (!Modernizr.touch) {
+        $(".selectable").selectable({ filter: "tr" });
+    }
+    else {
+        $(".selectable").on("click", "tr", function () { $(this).toggleClass("ui-selected"); });
+    }
 
 });
 
@@ -263,3 +272,18 @@ function SetMsAsModified(msArray, isModified) {
     $.each(msArray, function (i, ms) { ms.isModified = isModified; });
 }
 
+//Prepare Form For Create
+function FillFormForCreate(formId, msArray, labelText, setSelect) {
+
+    setSelect = (typeof setSelect !== "undefined" && setSelect == true) ? true : false;
+    
+    ClearFormInputs(formId, msArray);
+    $("#" + formId + "Label").text(labelText);
+    $("[data-val-dbisunique]").prop("disabled", false); DisableUniqueMs(msArray, false);
+    $(".modifiable").data("ismodified", true); SetMsAsModified(msArray, true);
+    $("#EditFormGroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true)
+    $("#CreateMultipleRow").removeClass("hide");
+    if (setSelect) $("#" + formId + " select").find("option:first").prop('selected', 'selected');
+    $("#MainView").addClass("hide");
+    $("#" + formId + "View").removeClass("hide");
+}

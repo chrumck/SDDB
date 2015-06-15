@@ -316,7 +316,7 @@ namespace SDDB.UnitTests
             var prsLogEntryService = new PersonLogEntryService(mockDbContextScopeFac.Object);
 
             //Act
-            var serviceResult = prsLogEntryService.EditAsync(prsLogEntrys).Result;
+            var serviceResult = prsLogEntryService.EditAsync("DummyUserId", prsLogEntrys).Result;
 
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
@@ -351,7 +351,7 @@ namespace SDDB.UnitTests
             var prsLogEntryService = new PersonLogEntryService(mockDbContextScopeFac.Object);
 
             //Act
-            var serviceResult = prsLogEntryService.EditAsync(prsLogEntrys).Result;
+            var serviceResult = prsLogEntryService.EditAsync("DummyUserId", prsLogEntrys).Result;
 
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
@@ -393,7 +393,7 @@ namespace SDDB.UnitTests
             var prsLogEntryService = new PersonLogEntryService(mockDbContextScopeFac.Object);
 
             //Act
-            var serviceResult = prsLogEntryService.EditAsync(prsLogEntrys).Result;
+            var serviceResult = prsLogEntryService.EditAsync("DummyUserId", prsLogEntrys).Result;
 
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
@@ -440,7 +440,7 @@ namespace SDDB.UnitTests
             var prsLogEntryService = new PersonLogEntryService(mockDbContextScopeFac.Object);
 
             //Act
-            var serviceResult = prsLogEntryService.EditAsync(prsLogEntrys).Result;
+            var serviceResult = prsLogEntryService.EditAsync("DummyUserId", prsLogEntrys).Result;
 
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
@@ -481,7 +481,7 @@ namespace SDDB.UnitTests
             var prsLogEntryService = new PersonLogEntryService(mockDbContextScopeFac.Object);
 
             //Act
-            var serviceResult = prsLogEntryService.EditAsync(prsLogEntrys).Result;
+            var serviceResult = prsLogEntryService.EditAsync("DummyUserId", prsLogEntrys).Result;
 
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);

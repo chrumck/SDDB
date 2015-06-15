@@ -39,7 +39,8 @@ namespace SDDB.Domain.Services
                 
                 var records = await dbContext.PersonLogEntrys
                     .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive)
-                    .Include(x => x.PersonActivityType).Include(x => x.AssignedToProject).Include(x => x.AssignedToProjectEvent)
+                    .Include(x => x.EnteredByPerson).Include(x => x.PersonActivityType)
+                    .Include(x => x.AssignedToProject).Include(x => x.AssignedToProjectEvent)
                     .ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
@@ -68,7 +69,8 @@ namespace SDDB.Domain.Services
 
                 var records = await dbContext.PersonLogEntrys
                     .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive && ids.Contains(x.Id))
-                    .Include(x => x.PersonActivityType).Include(x => x.AssignedToProject).Include(x => x.AssignedToProjectEvent)
+                    .Include(x => x.EnteredByPerson).Include(x => x.PersonActivityType)
+                    .Include(x => x.AssignedToProject).Include(x => x.AssignedToProjectEvent)
                     .ToListAsync().ConfigureAwait(false);
                 
                 foreach (var record in records)
@@ -101,12 +103,14 @@ namespace SDDB.Domain.Services
                 
                 var records = await dbContext.PersonLogEntrys
                        .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
-                            (personIds.Count() == 0 || x.PrsLogEntryPersons.Any(y => personIds.Contains(y.Id))) &&
+                            (personIds.Count() == 0 || x.PrsLogEntryPersons.Any(y => personIds.Contains(y.Id)) ||
+                                personIds.Contains(x.EnteredByPerson_Id)) &&
                             (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                             (typeIds.Count() == 0 || typeIds.Contains(x.PersonActivityType_Id)) &&
                             (startDate == null || x.LogEntryDateTime >= startDate) &&
                             (endDate == null || x.LogEntryDateTime <= endDate)  )
-                       .Include(x => x.PersonActivityType).Include(x => x.AssignedToProject).Include(x => x.AssignedToProjectEvent)
+                       .Include(x => x.EnteredByPerson).Include(x => x.PersonActivityType)
+                       .Include(x => x.AssignedToProject).Include(x => x.AssignedToProjectEvent)
                        .ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
@@ -136,8 +140,8 @@ namespace SDDB.Domain.Services
 
                 return dbContext.PersonLogEntrys
                     .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
-                        x.Comments.Contains(query))
-                    .Include(x => x.AssignedToProject).ToListAsync();
+                        (x.EnteredByPerson.Initials.Contains(query) || x.EnteredByPerson.LastName.Contains(query) || x.Comments.Contains(query)))
+                    .Include(x => x.EnteredByPerson).ToListAsync();
             }
         }
 
@@ -153,8 +157,8 @@ namespace SDDB.Domain.Services
                 var records = await dbContext.PersonLogEntrys
                     .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
-                        x.Comments.Contains(query))
-                    .Include(x => x.AssignedToProject).ToListAsync();
+                        (x.EnteredByPerson.Initials.Contains(query) || x.EnteredByPerson.LastName.Contains(query) || x.Comments.Contains(query)))
+                    .Include(x => x.EnteredByPerson).ToListAsync();
                 
                 return records;
             }
@@ -163,7 +167,7 @@ namespace SDDB.Domain.Services
         //-----------------------------------------------------------------------------------------------------------------------
 
         // Create and Update records given in []
-        public virtual async Task<DBResult> EditAsync(PersonLogEntry[] records)
+        public virtual async Task<DBResult> EditAsync(string userId, PersonLogEntry[] records)
         {
             var errorMessage = "";
             using (var dbContextScope = contextScopeFac.Create())
@@ -187,6 +191,7 @@ namespace SDDB.Domain.Services
                             if (dbEntry == null)
                             {
                                 record.Id = Guid.NewGuid().ToString();
+                                record.EnteredByPerson_Id = record.EnteredByPerson_Id ?? userId;
                                 dbContext.PersonLogEntrys.Add(record);
 
                             }

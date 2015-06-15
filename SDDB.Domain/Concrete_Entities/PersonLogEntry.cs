@@ -22,6 +22,11 @@ namespace SDDB.Domain.Entities
         [DBIsDateTimeISO] 
         public DateTime LogEntryDateTime { get; set; }
 
+        [Required(ErrorMessage = "Person field is required")]
+        [StringLength(40)]
+        [ForeignKey("EnteredByPerson")]
+        public string EnteredByPerson_Id { get; set; }
+
         [Required(ErrorMessage = "Activity Type field is required")]
         [StringLength(40)]
         [ForeignKey("PersonActivityType")]
@@ -63,6 +68,7 @@ namespace SDDB.Domain.Entities
         
         //one to many
 
+        public virtual Person EnteredByPerson { get; set; }
         public virtual PersonActivityType PersonActivityType { get; set; }
         public virtual Project AssignedToProject { get; set; }
         public virtual ProjectEvent AssignedToProjectEvent { get; set; }
