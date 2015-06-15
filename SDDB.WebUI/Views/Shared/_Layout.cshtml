@@ -115,10 +115,13 @@
 
     <!----------------Scripts and CSS----------->
     @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jquery-ui")
     @Scripts.Render("~/bundles/jqueryval")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/moment")
     <script src="/Scripts/SDDB/Shared.js"></script>
+
+    @Styles.Render("~/bundles/jquery-ui-CSS")
 
     @RenderSection("scripts", required: false)
 
