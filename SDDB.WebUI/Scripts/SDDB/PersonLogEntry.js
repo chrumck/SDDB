@@ -41,11 +41,11 @@ $(document).ready(function () {
 
     //Initialize DateTimePicker FilterDateStart
     $("#FilterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("blur", function (e) { RefreshMainView(); });
+        .on("dp.hide", function (e) { RefreshMainView(); });
 
     //Initialize DateTimePicker FilterDateEnd
     $("#FilterDateEnd").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("blur", function (e) { RefreshMainView(); });
+        .on("dp.hide", function (e) { RefreshMainView(); });
 
     //Initialize MagicSuggest MsFilterByType
     MsFilterByType = $("#MsFilterByType").magicSuggest({
@@ -174,6 +174,9 @@ $(document).ready(function () {
 
     //--------------------------------------View Initialization------------------------------------//
 
+    $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
+    $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
+
     //if (typeof assyId !== "undefined" && assyId != "") {
     //    $.ajax({
     //        type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 20000,
@@ -202,7 +205,7 @@ function FillFormForCreate() {
     $("[data-val-dbisunique]").prop("disabled", false);
     DisableUniqueMs(MagicSuggests, false);
     MagicSuggests[2].disable();
-    $(".modifiable").data("ismodified", true);
+    $(".modifiable").data("ismodified", true); SetMsAsModified(MagicSuggests, true);
     $("#EditFormGroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true)
     $("#MainView").addClass("hide");
     $("#EditFormView").removeClass("hide");
@@ -348,9 +351,10 @@ function RefreshMainView() {
         TableMain.clear().search("").draw();
     }
     else {
+        var endDate = moment($("#FilterDateEnd").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
         RefreshTable(TableMain, "/PersonLogEntrySrv/GetByFilterIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
             "POST", MsFilterByProject.getValue(), [], MsFilterByType.getValue(), [], [],
-            MsFilterByPerson.getValue(), $("#FilterDateStart").val(), $("#FilterDateEnd").val());
+            MsFilterByPerson.getValue(), $("#FilterDateStart").val(), endDate);
         $("#ChBoxShowDeleted").bootstrapToggle("enable")
     }
 

@@ -165,31 +165,43 @@ namespace SDDB.Domain.Services
         // Create and Update records given in []
         public virtual async Task<DBResult> EditAsync(PersonLogEntry[] records)
         {
+            var errorMessage = "";
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+                
                 using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
                     foreach (var record in records)
                     {
-                        var dbEntry = await dbContext.PersonLogEntrys.FindAsync(record.Id).ConfigureAwait(false);
-                        if (dbEntry == null)
+                        var projEvent = await dbContext.ProjectEvents.FindAsync(record.AssignedToProjectEvent_Id).ConfigureAwait(false);
+
+                        if (record.PropIsModified(x => x.AssignedToProjectEvent_Id) && record.AssignedToProjectEvent_Id != null &&
+                            projEvent.AssignedToProject_Id != record.AssignedToProject_Id )
                         {
-                            record.Id = Guid.NewGuid().ToString();
-                            dbContext.PersonLogEntrys.Add(record);
-                            
+                            errorMessage += "Log Entry and Project Event do not belong to the same project. Entry not saved.";
                         }
                         else
                         {
-                            var excludedProperties = new string[] { "Id", "TSP" };
-                            var properties = typeof(PersonLogEntry).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                            foreach (var property in properties)
+                            var dbEntry = await dbContext.PersonLogEntrys.FindAsync(record.Id).ConfigureAwait(false);
+                            if (dbEntry == null)
                             {
-                                if (property.GetMethod.IsVirtual) continue;
-                                if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                                if (excludedProperties.Contains(property.Name)) continue;
+                                record.Id = Guid.NewGuid().ToString();
+                                dbContext.PersonLogEntrys.Add(record);
 
-                                if (record.PropIsModified(property.Name)) property.SetValue(dbEntry, property.GetValue(record));
+                            }
+                            else
+                            {
+                                var excludedProperties = new string[] { "Id", "TSP" };
+                                var properties = typeof(PersonLogEntry).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+                                foreach (var property in properties)
+                                {
+                                    if (property.GetMethod.IsVirtual) continue;
+                                    if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
+                                    if (excludedProperties.Contains(property.Name)) continue;
+
+                                    if (record.PropIsModified(property.Name)) property.SetValue(dbEntry, property.GetValue(record));
+                                }
                             }
                         }
                     }
@@ -213,7 +225,9 @@ namespace SDDB.Domain.Services
                     trans.Complete();
                 }
             }
-            return new DBResult { StatusCode = HttpStatusCode.OK };
+            if (errorMessage == "") return new DBResult();
+            else return new DBResult { StatusCode = HttpStatusCode.Conflict,
+                StatusDescription = "Errors editing records:\n" + errorMessage };
         }
 
         // Delete records by their Ids

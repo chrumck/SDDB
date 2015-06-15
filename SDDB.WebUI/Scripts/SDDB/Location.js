@@ -222,7 +222,7 @@ function FillFormForCreate() {
     $("#EditFormLabel").text("Create Location");
     $("[data-val-dbisunique]").prop("disabled", false);
     DisableUniqueMs(MagicSuggests, false);
-    $(".modifiable").data("ismodified", true);
+    $(".modifiable").data("ismodified", true); SetMsAsModified(MagicSuggests, true);
     $("#EditFormGroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true)
     $("#CreateMultipleRow").removeClass("hide");
     $("#MainView").addClass("hide");

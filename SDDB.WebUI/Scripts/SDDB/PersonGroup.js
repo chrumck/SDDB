@@ -134,7 +134,7 @@ $(document).ready(function () {
         ],
         columnDefs: [
             { targets: [0], visible: false }, // - never show
-            { targets: [2,3], className: "hidden-xs hidden-sm" }
+            { targets: [2], className: "hidden-xs hidden-sm" }
         ],
         bAutoWidth: false,
         language: {
@@ -158,7 +158,7 @@ $(document).ready(function () {
         ],
         columnDefs: [
             { targets: [0], visible: false }, // - never show
-            { targets: [2, 3], className: "hidden-xs hidden-sm" }
+            { targets: [2], className: "hidden-xs hidden-sm" }
         ],
         bAutoWidth: false,
         language: {
@@ -192,7 +192,7 @@ function FillFormForCreate() {
     $("#EditFormLabel").text("Create Document");
     $("[data-val-dbisunique]").prop("disabled", false);
     DisableUniqueMs(MagicSuggests, false);
-    $(".modifiable").data("ismodified", true);
+    $(".modifiable").data("ismodified", true); SetMsAsModified(MagicSuggests, true);
     $("#EditFormGroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true)
     $("#MainView").addClass("hide");
     $("#EditFormView").removeClass("hide");

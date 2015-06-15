@@ -170,7 +170,7 @@ function FillFormForCreate() {
     $("#EditFormLabel").text("Create SDDB User");
     $("[data-val-dbisunique]").prop("disabled", false);
     DisableUniqueMs(MagicSuggests, false);
-    $(".modifiable").data("ismodified", true);
+    $(".modifiable").data("ismodified", true); SetMsAsModified(MagicSuggests, true);
     $("#MainView").addClass("hide");
     $("#EditFormView").removeClass("hide");
 }

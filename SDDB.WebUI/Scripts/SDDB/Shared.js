@@ -257,5 +257,9 @@ function DisableUniqueMs(msArray, disable) {
     });
 }
 
-
+//set MagicSuggests as modified ot not
+function SetMsAsModified(msArray, isModified) {
+    isModified = (typeof isModified !== "undefined" && isModified == false) ? false : true;
+    $.each(msArray, function (i, ms) { ms.isModified = isModified; });
+}
 
