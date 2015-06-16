@@ -89,7 +89,7 @@ namespace SDDB.Domain.Services
             }
         }
 
-        //find by query - returns only projects the person is assigned to
+        //lookup by query - returns only projects the person is assigned to
         public virtual Task<List<Project>> LookupAsync(string userId, string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())

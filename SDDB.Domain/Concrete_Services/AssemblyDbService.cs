@@ -161,7 +161,7 @@ namespace SDDB.Domain.Services
             }
         }
         
-        //find by query
+        //lookup by query
         public virtual Task<List<AssemblyDb>> LookupAsync(string userId, string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
@@ -175,7 +175,7 @@ namespace SDDB.Domain.Services
             }
         }
 
-        //find by query and project
+        //lookup by query and project
         public virtual async Task<List<AssemblyDb>> LookupByProjAsync(string userId, string[] projectIds = null, string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
@@ -190,6 +190,24 @@ namespace SDDB.Domain.Services
                         (x.AssyName.Contains(query) || x.AssyAltName.Contains(query) || x.AssyAltName2.Contains(query)))
                     .Include(x => x.AssignedToProject).ToListAsync();
                 
+                return records;
+            }
+        }
+
+        //lookup by location
+        public virtual async Task<List<AssemblyDb>> LookupByLocAsync(string userId, string locId = null, bool getActive = true)
+        {
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+                locId = locId ?? "";
+
+                var records = await dbContext.AssemblyDbs
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                        ( locId == "" || x.AssignedToLocation_Id == locId))
+                    .Include(x => x.AssignedToProject).ToListAsync();
+
                 return records;
             }
         }

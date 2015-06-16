@@ -273,7 +273,7 @@ function SetMsAsModified(msArray, isModified) {
 }
 
 //Prepare Form For Create
-function FillFormForCreate(formId, msArray, labelText, setSelect) {
+function FillFormForCreate(formId, msArray, labelText) {
 
     setSelect = (typeof setSelect !== "undefined" && setSelect == true) ? true : false;
     
@@ -283,7 +283,6 @@ function FillFormForCreate(formId, msArray, labelText, setSelect) {
     $(".modifiable").data("ismodified", true); SetMsAsModified(msArray, true);
     $("#EditFormGroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true)
     $("#CreateMultipleRow").removeClass("hide");
-    if (setSelect) $("#" + formId + " select").find("option:first").prop('selected', 'selected');
     $("#MainView").addClass("hide");
     $("#" + formId + "View").removeClass("hide");
 }

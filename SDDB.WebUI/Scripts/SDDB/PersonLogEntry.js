@@ -22,7 +22,8 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreate();
+        FillFormForCreate("EditForm", MagicSuggests, "Create Log Entry");
+        MagicSuggests[3].disable(); MagicSuggests[4].disable();
     });
 
     //Wire up BtnEdit
@@ -83,14 +84,6 @@ $(document).ready(function () {
         
     //---------------------------------------DataTables------------
 
-    //Enable jqueryUI selectable
-    if (!Modernizr.touch) {
-        $(".selectable").selectable({ filter: "tr" });
-    }
-    else {
-        $(".selectable").on("click", "tr", function () { $(this).toggleClass("ui-selected"); });
-    }
-
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
         if (($(this).prop("checked")) ? false : true)
@@ -109,6 +102,7 @@ $(document).ready(function () {
             { data: "ActivityTypeName", name: "ActivityTypeName" },//3
             { data: "ManHours", name: "ManHours" },//4
             { data: "AssignedToProject", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject" }, //5
+            { data: "AssignedToLocation", render: function (data, type, full, meta) { return data.LocName }, name: "AssignedToLocation" }, //5
             { data: "EventName", name: "EventName" },//6
             { data: "Comments", name: "Comments" },//7
             //------------------------------------------------never visible
@@ -116,6 +110,7 @@ $(document).ready(function () {
             { data: "EnteredByPerson_Id", name: "EnteredByPerson_Id" },//9
             { data: "PersonActivityType_Id", name: "PersonActivityType_Id" },//10
             { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//11
+            { data: "AssignedToLocation_Id", name: "AssignedToLocation_Id" },//11
             { data: "AssignedToProjectEvent_Id", name: "AssignedToProjectEvent_Id" },//12
         ],
         columnDefs: [
@@ -148,11 +143,8 @@ $(document).ready(function () {
 
     //Initialize MagicSuggest Array
     AddToMSArray(MagicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
-
     AddToMSArray(MagicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1);
-    
     AddToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-
     AddToMSArray(MagicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
         { projectIds: MagicSuggests[2].getValue });
 
@@ -160,8 +152,6 @@ $(document).ready(function () {
         if (this.getValue().length == 0) { MagicSuggests[3].disable(); MagicSuggests[3].clear(true); }
         else { MagicSuggests[3].enable(); MagicSuggests[3].clear(true); }
     });
-    
-
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
@@ -174,6 +164,11 @@ $(document).ready(function () {
     $("#EditFormBtnOk").click(function () {
         MsValidate(MagicSuggests);
         if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
+    });
+
+    //Wire Up EditFormBtnAddRemovePrs
+    $("#EditFormBtnAddRemovePrs").click(function () {
+        $("#LogEntryPersonsView").toggleClass("hide");
     });
 
     //--------------------------------------View Initialization------------------------------------//
@@ -201,19 +196,6 @@ $(document).ready(function () {
 
 
 //--------------------------------------Main Methods---------------------------------------//
-
-//FillFormForCreate
-function FillFormForCreate() {
-    ClearFormInputs("EditForm", MagicSuggests);
-    $("#EditFormLabel").text("Create Person Log Entry");
-    $("[data-val-dbisunique]").prop("disabled", false);
-    DisableUniqueMs(MagicSuggests, false);
-    MagicSuggests[3].disable();
-    $(".modifiable").data("ismodified", true); SetMsAsModified(MagicSuggests, true);
-    $("#EditFormGroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true)
-    $("#MainView").addClass("hide");
-    $("#EditFormView").removeClass("hide");
-}
 
 //FillFormForEdit
 function FillFormForEdit() {

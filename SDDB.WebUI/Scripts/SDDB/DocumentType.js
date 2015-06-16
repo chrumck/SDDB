@@ -14,7 +14,7 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreate();
+        FillFormForCreate("EditForm", MagicSuggests, "Create Document Type");
     });
 
     //Wire up BtnEdit
@@ -108,18 +108,6 @@ var MagicSuggests = [];
 var CurrRecord = {};
 
 //--------------------------------------Main Methods---------------------------------------//
-
-//FillFormForCreate
-function FillFormForCreate() {
-    ClearFormInputs("EditForm", MagicSuggests);
-    $("#EditFormLabel").text("Create Document Type");
-    $("[data-val-dbisunique]").prop("disabled", false);
-    DisableUniqueMs(MagicSuggests, false);
-    $(".modifiable").data("ismodified", true); SetMsAsModified(MagicSuggests, true);
-    $("#EditFormGroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true)
-    $("#MainView").addClass("hide");
-    $("#EditFormView").removeClass("hide");
-}
 
 //FillFormForEdit
 function FillFormForEdit() {

@@ -52,6 +52,7 @@
                     <th>Activity Type</th>
                     <th>Man Hours</th>
                     <th>Project</th>
+                    <th>Location</th>
                     <th>Event</th>
                     <th>Comments</th>
                     <th>Is Active</th>
@@ -120,6 +121,13 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        @Html.LabelFor(x => x.AssignedToLocation_Id, "Location", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssignedToLocation_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Location" })
+                            @Html.ValidationMessageFor(x => x.AssignedToLocation_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
                         @Html.LabelFor(x => x.AssignedToProjectEvent_Id, "Event", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.AssignedToProjectEvent_Id, new { @class = "form-control modifiable", placeholder = "Assigned To Project Event" })
@@ -142,21 +150,52 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-xs-12">
-                    
-                    <button class="btn btn-default" type="button" id="EditFormBtnCancel">Add/Remove People</button>
-                    
-                    <button class="btn btn-success" type="button" id="EditFormBtnOk">
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
-                    </button>
+            <div class="row" id="LogEntryAssysView">
+                <div class="col-xs-12 col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="font-weight:bold">Add Assemblies</div>
+                        <table class="table table-striped" id="TableLogEntryAssysAdd">
+                            <thead class="hide">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Last Nme</th>
+                                    <th>First Name</th>
+                                    <th>Initials</th>
+                                </tr>
+                            </thead>
+                            <tbody class="selectable"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="font-weight:bold">Remove Assemblies</div>
+                        <table class="table table-striped" id="TableLogEntryAssysRemove">
+                            <thead class="hide">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Last Nme</th>
+                                    <th>First Name</th>
+                                    <th>Initials</th>
+                                </tr>
+                            </thead>
+                            <tbody class="selectable"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <div class="row" id="LogEntryPersonsView">
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <button class="btn btn-default margin-bottom-5px" type="button" id="EditFormBtnAddRemovePrs">Add/Remove People</button>
+                </div>
+            </div>
+
+            <div class="row hide" id="LogEntryPersonsView">
                 <div class="col-xs-12 col-sm-6">
                     <div class="panel panel-default">
-                        <div class="panel-heading" style="font-weight:bold">Add</div>
+                        <div class="panel-heading" style="font-weight:bold">Add People</div>
                         <table class="table table-striped" id="TableLogEntryPersonsAdd">
                             <thead class="hide">
                                 <tr>
@@ -172,7 +211,7 @@
                 </div>
                 <div class="col-xs-12 col-sm-6">
                     <div class="panel panel-default">
-                        <div class="panel-heading" style="font-weight:bold">Remove</div>
+                        <div class="panel-heading" style="font-weight:bold">Remove People</div>
                         <table class="table table-striped" id="TableLogEntryPersonsRemove">
                             <thead class="hide">
                                 <tr>
@@ -196,6 +235,7 @@
                     <button class="btn btn-success pull-right" type="button" id="EditFormBtnOk">
                         &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
                     </button>
+                    
                 </div>
             </div>
             

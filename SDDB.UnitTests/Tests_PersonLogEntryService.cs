@@ -192,14 +192,17 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
+            var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1", Initials = "Initials1" };
 
             var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive = true, Comments="DummyComments1", AssignedToProject = project1 };
-            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive = true, Comments = "DummyComments2", AssignedToProject = project1 };
-            var dbEntry3 = new PersonLogEntry { Id = "dummyEntryId3", LogEntryDateTime = new DateTime(2000,1,3), IsActive = false, Comments = "DummyComments3", AssignedToProject = project1 };
+            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive = true, Comments="DummyComments1",
+                AssignedToProject = project1, EnteredByPerson = projectPerson1 };
+            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive = true, Comments = "DummyComments2",
+                AssignedToProject = project1, EnteredByPerson = projectPerson1  };
+            var dbEntry3 = new PersonLogEntry { Id = "dummyEntryId3", LogEntryDateTime = new DateTime(2000,1,3), IsActive = false, Comments = "DummyComments3", 
+                AssignedToProject = project1, EnteredByPerson = projectPerson1  };
             var dbEntries = (new List<PersonLogEntry> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
@@ -231,14 +234,17 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
+            var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1", Initials = "Initials1" };
 
             var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive = true, Comments="DummyComments1", AssignedToProject = project1 };
-            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive = true, Comments="DummyComments2", AssignedToProject = project1 };
-            var dbEntry3 = new PersonLogEntry { Id = "dummyEntryId3", LogEntryDateTime = new DateTime(2000,1,3),  IsActive = false,  Comments="DummyComments3", AssignedToProject = project1 };
+            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive = true, Comments="DummyComments1",
+                AssignedToProject = project1, EnteredByPerson = projectPerson1 };
+            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive = true, Comments="DummyComments2",
+                AssignedToProject = project1, EnteredByPerson = projectPerson1 };
+            var dbEntry3 = new PersonLogEntry { Id = "dummyEntryId3", LogEntryDateTime = new DateTime(2000,1,3),  IsActive = false,  Comments="DummyComments3",
+                AssignedToProject = project1, EnteredByPerson = projectPerson1 };
             var dbEntries = (new List<PersonLogEntry> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
@@ -270,14 +276,17 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-                        var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
+            var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1", Initials = "Initials1" };
 
             var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive = true, Comments="DummyComments1", AssignedToProject = project1 };
-            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive = true, Comments="DummyComments2", AssignedToProject = project1 };
-            var dbEntry3 = new PersonLogEntry { Id = "dummyEntryId3", LogEntryDateTime = new DateTime(2000,1,3),  IsActive = false, Comments="DummyComments3", AssignedToProject = project1 };
+            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive = true, Comments="DummyComments1",
+                AssignedToProject = project1, EnteredByPerson = projectPerson1 };
+            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive = true, Comments="DummyComments2",
+                AssignedToProject = project1, EnteredByPerson = projectPerson1 };
+            var dbEntry3 = new PersonLogEntry { Id = "dummyEntryId3", LogEntryDateTime = new DateTime(2000,1,3),  IsActive = false, Comments="DummyComments3",
+                AssignedToProject = project1, EnteredByPerson = projectPerson1 };
             var dbEntries = (new List<PersonLogEntry> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
@@ -343,8 +352,11 @@ namespace SDDB.UnitTests
 
             var projEventDbEntry = new ProjectEvent { Id = "DummyProjEntryID", AssignedToProject_Id = "DummyProjectId" };
 
+            var locDbEntry = new Location { Id = "DummyLocId", AssignedToProject_Id = "DummyProjectId" };
+
             mockEfDbContext.Setup(x => x.PersonLogEntrys.FindAsync(prsLogEntry1.Id)).Returns(Task.FromResult<PersonLogEntry>(null));
             mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync(projEventDbEntry.Id)).Returns(Task.FromResult<ProjectEvent>(projEventDbEntry));
+            mockEfDbContext.Setup(x => x.Locations.FindAsync(locDbEntry.Id)).Returns(Task.FromResult<Location>(locDbEntry));
             mockEfDbContext.Setup(x => x.PersonLogEntrys.Add(prsLogEntry1)).Returns(prsLogEntry1);
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
 
@@ -381,12 +393,15 @@ namespace SDDB.UnitTests
 
             var projEventDbEntry = new ProjectEvent { Id = "DummyProjEntryID", AssignedToProject_Id = "DummyProjectId" };
 
+            var locDbEntry = new Location { Id = "DummyLocId", AssignedToProject_Id = "DummyProjectId" };
+
             var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2001, 1, 1), IsActive = true };
             var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2001, 1, 2), IsActive = false };
 
             mockEfDbContext.Setup(x => x.PersonLogEntrys.FindAsync(prsLogEntry1.Id)).Returns(Task.FromResult(dbEntry1));
             mockEfDbContext.Setup(x => x.PersonLogEntrys.FindAsync(prsLogEntry2.Id)).Returns(Task.FromResult(dbEntry2));
             mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync(projEventDbEntry.Id)).Returns(Task.FromResult<ProjectEvent>(projEventDbEntry));
+            mockEfDbContext.Setup(x => x.Locations.FindAsync(locDbEntry.Id)).Returns(Task.FromResult<Location>(locDbEntry));
             mockEfDbContext.Setup(x => x.PersonLogEntrys.Add(prsLogEntry1)).Verifiable();
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
 
@@ -427,6 +442,8 @@ namespace SDDB.UnitTests
 
             var projEventDbEntry = new ProjectEvent { Id = "DummyProjEntryID", AssignedToProject_Id = "DummyProjectId" };
 
+            var locDbEntry = new Location { Id = "DummyLocId", AssignedToProject_Id = "DummyProjectId" };
+
             var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2001, 1, 1), IsActive = true };
             var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2001, 1, 2), IsActive = false };
 
@@ -434,6 +451,7 @@ namespace SDDB.UnitTests
             mockEfDbContext.Setup(x => x.PersonLogEntrys.FindAsync(prsLogEntry2.Id)).Returns(Task.FromResult(dbEntry2));
             mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync(projEventDbEntry.Id)).Returns(Task.FromResult<ProjectEvent>(projEventDbEntry));
             mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync(It.IsNotIn<string>(new[] { projEventDbEntry.Id }))).Returns(Task.FromResult<ProjectEvent>(null));
+            mockEfDbContext.Setup(x => x.Locations.FindAsync(locDbEntry.Id)).Returns(Task.FromResult<Location>(locDbEntry));
             mockEfDbContext.Setup(x => x.PersonLogEntrys.Add(prsLogEntry1)).Verifiable();
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
 
@@ -445,6 +463,57 @@ namespace SDDB.UnitTests
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Log Entry and Project Event do not belong to the same project. Entry not saved."));
+            Assert.IsTrue(prsLogEntry1.LogEntryDateTime == dbEntry1.LogEntryDateTime); Assert.IsTrue(prsLogEntry1.LogEntryDateTime == dbEntry1.LogEntryDateTime);
+            Assert.IsTrue(prsLogEntry1.IsActive != dbEntry1.IsActive);
+            Assert.IsTrue(prsLogEntry2.LogEntryDateTime != dbEntry2.LogEntryDateTime); Assert.IsTrue(prsLogEntry2.LogEntryDateTime != dbEntry2.LogEntryDateTime);
+            Assert.IsTrue(prsLogEntry2.IsActive != dbEntry2.IsActive);
+            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
+            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
+            mockEfDbContext.Verify(x => x.PersonLogEntrys.FindAsync(It.IsAny<string>()), Times.Once);
+            mockEfDbContext.Verify(x => x.PersonLogEntrys.Add(It.IsAny<PersonLogEntry>()), Times.Never);
+            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
+        }
+
+        [TestMethod]
+        public void PersonLogEntryService_EditAsync_DoesNotUpdateIfProjLocIdsNotMatching()
+        {
+            // Arrange
+            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
+            var mockDbContextScope = new Mock<IDbContextScope>();
+            var mockEfDbContext = new Mock<EFDbContext>();
+            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
+            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
+
+            var prsLogEntry1 = new PersonLogEntry { Id = "dummyPersonLogEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive = false, 
+                AssignedToProject_Id = "DummyProjectId", AssignedToProjectEvent_Id = "DummyProjEntryID", ModifiedProperties = new[] { "LogEntryDateTime" }};
+            var prsLogEntry2 = new PersonLogEntry { Id = "dummyPersonLogEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive = true,
+                AssignedToProject_Id = "DummyProjectId", AssignedToProjectEvent_Id = "DummyProjEntryID", AssignedToLocation_Id = "DummyLocId", 
+                ModifiedProperties = new[] { "LogEntryDateTime","AssignedToProjectEvent_Id","AssignedToLocation_Id" }};
+            var prsLogEntrys = new PersonLogEntry[] { prsLogEntry1, prsLogEntry2 };
+
+            var projEventDbEntry = new ProjectEvent { Id = "DummyProjEntryID", AssignedToProject_Id = "DummyProjectId" };
+
+            var locDbEntry = new Location { Id = "DummyLocId", AssignedToProject_Id = "DummyProjectId2" };
+
+            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2001, 1, 1), IsActive = true };
+            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2001, 1, 2), IsActive = false };
+
+            mockEfDbContext.Setup(x => x.PersonLogEntrys.FindAsync(prsLogEntry1.Id)).Returns(Task.FromResult(dbEntry1));
+            mockEfDbContext.Setup(x => x.PersonLogEntrys.FindAsync(prsLogEntry2.Id)).Returns(Task.FromResult(dbEntry2));
+            mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync(projEventDbEntry.Id)).Returns(Task.FromResult<ProjectEvent>(projEventDbEntry));
+            mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync(It.IsNotIn<string>(new[] { projEventDbEntry.Id }))).Returns(Task.FromResult<ProjectEvent>(null));
+            mockEfDbContext.Setup(x => x.Locations.FindAsync(locDbEntry.Id)).Returns(Task.FromResult<Location>(locDbEntry));
+            mockEfDbContext.Setup(x => x.PersonLogEntrys.Add(prsLogEntry1)).Verifiable();
+            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
+
+            var prsLogEntryService = new PersonLogEntryService(mockDbContextScopeFac.Object);
+
+            //Act
+            var serviceResult = prsLogEntryService.EditAsync("DummyUserId", prsLogEntrys).Result;
+
+            //Assert
+            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
+            Assert.IsTrue(serviceResult.StatusDescription.Contains("Log Entry and Location do not belong to the same project. Entry not saved."));
             Assert.IsTrue(prsLogEntry1.LogEntryDateTime == dbEntry1.LogEntryDateTime); Assert.IsTrue(prsLogEntry1.LogEntryDateTime == dbEntry1.LogEntryDateTime);
             Assert.IsTrue(prsLogEntry1.IsActive != dbEntry1.IsActive);
             Assert.IsTrue(prsLogEntry2.LogEntryDateTime != dbEntry2.LogEntryDateTime); Assert.IsTrue(prsLogEntry2.LogEntryDateTime != dbEntry2.LogEntryDateTime);
@@ -473,8 +542,11 @@ namespace SDDB.UnitTests
 
             var projEventDbEntry = new ProjectEvent { Id = "DummyProjEntryID", AssignedToProject_Id = "DummyProjectId" };
 
+            var locDbEntry = new Location { Id = "DummyLocId", AssignedToProject_Id = "DummyProjectId" };
+
             mockEfDbContext.Setup(x => x.PersonLogEntrys.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<PersonLogEntry>(null));
             mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync(projEventDbEntry.Id)).Returns(Task.FromResult<ProjectEvent>(projEventDbEntry));
+            mockEfDbContext.Setup(x => x.Locations.FindAsync(locDbEntry.Id)).Returns(Task.FromResult<Location>(locDbEntry));
             mockEfDbContext.Setup(x => x.PersonLogEntrys.Add(prsLogEntry1)).Returns(prsLogEntry1);
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
 

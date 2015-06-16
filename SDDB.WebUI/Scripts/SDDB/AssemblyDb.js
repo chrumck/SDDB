@@ -464,7 +464,7 @@ function DeleteRecords() {
         .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
 }
 
-//refresh view after magicsuggest update
+//refresh main view
 function RefreshMainView() {
     if (MsFilterByType.getValue().length == 0 && MsFilterByProject.getValue().length == 0
         && MsFilterByLoc.getValue().length == 0) {

@@ -121,7 +121,7 @@ namespace SDDB.Domain.Services
             }
         }
         
-        //find by query
+        //lookup by query
         public virtual Task<List<Location>> LookupAsync(string userId, string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
@@ -134,7 +134,7 @@ namespace SDDB.Domain.Services
             }
         }
 
-        //find by query and project
+        //lookup by query and project
         public virtual async Task<List<Location>> LookupByProjAsync(string userId, string[] projectIds = null, string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())

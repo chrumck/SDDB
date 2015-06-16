@@ -24,7 +24,7 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreate();
+        FillFormForCreate("EditForm", MagicSuggests, "Create Location");
     });
 
     //Wire up BtnEdit
@@ -96,14 +96,6 @@ $(document).ready(function () {
     $(MsFilterByProject).on('selectionchange', function (e, m) { RefreshMainView(); });
 
     //---------------------------------------DataTables------------
-
-    //Enable jqueryUI selectable
-    if (!Modernizr.touch) {
-        $(".selectable").selectable({ filter: "tr" });
-    }
-    else {
-        $(".selectable").on("click", "tr", function () { $(this).toggleClass("ui-selected"); });
-    }
 
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
@@ -215,19 +207,6 @@ $(document).ready(function () {
 
 
 //--------------------------------------Main Methods---------------------------------------//
-
-//FillFormForCreate
-function FillFormForCreate() {
-    ClearFormInputs("EditForm", MagicSuggests);
-    $("#EditFormLabel").text("Create Location");
-    $("[data-val-dbisunique]").prop("disabled", false);
-    DisableUniqueMs(MagicSuggests, false);
-    $(".modifiable").data("ismodified", true); SetMsAsModified(MagicSuggests, true);
-    $("#EditFormGroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true)
-    $("#CreateMultipleRow").removeClass("hide");
-    $("#MainView").addClass("hide");
-    $("#EditFormView").removeClass("hide");
-}
 
 //FillFormForEdit
 function FillFormForEdit() {

@@ -14,7 +14,8 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreate();
+        FillFormForCreate("EditForm", MagicSuggests, "Create Component Model");
+        $("#EditForm select").find("option:first").prop('selected', 'selected');
     });
 
     //Wire up BtnEdit
@@ -83,14 +84,6 @@ $(document).ready(function () {
     });
     
     //---------------------------------------DataTables------------
-
-    //Enable jqueryUI selectable
-    if (!Modernizr.touch) {
-        $(".selectable").selectable({ filter: "tr" });
-    }
-    else {
-        $(".selectable").on("click", "tr", function () { $(this).toggleClass("ui-selected"); });
-    }
 
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
@@ -184,10 +177,7 @@ $(document).ready(function () {
 
     //Enable modified field detection
     $(".modifiable").change(function () { $(this).data("ismodified", true); });
-
-    //Initialize MagicSuggest Array
-
-
+    
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
         IsCreate = false;
@@ -211,19 +201,6 @@ var MagicSuggests = [];
 var CurrRecord = {};
 
 //--------------------------------------Main Methods---------------------------------------//
-
-//FillFormForCreate
-function FillFormForCreate() {
-    ClearFormInputs("EditForm", MagicSuggests);
-    $("#EditForm select").find("option:first").prop('selected', 'selected'); //seting enum based select to default
-    $("#EditFormLabel").text("Create Component Model");
-    $("[data-val-dbisunique]").prop("disabled", false);
-    DisableUniqueMs(MagicSuggests, false);
-    $(".modifiable").data("ismodified", true); SetMsAsModified(MagicSuggests, true);
-    $("#EditFormGroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true)
-    $("#MainView").addClass("hide");
-    $("#EditFormView").removeClass("hide");
-}
 
 //FillFormForEdit
 function FillFormForEdit() {

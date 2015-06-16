@@ -102,14 +102,6 @@ $(document).ready(function () {
 
     //---------------------------------------DataTables------------
 
-    //Enable jqueryUI selectable
-    if (!Modernizr.touch) {
-        $(".selectable").selectable({ filter: "tr" });
-    }
-    else {
-        $(".selectable").on("click", "tr", function () { $(this).toggleClass("ui-selected"); });
-    }
-
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
         if (($(this).prop("checked")) ? false : true)

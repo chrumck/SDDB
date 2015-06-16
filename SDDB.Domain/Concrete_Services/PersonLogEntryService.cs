@@ -40,7 +40,7 @@ namespace SDDB.Domain.Services
                 var records = await dbContext.PersonLogEntrys
                     .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive)
                     .Include(x => x.EnteredByPerson).Include(x => x.PersonActivityType)
-                    .Include(x => x.AssignedToProject).Include(x => x.AssignedToProjectEvent)
+                    .Include(x => x.AssignedToProject).Include(x => x.AssignedToLocation).Include(x => x.AssignedToProjectEvent)
                     .ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
@@ -70,7 +70,7 @@ namespace SDDB.Domain.Services
                 var records = await dbContext.PersonLogEntrys
                     .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive && ids.Contains(x.Id))
                     .Include(x => x.EnteredByPerson).Include(x => x.PersonActivityType)
-                    .Include(x => x.AssignedToProject).Include(x => x.AssignedToProjectEvent)
+                    .Include(x => x.AssignedToProject).Include(x => x.AssignedToLocation).Include(x => x.AssignedToProjectEvent)
                     .ToListAsync().ConfigureAwait(false);
                 
                 foreach (var record in records)
@@ -110,7 +110,7 @@ namespace SDDB.Domain.Services
                             (startDate == null || x.LogEntryDateTime >= startDate) &&
                             (endDate == null || x.LogEntryDateTime <= endDate)  )
                        .Include(x => x.EnteredByPerson).Include(x => x.PersonActivityType)
-                       .Include(x => x.AssignedToProject).Include(x => x.AssignedToProjectEvent)
+                       .Include(x => x.AssignedToProject).Include(x => x.AssignedToLocation).Include(x => x.AssignedToProjectEvent)
                        .ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
@@ -131,7 +131,7 @@ namespace SDDB.Domain.Services
             }
         }
         
-        //find by query
+        //lookup by query
         public virtual Task<List<PersonLogEntry>> LookupAsync(string userId, string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
@@ -145,7 +145,7 @@ namespace SDDB.Domain.Services
             }
         }
 
-        //find by query and project
+        //lookup by query and project
         public virtual async Task<List<PersonLogEntry>> LookupByProjAsync(string userId, string[] projectIds = null, string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
@@ -179,11 +179,17 @@ namespace SDDB.Domain.Services
                     foreach (var record in records)
                     {
                         var projEvent = await dbContext.ProjectEvents.FindAsync(record.AssignedToProjectEvent_Id).ConfigureAwait(false);
+                        var location = await dbContext.Locations.FindAsync(record.AssignedToLocation_Id).ConfigureAwait(false);
 
                         if (record.PropIsModified(x => x.AssignedToProjectEvent_Id) && record.AssignedToProjectEvent_Id != null &&
                             projEvent.AssignedToProject_Id != record.AssignedToProject_Id )
                         {
                             errorMessage += "Log Entry and Project Event do not belong to the same project. Entry not saved.";
+                        }
+                        else if (record.PropIsModified(x => x.AssignedToLocation_Id) && record.AssignedToLocation_Id != null &&
+                            location.AssignedToProject_Id != record.AssignedToProject_Id)
+                        {
+                            errorMessage += "Log Entry and Location do not belong to the same project. Entry not saved.";
                         }
                         else
                         {

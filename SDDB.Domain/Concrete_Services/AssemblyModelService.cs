@@ -51,7 +51,7 @@ namespace SDDB.Domain.Services
         }
 
 
-        //find by query
+        //lookup by query
         public virtual Task<List<AssemblyModel>> LookupAsync(string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())

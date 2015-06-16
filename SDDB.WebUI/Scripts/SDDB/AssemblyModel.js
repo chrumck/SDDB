@@ -14,7 +14,8 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreate("EditForm", MagicSuggests, "Create Assembly Model", true)
+        FillFormForCreate("EditForm", MagicSuggests, "Create Assembly Model");
+        $("#EditForm select").find("option:first").prop('selected', 'selected');
     });
 
     //Wire up BtnEdit
@@ -176,9 +177,6 @@ $(document).ready(function () {
 
     //Enable modified field detection
     $(".modifiable").change(function () { $(this).data("ismodified", true); });
-
-    //Initialize MagicSuggest Array
-
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {

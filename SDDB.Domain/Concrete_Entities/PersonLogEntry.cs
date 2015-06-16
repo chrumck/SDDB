@@ -40,6 +40,11 @@ namespace SDDB.Domain.Entities
         [ForeignKey("AssignedToProject")]
         public string AssignedToProject_Id { get; set; }
 
+        [Required(ErrorMessage = "Location field is required")]
+        [StringLength(40)]
+        [ForeignKey("AssignedToLocation")]
+        public string AssignedToLocation_Id { get; set; }
+
         [StringLength(40)]
         [ForeignKey("AssignedToProjectEvent")]
         public string AssignedToProjectEvent_Id { get; set; }
@@ -71,6 +76,7 @@ namespace SDDB.Domain.Entities
         public virtual Person EnteredByPerson { get; set; }
         public virtual PersonActivityType PersonActivityType { get; set; }
         public virtual Project AssignedToProject { get; set; }
+        public virtual Location AssignedToLocation { get; set; }
         public virtual ProjectEvent AssignedToProjectEvent { get; set; }
 
         //many to many

@@ -127,7 +127,7 @@ namespace SDDB.Domain.Services
             }
         }
         
-        //find by query
+        //lookup by query
         public virtual Task<List<Document>> LookupAsync(string userId, string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
