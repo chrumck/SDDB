@@ -22,6 +22,7 @@
                 <input class="form-control input-tdo-warning" data-val="true" data-val-dbisdateiso="The field must have YYYY-MM-DD format."
                        id="FilterDateEnd" placeholder="End Date" type="text" value="">
             </div>
+
             <div class="btn-group margin-bottom-2px">
                 <div id="MsFilterByPerson" placeholder="Select Person"></div>
             </div>
@@ -123,8 +124,9 @@
                     <div class="form-group">
                         @Html.LabelFor(x => x.AssignedToLocation_Id, "Location", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
+                            <div class="small"><em> Choose Project first</em></div>
                             @Html.TextBoxFor(x => x.AssignedToLocation_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Location" })
-                            @Html.ValidationMessageFor(x => x.AssignedToLocation_Id)
+                            @Html.ValidationMessageFor(x => x.AssignedToLocation_Id) 
                         </div>
                     </div>
                     <div class="form-group">
@@ -154,7 +156,7 @@
 
                 <div class="col-xs-12 col-sm-6">
                     <div class="panel panel-default">
-                        <div class="panel-heading" ><strong>Add Assemblies </strong><small><em> Choose location to see assy's.</em></small></div>
+                        <div class="panel-heading" ><strong>Add Assemblies </strong><small><em> Choose Location first.</em></small></div>
                         <table class="table table-striped" id="TableLogEntryAssysAdd">
                             <thead class="hide">
                                 <tr>
@@ -168,7 +170,7 @@
                 </div>
                 <div class="col-xs-12 col-sm-6">
                     <div class="panel panel-default">
-                        <div class="panel-heading"><strong>Remove Assemblies </strong><small><em> Choose location to see assy's.</em></small></div>
+                        <div class="panel-heading"><strong>Remove Assemblies </strong><small><em> Choose Location first</em></small></div>
                         <table class="table table-striped" id="TableLogEntryAssysRemove">
                             <thead class="hide">
                                 <tr>

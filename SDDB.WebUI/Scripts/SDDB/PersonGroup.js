@@ -374,7 +374,7 @@ function SubmitGroupManagersEdits() {
             $("#MainView").removeClass("hide");
             $("#GroupManagersView").addClass("hide"); window.scrollTo(0, 0);
         })
-        .fail(function (xhr, status, error) { ajaxResult = false; ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
 }
 
 

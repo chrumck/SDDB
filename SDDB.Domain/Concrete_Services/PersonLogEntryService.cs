@@ -169,7 +169,7 @@ namespace SDDB.Domain.Services
         // Create and Update records given in []
         public virtual async Task<DBResult> EditAsync(string userId, PersonLogEntry[] records)
         {
-            var errorMessage = "";
+            var errorMessage = ""; var serviceResult = new DBResult();
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -199,6 +199,7 @@ namespace SDDB.Domain.Services
                                 record.Id = Guid.NewGuid().ToString();
                                 record.EnteredByPerson_Id = record.EnteredByPerson_Id ?? userId;
                                 dbContext.PersonLogEntrys.Add(record);
+                                serviceResult.ReturnIds.Add(record.Id);
 
                             }
                             else
@@ -236,15 +237,18 @@ namespace SDDB.Domain.Services
                     trans.Complete();
                 }
             }
-            if (errorMessage == "") return new DBResult();
-            else return new DBResult { StatusCode = HttpStatusCode.Conflict,
-                StatusDescription = "Errors editing records:\n" + errorMessage };
+            if (errorMessage == "") return serviceResult;
+            else
+            {
+                serviceResult.StatusCode = HttpStatusCode.Conflict; serviceResult.StatusDescription = "Errors editing records:\n" + errorMessage;
+                return serviceResult;
+            } 
         }
 
         // Delete records by their Ids
         public virtual async Task<DBResult> DeleteAsync(string[] ids)
         {
-            var errorMessage = "";
+            var errorMessage = ""; 
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();

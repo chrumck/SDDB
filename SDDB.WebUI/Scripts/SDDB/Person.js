@@ -514,7 +514,7 @@ function SubmitPrsProjEdits() {
             $("#MainView").removeClass("hide");
             $("#PrsProjView").addClass("hide"); window.scrollTo(0, 0);
         })
-        .fail(function (xhr, status, error) { ajaxResult = false; ShowModalAJAXFail(xhr, status, error); } );
+        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); } );
 }
 
 //---------------------------------------------------------------------------------------------
@@ -597,7 +597,7 @@ function SubmitPersonGroupsEdits() {
             $("#MainView").removeClass("hide");
             $("#PersonGroupsView").addClass("hide"); window.scrollTo(0, 0);
         })
-        .fail(function (xhr, status, error) { ajaxResult = false; ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) {ShowModalAJAXFail(xhr, status, error); });
 }
 
 //---------------------------------------Helper Methods--------------------------------------//

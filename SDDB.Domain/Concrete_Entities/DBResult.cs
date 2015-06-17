@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Net;
 
 using SDDB.Domain.Abstract;
+using System.Collections.Generic;
 
 namespace SDDB.Domain.Entities
 {
@@ -67,11 +68,16 @@ namespace SDDB.Domain.Entities
         public DBResult()
         {
             this.StatusCode = HttpStatusCode.OK;
+            this.ReturnIds = new List<string>();
         }
 
         //Non-persistent Properties----------------------------------------
 
+        [NotMapped]
         public string[] ModifiedProperties { get; set; }
+
+        [NotMapped]
+        public List<string> ReturnIds { get; set; }
     }
 
 }

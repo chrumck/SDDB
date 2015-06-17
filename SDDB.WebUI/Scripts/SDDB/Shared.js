@@ -20,6 +20,7 @@ $(document).ready(function () {
         $(".selectable").on("click", "tr", function () { $(this).toggleClass("ui-selected"); });
     }
 
+
 });
 
 //----------------------------------Custom Unobtrusive Validation----------------------------//

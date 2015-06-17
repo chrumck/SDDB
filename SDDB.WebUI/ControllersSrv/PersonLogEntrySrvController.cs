@@ -130,12 +130,14 @@ namespace SDDB.WebUI.ControllersSrv
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
             {
-                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new {
+                    Success = "True", ReturnIds = serviceResult.ReturnIds }, JsonRequestBehavior.AllowGet);
             }
             else
             {
                 Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
+                return Json(new { Success = "False", responseText = serviceResult.StatusDescription,
+                    ReturnIds = serviceResult.ReturnIds }, JsonRequestBehavior.AllowGet);
             }
         }
 
