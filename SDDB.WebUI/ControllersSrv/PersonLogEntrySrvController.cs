@@ -165,22 +165,22 @@ namespace SDDB.WebUI.ControllersSrv
         //-----------------------------------------------------------------------------------------------------------------------
 
         // GET: /PersonLogEntrySrv/GetPrsLogEntryAssys
-        [DBSrvAuth("PersonLogEntry_View,Person_View")]
+        [DBSrvAuth("PersonLogEntry_View,Assembly_View")]
         public async Task<ActionResult> GetPrsLogEntryAssys(string logEntryId)
         {
             var data = (await prsLogEntryService.GetPrsLogEntryAssysAsync(logEntryId).ConfigureAwait(false))
                 .Select(x => new { x.Id, x.AssyName, x.AssyAltName });
 
-            ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryAssysAsyn"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryAssysAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(new { data }, JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonLogEntrySrv/GetPrsLogEntryAssysNot
-        [DBSrvAuth("PersonLogEntry_View,Person_View")]
+        [DBSrvAuth("PersonLogEntry_View,Assembly_View")]
         public async Task<ActionResult> GetPrsLogEntryAssysNot(string logEntryId, string locId = null)
         {
-            var data = (await prsLogEntryService.GetPrsLogEntryAssysNotAsync(UserId, logEntryId, locId).ConfigureAwait(false))
+            var data = (await prsLogEntryService.GetPrsLogEntryAssysNotAsync(logEntryId, locId).ConfigureAwait(false))
                 .Select(x => new { x.Id, x.AssyName, x.AssyAltName });
 
             ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryAssysNotAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
@@ -190,12 +190,59 @@ namespace SDDB.WebUI.ControllersSrv
 
         // POST: /PersonLogEntrySrv/EditPrsLogEntryAssys
         [HttpPost]
-        [DBSrvAuth("PersonLogEntry_Edit,Person_Edit")]
+        [DBSrvAuth("PersonLogEntry_Edit,Assembly_Edit")]
         public async Task<ActionResult> EditPrsLogEntryAssys(string[] logEntryIds, string[] assyIds, bool isAdd)
         {
             var serviceResult = await prsLogEntryService.EditPrsLogEntryAssysAsync(logEntryIds, assyIds, isAdd).ConfigureAwait(false);
 
             ViewBag.ServiceName = "PersonLogEntryService.EditPrsLogEntryAssysAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.StatusDescription = serviceResult.StatusDescription;
+
+            if (serviceResult.StatusCode == HttpStatusCode.OK)
+            {
+                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                Response.StatusCode = (int)serviceResult.StatusCode;
+                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        // GET: /PersonLogEntrySrv/GetPrsLogEntryPersons
+        [DBSrvAuth("PersonLogEntry_View,Person_View")]
+        public async Task<ActionResult> GetPrsLogEntryPersons(string logEntryId)
+        {
+            var data = (await prsLogEntryService.GetPrsLogEntryPersonsAsync(logEntryId).ConfigureAwait(false))
+                .Select(x => new { x.Id, x.FirstName, x.LastName, x.Initials });
+
+            ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryPersonsAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+
+            return Json(new { data }, JsonRequestBehavior.AllowGet);
+        }
+
+        // GET: /PersonLogEntrySrv/GetPrsLogEntryPersonsNot
+        [DBSrvAuth("PersonLogEntry_View,Person_View")]
+        public async Task<ActionResult> GetPrsLogEntryPersonsNot(string logEntryId)
+        {
+            var data = (await prsLogEntryService.GetPrsLogEntryPersonsNotAsync(UserId, logEntryId).ConfigureAwait(false))
+                .Select(x => new { x.Id, x.FirstName, x.LastName, x.Initials });
+
+            ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryPersonsNotAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+
+            return Json(new { data }, JsonRequestBehavior.AllowGet);
+        }
+
+        // POST: /PersonLogEntrySrv/EditPrsLogEntryPersons
+        [HttpPost]
+        [DBSrvAuth("PersonLogEntry_Edit,Person_Edit")]
+        public async Task<ActionResult> EditPrsLogEntryPersons(string[] logEntryIds, string[] personIds, bool isAdd)
+        {
+            var serviceResult = await prsLogEntryService.EditPrsLogEntryPersonsAsync(logEntryIds, personIds, isAdd).ConfigureAwait(false);
+
+            ViewBag.ServiceName = "PersonLogEntryService.EditPrsLogEntryPersonsAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)

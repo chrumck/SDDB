@@ -145,16 +145,15 @@ function RefreshTable(table, url, getActive, httpType, projectIds, modelIds, typ
     startDate = (typeof startDate !== "undefined") ? startDate : {};
     endDate = (typeof endDate !== "undefined") ? endDate : {};
 
+    table.clear().search("").draw();
+    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+
     $.ajax({
         type: httpType, url: url, timeout: 20000,
         data: {getActive: getActive, projectIds: projectIds, modelIds: modelIds, typeIds: typeIds,
             locIds: locIds, assyIds: assyIds, personIds: personIds, startDate: startDate, endDate: endDate
         },
         dataType: "json",
-        beforeSend: function () {
-            table.clear().search("").draw();
-            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-        }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {

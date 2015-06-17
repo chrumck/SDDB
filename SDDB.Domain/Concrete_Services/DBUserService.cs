@@ -120,50 +120,50 @@ namespace SDDB.Domain.Services
         }
 
         //get particular DBUser Roles
-        public virtual async Task<List<string>> GetUserRolesAsync(string id)
+        public virtual async Task<List<string>> GetUserRolesAsync(string userId)
         {
-            return (await appUserManager.GetRolesAsync(id).ConfigureAwait(false)).ToList();
+            return (await appUserManager.GetRolesAsync(userId).ConfigureAwait(false)).ToList();
         }
 
         //get roles not assigned to DBUser
-        public virtual async Task<List<string>> GetUserRolesNotAsync(string id)
+        public virtual async Task<List<string>> GetUserRolesNotAsync(string userId)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                var userRoles = await appUserManager.GetRolesAsync(id).ConfigureAwait(false);
+                var userRoles = await appUserManager.GetRolesAsync(userId).ConfigureAwait(false);
                 return dbContext.Roles.Select(x => x.Name).ToList().Except(userRoles).ToList();
             }
         }
 
         //Add (or Remove  when set isAdd to false) roles to DBUSer
-        public virtual async Task<DBResult> EditRolesAsync(string[] ids, string[] dbRoles, bool isAdd)
+        public virtual async Task<DBResult> EditRolesAsync(string[] userIds, string[] dbRoles, bool isAdd)
         {
             var errorMessage = ""; var identityResult = IdentityResult.Success;
-            foreach (var id in ids)
+            foreach (var userId in userIds)
             {
-                var dbEntry = await appUserManager.FindByIdAsync(id).ConfigureAwait(false);
-                if (dbEntry == null) errorMessage += String.Format("User with Id={0} not found.\n", id);
+                var dbEntry = await appUserManager.FindByIdAsync(userId).ConfigureAwait(false);
+                if (dbEntry == null) errorMessage += String.Format("User with Id={0} not found.\n", userId);
                 else
                 {
-                    var userRoles = await appUserManager.GetRolesAsync(id).ConfigureAwait(false);
+                    var userRoles = await appUserManager.GetRolesAsync(userId).ConfigureAwait(false);
                     foreach (var dbRole in dbRoles)
                     {
                         if (isAdd)
                         {
                             if (!userRoles.Contains(dbRole))
                             {
-                                identityResult = await appUserManager.AddToRoleAsync(id, dbRole).ConfigureAwait(false);
+                                identityResult = await appUserManager.AddToRoleAsync(userId, dbRole).ConfigureAwait(false);
                             }
                         }
                         else
                         {
                             if (userRoles.Contains(dbRole))
                             {
-                                identityResult = await appUserManager.RemoveFromRoleAsync(id, dbRole).ConfigureAwait(false);
+                                identityResult = await appUserManager.RemoveFromRoleAsync(userId, dbRole).ConfigureAwait(false);
                             }
                         }
-                        errorMessage += (identityResult.Succeeded) ? "" : String.Format("User Id={0}:{1}\n", id, getErrorsFromIdResult(identityResult));
+                        errorMessage += (identityResult.Succeeded) ? "" : String.Format("User Id={0}:{1}\n", userId, getErrorsFromIdResult(identityResult));
                     }
                 }
             }

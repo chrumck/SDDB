@@ -9,7 +9,9 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var TableMain = {}; var TableProjectsAdd = {}; var TableProjectsRemove = {};
+var TableMain = {};
+var TableLogEntryAssysAdd = {}; var TableLogEntryAssysRemove = {};
+var TableLogEntryPersonsAdd = {}; var TableLogEntryPersonsRemove = {};
 var IsCreate = false;
 var MsFilterByProject = {}; var MsFilterByType = {}; var MsFilterByPerson = {};
 var MagicSuggests = [];
@@ -26,13 +28,15 @@ $(document).ready(function () {
         MagicSuggests[3].disable(); MagicSuggests[4].disable();
         TableLogEntryAssysAdd.clear().search("").draw();
         TableLogEntryAssysRemove.clear().search("").draw();
+        TableLogEntryPersonsAdd.clear().search("").draw();
+        TableLogEntryPersonsRemove.clear().search("").draw();
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         var selectedRows = TableMain.rows(".ui-selected").data();
         if (selectedRows.length == 0) ShowModalNothingSelected();
-        else FillFormForEdit();
+        else { IsCreate = false; FillFormForEdit(); }
     });
 
     //Wire up BtnDelete 
@@ -197,22 +201,17 @@ $(document).ready(function () {
         if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
     });
 
-    //Wire Up EditFormBtnAddRemovePrs
-    $("#EditFormBtnAddRemovePrs").click(function () {
-        $("#LogEntryPersonsView").toggleClass("hide");
-    });
-
-    //---------------------------------------DataTables------------
+    //------------------------------------DataTables - Log Entry Assemblies ---
 
     //TableLogEntryAssysAdd
     TableLogEntryAssysAdd = $("#TableLogEntryAssysAdd").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
-            { data: "AssyName", name: "AssyName" },//1
+            { data: "AssyName", name: "AssyName" }//1
         ],
         columnDefs: [
             { targets: [0], visible: false }, // - never show
-            { targets: [0], searchable: false },  //"orderable": false, "visible": false
+            { targets: [0], searchable: false }  //"orderable": false, "visible": false
         ],
         bAutoWidth: false,
         language: {
@@ -230,11 +229,11 @@ $(document).ready(function () {
     TableLogEntryAssysRemove = $("#TableLogEntryAssysRemove").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
-            { data: "AssyName", name: "AssyName" },//1
+            { data: "AssyName", name: "AssyName" }//1
         ],
         columnDefs: [
             { targets: [0], visible: false }, // - never show
-            { targets: [0], searchable: false },  //"orderable": false, "visible": false
+            { targets: [0], searchable: false }  //"orderable": false, "visible": false
         ],
         bAutoWidth: false,
         language: {
@@ -248,6 +247,59 @@ $(document).ready(function () {
         pageLength: 10
     });
     
+    //------------------------------------DataTables - Log Entry Persons ---
+
+    //TableLogEntryPersonsAdd
+    TableLogEntryPersonsAdd = $("#TableLogEntryPersonsAdd").DataTable({
+        columns: [
+            { data: "Id", name: "Id" },//0
+            { data: "LastName", name: "LastName" },//1
+            { data: "FirstName", name: "FirstName" },//2
+            { data: "Initials", name: "Initials" }//3
+        ],
+        columnDefs: [
+            { targets: [0], visible: false }, // - never show
+            { targets: [0], searchable: false },  //"orderable": false, "visible": false
+            { targets: [2], className: "hidden-xs hidden-sm" }
+        ],
+        bAutoWidth: false,
+        language: {
+            search: "",
+            lengthMenu: "_MENU_",
+            info: "_START_ - _END_ of _TOTAL_",
+            infoEmpty: "",
+            infoFiltered: "(filtered)",
+            paginate: { previous: "", next: "" }
+        },
+        pageLength: 10
+    });
+
+    //TableLogEntryPersonsRemove
+    TableLogEntryPersonsRemove = $("#TableLogEntryPersonsRemove").DataTable({
+        columns: [
+            { data: "Id", name: "Id" },//0
+            { data: "LastName", name: "LastName" },//1
+            { data: "FirstName", name: "FirstName" },//2
+            { data: "Initials", name: "Initials" }//3
+        ],
+        columnDefs: [
+            { targets: [0], visible: false }, // - never show
+            { targets: [0], searchable: false },  //"orderable": false, "visible": false
+            { targets: [2], className: "hidden-xs hidden-sm" }
+        ],
+        bAutoWidth: false,
+        language: {
+            search: "",
+            lengthMenu: "_MENU_",
+            info: "_START_ - _END_ of _TOTAL_",
+            infoEmpty: "",
+            infoFiltered: "(filtered)",
+            paginate: { previous: "", next: "" }
+        },
+        pageLength: 10
+    });
+
+
     //--------------------------------------View Initialization------------------------------------//
 
     $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
@@ -344,8 +396,14 @@ function FillFormForEdit() {
             FillLogEntryAssys()
                 .always(function () { $("#ModalWait").modal("hide"); })
                 .done(function () {
-                    $("#MainView").addClass("hide");
-                    $("#EditFormView").removeClass("hide");
+                    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+                    FillLogEntryPersons()
+                        .always(function () { $("#ModalWait").modal("hide"); })
+                        .done(function () {
+                            $("#MainView").addClass("hide");
+                            $("#EditFormView").removeClass("hide");
+                        })
+                        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
                 })
                 .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
         })
@@ -399,15 +457,20 @@ function SubmitEdits() {
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
-
             $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
             EditLogEntryAssys((IsCreate) ? data.ReturnIds : ids)
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function () {
-                RefreshMainView();
-                IsCreate = false;
-                $("#MainView").removeClass("hide");
-                $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
+                $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+                EditLogEntryPersons((IsCreate) ? data.ReturnIds : ids)
+                    .always(function () { $("#ModalWait").modal("hide"); })
+                    .done(function () {
+                        RefreshMainView();
+                        IsCreate = false;
+                        $("#MainView").removeClass("hide");
+                        $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
+                    })
+                    .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
             })
             .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
         })
@@ -437,11 +500,11 @@ function FillLogEntryAssys() {
         $.when(
             $.ajax({
                 type: "GET", url: "/PersonLogEntrySrv/GetPrsLogEntryAssysNot", timeout: 20000,
-                data: { logEntryId: currIds[0], locId: MagicSuggests[3].getValue, getActive: true }, dataType: "json"
+                data: { logEntryId: currIds[0], locId: MagicSuggests[3].getValue}, dataType: "json"
             }),
             $.ajax({
                 type: "GET", url: "/PersonLogEntrySrv/GetPrsLogEntryAssys", timeout: 20000,
-                data: { logEntryId: currIds[0], getActive: true }, dataType: "json"
+                data: { logEntryId: currIds[0] }, dataType: "json"
             })
         )
         .done(function (done1, done2) {
@@ -455,7 +518,7 @@ function FillLogEntryAssys() {
         $.when(
             $.ajax({
                 type: "GET", url: "AssemblyDbSrv/LookupByLocDTables", timeout: 20000,
-                data: { locId: MagicSuggests[3].getValue, getActive: true }, dataType: "json",
+                data: { locId: MagicSuggests[3].getValue, getActive: true }, dataType: "json"
             }),
             $.ajax({
                 type: "GET", url: "AssemblyDbSrv/LookupByLocDTables", timeout: 20000,
@@ -512,6 +575,85 @@ function EditLogEntryAssys(logEntryIds) {
 
     return deferred3.promise();
 }
+
+//---------------------------------------------------------------------------------------------
+
+//Fill Log Entry Persons to add and to remove
+function FillLogEntryPersons() {
+
+    var deferred1 = $.Deferred();
+
+    if (currIds.length == 1) {
+        $.when(
+            $.ajax({
+                type: "GET", url: "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", timeout: 20000,
+                data: { logEntryId: currIds[0] }, dataType: "json"
+            }),
+            $.ajax({
+                type: "GET", url: "/PersonLogEntrySrv/GetPrsLogEntryPersons", timeout: 20000,
+                data: { logEntryId: currIds[0] }, dataType: "json"
+            })
+        )
+        .done(function (done1, done2) {
+            TableLogEntryPersonsAdd.clear().search(""); TableLogEntryPersonsAdd.rows.add(done1[0].data).order([1, 'asc']).draw();
+            TableLogEntryPersonsRemove.clear().search(""); TableLogEntryPersonsRemove.rows.add(done2[0].data).order([1, 'asc']).draw();
+            deferred1.resolve();
+        })
+        .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
+    }
+    else {
+        $.ajax({ type: "GET", url: "/PersonSrv/Get", timeout: 20000, data: { getActive: true }, dataType: "json" })
+            .done(function (data) {
+                TableLogEntryPersonsAdd.clear().search(""); TableLogEntryPersonsAdd.rows.add(data.data).order([1, 'asc']).draw();
+                if (!IsCreate) { TableLogEntryPersonsRemove.clear().search(""); TableLogEntryPersonsRemove.rows.add(data.data).order([1, 'asc']).draw(); }
+                else TableLogEntryPersonsRemove.clear().search("");
+
+                deferred1.resolve();
+            })
+            .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
+    }
+
+    return deferred1.promise();
+}
+
+//Submit Log Entry Persons Edits to SDDB
+function EditLogEntryPersons(logEntryIds) {
+
+    var dbRecordsAdd = TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name").data().toArray();
+    var dbRecordsRemove = TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name").data().toArray();
+
+    var deferred1 = $.Deferred();
+    if (dbRecordsAdd.length == 0) deferred1.resolve();
+    else {
+        $.ajax({
+            type: "POST", url: "/PersonLogEntrySrv/EditPrsLogEntryPersons", timeout: 20000,
+            data: { logEntryIds: logEntryIds, personIds: dbRecordsAdd, isAdd: true }, dataType: "json"
+        })
+            .done(function () { deferred1.resolve(); })
+            .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
+    }
+
+    var deferred2 = $.Deferred();
+    if (dbRecordsRemove.length == 0) deferred2.resolve();
+    else {
+        setTimeout(function () {
+            $.ajax({
+                type: "POST", url: "/PersonLogEntrySrv/EditPrsLogEntryPersons", timeout: 20000,
+                data: { logEntryIds: logEntryIds, personIds: dbRecordsRemove, isAdd: false }, dataType: "json"
+            })
+                .done(function () { deferred2.resolve(); })
+                .fail(function (xhr, status, error) { deferred2.reject(xhr, status, error); });
+        }, 500);
+    }
+
+    var deferred3 = $.Deferred();
+    $.when(deferred1, deferred2)
+        .done(function () { deferred3.resolve(); })
+        .fail(function (xhr, status, error) { deferred3.reject(xhr, status, error); });
+
+    return deferred3.promise();
+}
+
 
 //---------------------------------------------------------------------------------------------
 

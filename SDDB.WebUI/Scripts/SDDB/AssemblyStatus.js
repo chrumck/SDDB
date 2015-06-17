@@ -21,7 +21,7 @@ $(document).ready(function () {
     $("#BtnEdit").click(function () {
         var selectedRows = TableMain.rows(".ui-selected").data();
         if (selectedRows.length == 0) ShowModalNothingSelected();
-        else FillFormForEdit();
+        else { IsCreate = false; FillFormForEdit(); }
     });
 
     //Wire up BtnDelete 
