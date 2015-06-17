@@ -135,7 +135,7 @@ namespace SDDB.WebUI.ControllersSrv
             var data = (await personService.GetPersonProjectsAsync(id).ConfigureAwait(false))
                 .Select(x => new { x.Id, x.ProjectName, x.ProjectAltName, x.ProjectCode });
 
-            ViewBag.ServiceName = "PersonService.GetPersonProjectsAsyn"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "PersonService.GetPersonProjectsAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(new { data }, JsonRequestBehavior.AllowGet);
         }
@@ -182,7 +182,7 @@ namespace SDDB.WebUI.ControllersSrv
             var data = (await personService.GetPersonGroupsAsync(id).ConfigureAwait(false))
                 .Select(x => new { x.Id, x.PrsGroupName, x.PrsGroupAltName });
 
-            ViewBag.ServiceName = "PersonService.GetPersonGroupsAsyn"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "PersonService.GetPersonGroupsAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(new { data }, JsonRequestBehavior.AllowGet);
         }

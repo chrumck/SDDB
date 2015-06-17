@@ -7,7 +7,7 @@ using SDDB.Domain.Abstract;
 
 namespace SDDB.Domain.Infrastructure
 {
-    public static class CustomHelpers
+    public static class DbHelpers
     {
 
         //checks if prop name is in  ModifiedPropeties array

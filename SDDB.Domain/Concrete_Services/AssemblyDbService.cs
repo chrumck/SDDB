@@ -205,13 +205,13 @@ namespace SDDB.Domain.Services
 
                 var records = await dbContext.AssemblyDbs
                     .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
-                        ( locId == "" || x.AssignedToLocation_Id == locId))
+                        (locId == "" || x.AssignedToLocation_Id == locId))
                     .Include(x => x.AssignedToProject).ToListAsync();
 
                 return records;
             }
         }
-        
+
         //-----------------------------------------------------------------------------------------------------------------------
 
         // Create and Update records given in []

@@ -126,6 +126,7 @@ $(document).ready(function () {
         ],
         columnDefs: [
             { targets: [0], visible: false }, // - never show
+            { targets: [0], searchable: false },  //"orderable": false, "visible": false
             { targets: [2], className: "hidden-xs hidden-sm" }
         ],
         bAutoWidth: false,
@@ -150,6 +151,7 @@ $(document).ready(function () {
         ],
         columnDefs: [
             { targets: [0], visible: false }, // - never show
+            { targets: [0], searchable: false },  //"orderable": false, "visible": false
             { targets: [2], className: "hidden-xs hidden-sm" }
         ],
         bAutoWidth: false,

@@ -147,8 +147,8 @@
     <Compile Include="Concrete_Entities\DBRole.cs" />
     <Compile Include="Concrete_Entities\Person.cs" />
     <Compile Include="Concrete_Entities\_SessionSettings.cs" />
-    <Compile Include="Concrete_Infrastructure\CustomDataAnnotations.cs" />
-    <Compile Include="Concrete_Infrastructure\CustomHelpers.cs" />
+    <Compile Include="Concrete_Infrastructure\DbDataAnnotations.cs" />
+    <Compile Include="Concrete_Infrastructure\DbHelpers.cs" />
     <Compile Include="Concrete_Services\PersonLogEntryService.cs" />
     <Compile Include="Concrete_Services\_DBftpRepoService.cs" />
     <Compile Include="Concrete_Services\ComponentService.cs" />
@@ -376,6 +376,10 @@
     <Compile Include="Migrations\201506150226143_person11.Designer.cs">
       <DependentUpon>201506150226143_person11.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201506161609059_LogEntry6.cs" />
+    <Compile Include="Migrations\201506161609059_LogEntry6.Designer.cs">
+      <DependentUpon>201506161609059_LogEntry6.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -533,6 +537,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201506150226143_person11.resx">
       <DependentUpon>201506150226143_person11.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506161609059_LogEntry6.resx">
+      <DependentUpon>201506161609059_LogEntry6.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

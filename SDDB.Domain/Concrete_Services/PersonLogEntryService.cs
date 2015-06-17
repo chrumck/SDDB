@@ -290,6 +290,91 @@ namespace SDDB.Domain.Services
             };
         }
 
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        //get all person log entry assemblies
+        public virtual Task<List<AssemblyDb>> GetPrsLogEntryAssysAsync(string logEntryId)
+        {
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+                return dbContext.AssemblyDbs
+                    .Where(x => x.AssemblyDbPrsLogEntrys.Any(y => y.Id == logEntryId) && x.IsActive == true).ToListAsync();
+            }
+        }
+
+        //get all active assemblies from the location not assigned to log entry
+        public virtual Task<List<AssemblyDb>> GetPrsLogEntryAssysNotAsync(string userId, string logEntryId, string locId = null)
+        {
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+                locId = locId ?? "";
+
+                return dbContext.AssemblyDbs
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == true &&
+                        !x.AssemblyDbPrsLogEntrys.Any(y => y.Id == logEntryId) && (locId == "" || x.AssignedToLocation_Id == locId))
+                    .ToListAsync();
+            }
+        }
+
+        //Add (or Remove  when set isAdd to false) Assemblies to Person Log Entry
+        public virtual async Task<DBResult> EditPrsLogEntryAssysAsync(string[] logEntryIds, string[] assyIds, bool isAdd)
+        {
+            var errorMessage = ""; var serviceResult = new DBResult();
+            using (var dbContextScope = contextScopeFac.Create())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    var logEntrys = await dbContext.PersonLogEntrys.Include(x => x.PrsLogEntryAssemblyDbs).Where(x => logEntryIds.Contains(x.Id))
+                       .ToListAsync().ConfigureAwait(false);
+
+                    var assys = await dbContext.AssemblyDbs.Where(x => assyIds.Contains(x.Id)).ToListAsync().ConfigureAwait(false);
+
+                    foreach (var logEntry in logEntrys)
+                    {
+                        foreach (var assy in assys)
+                        {
+                            if (isAdd) { if (!logEntry.PrsLogEntryAssemblyDbs.Contains(assy)) logEntry.PrsLogEntryAssemblyDbs.Add(assy); }
+                            else {
+                                if (logEntry.PrsLogEntryAssemblyDbs.Contains(assy)) logEntry.PrsLogEntryAssemblyDbs.Remove(assy); 
+                            }
+                        }
+                    }
+                    for (int i = 1; i <= 10; i++)
+                    {
+                        try
+                        {
+                            await dbContext.SaveChangesAsync().ConfigureAwait(false);
+                            break;
+                        }
+                        catch (Exception e)
+                        {
+                            var message = e.GetBaseException().Message;
+                            if (i == 10 || !message.Contains("Deadlock found when trying to get lock"))
+                            {
+                                errorMessage += string.Format("Error Saving changes: {0}\n", message);
+                                break;
+                            }
+                        }
+                        await Task.Delay(200).ConfigureAwait(false);
+                    }
+                    trans.Complete();
+                }
+            }
+
+            if (errorMessage == "" && serviceResult.StatusCode == HttpStatusCode.OK) return serviceResult;
+            else return new DBResult
+            {
+                StatusCode = HttpStatusCode.Conflict,
+                StatusDescription = "Errors editing records:\n" + errorMessage + serviceResult.StatusDescription
+            };
+        }
+
+
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
 

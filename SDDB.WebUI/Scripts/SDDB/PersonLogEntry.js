@@ -9,11 +9,11 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var TableMain = {};
+var TableMain = {}; var TableProjectsAdd = {}; var TableProjectsRemove = {};
 var IsCreate = false;
 var MsFilterByProject = {}; var MsFilterByType = {}; var MsFilterByPerson = {};
 var MagicSuggests = [];
-var CurrRecord = {};
+var CurrRecord = {}; var currIds = [];
 
 $(document).ready(function () {
 
@@ -21,9 +21,11 @@ $(document).ready(function () {
 
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
-        IsCreate = true;
+        IsCreate = true; currIds = [];
         FillFormForCreate("EditForm", MagicSuggests, "Create Log Entry");
         MagicSuggests[3].disable(); MagicSuggests[4].disable();
+        TableLogEntryAssysAdd.clear().search("").draw();
+        TableLogEntryAssysRemove.clear().search("").draw();
     });
 
     //Wire up BtnEdit
@@ -102,22 +104,23 @@ $(document).ready(function () {
             { data: "ActivityTypeName", name: "ActivityTypeName" },//3
             { data: "ManHours", name: "ManHours" },//4
             { data: "AssignedToProject", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject" }, //5
-            { data: "AssignedToLocation", render: function (data, type, full, meta) { return data.LocName }, name: "AssignedToLocation" }, //5
-            { data: "EventName", name: "EventName" },//6
-            { data: "Comments", name: "Comments" },//7
+            { data: "AssignedToLocation", render: function (data, type, full, meta) { return data.LocName }, name: "AssignedToLocation" }, //6
+            { data: "EventName", name: "EventName" },//7
+            { data: "Comments", name: "Comments" },//8
             //------------------------------------------------never visible
-            { data: "IsActive", name: "IsActive" },//8
-            { data: "EnteredByPerson_Id", name: "EnteredByPerson_Id" },//9
-            { data: "PersonActivityType_Id", name: "PersonActivityType_Id" },//10
-            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//11
-            { data: "AssignedToLocation_Id", name: "AssignedToLocation_Id" },//11
-            { data: "AssignedToProjectEvent_Id", name: "AssignedToProjectEvent_Id" },//12
+            { data: "IsActive", name: "IsActive" },//9
+            { data: "EnteredByPerson_Id", name: "EnteredByPerson_Id" },//10
+            { data: "PersonActivityType_Id", name: "PersonActivityType_Id" },//11
+            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//12
+            { data: "AssignedToLocation_Id", name: "AssignedToLocation_Id" },//13
+            { data: "AssignedToProjectEvent_Id", name: "AssignedToProjectEvent_Id" },//14
         ],
         columnDefs: [
-            { targets: [0, 8, 9, 10, 11, 12], visible: false }, // - never show
-            { targets: [0, 1, 4, 8, 9, 10, 11, 12], searchable: false },  //"orderable": false, "visible": false
-            { targets: [3, 4, 5], className: "hidden-xs hidden-sm" }, // - first set of columns
-            { targets: [6, 7], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
+            { targets: [0, 9, 10, 11, 12, 13, 14], visible: false }, // - never show
+            { targets: [0, 1, 4, 9, 10, 11, 12, 13, 14], searchable: false },  //"orderable": false, "visible": false
+            { targets: [5, 6], className: "hidden-xs" }, // - first set of columns
+            { targets: [3, 4], className: "hidden-xs hidden-sm" }, // - first set of columns
+            { targets: [7, 8], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
@@ -145,14 +148,37 @@ $(document).ready(function () {
     AddToMSArray(MagicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
     AddToMSArray(MagicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1);
     AddToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    AddToMSArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/LookupByProj", 1,null,
+        { projectIds: MagicSuggests[2].getValue });
     AddToMSArray(MagicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
         { projectIds: MagicSuggests[2].getValue });
 
     $(MagicSuggests[2]).on('selectionchange', function (e, m) {
-        if (this.getValue().length == 0) { MagicSuggests[3].disable(); MagicSuggests[3].clear(true); }
-        else { MagicSuggests[3].enable(); MagicSuggests[3].clear(true); }
+        if (this.getValue().length == 0) {
+            MagicSuggests[3].disable(); MagicSuggests[3].clear(true);
+            MagicSuggests[4].disable(); MagicSuggests[4].clear(true);
+            TableLogEntryAssysAdd.clear().search("").draw();
+            TableLogEntryAssysRemove.clear().search("").draw();
+        }
+        else {
+            MagicSuggests[3].enable(); MagicSuggests[3].clear(true);
+            MagicSuggests[4].enable(); MagicSuggests[4].clear(true);
+        }
     });
 
+    $(MagicSuggests[3]).on('selectionchange', function (e, m) {
+        if (this.getValue().length == 0) {
+            TableLogEntryAssysAdd.clear().search("").draw();
+            TableLogEntryAssysRemove.clear().search("").draw();
+        }
+        else {
+            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+            FillLogEntryAssys(currIds)
+                .always(function () { $("#ModalWait").modal("hide"); })
+                .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        }
+    });
+        
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
         IsCreate = false;
@@ -171,6 +197,52 @@ $(document).ready(function () {
         $("#LogEntryPersonsView").toggleClass("hide");
     });
 
+    //---------------------------------------DataTables------------
+
+    //TableLogEntryAssysAdd
+    TableLogEntryAssysAdd = $("#TableLogEntryAssysAdd").DataTable({
+        columns: [
+            { data: "Id", name: "Id" },//0
+            { data: "AssyName", name: "AssyName" },//1
+        ],
+        columnDefs: [
+            { targets: [0], visible: false }, // - never show
+            { targets: [0], searchable: false },  //"orderable": false, "visible": false
+        ],
+        bAutoWidth: false,
+        language: {
+            search: "",
+            lengthMenu: "_MENU_",
+            info: "_START_ - _END_ of _TOTAL_",
+            infoEmpty: "",
+            infoFiltered: "(filtered)",
+            paginate: { previous: "", next: "" }
+        },
+        pageLength: 10
+    });
+
+    //TableLogEntryAssysRemove
+    TableLogEntryAssysRemove = $("#TableLogEntryAssysRemove").DataTable({
+        columns: [
+            { data: "Id", name: "Id" },//0
+            { data: "AssyName", name: "AssyName" },//1
+        ],
+        columnDefs: [
+            { targets: [0], visible: false }, // - never show
+            { targets: [0], searchable: false },  //"orderable": false, "visible": false
+        ],
+        bAutoWidth: false,
+        language: {
+            search: "",
+            lengthMenu: "_MENU_",
+            info: "_START_ - _END_ of _TOTAL_",
+            infoEmpty: "",
+            infoFiltered: "(filtered)",
+            paginate: { previous: "", next: "" }
+        },
+        pageLength: 10
+    });
+    
     //--------------------------------------View Initialization------------------------------------//
 
     $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
@@ -202,10 +274,10 @@ function FillFormForEdit() {
     if ($("#ChBoxShowDeleted").prop("checked")) $("#EditFormGroupIsActive").removeClass("hide");
     else $("#EditFormGroupIsActive").addClass("hide");
 
-    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+    var currIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
     $.ajax({
         type: "POST", url: "/PersonLogEntrySrv/GetByIds", timeout: 20000,
-        data: { ids: ids, getActive: (($("#ChBoxShowDeleted").prop("checked")) ? false : true) }, dataType: "json",
+        data: { ids: currIds, getActive: (($("#ChBoxShowDeleted").prop("checked")) ? false : true) }, dataType: "json",
         beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
@@ -218,6 +290,7 @@ function FillFormForEdit() {
             CurrRecord.EnteredByPerson_Id = data[0].EnteredByPerson_Id;
             CurrRecord.PersonActivityType_Id = data[0].PersonActivityType_Id;
             CurrRecord.AssignedToProject_Id = data[0].AssignedToProject_Id;
+            CurrRecord.AssignedToLocation_Id = data[0].AssignedToLocation_Id;
             CurrRecord.AssignedToProjectEvent_Id = data[0].AssignedToProjectEvent_Id;
                         
             var FormInput = $.extend(true, {}, CurrRecord);
@@ -233,6 +306,8 @@ function FillFormForEdit() {
                 else FormInput.ActivityTypeName = dbEntry.ActivityTypeName;
                 if (FormInput.AssignedToProject_Id != dbEntry.AssignedToProject_Id) { FormInput.AssignedToProject_Id = "_VARIES_"; FormInput.AssignedToProject = "_VARIES_"; }
                 else FormInput.AssignedToProject = dbEntry.AssignedToProject.ProjectName + " " + dbEntry.AssignedToProject.ProjectCode;
+                if (FormInput.AssignedToLocation_Id != dbEntry.AssignedToLocation_Id) { FormInput.AssignedToLocation_Id = "_VARIES_"; FormInput.AssignedToLocation = "_VARIES_"; }
+                else FormInput.AssignedToLocation = dbEntry.AssignedToLocation.LocName;
                 if (FormInput.AssignedToProjectEvent_Id != dbEntry.AssignedToProjectEvent_Id) { FormInput.AssignedToProjectEvent_Id = "_VARIES_"; FormInput.EventName = "_VARIES_"; }
                 else FormInput.EventName = dbEntry.EventName;
             });
@@ -248,7 +323,8 @@ function FillFormForEdit() {
             if (FormInput.EnteredByPerson_Id != null) MagicSuggests[0].addToSelection([{ id: FormInput.EnteredByPerson_Id, name: FormInput.EnteredByPerson }], true);
             if (FormInput.PersonActivityType_Id != null) MagicSuggests[1].addToSelection([{ id: FormInput.PersonActivityType_Id, name: FormInput.ActivityTypeName }], true);
             if (FormInput.AssignedToProject_Id != null) MagicSuggests[2].addToSelection([{ id: FormInput.AssignedToProject_Id, name: FormInput.AssignedToProject }], true);
-            if (FormInput.AssignedToProjectEvent_Id != null) MagicSuggests[3].addToSelection([{ id: FormInput.AssignedToProjectEvent_Id, name: FormInput.EventName }], true);
+            if (FormInput.AssignedToLocation_Id != null) MagicSuggests[3].addToSelection([{ id: FormInput.AssignedToLocation_Id, name: FormInput.AssignedToLocation }], true);
+            if (FormInput.AssignedToProjectEvent_Id != null) MagicSuggests[4].addToSelection([{ id: FormInput.AssignedToProjectEvent_Id, name: FormInput.EventName }], true);
 
             if (data.length == 1) {
                 $("[data-val-dbisunique]").prop("disabled", false);
@@ -259,8 +335,15 @@ function FillFormForEdit() {
                 DisableUniqueMs(MagicSuggests, true);
             }
 
-            $("#MainView").addClass("hide");
-            $("#EditFormView").removeClass("hide");
+            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+
+            FillLogEntryAssys(currIds)
+                .always(function () { $("#ModalWait").modal("hide"); })
+                .done(function () {
+                    $("#MainView").addClass("hide");
+                    $("#EditFormView").removeClass("hide");
+                })
+                .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
         })
         .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
 }
@@ -298,7 +381,8 @@ function SubmitEdits() {
         editRecord.EnteredByPerson_Id = (MagicSuggests[0].isModified) ? magicResults[0] : CurrRecord.EnteredByPerson_Id;
         editRecord.PersonActivityType_Id = (MagicSuggests[1].isModified) ? magicResults[1] : CurrRecord.PersonActivityType_Id;
         editRecord.AssignedToProject_Id = (MagicSuggests[2].isModified) ? magicResults[2] : CurrRecord.AssignedToProject_Id;
-        editRecord.AssignedToProjectEvent_Id = (MagicSuggests[3].isModified) ? magicResults[3] : CurrRecord.AssignedToProjectEvent_Id;
+        editRecord.AssignedToLocation_Id = (MagicSuggests[3].isModified) ? magicResults[3] : CurrRecord.AssignedToLocation_Id;
+        editRecord.AssignedToProjectEvent_Id = (MagicSuggests[4].isModified) ? magicResults[4] : CurrRecord.AssignedToProjectEvent_Id;
         
         editRecord.ModifiedProperties = modifiedProperties;
 
@@ -331,6 +415,59 @@ function DeleteRecords() {
         .done(function () { RefreshMainView(); })
         .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
 }
+
+//---------------------------------------------------------------------------------------------
+
+//Fill Log Entry Assys to add and to remove
+function FillLogEntryAssys(logEntryIds) {
+
+    var dfrd = $.Deferred();
+
+    if (logEntryIds.length == 1) {
+        $.when(
+            $.ajax({
+                type: "GET", url: "/PersonLogEntrySrv/GetPrsLogEntryAssysNot", timeout: 20000,
+                data: { logEntryId: logEntryIds[0], locId: MagicSuggests[3].getValue, getActive: true }, dataType: "json"
+            }),
+            $.ajax({
+                type: "GET", url: "/PersonLogEntrySrv/GetPrsLogEntryAssys", timeout: 20000,
+                data: { logEntryId: logEntryIds[0], getActive: true }, dataType: "json"
+            })
+        )
+        .done(function (done1, done2) {
+            TableLogEntryAssysAdd.clear().search(""); TableLogEntryAssysAdd.rows.add(done1[0].data).order([1, 'asc']).draw();
+            TableLogEntryAssysRemove.clear().search(""); TableLogEntryAssysRemove.rows.add(done2[0].data).order([1, 'asc']).draw();
+            dfrd.resolve();
+        })
+        .fail(function (xhr, status, error) { dfrd.reject(xhr, status, error); });
+    }
+    else {
+        $.when(
+            $.ajax({
+                type: "GET", url: "AssemblyDbSrv/LookupByLocDTables", timeout: 20000,
+                data: { locId: MagicSuggests[3].getValue, getActive: true }, dataType: "json",
+            }),
+            $.ajax({
+                type: "GET", url: "AssemblyDbSrv/LookupByLocDTables", timeout: 20000,
+                data: { getActive: true }, dataType: "json",
+            })
+        )
+        .done(function (done1, done2) {
+            TableLogEntryAssysAdd.clear().search(""); TableLogEntryAssysAdd.rows.add(done1[0]).order([1, 'asc']).draw();
+
+            if (!IsCreate) { TableLogEntryAssysRemove.clear().search(""); TableLogEntryAssysRemove.rows.add(done2[0]).order([1, 'asc']).draw(); }
+            else TableLogEntryAssysRemove.clear().search("");
+
+            dfrd.resolve();
+        })
+        .fail(function (xhr, status, error) { dfrd.reject(xhr, status, error); });
+    }
+
+    return dfrd.promise();
+}
+
+
+//---------------------------------------------------------------------------------------------
 
 //refresh view after magicsuggest update
 function RefreshMainView() {

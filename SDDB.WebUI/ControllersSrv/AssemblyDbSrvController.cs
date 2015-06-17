@@ -158,6 +158,17 @@ namespace SDDB.WebUI.ControllersSrv
                 .Select(x => new { id = x.Id, name = x.AssyName + " - " + x.AssignedToProject.ProjectCode }), JsonRequestBehavior.AllowGet);
         }
 
+        // GET: /AssemblyDbSrv/LookupByLoc
+        public async Task<ActionResult> LookupByLocDTables(string locId = null, bool getActive = true)
+        {
+            var records = await assemblyService.LookupByLocAsync(UserId, locId, getActive).ConfigureAwait(false);
+
+            ViewBag.ServiceName = "AssemblyDbService.LookupByLocAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+
+            return Json(records.OrderBy(x => x.AssyName)
+                .Select(x => new { Id = x.Id, AssyName = x.AssyName }), JsonRequestBehavior.AllowGet);
+        }
+
         //-----------------------------------------------------------------------------------------------------------------------
 
         // POST: /AssemblyDbSrv/Edit

@@ -842,7 +842,8 @@ namespace SDDB.UnitTests
 
             mockEfDbContext.Setup(x => x.Projects).Returns(mockDbSet2.Object);
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1", PersonProjects = new List<Project> {dbEntry1} };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1", 
+                PersonProjects = new List<Project> {dbEntry1} };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));

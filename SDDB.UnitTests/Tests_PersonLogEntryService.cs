@@ -633,6 +633,496 @@ namespace SDDB.UnitTests
         }
 
 
+        //-----------------------------------------------------------------------------------------------------------------------
 
+        [TestMethod]
+        public void PersonLogEntryService_EditPrsLogEntryAssysAsync_DoesNothingIfNoPersonLogEntrys()
+        {
+            // Arrange
+            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
+            var mockDbContextScope = new Mock<IDbContextScope>();
+            var mockEfDbContext = new Mock<EFDbContext>();
+            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
+            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
+
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1), IsActive = false, ManHours = 10 };
+            var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
+            var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
+            mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<PersonLogEntry>(prsLogDbEntries.Provider));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Expression).Returns(prsLogDbEntries.Expression);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.ElementType).Returns(prsLogDbEntries.ElementType);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.GetEnumerator()).Returns(prsLogDbEntries.GetEnumerator());
+            mockDbSet.Setup(x => x.Include(It.IsAny<string>())).Returns(mockDbSet.Object);
+
+            mockEfDbContext.Setup(x => x.PersonLogEntrys).Returns(mockDbSet.Object);
+
+            var prsLogEntryIds = new string[] { };
+
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true};
+            var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
+            var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
+            mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<AssemblyDb>(assyDbEntries.Provider));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Expression).Returns(assyDbEntries.Expression);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.ElementType).Returns(assyDbEntries.ElementType);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
+
+            mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockDbSet2.Object);
+
+            var assyIds = new string[] { };
+
+            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
+
+            var prsLogEntryService = new PersonLogEntryService(mockDbContextScopeFac.Object);
+
+            //Act
+            var serviceResult = prsLogEntryService.EditPrsLogEntryAssysAsync(prsLogEntryIds, assyIds, true).Result;
+
+            //Assert
+            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
+            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
+            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
+            mockEfDbContext.Verify(x => x.PersonLogEntrys, Times.Once);
+            mockEfDbContext.Verify(x => x.AssemblyDbs, Times.Once);
+            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
+        }
+
+        [TestMethod]
+        public void PersonLogEntryService_EditPrsLogEntryAssysAsync_DoesNothingIfPersonLogEntryNotFound()
+        {
+            // Arrange
+            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
+            var mockDbContextScope = new Mock<IDbContextScope>();
+            var mockEfDbContext = new Mock<EFDbContext>();
+            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
+            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
+
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10 };
+            var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
+            var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
+            mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<PersonLogEntry>(prsLogDbEntries.Provider));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Expression).Returns(prsLogDbEntries.Expression);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.ElementType).Returns(prsLogDbEntries.ElementType);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.GetEnumerator()).Returns(prsLogDbEntries.GetEnumerator());
+            mockDbSet.Setup(x => x.Include(It.IsAny<string>())).Returns(mockDbSet.Object);
+
+            mockEfDbContext.Setup(x => x.PersonLogEntrys).Returns(mockDbSet.Object);
+
+            var prsLogEntryIds = new string[] { "dummyEntryId2" };
+
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true };
+            var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
+            var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
+            mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<AssemblyDb>(assyDbEntries.Provider));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Expression).Returns(assyDbEntries.Expression);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.ElementType).Returns(assyDbEntries.ElementType);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
+
+            mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockDbSet2.Object);
+
+            var assyIds = new string[] { };
+
+            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
+
+            var prsLogEntryService = new PersonLogEntryService(mockDbContextScopeFac.Object);
+
+            //Act
+            var serviceResult = prsLogEntryService.EditPrsLogEntryAssysAsync(prsLogEntryIds, assyIds, true).Result;
+
+            //Assert
+            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
+            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
+            mockEfDbContext.Verify(x => x.PersonLogEntrys, Times.Once);
+            mockEfDbContext.Verify(x => x.AssemblyDbs, Times.Once);
+            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
+            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
+        }
+
+        [TestMethod]
+        public void PersonLogEntryService_EditPrsLogEntryAssysAsync_DoesNothingIfNoAssemblyDbs()
+        {
+            // Arrange
+            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
+            var mockDbContextScope = new Mock<IDbContextScope>();
+            var mockEfDbContext = new Mock<EFDbContext>();
+            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
+            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
+
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10 };
+            var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
+            var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
+            mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<PersonLogEntry>(prsLogDbEntries.Provider));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Expression).Returns(prsLogDbEntries.Expression);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.ElementType).Returns(prsLogDbEntries.ElementType);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.GetEnumerator()).Returns(prsLogDbEntries.GetEnumerator());
+            mockDbSet.Setup(x => x.Include(It.IsAny<string>())).Returns(mockDbSet.Object);
+
+            mockEfDbContext.Setup(x => x.PersonLogEntrys).Returns(mockDbSet.Object);
+
+            var prsLogEntryIds = new string[] { "EntryId1" };
+
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true };
+            var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
+            var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
+            mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<AssemblyDb>(assyDbEntries.Provider));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Expression).Returns(assyDbEntries.Expression);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.ElementType).Returns(assyDbEntries.ElementType);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
+
+            mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockDbSet2.Object);
+
+            var assyIds = new string[] { };
+
+            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
+
+            var prsLogEntryService = new PersonLogEntryService(mockDbContextScopeFac.Object);
+
+            //Act
+            var serviceResult = prsLogEntryService.EditPrsLogEntryAssysAsync(prsLogEntryIds, assyIds, true).Result;
+
+            //Assert
+            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
+            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
+            mockEfDbContext.Verify(x => x.PersonLogEntrys, Times.Once);
+            mockEfDbContext.Verify(x => x.AssemblyDbs, Times.Once);
+            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
+            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
+        }
+
+        [TestMethod]
+        public void PersonLogEntryService_EditPrsLogEntryAssysAsync_DoesNothingIfAssemblyDbNotFound()
+        {
+            // Arrange
+            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
+            var mockDbContextScope = new Mock<IDbContextScope>();
+            var mockEfDbContext = new Mock<EFDbContext>();
+            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
+            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
+
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10 };
+            var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
+            var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
+            mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<PersonLogEntry>(prsLogDbEntries.Provider));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Expression).Returns(prsLogDbEntries.Expression);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.ElementType).Returns(prsLogDbEntries.ElementType);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.GetEnumerator()).Returns(prsLogDbEntries.GetEnumerator());
+            mockDbSet.Setup(x => x.Include(It.IsAny<string>())).Returns(mockDbSet.Object);
+
+            mockEfDbContext.Setup(x => x.PersonLogEntrys).Returns(mockDbSet.Object);
+
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true };
+            var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
+            var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
+            mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<AssemblyDb>(assyDbEntries.Provider));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Expression).Returns(assyDbEntries.Expression);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.ElementType).Returns(assyDbEntries.ElementType);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
+
+            mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockDbSet2.Object);
+
+            var prsLogEntryIds = new string[] { "EntryId1" };
+            var assyIds = new string[] { "AssemblyDbId2" };
+
+            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
+
+            var prsLogEntryService = new PersonLogEntryService(mockDbContextScopeFac.Object);
+
+            //Act
+            var serviceResult = prsLogEntryService.EditPrsLogEntryAssysAsync(prsLogEntryIds, assyIds, true).Result;
+
+            //Assert
+            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
+            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
+            mockEfDbContext.Verify(x => x.PersonLogEntrys, Times.Once);
+            mockEfDbContext.Verify(x => x.AssemblyDbs, Times.Once);
+            Assert.IsTrue(!prsLogDbEntry1.PrsLogEntryAssemblyDbs.Contains(assyDbEntry1));
+            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
+            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
+        }
+
+        [TestMethod]
+        public void PersonLogEntryService_EditPrsLogEntryAssysAsync_AddsAssemblyDbToPersonLogEntry()
+        {
+            // Arrange
+            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
+            var mockDbContextScope = new Mock<IDbContextScope>();
+            var mockEfDbContext = new Mock<EFDbContext>();
+            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
+            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
+
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10 };
+            var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
+            var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
+            mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<PersonLogEntry>(prsLogDbEntries.Provider));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Expression).Returns(prsLogDbEntries.Expression);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.ElementType).Returns(prsLogDbEntries.ElementType);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.GetEnumerator()).Returns(prsLogDbEntries.GetEnumerator());
+            mockDbSet.Setup(x => x.Include(It.IsAny<string>())).Returns(mockDbSet.Object);
+
+            mockEfDbContext.Setup(x => x.PersonLogEntrys).Returns(mockDbSet.Object);
+
+            var prsLogEntryIds = new string[] { "dummyEntryId1" };
+
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true };
+            var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
+            var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
+            mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<AssemblyDb>(assyDbEntries.Provider));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Expression).Returns(assyDbEntries.Expression);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.ElementType).Returns(assyDbEntries.ElementType);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
+
+            mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockDbSet2.Object);
+
+            var assyIds = new string[] { "AssemblyDbId1" };
+
+            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
+
+            var prsLogEntryService = new PersonLogEntryService(mockDbContextScopeFac.Object);
+
+            //Act
+            var serviceResult = prsLogEntryService.EditPrsLogEntryAssysAsync(prsLogEntryIds, assyIds, true).Result;
+
+            //Assert
+            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
+            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
+            mockEfDbContext.Verify(x => x.PersonLogEntrys, Times.Once);
+            mockEfDbContext.Verify(x => x.AssemblyDbs, Times.Once);
+            Assert.IsTrue(prsLogDbEntry1.PrsLogEntryAssemblyDbs.Contains(assyDbEntry1));
+            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
+            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
+        }
+
+        [TestMethod]
+        public void PersonLogEntryService_EditPrsLogEntryAssysAsync_DoesntAddProjectToPersonLogEntry()
+        {
+            // Arrange
+            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
+            var mockDbContextScope = new Mock<IDbContextScope>();
+            var mockEfDbContext = new Mock<EFDbContext>();
+            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
+            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
+
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true };
+            var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
+            var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
+            mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<AssemblyDb>(assyDbEntries.Provider));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Expression).Returns(assyDbEntries.Expression);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.ElementType).Returns(assyDbEntries.ElementType);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
+
+            mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockDbSet2.Object);
+
+            var assyIds = new string[] { "AssemblyDbId1" };
+
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10,
+            PrsLogEntryAssemblyDbs = new List<AssemblyDb> {assyDbEntry1} };
+            var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
+            var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
+            mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<PersonLogEntry>(prsLogDbEntries.Provider));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Expression).Returns(prsLogDbEntries.Expression);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.ElementType).Returns(prsLogDbEntries.ElementType);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.GetEnumerator()).Returns(prsLogDbEntries.GetEnumerator());
+            mockDbSet.Setup(x => x.Include(It.IsAny<string>())).Returns(mockDbSet.Object);
+
+            mockEfDbContext.Setup(x => x.PersonLogEntrys).Returns(mockDbSet.Object);
+
+            var prsLogEntryIds = new string[] { "dummyEntryId1" };
+
+            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
+
+            var prsLogEntryService = new PersonLogEntryService(mockDbContextScopeFac.Object);
+
+            //Act
+            var serviceResult = prsLogEntryService.EditPrsLogEntryAssysAsync(prsLogEntryIds, assyIds, true).Result;
+
+            //Assert
+            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
+            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
+            mockEfDbContext.Verify(x => x.PersonLogEntrys, Times.Once);
+            mockEfDbContext.Verify(x => x.AssemblyDbs, Times.Once);
+            Assert.IsTrue(prsLogDbEntry1.PrsLogEntryAssemblyDbs.Contains(assyDbEntry1));
+            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
+            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
+        }
+
+        [TestMethod]
+        public void PersonLogEntryService_EditPrsLogEntryAssysAsync_RemovesAssemblyDbFromPersonLogEntry()
+        {
+            // Arrange
+            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
+            var mockDbContextScope = new Mock<IDbContextScope>();
+            var mockEfDbContext = new Mock<EFDbContext>();
+            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
+            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
+
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true };
+            var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
+            var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
+            mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<AssemblyDb>(assyDbEntries.Provider));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Expression).Returns(assyDbEntries.Expression);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.ElementType).Returns(assyDbEntries.ElementType);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
+
+            mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockDbSet2.Object);
+
+            var assyIds = new string[] { "AssemblyDbId1" };
+
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10,
+                PrsLogEntryAssemblyDbs = new List<AssemblyDb> { assyDbEntry1 } };
+            var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
+            var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
+            mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<PersonLogEntry>(prsLogDbEntries.Provider));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Expression).Returns(prsLogDbEntries.Expression);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.ElementType).Returns(prsLogDbEntries.ElementType);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.GetEnumerator()).Returns(prsLogDbEntries.GetEnumerator());
+            mockDbSet.Setup(x => x.Include(It.IsAny<string>())).Returns(mockDbSet.Object);
+
+            mockEfDbContext.Setup(x => x.PersonLogEntrys).Returns(mockDbSet.Object);
+
+            var prsLogEntryIds = new string[] { "dummyEntryId1" };
+
+            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
+
+            var prsLogEntryService = new PersonLogEntryService(mockDbContextScopeFac.Object);
+
+            //Act
+            var serviceResult = prsLogEntryService.EditPrsLogEntryAssysAsync(prsLogEntryIds, assyIds, false).Result;
+
+            //Assert
+            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
+            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
+            mockEfDbContext.Verify(x => x.PersonLogEntrys, Times.Once);
+            mockEfDbContext.Verify(x => x.AssemblyDbs, Times.Once);
+            Assert.IsTrue(!prsLogDbEntry1.PrsLogEntryAssemblyDbs.Contains(assyDbEntry1));
+            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
+            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
+        }
+
+        [TestMethod]
+        public void PersonLogEntryService_EditPrsLogEntryAssysAsync_DoesntRemoveAssemblyDbFromPersonLogEntry()
+        {
+            // Arrange
+            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
+            var mockDbContextScope = new Mock<IDbContextScope>();
+            var mockEfDbContext = new Mock<EFDbContext>();
+            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
+            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
+
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true };
+            var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
+            var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
+            mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<AssemblyDb>(assyDbEntries.Provider));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Expression).Returns(assyDbEntries.Expression);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.ElementType).Returns(assyDbEntries.ElementType);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
+
+            mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockDbSet2.Object);
+
+            var assyIds = new string[] { "AssemblyDbId1" };
+
+            var prsLogDbEntry1 = new PersonLogEntry
+            { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10 };
+            var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
+            var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
+            mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<PersonLogEntry>(prsLogDbEntries.Provider));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Expression).Returns(prsLogDbEntries.Expression);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.ElementType).Returns(prsLogDbEntries.ElementType);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.GetEnumerator()).Returns(prsLogDbEntries.GetEnumerator());
+            mockDbSet.Setup(x => x.Include(It.IsAny<string>())).Returns(mockDbSet.Object);
+
+            mockEfDbContext.Setup(x => x.PersonLogEntrys).Returns(mockDbSet.Object);
+
+            var prsLogEntryIds = new string[] { "dummyEntryId1" };
+
+            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
+
+            var prsLogEntryService = new PersonLogEntryService(mockDbContextScopeFac.Object);
+
+            //Act
+            var serviceResult = prsLogEntryService.EditPrsLogEntryAssysAsync(prsLogEntryIds, assyIds, false).Result;
+
+            //Assert
+            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
+            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
+            mockEfDbContext.Verify(x => x.PersonLogEntrys, Times.Once);
+            mockEfDbContext.Verify(x => x.AssemblyDbs, Times.Once);
+            Assert.IsTrue(!prsLogDbEntry1.PrsLogEntryAssemblyDbs.Contains(assyDbEntry1));
+            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
+            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
+        }
+
+
+        [TestMethod]
+        public void PersonLogEntryService_EditPrsLogEntryAssysAsync_ReturnsExceptionMessageFromSaveChanges()
+        {
+            // Arrange
+            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
+            var mockDbContextScope = new Mock<IDbContextScope>();
+            var mockEfDbContext = new Mock<EFDbContext>();
+            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
+            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
+
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true };
+            var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
+            var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
+            mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<AssemblyDb>(assyDbEntries.Provider));
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.Expression).Returns(assyDbEntries.Expression);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.ElementType).Returns(assyDbEntries.ElementType);
+            mockDbSet2.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
+
+            mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockDbSet2.Object);
+
+            var assyIds = new string[] { "AssemblyDbId1" };
+
+            var prsLogDbEntry1 = new PersonLogEntry
+            { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10,
+                PrsLogEntryAssemblyDbs = new List<AssemblyDb> { assyDbEntry1 } };
+            var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
+            var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
+            mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<PersonLogEntry>(prsLogDbEntries.Provider));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Expression).Returns(prsLogDbEntries.Expression);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.ElementType).Returns(prsLogDbEntries.ElementType);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.GetEnumerator()).Returns(prsLogDbEntries.GetEnumerator());
+            mockDbSet.Setup(x => x.Include(It.IsAny<string>())).Returns(mockDbSet.Object);
+
+            mockEfDbContext.Setup(x => x.PersonLogEntrys).Returns(mockDbSet.Object);
+
+            var prsLogEntryIds = new string[] { "dummyEntryId1" };
+
+            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyExceptionMessage"));
+            //Returns(Task.FromResult<int>(throw new ArgumentException("DummyExceptionMessage"); ));
+
+            var prsLogEntryService = new PersonLogEntryService(mockDbContextScopeFac.Object);
+
+            //Act
+            var serviceResult = prsLogEntryService.EditPrsLogEntryAssysAsync(prsLogEntryIds, assyIds, false).Result;
+
+            //Assert
+            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
+            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
+            mockEfDbContext.Verify(x => x.PersonLogEntrys, Times.Once);
+            mockEfDbContext.Verify(x => x.AssemblyDbs, Times.Once);
+            Assert.IsTrue(!prsLogDbEntry1.PrsLogEntryAssemblyDbs.Contains(assyDbEntry1));
+            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
+            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
+            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyExceptionMessage"));
+        }
     }
 }
