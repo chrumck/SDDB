@@ -406,8 +406,10 @@ function FillFormForEdit(ids) {
         .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
 }
 
-//FillFormForEdit
-function FillFormForEditGeneric(type, url, ids, getActive, formId, labelText) {
+//FillFormForEdit Generic version
+function FillFormForEditGeneric(type, url, ids, getActive, formId, labelText, msArray) {
+
+    var deferred0 = $.Deferred();
 
     $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
 
@@ -430,43 +432,55 @@ function FillFormForEditGeneric(type, url, ids, getActive, formId, labelText) {
             $.each(data, function (i, dbEntry) {
                 for (var property in dbEntry) {
                     if (dbEntry.hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
-                        if (property.slice(-3) != "_Id") {
-                            if (formInput[property] != dbEntry[property]) formInput[property] = "_VARIES_";
-                        }
-                        else {
-                            if (formInput[property] != dbEntry[property]) { formInput[property] = "_VARIES_"; formInput[property.slice(0, -2)] = "_VARIES_"; }
+                        if (property.slice(-3) == "_Id") {
+                            if (formInput[property] != dbEntry[property]) {
+                                formInput[property] = "_VARIES_"; formInput[property.slice(0, -2)] = "_VARIES_";
+                            }
                             else {
                                 for (var subProp in dbEntry[property.slice(0, -2)]) {
                                     if (typeof formInput[property.slice(0, -2)] !== "undefined") formInput[property.slice(0, -2)] += " ";
                                     formInput[property.slice(0, -2)] += dbEntry[property.slice(0, -2)][subProp];
                                 }
-
                             }
+                        }
+                        else {
+                            if (formInput[property] != dbEntry[property]) formInput[property] = "_VARIES_";
                         }
                     }
                 }
             });
 
+            for (var property in formInput) {
+                if (formInput.hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
+                    if (property.slice(-3) == "_Id") {
+                        for (var ms in msArray) {
+                            if (ms.id == property) {
+                                if (FormInput[property] != null) ms.addToSelection([{ id: FormInput[property], name: FormInput[property.slice(-2)] }], true);
+                            }
+                        }
 
-            //$("#LogEntryDateTime").val(FormInput.LogEntryDateTime);
-            //$("#ManHours").val(FormInput.ManHours);
-            //$("#Comments").val(FormInput.Comments);
-            //if (FormInput.IsActive == true) $("#IsActive").prop("checked", true);
+                    }
+                    else if (property.slice(-5) == "_bool") {
+                        if (FormInput[property] == true) $("#" + property.slice(-5)).prop("checked", true);
+                    }
+                    else {
+                        $("#" + property).val(formInput[property]);
+                    }
+                }
+            }
 
-            //if (FormInput.EnteredByPerson_Id != null) MagicSuggests[0].addToSelection([{ id: FormInput.EnteredByPerson_Id, name: FormInput.EnteredByPerson }], true);
-            //if (FormInput.PersonActivityType_Id != null) MagicSuggests[1].addToSelection([{ id: FormInput.PersonActivityType_Id, name: FormInput.ActivityTypeName }], true);
-            //if (FormInput.AssignedToProject_Id != null) MagicSuggests[2].addToSelection([{ id: FormInput.AssignedToProject_Id, name: FormInput.AssignedToProject }], true);
-            //if (FormInput.AssignedToLocation_Id != null) MagicSuggests[3].addToSelection([{ id: FormInput.AssignedToLocation_Id, name: FormInput.AssignedToLocation }], true);
-            //if (FormInput.AssignedToProjectEvent_Id != null) MagicSuggests[4].addToSelection([{ id: FormInput.AssignedToProjectEvent_Id, name: FormInput.EventName }], true);
+            if (data.length == 1) {
+                $("[data-val-dbisunique]").prop("disabled", false);
+                DisableUniqueMs(msArray, false);
+            }
+            else {
+                $("[data-val-dbisunique]").prop("disabled", true);
+                DisableUniqueMs(msArray, true);
+            }
 
-            //if (data.length == 1) {
-            //    $("[data-val-dbisunique]").prop("disabled", false);
-            //    DisableUniqueMs(MagicSuggests, false);
-            //}
-            //else {
-            //    $("[data-val-dbisunique]").prop("disabled", true);
-            //    DisableUniqueMs(MagicSuggests, true);
-            //}
+            $("#ModalWait").modal("hide");
+
+            deferred0.resolve(currRecord);
 
             //$("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
             //FillLogEntryAssys(false)
