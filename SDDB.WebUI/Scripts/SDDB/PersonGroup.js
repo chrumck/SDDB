@@ -14,7 +14,7 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreate("EditForm", MagicSuggests, "Create Person Group");
+        FillFormForCreate("EditForm", MagicSuggests, "Create Person Group", "MainView");
     });
 
     //Wire up BtnEdit

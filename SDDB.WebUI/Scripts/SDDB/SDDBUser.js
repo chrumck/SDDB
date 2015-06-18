@@ -13,7 +13,7 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreate("EditForm", MagicSuggests, "Create SDDB User");
+        FillFormForCreate("EditForm", MagicSuggests, "Create SDDB User", "MainView");
     });
 
     //Wire up BtnEdit

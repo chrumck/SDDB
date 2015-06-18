@@ -24,7 +24,7 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreate("EditForm", MagicSuggests, "Create Location");
+        FillFormForCreate("EditForm", MagicSuggests, "Create Location", "MainView");
     });
 
     //Wire up BtnEdit
@@ -213,7 +213,7 @@ function FillFormForEdit() {
     if ($("#ChBoxShowDeleted").prop("checked")) $("#EditFormGroupIsActive").removeClass("hide");
     else $("#EditFormGroupIsActive").addClass("hide");
 
-    $("#CreateMultipleRow").addClass("hide");
+    $("#EditFormCreateMultiple").addClass("hide");
 
     var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
     $.ajax({

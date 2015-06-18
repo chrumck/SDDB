@@ -20,6 +20,9 @@ $(document).ready(function () {
         $(".selectable").on("click", "tr", function () { $(this).toggleClass("ui-selected"); });
     }
 
+    //Enable modified field detection
+    $(".modifiable").change(function () { $(this).data("ismodified", true); });
+
 
 });
 
@@ -273,16 +276,16 @@ function SetMsAsModified(msArray, isModified) {
 }
 
 //Prepare Form For Create
-function FillFormForCreate(formId, msArray, labelText) {
+function FillFormForCreate(formId, msArray, labelText, mainViewId) {
 
     setSelect = (typeof setSelect !== "undefined" && setSelect == true) ? true : false;
     
     ClearFormInputs(formId, msArray);
     $("#" + formId + "Label").text(labelText);
-    $("[data-val-dbisunique]").prop("disabled", false); DisableUniqueMs(msArray, false);
-    $(".modifiable").data("ismodified", true); SetMsAsModified(msArray, true);
-    $("#EditFormGroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true)
-    $("#CreateMultipleRow").removeClass("hide");
-    $("#MainView").addClass("hide");
+    $("#" + formId + " [data-val-dbisunique]").prop("disabled", false); DisableUniqueMs(msArray, false);
+    $("#" + formId + " .modifiable").data("ismodified", true); SetMsAsModified(msArray, true);
+    $("#" + formId + "GroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true)
+    $("#" + formId + "CreateMultiple").removeClass("hide");
+    $("#" + mainViewId).addClass("hide");
     $("#" + formId + "View").removeClass("hide");
 }
