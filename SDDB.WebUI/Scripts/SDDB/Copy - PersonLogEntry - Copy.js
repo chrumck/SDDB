@@ -2,8 +2,8 @@
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
-/// <reference path="../jquery-2.1.3.js" />
-/// <reference path="../jquery-2.1.3.intellisense.js" />
+/// <reference path="../jquery-2.1.4.js" />
+/// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
@@ -406,106 +406,6 @@ function FillFormForEdit(ids) {
         .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
 }
 
-//FillFormForEdit Generic version
-function FillFormForEditGeneric(type, url, ids, getActive, formId, labelText, msArray) {
-
-    var deferred0 = $.Deferred();
-
-    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-
-    ClearFormInputs(formId, MagicSuggests);
-    $("#" + formId + "Label").text(labelText);
-
-    $.ajax({ type: type, url: url, timeout: 20000, data: { ids: ids, getActive: getActive }, dataType: "json" })
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function (data) {
-
-            var currRecord = {};
-            for (var property in data[0]) {
-                if (data[0].hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
-                    currRecord[property] = data[0][property];
-                }
-            }
-
-            var formInput = $.extend(true, {}, currRecord);
-
-            $.each(data, function (i, dbEntry) {
-                for (var property in dbEntry) {
-                    if (dbEntry.hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
-                        if (property.slice(-3) == "_Id") {
-                            if (formInput[property] != dbEntry[property]) {
-                                formInput[property] = "_VARIES_"; formInput[property.slice(0, -2)] = "_VARIES_";
-                            }
-                            else {
-                                for (var subProp in dbEntry[property.slice(0, -2)]) {
-                                    if (typeof formInput[property.slice(0, -2)] !== "undefined") formInput[property.slice(0, -2)] += " ";
-                                    formInput[property.slice(0, -2)] += dbEntry[property.slice(0, -2)][subProp];
-                                }
-                            }
-                        }
-                        else {
-                            if (formInput[property] != dbEntry[property]) formInput[property] = "_VARIES_";
-                        }
-                    }
-                }
-            });
-
-            for (var property in formInput) {
-                if (formInput.hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
-                    if (property.slice(-3) == "_Id") {
-                        for (var ms in msArray) {
-                            if (ms.id == property) {
-                                if (FormInput[property] != null) ms.addToSelection([{ id: FormInput[property], name: FormInput[property.slice(-2)] }], true);
-                            }
-                        }
-
-                    }
-                    else if (property.slice(-5) == "_bool") {
-                        if (FormInput[property] == true) $("#" + property.slice(-5)).prop("checked", true);
-                    }
-                    else {
-                        $("#" + property).val(formInput[property]);
-                    }
-                }
-            }
-
-            if (data.length == 1) {
-                $("[data-val-dbisunique]").prop("disabled", false);
-                DisableUniqueMs(msArray, false);
-            }
-            else {
-                $("[data-val-dbisunique]").prop("disabled", true);
-                DisableUniqueMs(msArray, true);
-            }
-
-            $("#ModalWait").modal("hide");
-
-            deferred0.resolve(currRecord);
-
-            //$("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-            //FillLogEntryAssys(false)
-            //    .always(function () { $("#ModalWait").modal("hide"); })
-            //    .done(function () {
-            //        $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-            //        FillLogEntryPersons(false)
-            //            .always(function () { $("#ModalWait").modal("hide"); })
-            //            .done(function () {
-            //                $("#MainView").addClass("hide");
-            //                $("#EditFormView").removeClass("hide");
-            //            })
-            //            .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
-            //    })
-            //    .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
-
-
-
-
-
-        })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
-}
-
-
 //SubmitEdits to DB
 function SubmitEdits(ids) {
 
@@ -574,10 +474,8 @@ function SubmitEdits(ids) {
 //Delete Records from DB
 function DeleteRecords() {
     var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    $.ajax({
-        type: "POST", url: "/PersonLogEntrySrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
-    })
+    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+    $.ajax({ type: "POST", url: "/PersonLogEntrySrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json"})
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () { RefreshMainView(); })
         .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
@@ -588,7 +486,7 @@ function DeleteRecords() {
 //Fill Log Entry Assys to add and to remove
 function FillLogEntryAssys(isCreate) {
 
-    var deferred1 = $.Deferred();
+    var deferred1 = $.Deferred(); return deferred1.promise();
 
     if (currIds.length == 1) {
         $.when(
@@ -627,13 +525,13 @@ function FillLogEntryAssys(isCreate) {
             deferred1.resolve();
         })
         .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
-    }
-
-    return deferred1.promise();
+    } 
 }
 
 //Submit Log Entry Assemblies Edits to SDDB
 function EditLogEntryAssys(logEntryIds) {
+
+    var deferred0 = $.Deferred(); return deferred0.promise();
 
     var dbRecordsAdd = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name").data().toArray();
     var dbRecordsRemove = TableLogEntryAssysRemove.cells(".ui-selected", "Id:name").data().toArray();
@@ -662,12 +560,9 @@ function EditLogEntryAssys(logEntryIds) {
         }, 500);
     }
 
-    var deferred3 = $.Deferred();
     $.when(deferred1, deferred2)
-        .done(function () { deferred3.resolve();})
-        .fail(function (xhr, status, error) { deferred3.reject(xhr, status, error); });
-
-    return deferred3.promise();
+        .done(function () { deferred0.resolve();})
+        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 }
 
 //---------------------------------------------------------------------------------------------
@@ -713,6 +608,8 @@ function FillLogEntryPersons(isCreate) {
 //Submit Log Entry Persons Edits to SDDB
 function EditLogEntryPersons(logEntryIds) {
 
+    var deferred0 = $.Deferred(); return deferred0.promise();
+
     var dbRecordsAdd = TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name").data().toArray();
     var dbRecordsRemove = TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name").data().toArray();
 
@@ -740,12 +637,9 @@ function EditLogEntryPersons(logEntryIds) {
         }, 500);
     }
 
-    var deferred3 = $.Deferred();
     $.when(deferred1, deferred2)
-        .done(function () { deferred3.resolve(); })
-        .fail(function (xhr, status, error) { deferred3.reject(xhr, status, error); });
-
-    return deferred3.promise();
+        .done(function () { deferred0.resolve(); })
+        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });    
 }
 
 

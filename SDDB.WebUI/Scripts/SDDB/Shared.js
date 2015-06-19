@@ -167,17 +167,147 @@ function RefreshTable(table, url, getActive, httpType, projectIds, modelIds, typ
         });
 }
 
-//checking if form is valid
-function FormIsValid(id, isCreate) {
-    if ($("#" + id).valid()) return true;
-    else if (isCreate) return false;
-    else {
-        var isValid = true;
-        $("#" + id + " input").each(function (index) {
-            if ($(this).data("ismodified") && $(this).hasClass("input-validation-error")) isValid = false;
-        });
-        return isValid;
-    }
+//Refresh main table from AJAX - generic version
+function RefreshTableGeneric(table, url, data, httpType) {
+
+    var deferred0 = $.Deferred(); return deferred0.promise();
+
+    httpType = (typeof httpType !== "undefined") ? httpType : "GET";
+    data = (typeof data !== "undefined") ? data : {};
+
+    table.clear().search("").draw();
+
+    $.ajax({ type: httpType, url: url, timeout: 20000, data: data, dataType: "json", })
+        .done(function (data) {
+            table.rows.add(data.data).order([1, 'asc']).draw();
+            deferred0.resolve();
+        })
+        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
+}
+
+//FillFormForEdit Generic version
+function FillFormForEditGeneric(httpType, url, ids, getActive, formId, labelText, msArray) {
+
+    var deferred0 = $.Deferred(); return deferred0.promise();
+
+    ClearFormInputs(formId, msArray);
+    $("#" + formId + "Label").text(labelText);
+
+    $.ajax({ type: httpType, url: url, timeout: 20000, data: { ids: ids, getActive: getActive }, dataType: "json" })
+        .done(function (data) {
+
+            var currRecord = {};
+            for (var property in data[0]) {
+                if (data[0].hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
+                    currRecord[property] = data[0][property];
+                }
+            }
+
+            var formInput = $.extend(true, {}, currRecord);
+
+            $.each(data, function (i, dbEntry) {
+                for (var property in dbEntry) {
+                    if (dbEntry.hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
+                        if (property.slice(-3) == "_Id") {
+                            if (formInput[property] != dbEntry[property]) {
+                                formInput[property] = "_VARIES_"; formInput[property.slice(0, -2)] = "_VARIES_";
+                            }
+                            else {
+                                for (var subProp in dbEntry[property.slice(0, -2)]) {
+                                    if (typeof formInput[property.slice(0, -2)] !== "undefined") formInput[property.slice(0, -2)] += " ";
+                                    formInput[property.slice(0, -2)] += dbEntry[property.slice(0, -2)][subProp];
+                                }
+                            }
+                        }
+                        else {
+                            if (formInput[property] != dbEntry[property]) formInput[property] = "_VARIES_";
+                        }
+                    }
+                }
+            });
+
+            for (var property in formInput) {
+                if (formInput.hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
+                    if (property.slice(-3) == "_Id") {
+                        for (var ms in msArray) {
+                            if (ms.id == property) {
+                                if (FormInput[property] != null) ms.addToSelection([{ id: FormInput[property], name: FormInput[property.slice(-2)] }], true);
+                            }
+                        }
+
+                    }
+                    else if (property.slice(-5) == "_bool") {
+                        if (FormInput[property] == true) $("#" + property.slice(-5)).prop("checked", true);
+                    }
+                    else {
+                        $("#" + property).val(formInput[property]);
+                    }
+                }
+            }
+
+            if (data.length == 1) {
+                $("[data-val-dbisunique]").prop("disabled", false);
+                DisableUniqueMs(msArray, false);
+            }
+            else {
+                $("[data-val-dbisunique]").prop("disabled", true);
+                DisableUniqueMs(msArray, true);
+            }
+
+            deferred0.resolve(currRecord);
+        })
+        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
+}
+
+//SubmitEdits to DB - generic version
+function SubmitEditsGeneric(ids, formId, msArray, currRecord, httpType, url) {
+
+    var deferred0 = $.Deferred(); return deferred0.promise();
+
+    var modifiedProperties = [];
+    $("#" + formId + " .modifiable").each(function (index) {
+        if ($(this).data("ismodified")) modifiedProperties.push($(this).prop("id"));
+    });
+
+    $.each(msArray, function (i, ms) {
+        if (ms.isModified == true) modifiedProperties.push(ms.id);
+    });
+
+    var editRecords = [];
+
+    if (ids.length == 0) ids = ["newEntryId"];
+    $.each(ids, function (i, id) {
+        var editRecord = {};
+        editRecord.Id = id;
+
+        for (var property in currRecord) {
+            if (currRecord.hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
+                if (property.slice(-3) == "_Id") {
+                    for (var ms in msArray) {
+                        if (ms.id == property) {
+                            editRecord[property] = (ms.isModified && ms.getSelection().length != 0) ? (ms.getSelection())[0].id : currRecord[property];
+                        }
+                    }
+                }
+                else if (property.slice(-5) == "_bool") {
+                    editRecord[property] = ($.inArray(property, modifiedProperties) != -1) ?
+                        (($("#" + property.slice(-5)).prop("checked")) ? true : false) : currRecord[property];
+                }
+                else {
+                    editRecord[property] = ($.inArray(property, modifiedProperties) != -1) ?
+                        $("#" + property).val() : currRecord[property];
+                }
+            }
+        }
+
+        editRecord.ModifiedProperties = modifiedProperties;
+
+        editRecords.push(editRecord);
+    });
+
+    $.ajax({ type: httpType, url: url, timeout: 20000, data: { records: editRecords }, dataType: "json" })
+        .done(function (data) { deferred0.resolve(data); })
+        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 }
 
 //Clear inputs from forms and reset .ismodified to false
@@ -190,6 +320,19 @@ function ClearFormInputs(formId, msArray) {
 
     if (typeof msArray !== "undefined") {
         $.each(msArray, function (i, ms) { ms.clear(true); ms.isModified = false; });
+    }
+}
+
+//checking if form is valid
+function FormIsValid(id, isCreate) {
+    if ($("#" + id).valid()) return true;
+    else if (isCreate) return false;
+    else {
+        var isValid = true;
+        $("#" + id + " input").each(function (index) {
+            if ($(this).data("ismodified") && $(this).hasClass("input-validation-error")) isValid = false;
+        });
+        return isValid;
     }
 }
 
