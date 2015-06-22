@@ -1,5 +1,5 @@
-﻿/// <reference path="../jquery-2.1.3.js" />
-/// <reference path="../jquery-2.1.3.intellisense.js" />
+﻿/// <reference path="../jquery-2.1.4.js" />
+/// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../jquery.validate.js" />
 /// <reference path="../jquery.validate.unobtrusive.js" />
 /// <reference path="../modernizr-2.8.3.js" />
@@ -179,10 +179,36 @@ function RefreshTableGeneric(table, url, data, httpType) {
 
     $.ajax({ type: httpType, url: url, timeout: 20000, data: data, dataType: "json", })
         .done(function (data) {
-            table.rows.add(data.data).order([1, 'asc']).draw();
+            table.rows.add(data).order([1, 'asc']).draw();
             deferred0.resolve();
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
+}
+
+//Clear inputs from forms and reset .ismodified to false
+function ClearFormInputs(formId, msArray) {
+    $("#" + formId + " :input").prop("checked", false).prop("selected", false)
+        .not(":button, :submit, :reset, :radio, :checkbox").val("");
+    $("#" + formId + " [data-valmsg-for]").empty();
+    $("#" + formId + " .input-validation-error").removeClass("input-validation-error");
+    $("#" + formId + " .modifiable").data("ismodified", false);
+
+    if (typeof msArray !== "undefined") {
+        $.each(msArray, function (i, ms) { ms.clear(true); ms.isModified = false; });
+    }
+}
+
+//checking if form is valid
+function FormIsValid(id, isCreate) {
+    if ($("#" + id).valid()) return true;
+    else if (isCreate) return false;
+    else {
+        var isValid = true;
+        $("#" + id + " input").each(function (index) {
+            if ($(this).data("ismodified") && $(this).hasClass("input-validation-error")) isValid = false;
+        });
+        return isValid;
+    }
 }
 
 //FillFormForEdit Generic version
@@ -310,30 +336,71 @@ function SubmitEditsGeneric(ids, formId, msArray, currRecord, httpType, url) {
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 }
 
-//Clear inputs from forms and reset .ismodified to false
-function ClearFormInputs(formId, msArray) {
-    $("#" + formId + " :input").prop("checked", false).prop("selected", false)
-        .not(":button, :submit, :reset, :radio, :checkbox").val("");
-    $("#" + formId + " [data-valmsg-for]").empty();
-    $("#" + formId + " .input-validation-error").removeClass("input-validation-error");
-    $("#" + formId + " .modifiable").data("ismodified", false);
+//Fill Form for Edit from n:n related table - generic version
+function FillFormForRelatedGeneric(tableAdd, tableRemove, ids,
+    httpType, url, data, httpTypeNot, urlNot, dataNot, httpTypeAll, urlAll, dataNot) {
 
-    if (typeof msArray !== "undefined") {
-        $.each(msArray, function (i, ms) { ms.clear(true); ms.isModified = false; });
+    var deferred0 = $.Deferred(); return deferred0.promise();
+
+    if (ids.length == 1) {
+        $.when(
+            $.ajax({type: httpTypeNot, url: urlNot, timeout: 20000, data: dataNot, dataType: "json" }),
+            $.ajax({type: httpType, url: url, timeout: 20000, data: data, dataType: "json" })
+        )
+        .done(function (done1, done2) {
+            tableAdd.clear().search(""); tableAdd.rows.add(done1[0].data).order([1, 'asc']).draw();
+            tableRemove.clear().search(""); tableRemove.rows.add(done2[0].data).order([1, 'asc']).draw();
+            deferred0.resolve();
+        })
+        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
+    }
+    else {
+        $.ajax({ type: httpTypeAll, url: urlAll, timeout: 20000, data: dataNot, dataType: "json" })
+            .done(function (data) {
+                tableAdd.clear().search(""); tableAdd.rows.add(data).order([1, 'asc']).draw();
+                if (ids.length == 0) { tableRemove.clear().search(""); tableRemove.rows.add(data).order([1, 'asc']).draw(); }
+                else tableRemove.clear().search("");
+                deferred0.resolve();
+            })
+            .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
     }
 }
 
-//checking if form is valid
-function FormIsValid(id, isCreate) {
-    if ($("#" + id).valid()) return true;
-    else if (isCreate) return false;
+//Submit Edits for n:n related table - generic version
+function SubmitEditsForRelatedGeneric(logEntryIds) {
+
+    var deferred0 = $.Deferred(); return deferred0.promise();
+
+    var dbRecordsAdd = TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name").data().toArray();
+    var dbRecordsRemove = TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name").data().toArray();
+
+    var deferred1 = $.Deferred();
+    if (dbRecordsAdd.length == 0) deferred1.resolve();
     else {
-        var isValid = true;
-        $("#" + id + " input").each(function (index) {
-            if ($(this).data("ismodified") && $(this).hasClass("input-validation-error")) isValid = false;
-        });
-        return isValid;
+        $.ajax({
+            type: "POST", url: "/PersonLogEntrySrv/EditPrsLogEntryPersons", timeout: 20000,
+            data: { logEntryIds: logEntryIds, personIds: dbRecordsAdd, isAdd: true }, dataType: "json"
+        })
+            .done(function () { deferred1.resolve(); })
+            .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
     }
+
+    var deferred2 = $.Deferred();
+    if (dbRecordsRemove.length == 0) deferred2.resolve();
+    else {
+        setTimeout(function () {
+            $.ajax({
+                type: "POST", url: "/PersonLogEntrySrv/EditPrsLogEntryPersons", timeout: 20000,
+                data: { logEntryIds: logEntryIds, personIds: dbRecordsRemove, isAdd: false }, dataType: "json"
+            })
+                .done(function () { deferred2.resolve(); })
+                .fail(function (xhr, status, error) { deferred2.reject(xhr, status, error); });
+        }, 500);
+    }
+
+    $.when(deferred1, deferred2)
+        .done(function () { deferred0.resolve(); })
+        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 }
 
 //initialize MagicSuggest and add to MagicSuggest array
