@@ -2,8 +2,8 @@
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
-/// <reference path="../jquery-2.1.3.js" />
-/// <reference path="../jquery-2.1.3.intellisense.js" />
+/// <reference path="../jquery-2.1.4.js" />
+/// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
@@ -12,10 +12,10 @@
 var TableMain = {};
 var TableLogEntryAssysAdd = {}; var TableLogEntryAssysRemove = {};
 var TableLogEntryPersonsAdd = {}; var TableLogEntryPersonsRemove = {};
-var IsCreate = false;
 var MsFilterByProject = {}; var MsFilterByType = {}; var MsFilterByPerson = {};
 var MagicSuggests = [];
-var CurrRecord = {}; var currIds = [];
+var CurrRecord = {}; var CurrIds = [];
+var GetActive = true;
 
 $(document).ready(function () {
 
@@ -23,7 +23,7 @@ $(document).ready(function () {
 
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
-        IsCreate = true; currIds = [];
+        CurrIds = [];
         FillFormForCreate("EditForm", MagicSuggests, "Create Log Entry", "MainView");
         MagicSuggests[3].disable(); MagicSuggests[4].disable();
         TableLogEntryAssysAdd.clear().search("").draw();
@@ -34,16 +34,44 @@ $(document).ready(function () {
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-        var selectedRows = TableMain.rows(".ui-selected").data();
-        if (selectedRows.length == 0) ShowModalNothingSelected();
-        else { IsCreate = false; FillFormForEdit(); }
+
+        if (GetActive) $("#EditFormGroupIsActive").addClass("hide"); 
+        else $("#EditFormGroupIsActive").removeClass("hide");
+
+        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+
+        if (CurrIds.length == 0) ShowModalNothingSelected();
+        else {
+            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+
+            FillFormForEditGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
+                GetActive, "EditForm", "Edit Person Log Entry", MagicSuggests)
+                //.then(function () {
+                //    FillFormForRelatedGeneric(TableLogEntryAssysAdd, TableLogEntryAssysRemove, CurrIds,
+                //        "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys", { logEntryId: currIds[0] },
+                //        "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot", { logEntryId: currIds[0], locId: MagicSuggests[3].getValue },
+                //        "GET", "AssemblyDbSrv/LookupByLocDTables", { getActive: true });
+                //})
+                //.then(function () {
+                //    FillFormForRelatedGeneric(TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
+                //         "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { logEntryId: currIds[0] },
+                //         "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { logEntryId: currIds[0] },
+                //         "GET", "/PersonSrv/Get", { getActive: true });
+                //})
+                .always(function () { $("#ModalWait").modal("hide"); })
+                .done(function () {
+                    $("#MainView").addClass("hide");
+                    $("#EditFormView").removeClass("hide");
+                })
+                .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        }
     });
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
-        var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) ShowModalNothingSelected();
-        else ShowModalDelete(noOfRows);
+        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        if (CurrIds == 0) ShowModalNothingSelected();
+        else ShowModalDelete(CurrIds.length);
     });
 
     //Initialize DateTimePicker FilterDateStart
@@ -92,9 +120,8 @@ $(document).ready(function () {
 
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
-        if (($(this).prop("checked")) ? false : true)
-            $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
-        else $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
+        if (!$(this).prop("checked")) { GetActive = true; $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary"); }
+        else { GetActive = false; $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger"); }
         RefreshMainView();
     });
 
@@ -140,10 +167,6 @@ $(document).ready(function () {
 
     //---------------------------------------EditFormView----------------------------------------//
 
-    //Enable modified field detection
-    $(".modifiable").change(function () { $(this).data("ismodified", true); });
-
-
     //Initialize DateTimePicker
     $("#LogEntryDateTime").datetimepicker({ format: "YYYY-MM-DD HH:mm" })
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
@@ -151,8 +174,12 @@ $(document).ready(function () {
     //Initialize MagicSuggest Array
     AddToMSArray(MagicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
     AddToMSArray(MagicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1);
-
     AddToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    AddToMSArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/LookupByProj", 1, null,
+        { projectIds: MagicSuggests[2].getValue });
+    AddToMSArray(MagicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
+        { projectIds: MagicSuggests[2].getValue });
+    
     $(MagicSuggests[2]).on('selectionchange', function (e, m) {
         if (this.getValue().length == 0) {
             MagicSuggests[3].disable(); MagicSuggests[3].clear(true);
@@ -166,8 +193,6 @@ $(document).ready(function () {
         }
     });
 
-    AddToMSArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/LookupByProj", 1, null,
-        { projectIds: MagicSuggests[2].getValue });
     $(MagicSuggests[3]).on('selectionchange', function (e, m) {
         if (this.getValue().length == 0) {
             TableLogEntryAssysAdd.clear().search("").draw();
@@ -175,7 +200,7 @@ $(document).ready(function () {
         }
         else {
             $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-            FillLogEntryAssys()
+            FillLogEntryAssys(CurrIds.length == 0)
                 .always(function () {
                     $("#ModalWait").modal("hide");
                     $("#AssignedToLocation_Id input").focus();
@@ -184,13 +209,9 @@ $(document).ready(function () {
         }
     });
 
-    AddToMSArray(MagicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
-        { projectIds: MagicSuggests[2].getValue });
-
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        IsCreate = false;
         $("#MainView").removeClass("hide");
         $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
     });
@@ -198,7 +219,7 @@ $(document).ready(function () {
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         MsValidate(MagicSuggests);
-        if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
+        if (FormIsValid("EditForm", CurrIds.length == 0) && MsIsValid(MagicSuggests)) SubmitEdits(CurrIds);
     });
 
     //------------------------------------DataTables - Log Entry Assemblies ---
@@ -326,92 +347,8 @@ $(document).ready(function () {
 
 //--------------------------------------Main Methods---------------------------------------//
 
-//FillFormForEdit
-function FillFormForEdit() {
-    if ($("#ChBoxShowDeleted").prop("checked")) $("#EditFormGroupIsActive").removeClass("hide");
-    else $("#EditFormGroupIsActive").addClass("hide");
-
-    currIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    $.ajax({
-        type: "POST", url: "/PersonLogEntrySrv/GetByIds", timeout: 20000,
-        data: { ids: currIds, getActive: (($("#ChBoxShowDeleted").prop("checked")) ? false : true) }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
-    })
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function (data) {
-
-            CurrRecord.LogEntryDateTime = data[0].LogEntryDateTime;
-            CurrRecord.ManHours = data[0].ManHours;
-            CurrRecord.Comments = data[0].Comments;
-            CurrRecord.IsActive = data[0].IsActive;
-            CurrRecord.EnteredByPerson_Id = data[0].EnteredByPerson_Id;
-            CurrRecord.PersonActivityType_Id = data[0].PersonActivityType_Id;
-            CurrRecord.AssignedToProject_Id = data[0].AssignedToProject_Id;
-            CurrRecord.AssignedToLocation_Id = data[0].AssignedToLocation_Id;
-            CurrRecord.AssignedToProjectEvent_Id = data[0].AssignedToProjectEvent_Id;
-                        
-            var FormInput = $.extend(true, {}, CurrRecord);
-            $.each(data, function (i, dbEntry) {
-                if (FormInput.LogEntryDateTime != dbEntry.LogEntryDateTime) FormInput.LogEntryDateTime = "_VARIES_";
-                if (FormInput.ManHours != dbEntry.ManHours) FormInput.ManHours = "_VARIES_";
-                if (FormInput.Comments != dbEntry.Comments) FormInput.Comments = "_VARIES_";
-                if (FormInput.IsActive != dbEntry.IsActive) FormInput.IsActive = "_VARIES_";
-
-                if (FormInput.EnteredByPerson_Id != dbEntry.EnteredByPerson_Id) { FormInput.EnteredByPerson_Id = "_VARIES_"; FormInput.EnteredByPerson = "_VARIES_"; }
-                else FormInput.EnteredByPerson = dbEntry.EnteredByPerson.FirstName + " " + dbEntry.EnteredByPerson.LastName + " " + dbEntry.EnteredByPerson.Initials;
-                if (FormInput.PersonActivityType_Id != dbEntry.PersonActivityType_Id) { FormInput.PersonActivityType_Id = "_VARIES_"; FormInput.ActivityTypeName = "_VARIES_"; }
-                else FormInput.ActivityTypeName = dbEntry.ActivityTypeName;
-                if (FormInput.AssignedToProject_Id != dbEntry.AssignedToProject_Id) { FormInput.AssignedToProject_Id = "_VARIES_"; FormInput.AssignedToProject = "_VARIES_"; }
-                else FormInput.AssignedToProject = dbEntry.AssignedToProject.ProjectName + " " + dbEntry.AssignedToProject.ProjectCode;
-                if (FormInput.AssignedToLocation_Id != dbEntry.AssignedToLocation_Id) { FormInput.AssignedToLocation_Id = "_VARIES_"; FormInput.AssignedToLocation = "_VARIES_"; }
-                else FormInput.AssignedToLocation = dbEntry.AssignedToLocation.LocName;
-                if (FormInput.AssignedToProjectEvent_Id != dbEntry.AssignedToProjectEvent_Id) { FormInput.AssignedToProjectEvent_Id = "_VARIES_"; FormInput.EventName = "_VARIES_"; }
-                else FormInput.EventName = dbEntry.EventName;
-            });
-
-            ClearFormInputs("EditForm", MagicSuggests);
-            $("#EditFormLabel").text("Edit Person Log Entry");
-
-            $("#LogEntryDateTime").val(FormInput.LogEntryDateTime);
-            $("#ManHours").val(FormInput.ManHours);
-            $("#Comments").val(FormInput.Comments);
-            if (FormInput.IsActive == true) $("#IsActive").prop("checked", true);
-
-            if (FormInput.EnteredByPerson_Id != null) MagicSuggests[0].addToSelection([{ id: FormInput.EnteredByPerson_Id, name: FormInput.EnteredByPerson }], true);
-            if (FormInput.PersonActivityType_Id != null) MagicSuggests[1].addToSelection([{ id: FormInput.PersonActivityType_Id, name: FormInput.ActivityTypeName }], true);
-            if (FormInput.AssignedToProject_Id != null) MagicSuggests[2].addToSelection([{ id: FormInput.AssignedToProject_Id, name: FormInput.AssignedToProject }], true);
-            if (FormInput.AssignedToLocation_Id != null) MagicSuggests[3].addToSelection([{ id: FormInput.AssignedToLocation_Id, name: FormInput.AssignedToLocation }], true);
-            if (FormInput.AssignedToProjectEvent_Id != null) MagicSuggests[4].addToSelection([{ id: FormInput.AssignedToProjectEvent_Id, name: FormInput.EventName }], true);
-
-            if (data.length == 1) {
-                $("[data-val-dbisunique]").prop("disabled", false);
-                DisableUniqueMs(MagicSuggests, false);
-            }
-            else {
-                $("[data-val-dbisunique]").prop("disabled", true);
-                DisableUniqueMs(MagicSuggests, true);
-            }
-
-            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-            FillLogEntryAssys()
-                .always(function () { $("#ModalWait").modal("hide"); })
-                .done(function () {
-                    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-                    FillLogEntryPersons()
-                        .always(function () { $("#ModalWait").modal("hide"); })
-                        .done(function () {
-                            $("#MainView").addClass("hide");
-                            $("#EditFormView").removeClass("hide");
-                        })
-                        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
-                })
-                .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
-        })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
-}
-
 //SubmitEdits to DB
-function SubmitEdits() {
+function SubmitEdits(ids) {
 
     var modifiedProperties = [];
     $(".modifiable").each(function (index) {
@@ -423,8 +360,7 @@ function SubmitEdits() {
     });
 
     var editRecords = [];
-    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    if (IsCreate == true) ids = ["newEntryId"];
+    if (ids.length == 0) ids = ["newEntryId"];
 
     var magicResults = [];
     $.each(MagicSuggests, function (i, ms) {
@@ -458,15 +394,14 @@ function SubmitEdits() {
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
             $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-            EditLogEntryAssys((IsCreate) ? data.ReturnIds : ids)
+            EditLogEntryAssys((ids[0] == "newEntryId") ? data.ReturnIds : ids)
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function () {
                 $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-                EditLogEntryPersons((IsCreate) ? data.ReturnIds : ids)
+                EditLogEntryPersons((ids[0] == "newEntryId") ? data.ReturnIds : ids)
                     .always(function () { $("#ModalWait").modal("hide"); })
                     .done(function () {
                         RefreshMainView();
-                        IsCreate = false;
                         $("#MainView").removeClass("hide");
                         $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
                     })
@@ -480,10 +415,8 @@ function SubmitEdits() {
 //Delete Records from DB
 function DeleteRecords() {
     var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    $.ajax({
-        type: "POST", url: "/PersonLogEntrySrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
-    })
+    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+    $.ajax({ type: "POST", url: "/PersonLogEntrySrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json"})
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () { RefreshMainView(); })
         .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
@@ -492,9 +425,10 @@ function DeleteRecords() {
 //---------------------------------------------------------------------------------------------
 
 //Fill Log Entry Assys to add and to remove
-function FillLogEntryAssys() {
 
-    var deferred1 = $.Deferred();
+function FillLogEntryAssys(isCreate) {
+
+    var deferred1 = $.Deferred(); return deferred1.promise();
 
     if (currIds.length == 1) {
         $.when(
@@ -527,19 +461,19 @@ function FillLogEntryAssys() {
         )
         .done(function (done1, done2) {
             TableLogEntryAssysAdd.clear().search(""); TableLogEntryAssysAdd.rows.add(done1[0]).order([1, 'asc']).draw();
-            if (!IsCreate) { TableLogEntryAssysRemove.clear().search(""); TableLogEntryAssysRemove.rows.add(done2[0]).order([1, 'asc']).draw(); }
+            if (!isCreate) { TableLogEntryAssysRemove.clear().search(""); TableLogEntryAssysRemove.rows.add(done2[0]).order([1, 'asc']).draw(); }
             else TableLogEntryAssysRemove.clear().search("");
 
             deferred1.resolve();
         })
         .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
-    }
-
-    return deferred1.promise();
+    } 
 }
 
 //Submit Log Entry Assemblies Edits to SDDB
 function EditLogEntryAssys(logEntryIds) {
+
+    var deferred0 = $.Deferred(); return deferred0.promise();
 
     var dbRecordsAdd = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name").data().toArray();
     var dbRecordsRemove = TableLogEntryAssysRemove.cells(".ui-selected", "Id:name").data().toArray();
@@ -568,18 +502,15 @@ function EditLogEntryAssys(logEntryIds) {
         }, 500);
     }
 
-    var deferred3 = $.Deferred();
     $.when(deferred1, deferred2)
-        .done(function () { deferred3.resolve();})
-        .fail(function (xhr, status, error) { deferred3.reject(xhr, status, error); });
-
-    return deferred3.promise();
+        .done(function () { deferred0.resolve();})
+        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 }
 
 //---------------------------------------------------------------------------------------------
 
 //Fill Log Entry Persons to add and to remove
-function FillLogEntryPersons() {
+function FillLogEntryPersons(isCreate) {
 
     var deferred1 = $.Deferred();
 
@@ -605,7 +536,7 @@ function FillLogEntryPersons() {
         $.ajax({ type: "GET", url: "/PersonSrv/Get", timeout: 20000, data: { getActive: true }, dataType: "json" })
             .done(function (data) {
                 TableLogEntryPersonsAdd.clear().search(""); TableLogEntryPersonsAdd.rows.add(data.data).order([1, 'asc']).draw();
-                if (!IsCreate) { TableLogEntryPersonsRemove.clear().search(""); TableLogEntryPersonsRemove.rows.add(data.data).order([1, 'asc']).draw(); }
+                if (!isCreate) { TableLogEntryPersonsRemove.clear().search(""); TableLogEntryPersonsRemove.rows.add(data.data).order([1, 'asc']).draw(); }
                 else TableLogEntryPersonsRemove.clear().search("");
 
                 deferred1.resolve();
@@ -618,6 +549,8 @@ function FillLogEntryPersons() {
 
 //Submit Log Entry Persons Edits to SDDB
 function EditLogEntryPersons(logEntryIds) {
+
+    var deferred0 = $.Deferred(); return deferred0.promise();
 
     var dbRecordsAdd = TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name").data().toArray();
     var dbRecordsRemove = TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name").data().toArray();
@@ -646,12 +579,9 @@ function EditLogEntryPersons(logEntryIds) {
         }, 500);
     }
 
-    var deferred3 = $.Deferred();
     $.when(deferred1, deferred2)
-        .done(function () { deferred3.resolve(); })
-        .fail(function (xhr, status, error) { deferred3.reject(xhr, status, error); });
-
-    return deferred3.promise();
+        .done(function () { deferred0.resolve(); })
+        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });    
 }
 
 

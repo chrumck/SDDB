@@ -2,8 +2,8 @@
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
-/// <reference path="../jquery-2.1.4.js" />
-/// <reference path="../jquery-2.1.4.intellisense.js" />
+/// <reference path="../jquery-2.1.3.js" />
+/// <reference path="../jquery-2.1.3.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
@@ -12,10 +12,10 @@
 var TableMain = {};
 var TableLogEntryAssysAdd = {}; var TableLogEntryAssysRemove = {};
 var TableLogEntryPersonsAdd = {}; var TableLogEntryPersonsRemove = {};
+var IsCreate = false;
 var MsFilterByProject = {}; var MsFilterByType = {}; var MsFilterByPerson = {};
 var MagicSuggests = [];
-var CurrRecord = {}; var CurrIds = [];
-var GetActive = true;
+var CurrRecord = {}; var currIds = [];
 
 $(document).ready(function () {
 
@@ -23,7 +23,7 @@ $(document).ready(function () {
 
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
-        CurrIds = [];
+        IsCreate = true; currIds = [];
         FillFormForCreate("EditForm", MagicSuggests, "Create Log Entry", "MainView");
         MagicSuggests[3].disable(); MagicSuggests[4].disable();
         TableLogEntryAssysAdd.clear().search("").draw();
@@ -34,21 +34,16 @@ $(document).ready(function () {
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-
-        if (GetActive) $("#EditFormGroupIsActive").addClass("hide"); 
-        else $("#EditFormGroupIsActive").removeClass("hide");
-
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-
-        if (CurrIds.length == 0) ShowModalNothingSelected();
-        else FillFormForEdit(CurrIds);
+        var selectedRows = TableMain.rows(".ui-selected").data();
+        if (selectedRows.length == 0) ShowModalNothingSelected();
+        else { IsCreate = false; FillFormForEdit(); }
     });
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-        if (CurrIds == 0) ShowModalNothingSelected();
-        else ShowModalDelete(CurrIds.length);
+        var noOfRows = TableMain.rows(".ui-selected").data().length;
+        if (noOfRows == 0) ShowModalNothingSelected();
+        else ShowModalDelete(noOfRows);
     });
 
     //Initialize DateTimePicker FilterDateStart
@@ -97,8 +92,9 @@ $(document).ready(function () {
 
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
-        if (!$(this).prop("checked")) { GetActive = true; $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary"); }
-        else { GetActive = false; $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger"); }
+        if (($(this).prop("checked")) ? false : true)
+            $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
+        else $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
         RefreshMainView();
     });
 
@@ -144,6 +140,10 @@ $(document).ready(function () {
 
     //---------------------------------------EditFormView----------------------------------------//
 
+    //Enable modified field detection
+    $(".modifiable").change(function () { $(this).data("ismodified", true); });
+
+
     //Initialize DateTimePicker
     $("#LogEntryDateTime").datetimepicker({ format: "YYYY-MM-DD HH:mm" })
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
@@ -175,7 +175,7 @@ $(document).ready(function () {
         }
         else {
             $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-            FillLogEntryAssys(CurrIds.length == 0)
+            FillLogEntryAssys()
                 .always(function () {
                     $("#ModalWait").modal("hide");
                     $("#AssignedToLocation_Id input").focus();
@@ -190,6 +190,7 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
+        IsCreate = false;
         $("#MainView").removeClass("hide");
         $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
     });
@@ -197,7 +198,7 @@ $(document).ready(function () {
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         MsValidate(MagicSuggests);
-        if (FormIsValid("EditForm", CurrIds.length == 0) && MsIsValid(MagicSuggests)) SubmitEdits(CurrIds);
+        if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
     });
 
     //------------------------------------DataTables - Log Entry Assemblies ---
@@ -326,11 +327,14 @@ $(document).ready(function () {
 //--------------------------------------Main Methods---------------------------------------//
 
 //FillFormForEdit
-function FillFormForEdit(ids) {
+function FillFormForEdit() {
+    if ($("#ChBoxShowDeleted").prop("checked")) $("#EditFormGroupIsActive").removeClass("hide");
+    else $("#EditFormGroupIsActive").addClass("hide");
 
+    currIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
     $.ajax({
         type: "POST", url: "/PersonLogEntrySrv/GetByIds", timeout: 20000,
-        data: { ids: ids, getActive: (($("#ChBoxShowDeleted").prop("checked")) ? false : true) }, dataType: "json",
+        data: { ids: currIds, getActive: (($("#ChBoxShowDeleted").prop("checked")) ? false : true) }, dataType: "json",
         beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
@@ -389,11 +393,11 @@ function FillFormForEdit(ids) {
             }
 
             $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-            FillLogEntryAssys(false)
+            FillLogEntryAssys()
                 .always(function () { $("#ModalWait").modal("hide"); })
                 .done(function () {
                     $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-                    FillLogEntryPersons(false)
+                    FillLogEntryPersons()
                         .always(function () { $("#ModalWait").modal("hide"); })
                         .done(function () {
                             $("#MainView").addClass("hide");
@@ -407,7 +411,7 @@ function FillFormForEdit(ids) {
 }
 
 //SubmitEdits to DB
-function SubmitEdits(ids) {
+function SubmitEdits() {
 
     var modifiedProperties = [];
     $(".modifiable").each(function (index) {
@@ -419,7 +423,8 @@ function SubmitEdits(ids) {
     });
 
     var editRecords = [];
-    if (ids.length == 0) ids = ["newEntryId"];
+    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+    if (IsCreate == true) ids = ["newEntryId"];
 
     var magicResults = [];
     $.each(MagicSuggests, function (i, ms) {
@@ -453,14 +458,15 @@ function SubmitEdits(ids) {
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
             $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-            EditLogEntryAssys((ids[0] == "newEntryId") ? data.ReturnIds : ids)
+            EditLogEntryAssys((IsCreate) ? data.ReturnIds : ids)
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function () {
                 $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-                EditLogEntryPersons((ids[0] == "newEntryId") ? data.ReturnIds : ids)
+                EditLogEntryPersons((IsCreate) ? data.ReturnIds : ids)
                     .always(function () { $("#ModalWait").modal("hide"); })
                     .done(function () {
                         RefreshMainView();
+                        IsCreate = false;
                         $("#MainView").removeClass("hide");
                         $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
                     })
@@ -474,8 +480,10 @@ function SubmitEdits(ids) {
 //Delete Records from DB
 function DeleteRecords() {
     var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-    $.ajax({ type: "POST", url: "/PersonLogEntrySrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json"})
+    $.ajax({
+        type: "POST", url: "/PersonLogEntrySrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json",
+        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+    })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () { RefreshMainView(); })
         .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
@@ -484,9 +492,9 @@ function DeleteRecords() {
 //---------------------------------------------------------------------------------------------
 
 //Fill Log Entry Assys to add and to remove
-function FillLogEntryAssys(isCreate) {
+function FillLogEntryAssys() {
 
-    var deferred1 = $.Deferred(); return deferred1.promise();
+    var deferred1 = $.Deferred();
 
     if (currIds.length == 1) {
         $.when(
@@ -519,19 +527,19 @@ function FillLogEntryAssys(isCreate) {
         )
         .done(function (done1, done2) {
             TableLogEntryAssysAdd.clear().search(""); TableLogEntryAssysAdd.rows.add(done1[0]).order([1, 'asc']).draw();
-            if (!isCreate) { TableLogEntryAssysRemove.clear().search(""); TableLogEntryAssysRemove.rows.add(done2[0]).order([1, 'asc']).draw(); }
+            if (!IsCreate) { TableLogEntryAssysRemove.clear().search(""); TableLogEntryAssysRemove.rows.add(done2[0]).order([1, 'asc']).draw(); }
             else TableLogEntryAssysRemove.clear().search("");
 
             deferred1.resolve();
         })
         .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
-    } 
+    }
+
+    return deferred1.promise();
 }
 
 //Submit Log Entry Assemblies Edits to SDDB
 function EditLogEntryAssys(logEntryIds) {
-
-    var deferred0 = $.Deferred(); return deferred0.promise();
 
     var dbRecordsAdd = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name").data().toArray();
     var dbRecordsRemove = TableLogEntryAssysRemove.cells(".ui-selected", "Id:name").data().toArray();
@@ -560,15 +568,18 @@ function EditLogEntryAssys(logEntryIds) {
         }, 500);
     }
 
+    var deferred3 = $.Deferred();
     $.when(deferred1, deferred2)
-        .done(function () { deferred0.resolve();})
-        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
+        .done(function () { deferred3.resolve();})
+        .fail(function (xhr, status, error) { deferred3.reject(xhr, status, error); });
+
+    return deferred3.promise();
 }
 
 //---------------------------------------------------------------------------------------------
 
 //Fill Log Entry Persons to add and to remove
-function FillLogEntryPersons(isCreate) {
+function FillLogEntryPersons() {
 
     var deferred1 = $.Deferred();
 
@@ -594,7 +605,7 @@ function FillLogEntryPersons(isCreate) {
         $.ajax({ type: "GET", url: "/PersonSrv/Get", timeout: 20000, data: { getActive: true }, dataType: "json" })
             .done(function (data) {
                 TableLogEntryPersonsAdd.clear().search(""); TableLogEntryPersonsAdd.rows.add(data.data).order([1, 'asc']).draw();
-                if (!isCreate) { TableLogEntryPersonsRemove.clear().search(""); TableLogEntryPersonsRemove.rows.add(data.data).order([1, 'asc']).draw(); }
+                if (!IsCreate) { TableLogEntryPersonsRemove.clear().search(""); TableLogEntryPersonsRemove.rows.add(data.data).order([1, 'asc']).draw(); }
                 else TableLogEntryPersonsRemove.clear().search("");
 
                 deferred1.resolve();
@@ -607,8 +618,6 @@ function FillLogEntryPersons(isCreate) {
 
 //Submit Log Entry Persons Edits to SDDB
 function EditLogEntryPersons(logEntryIds) {
-
-    var deferred0 = $.Deferred(); return deferred0.promise();
 
     var dbRecordsAdd = TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name").data().toArray();
     var dbRecordsRemove = TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name").data().toArray();
@@ -637,9 +646,12 @@ function EditLogEntryPersons(logEntryIds) {
         }, 500);
     }
 
+    var deferred3 = $.Deferred();
     $.when(deferred1, deferred2)
-        .done(function () { deferred0.resolve(); })
-        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });    
+        .done(function () { deferred3.resolve(); })
+        .fail(function (xhr, status, error) { deferred3.reject(xhr, status, error); });
+
+    return deferred3.promise();
 }
 
 

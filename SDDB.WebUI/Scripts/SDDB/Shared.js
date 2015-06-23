@@ -212,9 +212,9 @@ function FormIsValid(id, isCreate) {
 }
 
 //FillFormForEdit Generic version
-function FillFormForEditGeneric(httpType, url, ids, getActive, formId, labelText, msArray) {
+function FillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText, msArray) {
 
-    var deferred0 = $.Deferred(); return deferred0.promise();
+    var deferred0 = $.Deferred();
 
     ClearFormInputs(formId, msArray);
     $("#" + formId + "Label").text(labelText);
@@ -283,12 +283,14 @@ function FillFormForEditGeneric(httpType, url, ids, getActive, formId, labelText
             deferred0.resolve(currRecord);
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
+
+    return deferred0.promise();
 }
 
 //SubmitEdits to DB - generic version
 function SubmitEditsGeneric(ids, formId, msArray, currRecord, httpType, url) {
 
-    var deferred0 = $.Deferred(); return deferred0.promise();
+    var deferred0 = $.Deferred();
 
     var modifiedProperties = [];
     $("#" + formId + " .modifiable").each(function (index) {
@@ -334,13 +336,15 @@ function SubmitEditsGeneric(ids, formId, msArray, currRecord, httpType, url) {
     $.ajax({ type: httpType, url: url, timeout: 20000, data: { records: editRecords }, dataType: "json" })
         .done(function (data) { deferred0.resolve(data); })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
+
+    return deferred0.promise();
 }
 
 //Fill Form for Edit from n:n related table - generic version
 function FillFormForRelatedGeneric(tableAdd, tableRemove, ids,
     httpType, url, data, httpTypeNot, urlNot, dataNot, httpTypeAll, urlAll, dataNot) {
 
-    var deferred0 = $.Deferred(); return deferred0.promise();
+    var deferred0 = $.Deferred();
 
     if (ids.length == 1) {
         $.when(
@@ -364,35 +368,27 @@ function FillFormForRelatedGeneric(tableAdd, tableRemove, ids,
             })
             .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
     }
+
+    return deferred0.promise();
 }
 
 //Submit Edits for n:n related table - generic version
-function SubmitEditsForRelatedGeneric(logEntryIds) {
+function SubmitEditsForRelatedGeneric(ids,idsAdd,idsRemove, urlAdd, httpTypeAdd, urlRemove, httpTypeRemove) {
 
-    var deferred0 = $.Deferred(); return deferred0.promise();
+    var deferred0 = $.Deferred();
+    var deferred1 = $.Deferred(); var deferred2 = $.Deferred();
 
-    var dbRecordsAdd = TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name").data().toArray();
-    var dbRecordsRemove = TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name").data().toArray();
-
-    var deferred1 = $.Deferred();
-    if (dbRecordsAdd.length == 0) deferred1.resolve();
+    if (idsAdd.length == 0) deferred1.resolve();
     else {
-        $.ajax({
-            type: "POST", url: "/PersonLogEntrySrv/EditPrsLogEntryPersons", timeout: 20000,
-            data: { logEntryIds: logEntryIds, personIds: dbRecordsAdd, isAdd: true }, dataType: "json"
-        })
+        $.ajax({type: httpTypeAdd, url: urlAdd, timeout: 20000, data: { ids: ids, idsAddRem: idsAdd, isAdd: true }, dataType: "json" })
             .done(function () { deferred1.resolve(); })
             .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
     }
 
-    var deferred2 = $.Deferred();
-    if (dbRecordsRemove.length == 0) deferred2.resolve();
+    if (idsRemove.length == 0) deferred2.resolve();
     else {
         setTimeout(function () {
-            $.ajax({
-                type: "POST", url: "/PersonLogEntrySrv/EditPrsLogEntryPersons", timeout: 20000,
-                data: { logEntryIds: logEntryIds, personIds: dbRecordsRemove, isAdd: false }, dataType: "json"
-            })
+            $.ajax({ type: httpTypeRemove, url: urlRemove, timeout: 20000, data: { ids: ids, idsAddRem: idsRemove, isAdd: false }, dataType: "json" })
                 .done(function () { deferred2.resolve(); })
                 .fail(function (xhr, status, error) { deferred2.reject(xhr, status, error); });
         }, 500);
@@ -401,6 +397,8 @@ function SubmitEditsForRelatedGeneric(logEntryIds) {
     $.when(deferred1, deferred2)
         .done(function () { deferred0.resolve(); })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
+
+    return deferred0.promise();
 }
 
 //initialize MagicSuggest and add to MagicSuggest array
