@@ -33,12 +33,14 @@ namespace SDDB.Domain.Services
         //get all 
         public virtual async Task<List<PersonLogEntry>> GetAsync(string userId, bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 
                 var records = await dbContext.PersonLogEntrys
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive)
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive)
                     .Include(x => x.EnteredByPerson).Include(x => x.PersonActivityType)
                     .Include(x => x.AssignedToProject).Include(x => x.AssignedToLocation).Include(x => x.AssignedToProjectEvent)
                     .ToListAsync().ConfigureAwait(false);
@@ -63,12 +65,15 @@ namespace SDDB.Domain.Services
         //get by ids
         public virtual async Task<List<PersonLogEntry>> GetAsync(string userId, string[] ids, bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+            if (ids == null || ids.Length == 0 ) throw new ArgumentNullException("ids");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 var records = await dbContext.PersonLogEntrys
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive && ids.Contains(x.Id))
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive && ids.Contains(x.Id))
                     .Include(x => x.EnteredByPerson).Include(x => x.PersonActivityType)
                     .Include(x => x.AssignedToProject).Include(x => x.AssignedToLocation).Include(x => x.AssignedToProjectEvent)
                     .ToListAsync().ConfigureAwait(false);
@@ -95,6 +100,8 @@ namespace SDDB.Domain.Services
         public virtual async Task<List<PersonLogEntry>> GetByFiltersAsync(string userId, string[] personIds = null, string[] projectIds = null,
             string[] typeIds = null, DateTime? startDate = null, DateTime? endDate = null, bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -102,7 +109,7 @@ namespace SDDB.Domain.Services
                 personIds = personIds ?? new string[] { }; projectIds = projectIds ?? new string[] { }; typeIds = typeIds ?? new string[] { };
                 
                 var records = await dbContext.PersonLogEntrys
-                       .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                       .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                             (personIds.Count() == 0 || x.PrsLogEntryPersons.Any(y => personIds.Contains(y.Id)) ||
                                 personIds.Contains(x.EnteredByPerson_Id)) &&
                             (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
@@ -134,12 +141,14 @@ namespace SDDB.Domain.Services
         //lookup by query
         public virtual Task<List<PersonLogEntry>> LookupAsync(string userId, string query = "", bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 return dbContext.PersonLogEntrys
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                         (x.EnteredByPerson.Initials.Contains(query) || x.EnteredByPerson.LastName.Contains(query) || x.Comments.Contains(query)))
                     .Include(x => x.EnteredByPerson).ToListAsync();
             }
@@ -148,6 +157,8 @@ namespace SDDB.Domain.Services
         //lookup by query and project
         public virtual async Task<List<PersonLogEntry>> LookupByProjAsync(string userId, string[] projectIds = null, string query = "", bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -155,7 +166,7 @@ namespace SDDB.Domain.Services
                 projectIds = projectIds ?? new string[] { };
                 
                 var records = await dbContext.PersonLogEntrys
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         (x.EnteredByPerson.Initials.Contains(query) || x.EnteredByPerson.LastName.Contains(query) || x.Comments.Contains(query)))
                     .Include(x => x.EnteredByPerson).ToListAsync();
@@ -169,6 +180,8 @@ namespace SDDB.Domain.Services
         // Create and Update records given in []
         public virtual async Task<DBResult> EditAsync(string userId, PersonLogEntry[] records)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             var errorMessage = ""; var serviceResult = new DBResult();
             using (var dbContextScope = contextScopeFac.Create())
             {
@@ -259,7 +272,7 @@ namespace SDDB.Domain.Services
                         var dbEntry = await dbContext.PersonLogEntrys.FindAsync(id).ConfigureAwait(false);
                         if (dbEntry != null)
                         {
-                            dbEntry.IsActive = false;
+                            dbEntry.IsActive_bl = false;
                         }
                         else
                         {
@@ -299,6 +312,8 @@ namespace SDDB.Domain.Services
         //get all person log entry assemblies
         public virtual Task<List<AssemblyDb>> GetPrsLogEntryAssysAsync(string logEntryId)
         {
+            if (String.IsNullOrEmpty(logEntryId)) throw new ArgumentNullException("logEntryId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -311,6 +326,8 @@ namespace SDDB.Domain.Services
         //get all active assemblies from the location not assigned to log entry
         public virtual Task<List<AssemblyDb>> GetPrsLogEntryAssysNotAsync(string logEntryId, string locId = null)
         {
+            if (String.IsNullOrEmpty(logEntryId)) throw new ArgumentNullException("logEntryId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -383,6 +400,8 @@ namespace SDDB.Domain.Services
         //get all person log entry persons
         public virtual Task<List<Person>> GetPrsLogEntryPersonsAsync(string logEntryId)
         {
+            if (String.IsNullOrEmpty(logEntryId)) throw new ArgumentNullException("logEntryId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -395,6 +414,9 @@ namespace SDDB.Domain.Services
         //get all active persons managed by user and not assigned to log entry
         public virtual Task<List<Person>> GetPrsLogEntryPersonsNotAsync(string userId, string logEntryId)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+            if (String.IsNullOrEmpty(logEntryId)) throw new ArgumentNullException("logEntryId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();

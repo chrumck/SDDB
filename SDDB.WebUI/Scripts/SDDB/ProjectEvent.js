@@ -7,6 +7,15 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
+//--------------------------------------Global Properties------------------------------------//
+
+var TableMain = {};
+var IsCreate = false;
+var MsFilterByProject = {};
+var MagicSuggests = [];
+var CurrRecord = {};
+
+
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
@@ -14,7 +23,7 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreate("EditForm", MagicSuggests, "Create Event", "MainView");
+        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create Event", "MainView");
     });
 
     //Wire up BtnEdit
@@ -90,7 +99,6 @@ $(document).ready(function () {
             paginate: { previous: "", next: "" }
         }
     });
-    RefreshMainView()
 
     //---------------------------------------EditFormView----------------------------------------//
 
@@ -120,15 +128,13 @@ $(document).ready(function () {
     });
 
 
+    //--------------------------------------View Initialization------------------------------------//
+
+    RefreshMainView();
+
+    //--------------------------------End of execution at Start-----------
 });
 
-//--------------------------------------Global Properties------------------------------------//
-
-var TableMain = {};
-var IsCreate = false;
-var MsFilterByProject = {};
-var MagicSuggests = [];
-var CurrRecord = {};
 
 //--------------------------------------Main Methods---------------------------------------//
 

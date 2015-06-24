@@ -61,6 +61,8 @@ namespace SDDB.Domain.Services
         //get by ids
         public virtual async Task<List<PersonGroup>> GetAsync(string[] ids, bool getActive = true)
         {
+            if (ids == null || ids.Length == 0) throw new ArgumentNullException("ids");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -87,6 +89,8 @@ namespace SDDB.Domain.Services
         //find managed froups by query
         public virtual Task<List<PersonGroup>> LookupAsync(string userId, string query = "", bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -214,6 +218,8 @@ namespace SDDB.Domain.Services
         //get all group managers
         public virtual Task<List<Person>> GetGroupManagersAsync(string groupId)
         {
+            if (String.IsNullOrEmpty(groupId)) throw new ArgumentNullException("groupId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -225,6 +231,8 @@ namespace SDDB.Domain.Services
         //get all active persons not assigned to group managers
         public virtual Task<List<Person>> GetGroupManagersNotAsync(string groupId)
         {
+            if (String.IsNullOrEmpty(groupId)) throw new ArgumentNullException("groupId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();

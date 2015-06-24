@@ -7,6 +7,14 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
+
+//--------------------------------------Global Properties------------------------------------//
+
+var TableMain = {};
+var IsCreate = false;
+var MagicSuggests = [];
+var CurrRecord = {};
+
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
@@ -14,7 +22,7 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreate("EditForm", MagicSuggests, "Create Component Model", "MainView");
+        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create Component Model", "MainView");
         $("#EditForm select").find("option:first").prop('selected', 'selected');
     });
 
@@ -95,7 +103,6 @@ $(document).ready(function () {
 
     //TableMain Component Models
     TableMain = $("#TableMain").DataTable({
-        ajax: { url: "/ComponentModelSrv/Get?getActive=" + (($("#ChBoxShowDeleted").prop("checked")) ? false : true) },
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "CompModelName", name: "CompModelName" },//1
@@ -191,14 +198,14 @@ $(document).ready(function () {
         if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
     });
 
+
+    //--------------------------------------View Initialization------------------------------------//
+
+    RefreshTable(TableMain, "/ComponentModelSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
+
+
+    //--------------------------------End of execution at Start-----------
 });
-
-//--------------------------------------Global Properties------------------------------------//
-
-var TableMain = {};
-var IsCreate = false;
-var MagicSuggests = [];
-var CurrRecord = {};
 
 //--------------------------------------Main Methods---------------------------------------//
 

@@ -7,6 +7,14 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
+//--------------------------------------Global Properties------------------------------------//
+
+var TableMain = {};
+var IsCreate = false;
+var MagicSuggests = [];
+var CurrRecord = {};
+
+
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
@@ -14,7 +22,7 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreate("EditForm", MagicSuggests, "Create Person Activity Type", "MainView");
+        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create Person Activity Type", "MainView");
     });
 
     //Wire up BtnEdit
@@ -43,7 +51,6 @@ $(document).ready(function () {
 
     //TableMain Person Activity Types
     TableMain = $("#TableMain").DataTable({
-        ajax: { url: "/PersonActivityTypeSrv/Get?getActive=" + (($("#ChBoxShowDeleted").prop("checked")) ? false : true) },
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "ActivityTypeName", name: "ActivityTypeName" },//1
@@ -87,14 +94,14 @@ $(document).ready(function () {
         if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
     });
 
+
+    //--------------------------------------View Initialization------------------------------------//
+
+    RefreshTable(TableMain, "/PersonActivityTypeSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
+
+
+    //--------------------------------End of execution at Start-----------
 });
-
-//--------------------------------------Global Properties------------------------------------//
-
-var TableMain = {};
-var IsCreate = false;
-var MagicSuggests = [];
-var CurrRecord = {};
 
 //--------------------------------------Main Methods---------------------------------------//
 

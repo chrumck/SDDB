@@ -34,7 +34,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonGroupService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonGroupSrv/GetByIds
@@ -115,7 +115,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonGroupService.GetGroupManagersAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonGroupSrv/GetGroupManagersNot
@@ -127,7 +127,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonGroupService.GetGroupManagersNotAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /PersonGroupSrv/EditGroupManagers

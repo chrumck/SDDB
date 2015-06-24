@@ -36,7 +36,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "DBUserService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         //POST: /DBUserSrv/Get By Ids
@@ -109,7 +109,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "DBUserService.GetAllRolesAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // GET: /DBUserSrv/GetUserRoles
@@ -120,7 +120,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "DBUserService.GetUserRolesAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // GET: /DBUserSrv/GetUserRolesNot
@@ -131,7 +131,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "DBUserService.GetUserRolesNotAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /DBUserSrv/EditRoles

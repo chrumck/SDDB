@@ -44,7 +44,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "AssemblyDbService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
         
         // GET: /AssemblyDbSrv/GetByIds
@@ -93,7 +93,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "AssemblyDbService.GetByProjectAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // GET: /AssemblyDbSrv/GetByTypeLocIds
@@ -118,7 +118,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "AssemblyDbService.GetByTypeLocAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
 
@@ -158,7 +158,7 @@ namespace SDDB.WebUI.ControllersSrv
                 .Select(x => new { id = x.Id, name = x.AssyName + " - " + x.AssignedToProject.ProjectCode }), JsonRequestBehavior.AllowGet);
         }
 
-        // GET: /AssemblyDbSrv/LookupByLoc
+        // GET: /AssemblyDbSrv/LookupByLocDTables
         public async Task<ActionResult> LookupByLocDTables(string locId = null, bool getActive = true)
         {
             var records = await assemblyService.LookupByLocAsync(UserId, locId, getActive).ConfigureAwait(false);

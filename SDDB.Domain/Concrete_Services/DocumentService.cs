@@ -33,6 +33,8 @@ namespace SDDB.Domain.Services
         //get all 
         public virtual async Task<List<Document>> GetAsync(string userId, bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -64,6 +66,9 @@ namespace SDDB.Domain.Services
         //get by ids
         public virtual async Task<List<Document>> GetAsync(string userId, string[] ids, bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+            if (ids == null || ids.Length == 0) throw new ArgumentNullException("ids");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -95,6 +100,8 @@ namespace SDDB.Domain.Services
         //get by projectIds and typeIds
         public virtual async Task<List<Document>> GetByTypeAsync(string userId, string[] projectIds = null, string[] typeIds = null, bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -130,6 +137,8 @@ namespace SDDB.Domain.Services
         //lookup by query
         public virtual Task<List<Document>> LookupAsync(string userId, string query = "", bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();

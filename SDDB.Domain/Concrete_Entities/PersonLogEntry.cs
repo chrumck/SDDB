@@ -54,7 +54,7 @@ namespace SDDB.Domain.Entities
 
         [Required]
         [DefaultValue(true)]
-        public bool IsActive { get; set; }
+        public bool IsActive_bl { get; set; }
 
         //TSP Column Wireup ---------------------------------------------------------------------------------------------------//
         [ConcurrencyCheck]

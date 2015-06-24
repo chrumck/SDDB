@@ -33,7 +33,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "ComponentStatusService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // GET: /ComponentStatusSrv/GetByIds

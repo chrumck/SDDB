@@ -43,6 +43,8 @@ namespace SDDB.Domain.Services
         //get by ids
         public virtual Task<List<ComponentModel>> GetAsync(string[] ids, bool getActive = true)
         {
+            if (ids == null || ids.Length == 0) throw new ArgumentNullException("ids");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();

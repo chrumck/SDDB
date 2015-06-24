@@ -5,6 +5,16 @@
 /// <reference path="../jquery-2.1.3.js" />
 /// <reference path="../jquery-2.1.3.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
+/// <reference path="Shared.js" />
+
+//--------------------------------------Global  Properties-----------------------------------//
+
+var TableMain = {};
+var TableDBRolesAdd = {};
+var TableDBRolesRemove = {};
+var IsCreate = false;
+var MagicSuggests = [];
+var CurrRecord = {};
 
 $(document).ready(function () {
 
@@ -13,7 +23,7 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreate("EditForm", MagicSuggests, "Create SDDB User", "MainView");
+        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create SDDB User", "MainView");
     });
 
     //Wire up BtnEdit
@@ -42,7 +52,6 @@ $(document).ready(function () {
 
     //TableMain DBUsers
     TableMain = $("#TableMain").DataTable({
-        ajax: { url: "/DBUserSrv/Get" },
         columns: [
             { data: "Id", name: "Id" },
             { data: "LastName", name: "LastName" },
@@ -142,16 +151,14 @@ $(document).ready(function () {
         pageLength: 100
     });
 
+
+    //--------------------------------------View Initialization------------------------------------//
+
+    RefreshTblGenWait(TableMain, "/DBUserSrv/Get", {},"GET");
+
+
+    //--------------------------------End of execution at Start-----------
 });
-
-//--------------------------------------Global  Properties-----------------------------------//
-
-var TableMain = {};
-var TableDBRolesAdd = {};
-var TableDBRolesRemove = {};
-var IsCreate = false;
-var MagicSuggests = [];
-var CurrRecord = {};
 
 
 //--------------------------------------Main Methods---------------------------------------//
@@ -250,7 +257,7 @@ function SubmitEdits() {
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
-            TableMain.ajax.reload();
+            RefreshTblGenWait(TableMain, "/DBUserSrv/Get", {}, "GET");
             IsCreate = false;
             $("#MainView").removeClass("hide");
             $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
@@ -268,7 +275,7 @@ function DeleteRecords() {
         beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function () { TableMain.ajax.reload(); })
+        .done(function () { RefreshTblGenWait(TableMain, "/DBUserSrv/Get", {}, "GET"); })
         .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
 }
 
@@ -288,8 +295,8 @@ function FillDBRoleForEdit(noOfRows) {
             )
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function (done1, done2) {
-                TableDBRolesAdd.clear().search(""); TableDBRolesAdd.rows.add(done1[0].data).order([0, 'asc']).draw();
-                TableDBRolesRemove.clear().search(""); TableDBRolesRemove.rows.add(done2[0].data).order([0, 'asc']).draw();
+                TableDBRolesAdd.clear().search(""); TableDBRolesAdd.rows.add(done1[0]).order([0, 'asc']).draw();
+                TableDBRolesRemove.clear().search(""); TableDBRolesRemove.rows.add(done2[0]).order([0, 'asc']).draw();
                 $("#MainView").addClass("hide");
                 $("#DBRolesView").removeClass("hide");
             })
@@ -304,8 +311,8 @@ function FillDBRoleForEdit(noOfRows) {
         })
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function (data) {
-                TableDBRolesAdd.clear().search(""); TableDBRolesAdd.rows.add(data.data).order([0, 'asc']).draw();
-                TableDBRolesRemove.clear().search(""); TableDBRolesRemove.rows.add(data.data).order([0, 'asc']).draw();
+                TableDBRolesAdd.clear().search(""); TableDBRolesAdd.rows.add(data).order([0, 'asc']).draw();
+                TableDBRolesRemove.clear().search(""); TableDBRolesRemove.rows.add(data).order([0, 'asc']).draw();
                 $("#MainView").addClass("hide");
                 $("#DBRolesView").removeClass("hide");
             })
@@ -348,7 +355,7 @@ function SubmitRolesEdits() {
     $.when(deferred1, deferred2)
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () {
-            TableMain.ajax.reload();
+            RefreshTblGenWait(TableMain, "/DBUserSrv/Get", {}, "GET");
             $("#MainView").removeClass("hide");
             $("#DBRolesView").addClass("hide"); window.scrollTo(0, 0);
         })

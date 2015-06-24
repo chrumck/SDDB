@@ -33,6 +33,8 @@ namespace SDDB.Domain.Services
         //get all 
         public virtual async Task<List<Component>> GetAsync(string userId, bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -63,6 +65,9 @@ namespace SDDB.Domain.Services
         //get by ids
         public virtual async Task<List<Component>> GetAsync(string userId, string[] ids, bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+            if (ids == null || ids.Length == 0) throw new ArgumentNullException("ids");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -93,6 +98,8 @@ namespace SDDB.Domain.Services
         //get by projectIds and modelIds
         public virtual async Task<List<Component>> GetByModelAsync(string userId, string[] projectIds = null, string[] modelIds = null, bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -129,6 +136,8 @@ namespace SDDB.Domain.Services
         public virtual async Task<List<Component>> GetByTypeAssyAsync(string userId,
             string[] projectIds = null, string[] typeIds = null, string[] assyIds = null, bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -165,6 +174,8 @@ namespace SDDB.Domain.Services
         //lookup by query
         public virtual Task<List<Component>> LookupAsync(string userId, string query = "", bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -178,6 +189,8 @@ namespace SDDB.Domain.Services
         //lookup by query and project
         public virtual async Task<List<Component>> LookupByProjAsync(string userId, string[] projectIds = null, string query = "", bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();

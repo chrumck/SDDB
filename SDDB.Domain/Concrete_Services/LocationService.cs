@@ -33,6 +33,8 @@ namespace SDDB.Domain.Services
         //get all 
         public virtual async Task<List<Location>> GetAsync(string userId, bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -62,6 +64,9 @@ namespace SDDB.Domain.Services
         //get by ids
         public virtual async Task<List<Location>> GetAsync(string userId, string[] ids, bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+            if (ids == null || ids.Length == 0) throw new ArgumentNullException("ids");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -91,6 +96,8 @@ namespace SDDB.Domain.Services
         //get by projectIds and TypeIds
         public virtual async Task<List<Location>> GetByTypeAsync(string userId, string[] projectIds = null, string[] typeIds = null, bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -124,12 +131,14 @@ namespace SDDB.Domain.Services
         //lookup by query
         public virtual Task<List<Location>> LookupAsync(string userId, string query = "", bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.Locations
                     .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
-                        (x.LocName.Contains(query) || x.LocAltName.Contains(query) || x.LocStationing.ToString().Contains(query)))
+                        (x.LocName.Contains(query) || x.LocAltName.Contains(query) || x.AssignedToProject.ProjectCode.Contains(query)))
                     .Include(x => x.AssignedToProject).ToListAsync();
             }
         }
@@ -137,6 +146,8 @@ namespace SDDB.Domain.Services
         //lookup by query and project
         public virtual async Task<List<Location>> LookupByProjAsync(string userId, string[] projectIds = null, string query = "", bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -146,7 +157,7 @@ namespace SDDB.Domain.Services
                 var records = await dbContext.Locations
                     .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
-                        (x.LocName.Contains(query) || x.LocAltName.Contains(query) || x.LocStationing.ToString().Contains(query)))
+                        (x.LocName.Contains(query) || x.LocAltName.Contains(query) || x.AssignedToProject.ProjectCode.Contains(query)))
                     .Include(x => x.AssignedToProject).ToListAsync();
 
                 return records;

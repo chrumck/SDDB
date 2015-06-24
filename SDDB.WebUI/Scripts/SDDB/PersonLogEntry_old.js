@@ -24,7 +24,7 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true; currIds = [];
-        FillFormForCreate("EditForm", MagicSuggests, "Create Log Entry", "MainView");
+        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create Log Entry", "MainView");
         MagicSuggests[3].disable(); MagicSuggests[4].disable();
         TableLogEntryAssysAdd.clear().search("").draw();
         TableLogEntryAssysRemove.clear().search("").draw();

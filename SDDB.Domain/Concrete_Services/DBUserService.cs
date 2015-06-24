@@ -122,12 +122,16 @@ namespace SDDB.Domain.Services
         //get particular DBUser Roles
         public virtual async Task<List<string>> GetUserRolesAsync(string userId)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             return (await appUserManager.GetRolesAsync(userId).ConfigureAwait(false)).ToList();
         }
 
         //get roles not assigned to DBUser
         public virtual async Task<List<string>> GetUserRolesNotAsync(string userId)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();

@@ -32,7 +32,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return new DBJsonDateISO { Data = new { data }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // GET: /PersonSrv/GetByIds
@@ -56,7 +56,7 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonService.GetWoDBUserAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(persons.OrderBy(p => p.LastName)
-                .Select(p => new { id = p.Id, name = p.LastName + " " + p.FirstName + " " + p.Initials }), JsonRequestBehavior.AllowGet);
+                .Select(x => new { id = x.Id, name = x.FirstName + " " + x.LastName + " " + x.Initials }), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonSrv/LookupAll
@@ -68,7 +68,7 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonService.LookupAllAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(records.OrderBy(x => x.LastName)
-                .Select(x => new { id = x.Id, name = x.LastName + " " + x.FirstName + " " + x.Initials }), JsonRequestBehavior.AllowGet);
+                .Select(x => new { id = x.Id, name = x.FirstName + " " + x.LastName + " " + x.Initials }), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonSrv/Lookup
@@ -79,7 +79,7 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonService.LookupAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(records.OrderBy(x => x.LastName)
-                .Select(x => new { id = x.Id, name = x.LastName + " " + x.FirstName + " " + x.Initials }), JsonRequestBehavior.AllowGet);
+                .Select(x => new { id = x.Id, name = x.FirstName + " " + x.LastName + " " + x.Initials }), JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -137,7 +137,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonService.GetPersonProjectsAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonSrv/GetPersonProjectsNot
@@ -149,7 +149,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonService.GetPersonProjectsNotAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /PersonSrv/EditPersonProjects
@@ -184,7 +184,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonService.GetPersonGroupsAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonSrv/GetPersonGroupsNot
@@ -196,7 +196,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonService.GetPersonGroupsNotAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /PersonSrv/EditPersonGroups
@@ -231,7 +231,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonService.GetManagedGroupsAsyn"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonSrv/GetManagedGroupsNot
@@ -243,7 +243,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonService.GetManagedGroupsNotAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /PersonSrv/EditManagedGroups

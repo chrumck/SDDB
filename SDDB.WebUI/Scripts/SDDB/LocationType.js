@@ -7,6 +7,14 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
+//--------------------------------------Global Properties------------------------------------//
+
+var TableMain = {};
+var IsCreate = false;
+var MagicSuggests = [];
+var CurrRecord = {};
+
+
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
@@ -14,7 +22,7 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreate("EditForm", MagicSuggests, "Create Location Type", "MainView");
+        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create Location Type", "MainView");
     });
 
     //Wire up BtnEdit
@@ -43,7 +51,6 @@ $(document).ready(function () {
 
     //TableMain Location Types
     TableMain = $("#TableMain").DataTable({
-        ajax: { url: "/LocationTypeSrv/Get?getActive=" + (($("#ChBoxShowDeleted").prop("checked")) ? false : true) },
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LocTypeName", name: "LocTypeName" },//1
@@ -90,14 +97,15 @@ $(document).ready(function () {
         if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
     });
 
+
+    //--------------------------------------View Initialization------------------------------------//
+
+    RefreshTable(TableMain, "/LocationTypeSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
+
+
+    //--------------------------------End of execution at Start-----------  
+
 });
-
-//--------------------------------------Global Properties------------------------------------//
-
-var TableMain = {};
-var IsCreate = false;
-var MagicSuggests = [];
-var CurrRecord = {};
 
 //--------------------------------------Main Methods---------------------------------------//
 

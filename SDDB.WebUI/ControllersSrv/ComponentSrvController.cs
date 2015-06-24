@@ -42,7 +42,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "ComponentService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
         
         // GET: /ComponentSrv/GetByIds
@@ -87,7 +87,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "ComponentService.GetByProjectAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // GET: /ComponentSrv/GetByTypeAssyIds
@@ -110,7 +110,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "ComponentService.GetByTypeAssyAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
 

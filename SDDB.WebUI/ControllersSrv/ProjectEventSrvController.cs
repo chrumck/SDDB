@@ -75,7 +75,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "ProjectEventService.GetByProjectAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return new DBJsonDateTimeISO { Data = new { data }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // GET: /ProjectEventSrv/Lookup

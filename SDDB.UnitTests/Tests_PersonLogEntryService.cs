@@ -34,8 +34,8 @@ namespace SDDB.UnitTests
             var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1), IsActive = false, Comments = "DummyComments1", AssignedToProject = project1 };
-            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive = true, Comments = "DummyComments2",
+            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1), IsActive_bl = false, Comments = "DummyComments1", AssignedToProject = project1 };
+            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive_bl = true, Comments = "DummyComments2",
                  AssignedToProject = project1 };
             var dbEntries = (new List<PersonLogEntry> { dbEntry1, dbEntry2 }).AsQueryable();
 
@@ -77,8 +77,8 @@ namespace SDDB.UnitTests
             var project2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive = false, ProjectCode = "CODE2", 
                 ProjectPersons = new List<Person> { projectPerson2 } };
 
-            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive = false, Comments = "DummyComments1", AssignedToProject = project1 };
-            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive = true, Comments = "DummyComments2", AssignedToProject = project2 };
+            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive_bl = false, Comments = "DummyComments1", AssignedToProject = project1 };
+            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive_bl = true, Comments = "DummyComments2", AssignedToProject = project2 };
             var dbEntries = (new List<PersonLogEntry> { dbEntry1, dbEntry2 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
@@ -115,9 +115,9 @@ namespace SDDB.UnitTests
             var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive = false,  AssignedToProject = project1 };
-            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive = true, AssignedToProject = project1 };
-            var dbEntry3 = new PersonLogEntry { Id = "dummyEntryId3", LogEntryDateTime = new DateTime(2000,1,3),  IsActive = true, AssignedToProject = project1 };
+            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive_bl = false,  AssignedToProject = project1 };
+            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive_bl = true, AssignedToProject = project1 };
+            var dbEntry3 = new PersonLogEntry { Id = "dummyEntryId3", LogEntryDateTime = new DateTime(2000,1,3),  IsActive_bl = true, AssignedToProject = project1 };
             var dbEntries = (new List<PersonLogEntry> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
@@ -156,9 +156,9 @@ namespace SDDB.UnitTests
             var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive = false, AssignedToProject = project1 };
-            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive = true, AssignedToProject = project1 };
-            var dbEntry3 = new PersonLogEntry { Id = "dummyEntryId3", LogEntryDateTime = new DateTime(2000,1,3),  IsActive = false, AssignedToProject = project1 };
+            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive_bl = false, AssignedToProject = project1 };
+            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive_bl = true, AssignedToProject = project1 };
+            var dbEntry3 = new PersonLogEntry { Id = "dummyEntryId3", LogEntryDateTime = new DateTime(2000,1,3),  IsActive_bl = false, AssignedToProject = project1 };
             var dbEntries = (new List<PersonLogEntry> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
@@ -197,11 +197,11 @@ namespace SDDB.UnitTests
             var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive = true, Comments="DummyComments1",
+            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive_bl = true, Comments="DummyComments1",
                 AssignedToProject = project1, EnteredByPerson = projectPerson1 };
-            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive = true, Comments = "DummyComments2",
+            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive_bl = true, Comments = "DummyComments2",
                 AssignedToProject = project1, EnteredByPerson = projectPerson1  };
-            var dbEntry3 = new PersonLogEntry { Id = "dummyEntryId3", LogEntryDateTime = new DateTime(2000,1,3), IsActive = false, Comments = "DummyComments3", 
+            var dbEntry3 = new PersonLogEntry { Id = "dummyEntryId3", LogEntryDateTime = new DateTime(2000,1,3), IsActive_bl = false, Comments = "DummyComments3", 
                 AssignedToProject = project1, EnteredByPerson = projectPerson1  };
             var dbEntries = (new List<PersonLogEntry> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -239,11 +239,11 @@ namespace SDDB.UnitTests
             var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive = true, Comments="DummyComments1",
+            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive_bl = true, Comments="DummyComments1",
                 AssignedToProject = project1, EnteredByPerson = projectPerson1 };
-            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive = true, Comments="DummyComments2",
+            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive_bl = true, Comments="DummyComments2",
                 AssignedToProject = project1, EnteredByPerson = projectPerson1 };
-            var dbEntry3 = new PersonLogEntry { Id = "dummyEntryId3", LogEntryDateTime = new DateTime(2000,1,3),  IsActive = false,  Comments="DummyComments3",
+            var dbEntry3 = new PersonLogEntry { Id = "dummyEntryId3", LogEntryDateTime = new DateTime(2000,1,3),  IsActive_bl = false,  Comments="DummyComments3",
                 AssignedToProject = project1, EnteredByPerson = projectPerson1 };
             var dbEntries = (new List<PersonLogEntry> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -281,11 +281,11 @@ namespace SDDB.UnitTests
             var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive = true, Comments="DummyComments1",
+            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive_bl = true, Comments="DummyComments1",
                 AssignedToProject = project1, EnteredByPerson = projectPerson1 };
-            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive = true, Comments="DummyComments2",
+            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive_bl = true, Comments="DummyComments2",
                 AssignedToProject = project1, EnteredByPerson = projectPerson1 };
-            var dbEntry3 = new PersonLogEntry { Id = "dummyEntryId3", LogEntryDateTime = new DateTime(2000,1,3),  IsActive = false, Comments="DummyComments3",
+            var dbEntry3 = new PersonLogEntry { Id = "dummyEntryId3", LogEntryDateTime = new DateTime(2000,1,3),  IsActive_bl = false, Comments="DummyComments3",
                 AssignedToProject = project1, EnteredByPerson = projectPerson1 };
             var dbEntries = (new List<PersonLogEntry> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -347,7 +347,7 @@ namespace SDDB.UnitTests
 
             var initialId = "dummyEntryId1";
             var prsLogEntry1 = new PersonLogEntry { Id = initialId, LogEntryDateTime = new DateTime(2000,1,1), 
-                AssignedToProject_Id = "DummyProjectId", AssignedToProjectEvent_Id = "DummyProjEntryID", IsActive = false,  };
+                AssignedToProject_Id = "DummyProjectId", AssignedToProjectEvent_Id = "DummyProjEntryID", IsActive_bl = false,  };
             var prsLogEntrys = new PersonLogEntry[] { prsLogEntry1 };
 
             var projEventDbEntry = new ProjectEvent { Id = "DummyProjEntryID", AssignedToProject_Id = "DummyProjectId" };
@@ -385,9 +385,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var prsLogEntry1 = new PersonLogEntry { Id = "dummyPersonLogEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive = false, 
+            var prsLogEntry1 = new PersonLogEntry { Id = "dummyPersonLogEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive_bl = false, 
                 AssignedToProject_Id = "DummyProjectId", AssignedToProjectEvent_Id = "DummyProjEntryID", ModifiedProperties = new string[] { "LogEntryDateTime" }};
-            var prsLogEntry2 = new PersonLogEntry { Id = "dummyPersonLogEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive = true,
+            var prsLogEntry2 = new PersonLogEntry { Id = "dummyPersonLogEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive_bl = true,
                 AssignedToProject_Id = "DummyProjectId", AssignedToProjectEvent_Id = "DummyProjEntryID"};
             var prsLogEntrys = new PersonLogEntry[] { prsLogEntry1, prsLogEntry2 };
 
@@ -395,8 +395,8 @@ namespace SDDB.UnitTests
 
             var locDbEntry = new Location { Id = "DummyLocId", AssignedToProject_Id = "DummyProjectId" };
 
-            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2001, 1, 1), IsActive = true };
-            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2001, 1, 2), IsActive = false };
+            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2001, 1, 1), IsActive_bl = true };
+            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2001, 1, 2), IsActive_bl = false };
 
             mockEfDbContext.Setup(x => x.PersonLogEntrys.FindAsync(prsLogEntry1.Id)).Returns(Task.FromResult(dbEntry1));
             mockEfDbContext.Setup(x => x.PersonLogEntrys.FindAsync(prsLogEntry2.Id)).Returns(Task.FromResult(dbEntry2));
@@ -413,9 +413,9 @@ namespace SDDB.UnitTests
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
             Assert.IsTrue(prsLogEntry1.LogEntryDateTime == dbEntry1.LogEntryDateTime); Assert.IsTrue(prsLogEntry1.LogEntryDateTime == dbEntry1.LogEntryDateTime);
-            Assert.IsTrue(prsLogEntry1.IsActive != dbEntry1.IsActive);
+            Assert.IsTrue(prsLogEntry1.IsActive_bl != dbEntry1.IsActive_bl);
             Assert.IsTrue(prsLogEntry2.LogEntryDateTime != dbEntry2.LogEntryDateTime); Assert.IsTrue(prsLogEntry2.LogEntryDateTime != dbEntry2.LogEntryDateTime);
-            Assert.IsTrue(prsLogEntry2.IsActive != dbEntry2.IsActive);
+            Assert.IsTrue(prsLogEntry2.IsActive_bl != dbEntry2.IsActive_bl);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.PersonLogEntrys.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -433,9 +433,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var prsLogEntry1 = new PersonLogEntry { Id = "dummyPersonLogEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive = false, 
+            var prsLogEntry1 = new PersonLogEntry { Id = "dummyPersonLogEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive_bl = false, 
                 AssignedToProject_Id = "DummyProjectId", AssignedToProjectEvent_Id = "DummyProjEntryID", ModifiedProperties = new[] { "LogEntryDateTime" }};
-            var prsLogEntry2 = new PersonLogEntry { Id = "dummyPersonLogEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive = true,
+            var prsLogEntry2 = new PersonLogEntry { Id = "dummyPersonLogEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive_bl = true,
                 AssignedToProject_Id = "DummyProjectId2", AssignedToProjectEvent_Id = "DummyProjEntryID", 
                 ModifiedProperties = new[] { "LogEntryDateTime","AssignedToProjectEvent_Id" }};
             var prsLogEntrys = new PersonLogEntry[] { prsLogEntry1, prsLogEntry2 };
@@ -444,8 +444,8 @@ namespace SDDB.UnitTests
 
             var locDbEntry = new Location { Id = "DummyLocId", AssignedToProject_Id = "DummyProjectId" };
 
-            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2001, 1, 1), IsActive = true };
-            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2001, 1, 2), IsActive = false };
+            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2001, 1, 1), IsActive_bl = true };
+            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2001, 1, 2), IsActive_bl = false };
 
             mockEfDbContext.Setup(x => x.PersonLogEntrys.FindAsync(prsLogEntry1.Id)).Returns(Task.FromResult(dbEntry1));
             mockEfDbContext.Setup(x => x.PersonLogEntrys.FindAsync(prsLogEntry2.Id)).Returns(Task.FromResult(dbEntry2));
@@ -464,9 +464,9 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Log Entry and Project Event do not belong to the same project. Entry not saved."));
             Assert.IsTrue(prsLogEntry1.LogEntryDateTime == dbEntry1.LogEntryDateTime); Assert.IsTrue(prsLogEntry1.LogEntryDateTime == dbEntry1.LogEntryDateTime);
-            Assert.IsTrue(prsLogEntry1.IsActive != dbEntry1.IsActive);
+            Assert.IsTrue(prsLogEntry1.IsActive_bl != dbEntry1.IsActive_bl);
             Assert.IsTrue(prsLogEntry2.LogEntryDateTime != dbEntry2.LogEntryDateTime); Assert.IsTrue(prsLogEntry2.LogEntryDateTime != dbEntry2.LogEntryDateTime);
-            Assert.IsTrue(prsLogEntry2.IsActive != dbEntry2.IsActive);
+            Assert.IsTrue(prsLogEntry2.IsActive_bl != dbEntry2.IsActive_bl);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.PersonLogEntrys.FindAsync(It.IsAny<string>()), Times.Once);
@@ -484,9 +484,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var prsLogEntry1 = new PersonLogEntry { Id = "dummyPersonLogEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive = false, 
+            var prsLogEntry1 = new PersonLogEntry { Id = "dummyPersonLogEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive_bl = false, 
                 AssignedToProject_Id = "DummyProjectId", AssignedToProjectEvent_Id = "DummyProjEntryID", ModifiedProperties = new[] { "LogEntryDateTime" }};
-            var prsLogEntry2 = new PersonLogEntry { Id = "dummyPersonLogEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive = true,
+            var prsLogEntry2 = new PersonLogEntry { Id = "dummyPersonLogEntryId2", LogEntryDateTime = new DateTime(2000,1,2), IsActive_bl = true,
                 AssignedToProject_Id = "DummyProjectId", AssignedToProjectEvent_Id = "DummyProjEntryID", AssignedToLocation_Id = "DummyLocId", 
                 ModifiedProperties = new[] { "LogEntryDateTime","AssignedToProjectEvent_Id","AssignedToLocation_Id" }};
             var prsLogEntrys = new PersonLogEntry[] { prsLogEntry1, prsLogEntry2 };
@@ -495,8 +495,8 @@ namespace SDDB.UnitTests
 
             var locDbEntry = new Location { Id = "DummyLocId", AssignedToProject_Id = "DummyProjectId2" };
 
-            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2001, 1, 1), IsActive = true };
-            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2001, 1, 2), IsActive = false };
+            var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2001, 1, 1), IsActive_bl = true };
+            var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2001, 1, 2), IsActive_bl = false };
 
             mockEfDbContext.Setup(x => x.PersonLogEntrys.FindAsync(prsLogEntry1.Id)).Returns(Task.FromResult(dbEntry1));
             mockEfDbContext.Setup(x => x.PersonLogEntrys.FindAsync(prsLogEntry2.Id)).Returns(Task.FromResult(dbEntry2));
@@ -515,9 +515,9 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Log Entry and Location do not belong to the same project. Entry not saved."));
             Assert.IsTrue(prsLogEntry1.LogEntryDateTime == dbEntry1.LogEntryDateTime); Assert.IsTrue(prsLogEntry1.LogEntryDateTime == dbEntry1.LogEntryDateTime);
-            Assert.IsTrue(prsLogEntry1.IsActive != dbEntry1.IsActive);
+            Assert.IsTrue(prsLogEntry1.IsActive_bl != dbEntry1.IsActive_bl);
             Assert.IsTrue(prsLogEntry2.LogEntryDateTime != dbEntry2.LogEntryDateTime); Assert.IsTrue(prsLogEntry2.LogEntryDateTime != dbEntry2.LogEntryDateTime);
-            Assert.IsTrue(prsLogEntry2.IsActive != dbEntry2.IsActive);
+            Assert.IsTrue(prsLogEntry2.IsActive_bl != dbEntry2.IsActive_bl);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.PersonLogEntrys.FindAsync(It.IsAny<string>()), Times.Once);
@@ -537,7 +537,7 @@ namespace SDDB.UnitTests
 
             var initialId = "dummyEntryId1";
             var prsLogEntry1 = new PersonLogEntry { Id = initialId, LogEntryDateTime = new DateTime(2000,1,1), 
-                AssignedToProject_Id = "DummyProjectId", AssignedToProjectEvent_Id = "DummyProjEntryID", IsActive = false,  };
+                AssignedToProject_Id = "DummyProjectId", AssignedToProjectEvent_Id = "DummyProjEntryID", IsActive_bl = false,  };
             var prsLogEntrys = new PersonLogEntry[] { prsLogEntry1 };
 
             var projEventDbEntry = new ProjectEvent { Id = "DummyProjEntryID", AssignedToProject_Id = "DummyProjectId" };
@@ -577,7 +577,7 @@ namespace SDDB.UnitTests
 
             var prsLogEntryIds = new string[] { "dummyId1", "DummyId2" };
 
-            var dbEntry = new PersonLogEntry { IsActive = true };
+            var dbEntry = new PersonLogEntry { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.PersonLogEntrys.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
             mockEfDbContext.Setup(x => x.PersonLogEntrys.FindAsync("dummyId2")).Returns(Task.FromResult<PersonLogEntry>(null));
 
@@ -592,7 +592,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Record with Id=DummyId2 not found\n"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.PersonLogEntrys.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -611,7 +611,7 @@ namespace SDDB.UnitTests
 
             var prsLogEntryIds = new string[] { "dummyId1" };
 
-            var dbEntry = new PersonLogEntry { IsActive = true };
+            var dbEntry = new PersonLogEntry { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.PersonLogEntrys.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
 
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
@@ -625,7 +625,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.PersonLogEntrys.FindAsync(It.IsAny<string>()), Times.Once);
@@ -645,7 +645,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1), IsActive = false, ManHours = 10 };
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1), IsActive_bl = false, ManHours = 10 };
             var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
             mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
@@ -698,7 +698,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10 };
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive_bl = false, ManHours = 10 };
             var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
             mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
@@ -751,7 +751,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10 };
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive_bl = false, ManHours = 10 };
             var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
             mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
@@ -804,7 +804,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10 };
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive_bl = false, ManHours = 10 };
             var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
             mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
@@ -857,7 +857,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10 };
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive_bl = false, ManHours = 10 };
             var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
             mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
@@ -924,7 +924,7 @@ namespace SDDB.UnitTests
 
             var assyIds = new string[] { "AssemblyDbId1" };
 
-            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10,
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive_bl = false, ManHours = 10,
             PrsLogEntryAssemblyDbs = new List<AssemblyDb> {assyDbEntry1} };
             var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
@@ -979,7 +979,7 @@ namespace SDDB.UnitTests
 
             var assyIds = new string[] { "AssemblyDbId1" };
 
-            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10,
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive_bl = false, ManHours = 10,
                 PrsLogEntryAssemblyDbs = new List<AssemblyDb> { assyDbEntry1 } };
             var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
@@ -1035,7 +1035,7 @@ namespace SDDB.UnitTests
             var assyIds = new string[] { "AssemblyDbId1" };
 
             var prsLogDbEntry1 = new PersonLogEntry
-            { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10 };
+            { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive_bl = false, ManHours = 10 };
             var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
             mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
@@ -1091,7 +1091,7 @@ namespace SDDB.UnitTests
             var assyIds = new string[] { "AssemblyDbId1" };
 
             var prsLogDbEntry1 = new PersonLogEntry
-            { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10,
+            { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive_bl = false, ManHours = 10,
                 PrsLogEntryAssemblyDbs = new List<AssemblyDb> { assyDbEntry1 } };
             var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
@@ -1137,7 +1137,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10 };
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive_bl = false, ManHours = 10 };
             var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
             mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
@@ -1190,7 +1190,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10 };
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive_bl = false, ManHours = 10 };
             var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
             mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
@@ -1243,7 +1243,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10 };
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive_bl = false, ManHours = 10 };
             var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
             mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
@@ -1296,7 +1296,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10 };
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive_bl = false, ManHours = 10 };
             var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
             mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
@@ -1349,7 +1349,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10 };
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive_bl = false, ManHours = 10 };
             var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
             mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
@@ -1420,7 +1420,7 @@ namespace SDDB.UnitTests
             {
                 Id = "dummyEntryId1",
                 LogEntryDateTime = new DateTime(2000, 1, 1),
-                IsActive = false,
+                IsActive_bl = false,
                 ManHours = 10,
                 PrsLogEntryPersons = new List<Person> { personDbEntry1 }
             };
@@ -1481,7 +1481,7 @@ namespace SDDB.UnitTests
             {
                 Id = "dummyEntryId1",
                 LogEntryDateTime = new DateTime(2000, 1, 1),
-                IsActive = false,
+                IsActive_bl = false,
                 ManHours = 10,
                 PrsLogEntryPersons = new List<Person> { personDbEntry1 }
             };
@@ -1538,7 +1538,7 @@ namespace SDDB.UnitTests
 
             var personIds = new string[] { "PersonId1" };
 
-            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive = false, ManHours = 10 };
+            var prsLogDbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000, 1, 1), IsActive_bl = false, ManHours = 10 };
             var prsLogDbEntries = (new List<PersonLogEntry> { prsLogDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
             mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(prsLogDbEntries.GetEnumerator()));
@@ -1597,7 +1597,7 @@ namespace SDDB.UnitTests
             {
                 Id = "dummyEntryId1",
                 LogEntryDateTime = new DateTime(2000, 1, 1),
-                IsActive = false,
+                IsActive_bl = false,
                 ManHours = 10,
                 PrsLogEntryPersons = new List<Person> { personDbEntry1 }
             };

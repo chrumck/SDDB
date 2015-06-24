@@ -2,10 +2,19 @@
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
-/// <reference path="../jquery-2.1.3.js" />
-/// <reference path="../jquery-2.1.3.intellisense.js" />
+/// <reference path="../jquery-2.1.4.js" />
+/// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
+
+//--------------------------------------Global Properties------------------------------------//
+
+var TableMain = {};
+var TableGroupManagersAdd = {};
+var TableGroupManagersRemove = {};
+var IsCreate = false;
+var MagicSuggests = [];
+var CurrRecord = {};
 
 $(document).ready(function () {
 
@@ -14,7 +23,7 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreate("EditForm", MagicSuggests, "Create Person Group", "MainView");
+        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create Person Group", "MainView");
     });
 
     //Wire up BtnEdit
@@ -50,7 +59,6 @@ $(document).ready(function () {
 
     //TableMain PersonGroups
     TableMain = $("#TableMain").DataTable({
-        ajax: { url: "/PersonGroupSrv/Get?getActive=" + (($("#ChBoxShowDeleted").prop("checked")) ? false : true) },
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "PrsGroupName", name: "PrsGroupName" },//1
@@ -167,15 +175,13 @@ $(document).ready(function () {
     });
 
 
-});
-//--------------------------------------Global Properties------------------------------------//
+    //--------------------------------------View Initialization------------------------------------//
 
-var TableMain = {};
-var TableGroupManagersAdd = {};
-var TableGroupManagersRemove = {};
-var IsCreate = false;
-var MagicSuggests = [];
-var CurrRecord = {};
+    RefreshTable(TableMain, "/PersonGroupSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
+
+
+    //--------------------------------End of execution at Start-----------
+});
 
 
 //--------------------------------------Main Methods---------------------------------------//
@@ -310,8 +316,8 @@ function FillGroupManagersForEdit(noOfRows) {
             )
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function (done1, done2) {
-                TableGroupManagersAdd.clear().search(""); TableGroupManagersAdd.rows.add(done1[0].data).order([1, 'asc']).draw();
-                TableGroupManagersRemove.clear().search(""); TableGroupManagersRemove.rows.add(done2[0].data).order([1, 'asc']).draw();
+                TableGroupManagersAdd.clear().search(""); TableGroupManagersAdd.rows.add(done1[0]).order([1, 'asc']).draw();
+                TableGroupManagersRemove.clear().search(""); TableGroupManagersRemove.rows.add(done2[0]).order([1, 'asc']).draw();
                 $("#MainView").addClass("hide");
                 $("#GroupManagersView").removeClass("hide");
             })
@@ -326,8 +332,8 @@ function FillGroupManagersForEdit(noOfRows) {
         })
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function (data) {
-                TableGroupManagersAdd.clear().search(""); TableGroupManagersAdd.rows.add(data.data).order([1, 'asc']).draw();
-                TableGroupManagersRemove.clear().search(""); TableGroupManagersRemove.rows.add(data.data).order([1, 'asc']).draw();
+                TableGroupManagersAdd.clear().search(""); TableGroupManagersAdd.rows.add(data).order([1, 'asc']).draw();
+                TableGroupManagersRemove.clear().search(""); TableGroupManagersRemove.rows.add(data).order([1, 'asc']).draw();
                 $("#MainView").addClass("hide");
                 $("#GroupManagersView").removeClass("hide");
             })

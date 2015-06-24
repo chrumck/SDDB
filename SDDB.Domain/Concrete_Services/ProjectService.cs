@@ -65,6 +65,8 @@ namespace SDDB.Domain.Services
         //get by ids
         public virtual async Task<List<Project>> GetAsync(string[] ids, bool getActive = true)
         {
+            if (ids == null || ids.Length == 0) throw new ArgumentNullException("ids");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -92,6 +94,8 @@ namespace SDDB.Domain.Services
         //lookup by query - returns only projects the person is assigned to
         public virtual Task<List<Project>> LookupAsync(string userId, string query = "", bool getActive = true)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();

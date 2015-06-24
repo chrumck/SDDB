@@ -133,7 +133,7 @@ function ShowModalAJAXFail(xhr, status, error) {
     $("#ModalInfo").modal("show");
 }
 
-//Refresh main table from AJAX
+//Refresh  table from AJAX
 function RefreshTable(table, url, getActive, httpType, projectIds, modelIds, typeIds,
     locIds, assyIds, personIds, startDate, endDate) {
 
@@ -160,17 +160,17 @@ function RefreshTable(table, url, getActive, httpType, projectIds, modelIds, typ
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
-            table.rows.add(data.data).order([1, 'asc']).draw();
+            table.rows.add(data).order([1, 'asc']).draw();
         })
         .fail(function (xhr, status, error) {
             ShowModalAJAXFail(xhr, status, error);
         });
 }
 
-//Refresh main table from AJAX - generic version
+//Refresh  table from AJAX - generic version
 function RefreshTableGeneric(table, url, data, httpType) {
 
-    var deferred0 = $.Deferred(); return deferred0.promise();
+    var deferred0 = $.Deferred(); 
 
     httpType = (typeof httpType !== "undefined") ? httpType : "GET";
     data = (typeof data !== "undefined") ? data : {};
@@ -183,6 +183,39 @@ function RefreshTableGeneric(table, url, data, httpType) {
             deferred0.resolve();
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
+
+    return deferred0.promise();
+}
+
+//Refresh  table from AJAX - generic version - showing wait dialogs
+function RefreshTblGenWait(table, url, data, httpType) {
+
+    var deferred0 = $.Deferred();
+
+    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+
+    RefreshTableGeneric(table, url, data, httpType)
+        .always(function () { $("#ModalWait").modal("hide"); })
+        .done(function () { deferred0.resolve(); })
+        .fail(function (xhr, status, error) {
+            ShowModalAJAXFail(xhr, status, error);
+            deferred0.reject(xhr, status, error);
+        });
+
+    return deferred0.promise();
+}
+
+//checking if form is valid
+function FormIsValid(id, isCreate) {
+    if ($("#" + id).valid()) return true;
+    else if (isCreate) return false;
+    else {
+        var isValid = true;
+        $("#" + id + " input").each(function (index) {
+            if ($(this).data("ismodified") && $(this).hasClass("input-validation-error")) isValid = false;
+        });
+        return isValid;
+    }
 }
 
 //Clear inputs from forms and reset .ismodified to false
@@ -198,17 +231,17 @@ function ClearFormInputs(formId, msArray) {
     }
 }
 
-//checking if form is valid
-function FormIsValid(id, isCreate) {
-    if ($("#" + id).valid()) return true;
-    else if (isCreate) return false;
-    else {
-        var isValid = true;
-        $("#" + id + " input").each(function (index) {
-            if ($(this).data("ismodified") && $(this).hasClass("input-validation-error")) isValid = false;
-        });
-        return isValid;
-    }
+//Prepare Form For Create
+function FillFormForCreateGeneric(formId, msArray, labelText, mainViewId) {
+
+    ClearFormInputs(formId, msArray);
+    $("#" + formId + "Label").text(labelText);
+    $("#" + formId + " [data-val-dbisunique]").prop("disabled", false); DisableUniqueMs(msArray, false);
+    $("#" + formId + " .modifiable").data("ismodified", true); SetMsAsModified(msArray, true);
+    $("#" + formId + "GroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true)
+    $("#" + formId + "CreateMultiple").removeClass("hide");
+    $("#" + mainViewId).addClass("hide");
+    $("#" + formId + "View").removeClass("hide");
 }
 
 //FillFormForEdit Generic version
@@ -239,9 +272,12 @@ function FillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
                                 formInput[property] = "_VARIES_"; formInput[property.slice(0, -2)] = "_VARIES_";
                             }
                             else {
+                                formInput[property.slice(0, -2)] = "";
                                 for (var subProp in dbEntry[property.slice(0, -2)]) {
-                                    if (typeof formInput[property.slice(0, -2)] !== "undefined") formInput[property.slice(0, -2)] += " ";
-                                    formInput[property.slice(0, -2)] += dbEntry[property.slice(0, -2)][subProp];
+                                    if (dbEntry[property.slice(0, -2)][subProp] != null) {
+                                        if (formInput[property.slice(0, -2)] != "") formInput[property.slice(0, -2)] += " ";
+                                        formInput[property.slice(0, -2)] += dbEntry[property.slice(0, -2)][subProp];
+                                    }
                                 }
                             }
                         }
@@ -255,15 +291,14 @@ function FillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
             for (var property in formInput) {
                 if (formInput.hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
                     if (property.slice(-3) == "_Id") {
-                        for (var ms in msArray) {
+                        $.each(msArray, function (i, ms) {
                             if (ms.id == property) {
-                                if (FormInput[property] != null) ms.addToSelection([{ id: FormInput[property], name: FormInput[property.slice(-2)] }], true);
+                                if (formInput[property] != null) ms.addToSelection([{ id: formInput[property], name: formInput[property.slice(0,-2)] }], true);
                             }
-                        }
-
+                        });
                     }
-                    else if (property.slice(-5) == "_bool") {
-                        if (FormInput[property] == true) $("#" + property.slice(-5)).prop("checked", true);
+                    else if (property.slice(-3) == "_bl") {
+                        if (formInput[property] == true) $("#" + property).prop("checked", true);
                     }
                     else {
                         $("#" + property).val(formInput[property]);
@@ -311,15 +346,16 @@ function SubmitEditsGeneric(ids, formId, msArray, currRecord, httpType, url) {
         for (var property in currRecord) {
             if (currRecord.hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
                 if (property.slice(-3) == "_Id") {
-                    for (var ms in msArray) {
+                    $.each(msArray, function (i, ms) {
                         if (ms.id == property) {
-                            editRecord[property] = (ms.isModified && ms.getSelection().length != 0) ? (ms.getSelection())[0].id : currRecord[property];
+                            editRecord[property] = (ms.isModified && ms.getSelection().length != 0) ?
+                                (ms.getSelection())[0].id : currRecord[property];
                         }
-                    }
+                    });
                 }
-                else if (property.slice(-5) == "_bool") {
+                else if (property.slice(-3) == "_bl") {
                     editRecord[property] = ($.inArray(property, modifiedProperties) != -1) ?
-                        (($("#" + property.slice(-5)).prop("checked")) ? true : false) : currRecord[property];
+                        $("#" + property).prop("checked") : currRecord[property];
                 }
                 else {
                     editRecord[property] = ($.inArray(property, modifiedProperties) != -1) ?
@@ -342,9 +378,11 @@ function SubmitEditsGeneric(ids, formId, msArray, currRecord, httpType, url) {
 
 //Fill Form for Edit from n:n related table - generic version
 function FillFormForRelatedGeneric(tableAdd, tableRemove, ids,
-    httpType, url, data, httpTypeNot, urlNot, dataNot, httpTypeAll, urlAll, dataNot) {
+    httpType, url, data, httpTypeNot, urlNot, dataNot, httpTypeMany, urlMany, dataMany) {
 
     var deferred0 = $.Deferred();
+
+    tableAdd.clear().search(""); tableRemove.clear().search("");
 
     if (ids.length == 1) {
         $.when(
@@ -352,18 +390,17 @@ function FillFormForRelatedGeneric(tableAdd, tableRemove, ids,
             $.ajax({type: httpType, url: url, timeout: 20000, data: data, dataType: "json" })
         )
         .done(function (done1, done2) {
-            tableAdd.clear().search(""); tableAdd.rows.add(done1[0].data).order([1, 'asc']).draw();
-            tableRemove.clear().search(""); tableRemove.rows.add(done2[0].data).order([1, 'asc']).draw();
+            tableAdd.rows.add(done1[0]).order([1, 'asc']).draw();
+            tableRemove.rows.add(done2[0]).order([1, 'asc']).draw();
             deferred0.resolve();
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
     }
     else {
-        $.ajax({ type: httpTypeAll, url: urlAll, timeout: 20000, data: dataNot, dataType: "json" })
+        $.ajax({ type: httpTypeMany, url: urlMany, timeout: 20000, data: dataMany, dataType: "json" })
             .done(function (data) {
-                tableAdd.clear().search(""); tableAdd.rows.add(data).order([1, 'asc']).draw();
-                if (ids.length == 0) { tableRemove.clear().search(""); tableRemove.rows.add(data).order([1, 'asc']).draw(); }
-                else tableRemove.clear().search("");
+                tableAdd.rows.add(data).order([1, 'asc']).draw();
+                if (ids.length != 0) tableRemove.rows.add(data).order([1, 'asc']).draw();
                 deferred0.resolve();
             })
             .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
@@ -483,17 +520,3 @@ function SetMsAsModified(msArray, isModified) {
     $.each(msArray, function (i, ms) { ms.isModified = isModified; });
 }
 
-//Prepare Form For Create
-function FillFormForCreate(formId, msArray, labelText, mainViewId) {
-
-    setSelect = (typeof setSelect !== "undefined" && setSelect == true) ? true : false;
-    
-    ClearFormInputs(formId, msArray);
-    $("#" + formId + "Label").text(labelText);
-    $("#" + formId + " [data-val-dbisunique]").prop("disabled", false); DisableUniqueMs(msArray, false);
-    $("#" + formId + " .modifiable").data("ismodified", true); SetMsAsModified(msArray, true);
-    $("#" + formId + "GroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true)
-    $("#" + formId + "CreateMultiple").removeClass("hide");
-    $("#" + mainViewId).addClass("hide");
-    $("#" + formId + "View").removeClass("hide");
-}

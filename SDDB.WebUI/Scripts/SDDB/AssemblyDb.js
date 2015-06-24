@@ -23,7 +23,7 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreate("EditForm", MagicSuggests, "Create Assembly", "MainView");
+        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create Assembly", "MainView");
     });
 
     //Wire up BtnEdit

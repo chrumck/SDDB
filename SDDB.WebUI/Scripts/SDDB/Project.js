@@ -22,7 +22,7 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreate("EditForm", MagicSuggests, "Create Project", "MainView");
+        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create Project", "MainView");
     });
 
     //Wire up BtnEdit
@@ -59,7 +59,6 @@ $(document).ready(function () {
 
     //TableMain Projects
     TableMain = $("#TableMain").DataTable({
-        ajax: { url: "/ProjectSrv/Get?getActive=" + (($("#ChBoxShowDeleted").prop("checked")) ? false : true) },
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "ProjectName", name: "ProjectName" },//1
@@ -112,6 +111,10 @@ $(document).ready(function () {
         MsValidate(MagicSuggests);
         if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
     });
+
+    //--------------------------------------View Initialization------------------------------------//
+
+    RefreshTable(TableMain, "/ProjectSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
 
 
     //--------------------------------End of execution at Start-----------

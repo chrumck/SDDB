@@ -31,17 +31,19 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var data = (await prsLogEntryService.GetAsync(UserId, getActive).ConfigureAwait(false)).Select(x => new {
                 x.Id, x.LogEntryDateTime,
-                EnteredByPerson = new { x.EnteredByPerson.LastName, x.EnteredByPerson.FirstName, x.EnteredByPerson.Initials },
-                x.PersonActivityType.ActivityTypeName, x.ManHours, 
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                AssignedToLocation = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName },
-                x.AssignedToProjectEvent.EventName, x.Comments, x.IsActive,
-                x.EnteredByPerson_Id ,x.PersonActivityType_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id, x.AssignedToProjectEvent_Id,
+                EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
+                PersonActivityType_ = new { x.PersonActivityType.ActivityTypeName },
+                x.ManHours, 
+                AssignedToProject_ = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
+                AssignedToLocation_ = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName },
+                AssignedToProjectEvent_ = new { x.AssignedToProjectEvent.EventName },  
+                x.Comments, x.IsActive_bl,
+                x.EnteredByPerson_Id ,x.PersonActivityType_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id, x.AssignedToProjectEvent_Id
             });
 
             ViewBag.ServiceName = "PersonLogEntryService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return new DBJsonDateTimeISO { Data = new { data }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
         
         // GET: /PersonLogEntrySrv/GetByIds
@@ -51,12 +53,14 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var data = (await prsLogEntryService.GetAsync(UserId, ids, getActive).ConfigureAwait(false)).Select(x => new {
                 x.Id, x.LogEntryDateTime,
-                EnteredByPerson = new { x.EnteredByPerson.LastName, x.EnteredByPerson.FirstName, x.EnteredByPerson.Initials },
-                x.PersonActivityType.ActivityTypeName, x.ManHours, 
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                AssignedToLocation = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName },
-                x.AssignedToProjectEvent.EventName, x.Comments, x.IsActive,
-                x.EnteredByPerson_Id ,x.PersonActivityType_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id, x.AssignedToProjectEvent_Id,
+                EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
+                PersonActivityType_ = new { x.PersonActivityType.ActivityTypeName },
+                x.ManHours, 
+                AssignedToProject_ = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
+                AssignedToLocation_ = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName },
+                AssignedToProjectEvent_ = new { x.AssignedToProjectEvent.EventName },  
+                x.Comments, x.IsActive_bl,
+                x.EnteredByPerson_Id ,x.PersonActivityType_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id, x.AssignedToProjectEvent_Id
             });
 
             ViewBag.ServiceName = "PersonLogEntryService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
@@ -73,17 +77,19 @@ namespace SDDB.WebUI.ControllersSrv
             var data = (await prsLogEntryService.GetByFiltersAsync(UserId, personIds, projectIds, typeIds, startDate, endDate, getActive)
                 .ConfigureAwait(false)).Select(x => new {
                 x.Id, x.LogEntryDateTime,
-                EnteredByPerson = new { x.EnteredByPerson.LastName, x.EnteredByPerson.FirstName, x.EnteredByPerson.Initials },
-                x.PersonActivityType.ActivityTypeName, x.ManHours, 
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                AssignedToLocation = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName },
-                x.AssignedToProjectEvent.EventName, x.Comments, x.IsActive,
-                x.EnteredByPerson_Id ,x.PersonActivityType_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id, x.AssignedToProjectEvent_Id,
+                EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
+                PersonActivityType_ = new { x.PersonActivityType.ActivityTypeName },
+                x.ManHours, 
+                AssignedToProject_ = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
+                AssignedToLocation_ = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName },
+                AssignedToProjectEvent_ = new { x.AssignedToProjectEvent.EventName },  
+                x.Comments, x.IsActive_bl,
+                x.EnteredByPerson_Id ,x.PersonActivityType_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id, x.AssignedToProjectEvent_Id
             });
 
             ViewBag.ServiceName = "PersonLogEntryService.GetByFiltersAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return new DBJsonDateTimeISO { Data = new { data }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
 
@@ -173,7 +179,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryAssysAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonLogEntrySrv/GetPrsLogEntryAssysNot
@@ -185,7 +191,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryAssysNotAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /PersonLogEntrySrv/EditPrsLogEntryAssys
@@ -220,7 +226,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryPersonsAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonLogEntrySrv/GetPrsLogEntryPersonsNot
@@ -232,7 +238,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryPersonsNotAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(new { data }, JsonRequestBehavior.AllowGet);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /PersonLogEntrySrv/EditPrsLogEntryPersons

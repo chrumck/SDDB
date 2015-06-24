@@ -7,6 +7,18 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
+//--------------------------------------Global Properties------------------------------------//
+
+var TableMain = {};
+var TableProjectsAdd = {};
+var TableProjectsRemove = {};
+var TablePersonGroupsAdd = {};
+var TablePersonGroupsRemove = {};
+var IsCreate = false;
+var MagicSuggests = [];
+var CurrRecord = {};
+
+
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
@@ -14,7 +26,7 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreate("EditForm", MagicSuggests, "Create Person", "MainView");
+        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create Person", "MainView");
     });
 
     //Wire up BtnEdit
@@ -71,7 +83,6 @@ $(document).ready(function () {
 
     //TableMain Persons
     TableMain = $("#TableMain").DataTable({
-        ajax: { url: "/PersonSrv/Get?getActive=" + (($("#ChBoxShowDeleted").prop("checked")) ? false : true) },
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LastName", name: "LastName" },//1
@@ -264,18 +275,15 @@ $(document).ready(function () {
         },
         pageLength: 100
     });
-});
-      
-//--------------------------------------Global Properties------------------------------------//
 
-var TableMain = {};
-var TableProjectsAdd = {};
-var TableProjectsRemove = {};
-var TablePersonGroupsAdd = {};
-var TablePersonGroupsRemove = {};
-var IsCreate = false;
-var MagicSuggests = [];
-var CurrRecord = {};
+
+    //--------------------------------------View Initialization------------------------------------//
+
+    RefreshTable(TableMain, "/PersonSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
+
+
+    //--------------------------------End of execution at Start-----------
+});
 
 
 //--------------------------------------Main Methods---------------------------------------//
@@ -450,8 +458,8 @@ function FillPrsProjForEdit(noOfRows) {
             )
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function (done1, done2) {
-                TableProjectsAdd.clear().search(""); TableProjectsAdd.rows.add(done1[0].data).order([1, 'asc']).draw();
-                TableProjectsRemove.clear().search(""); TableProjectsRemove.rows.add(done2[0].data).order([1, 'asc']).draw();
+                TableProjectsAdd.clear().search(""); TableProjectsAdd.rows.add(done1[0]).order([1, 'asc']).draw();
+                TableProjectsRemove.clear().search(""); TableProjectsRemove.rows.add(done2[0]).order([1, 'asc']).draw();
                 $("#MainView").addClass("hide");
                 $("#PrsProjView").removeClass("hide");
             })
@@ -466,8 +474,8 @@ function FillPrsProjForEdit(noOfRows) {
         })
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function (data) {
-                TableProjectsAdd.clear().search(""); TableProjectsAdd.rows.add(data.data).order([1, 'asc']).draw();
-                TableProjectsRemove.clear().search(""); TableProjectsRemove.rows.add(data.data).order([1, 'asc']).draw();
+                TableProjectsAdd.clear().search(""); TableProjectsAdd.rows.add(data).order([1, 'asc']).draw();
+                TableProjectsRemove.clear().search(""); TableProjectsRemove.rows.add(data).order([1, 'asc']).draw();
                 $("#MainView").addClass("hide");
                 $("#PrsProjView").removeClass("hide");
             })
@@ -533,8 +541,8 @@ function FillPersonGroupsForEdit(noOfRows) {
             )
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function (done1, done2) {
-                TablePersonGroupsAdd.clear().search(""); TablePersonGroupsAdd.rows.add(done1[0].data).order([1, 'asc']).draw();
-                TablePersonGroupsRemove.clear().search(""); TablePersonGroupsRemove.rows.add(done2[0].data).order([1, 'asc']).draw();
+                TablePersonGroupsAdd.clear().search(""); TablePersonGroupsAdd.rows.add(done1[0]).order([1, 'asc']).draw();
+                TablePersonGroupsRemove.clear().search(""); TablePersonGroupsRemove.rows.add(done2[0]).order([1, 'asc']).draw();
                 $("#MainView").addClass("hide");
                 $("#PersonGroupsView").removeClass("hide");
             })
@@ -549,8 +557,8 @@ function FillPersonGroupsForEdit(noOfRows) {
         })
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function (data) {
-                TablePersonGroupsAdd.clear().search(""); TablePersonGroupsAdd.rows.add(data.data).order([1, 'asc']).draw();
-                TablePersonGroupsRemove.clear().search(""); TablePersonGroupsRemove.rows.add(data.data).order([1, 'asc']).draw();
+                TablePersonGroupsAdd.clear().search(""); TablePersonGroupsAdd.rows.add(data).order([1, 'asc']).draw();
+                TablePersonGroupsRemove.clear().search(""); TablePersonGroupsRemove.rows.add(data).order([1, 'asc']).draw();
                 $("#MainView").addClass("hide");
                 $("#PersonGroupsView").removeClass("hide");
             })
