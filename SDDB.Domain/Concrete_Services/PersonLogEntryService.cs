@@ -342,7 +342,7 @@ namespace SDDB.Domain.Services
         }
 
         //Add (or Remove  when set isAdd to false) Assemblies to Person Log Entry
-        public virtual async Task<DBResult> EditPrsLogEntryAssysAsync(string[] logEntryIds, string[] assyIds, bool isAdd)
+        public virtual async Task<DBResult> EditPrsLogEntryAssysAsync(string[] ids, string[] idsAddRem, bool isAdd)
         {
             var errorMessage = ""; var serviceResult = new DBResult();
             using (var dbContextScope = contextScopeFac.Create())
@@ -350,10 +350,10 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    var logEntrys = await dbContext.PersonLogEntrys.Include(x => x.PrsLogEntryAssemblyDbs).Where(x => logEntryIds.Contains(x.Id))
+                    var logEntrys = await dbContext.PersonLogEntrys.Include(x => x.PrsLogEntryAssemblyDbs).Where(x => ids.Contains(x.Id))
                        .ToListAsync().ConfigureAwait(false);
 
-                    var assys = await dbContext.AssemblyDbs.Where(x => assyIds.Contains(x.Id)).ToListAsync().ConfigureAwait(false);
+                    var assys = await dbContext.AssemblyDbs.Where(x => idsAddRem.Contains(x.Id)).ToListAsync().ConfigureAwait(false);
 
                     foreach (var logEntry in logEntrys)
                     {
@@ -428,7 +428,7 @@ namespace SDDB.Domain.Services
         }
 
         //Add (or Remove  when set isAdd to false) Persons to Person Log Entry
-        public virtual async Task<DBResult> EditPrsLogEntryPersonsAsync(string[] logEntryIds, string[] personIds, bool isAdd)
+        public virtual async Task<DBResult> EditPrsLogEntryPersonsAsync(string[] ids, string[] idsAddRem, bool isAdd)
         {
             var errorMessage = ""; var serviceResult = new DBResult();
             using (var dbContextScope = contextScopeFac.Create())
@@ -436,10 +436,10 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    var logEntrys = await dbContext.PersonLogEntrys.Include(x => x.PrsLogEntryPersons).Where(x => logEntryIds.Contains(x.Id))
+                    var logEntrys = await dbContext.PersonLogEntrys.Include(x => x.PrsLogEntryPersons).Where(x => ids.Contains(x.Id))
                        .ToListAsync().ConfigureAwait(false);
 
-                    var persons = await dbContext.Persons.Where(x => personIds.Contains(x.Id)).ToListAsync().ConfigureAwait(false);
+                    var persons = await dbContext.Persons.Where(x => idsAddRem.Contains(x.Id)).ToListAsync().ConfigureAwait(false);
 
                     foreach (var logEntry in logEntrys)
                     {

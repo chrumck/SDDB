@@ -188,7 +188,7 @@ function RefreshTableGeneric(table, url, data, httpType) {
 }
 
 //Refresh  table from AJAX - generic version - showing wait dialogs
-function RefreshTblGenWait(table, url, data, httpType) {
+function RefreshTblGenWrp(table, url, data, httpType) {
 
     var deferred0 = $.Deferred();
 
@@ -293,7 +293,8 @@ function FillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
                     if (property.slice(-3) == "_Id") {
                         $.each(msArray, function (i, ms) {
                             if (ms.id == property) {
-                                if (formInput[property] != null) ms.addToSelection([{ id: formInput[property], name: formInput[property.slice(0,-2)] }], true);
+                                if (formInput[property] != null) ms.addToSelection([{ id: formInput[property], name: formInput[property.slice(0, -2)] }], true);
+                                return false;
                             }
                         });
                     }
@@ -350,6 +351,7 @@ function SubmitEditsGeneric(ids, formId, msArray, currRecord, httpType, url) {
                         if (ms.id == property) {
                             editRecord[property] = (ms.isModified && ms.getSelection().length != 0) ?
                                 (ms.getSelection())[0].id : currRecord[property];
+                            return false;
                         }
                     });
                 }
@@ -382,7 +384,7 @@ function FillFormForRelatedGeneric(tableAdd, tableRemove, ids,
 
     var deferred0 = $.Deferred();
 
-    tableAdd.clear().search(""); tableRemove.clear().search("");
+    tableAdd.clear().search("").draw(); tableRemove.clear().search("").draw();
 
     if (ids.length == 1) {
         $.when(
@@ -410,14 +412,14 @@ function FillFormForRelatedGeneric(tableAdd, tableRemove, ids,
 }
 
 //Submit Edits for n:n related table - generic version
-function SubmitEditsForRelatedGeneric(ids,idsAdd,idsRemove, urlAdd, httpTypeAdd, urlRemove, httpTypeRemove) {
+function SubmitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
 
     var deferred0 = $.Deferred();
     var deferred1 = $.Deferred(); var deferred2 = $.Deferred();
 
     if (idsAdd.length == 0) deferred1.resolve();
     else {
-        $.ajax({type: httpTypeAdd, url: urlAdd, timeout: 20000, data: { ids: ids, idsAddRem: idsAdd, isAdd: true }, dataType: "json" })
+        $.ajax({type: "POST", url: url, timeout: 20000, data: { ids: ids, idsAddRem: idsAdd, isAdd: true }, dataType: "json" })
             .done(function () { deferred1.resolve(); })
             .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
     }
@@ -425,7 +427,7 @@ function SubmitEditsForRelatedGeneric(ids,idsAdd,idsRemove, urlAdd, httpTypeAdd,
     if (idsRemove.length == 0) deferred2.resolve();
     else {
         setTimeout(function () {
-            $.ajax({ type: httpTypeRemove, url: urlRemove, timeout: 20000, data: { ids: ids, idsAddRem: idsRemove, isAdd: false }, dataType: "json" })
+            $.ajax({ type: "POST", url: url, timeout: 20000, data: { ids: ids, idsAddRem: idsRemove, isAdd: false }, dataType: "json" })
                 .done(function () { deferred2.resolve(); })
                 .fail(function (xhr, status, error) { deferred2.reject(xhr, status, error); });
         }, 500);

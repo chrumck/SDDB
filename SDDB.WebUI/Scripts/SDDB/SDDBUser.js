@@ -154,7 +154,7 @@ $(document).ready(function () {
 
     //--------------------------------------View Initialization------------------------------------//
 
-    RefreshTblGenWait(TableMain, "/DBUserSrv/Get", {},"GET");
+    RefreshTblGenWrp(TableMain, "/DBUserSrv/Get", {},"GET");
 
 
     //--------------------------------End of execution at Start-----------
@@ -257,7 +257,7 @@ function SubmitEdits() {
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
-            RefreshTblGenWait(TableMain, "/DBUserSrv/Get", {}, "GET");
+            RefreshTblGenWrp(TableMain, "/DBUserSrv/Get", {}, "GET");
             IsCreate = false;
             $("#MainView").removeClass("hide");
             $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
@@ -275,7 +275,7 @@ function DeleteRecords() {
         beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function () { RefreshTblGenWait(TableMain, "/DBUserSrv/Get", {}, "GET"); })
+        .done(function () { RefreshTblGenWrp(TableMain, "/DBUserSrv/Get", {}, "GET"); })
         .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
 }
 
@@ -355,7 +355,7 @@ function SubmitRolesEdits() {
     $.when(deferred1, deferred2)
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () {
-            RefreshTblGenWait(TableMain, "/DBUserSrv/Get", {}, "GET");
+            RefreshTblGenWrp(TableMain, "/DBUserSrv/Get", {}, "GET");
             $("#MainView").removeClass("hide");
             $("#DBRolesView").addClass("hide"); window.scrollTo(0, 0);
         })

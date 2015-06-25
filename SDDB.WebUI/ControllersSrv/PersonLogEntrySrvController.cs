@@ -197,9 +197,9 @@ namespace SDDB.WebUI.ControllersSrv
         // POST: /PersonLogEntrySrv/EditPrsLogEntryAssys
         [HttpPost]
         [DBSrvAuth("PersonLogEntry_Edit,Assembly_Edit")]
-        public async Task<ActionResult> EditPrsLogEntryAssys(string[] logEntryIds, string[] assyIds, bool isAdd)
+        public async Task<ActionResult> EditPrsLogEntryAssys(string[] ids, string[] idsAddRem, bool isAdd)
         {
-            var serviceResult = await prsLogEntryService.EditPrsLogEntryAssysAsync(logEntryIds, assyIds, isAdd).ConfigureAwait(false);
+            var serviceResult = await prsLogEntryService.EditPrsLogEntryAssysAsync(ids, idsAddRem, isAdd).ConfigureAwait(false);
 
             ViewBag.ServiceName = "PersonLogEntryService.EditPrsLogEntryAssysAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
@@ -244,9 +244,9 @@ namespace SDDB.WebUI.ControllersSrv
         // POST: /PersonLogEntrySrv/EditPrsLogEntryPersons
         [HttpPost]
         [DBSrvAuth("PersonLogEntry_Edit,Person_Edit")]
-        public async Task<ActionResult> EditPrsLogEntryPersons(string[] logEntryIds, string[] personIds, bool isAdd)
+        public async Task<ActionResult> EditPrsLogEntryPersons(string[] ids, string[] idsAddRem, bool isAdd)
         {
-            var serviceResult = await prsLogEntryService.EditPrsLogEntryPersonsAsync(logEntryIds, personIds, isAdd).ConfigureAwait(false);
+            var serviceResult = await prsLogEntryService.EditPrsLogEntryPersonsAsync(ids, idsAddRem, isAdd).ConfigureAwait(false);
 
             ViewBag.ServiceName = "PersonLogEntryService.EditPrsLogEntryPersonsAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;

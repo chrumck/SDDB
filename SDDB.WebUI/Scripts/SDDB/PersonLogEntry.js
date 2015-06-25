@@ -211,12 +211,12 @@ $(document).ready(function () {
         else {
             
             if (CurrIds.length == 1) {
-                RefreshTblGenWait(TableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
+                RefreshTblGenWrp(TableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
                     { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] }, "GET")
                     .done(function () { $("#AssignedToLocation_Id input").focus(); });
             }
             else {
-                RefreshTblGenWait(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
+                RefreshTblGenWrp(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
                 { getActive: true, locId: MagicSuggests[3].getValue()[0] }, "GET")
                 .done(function () { $("#AssignedToLocation_Id input").focus(); });
             }
@@ -233,7 +233,39 @@ $(document).ready(function () {
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         MsValidate(MagicSuggests);
-        if (FormIsValid("EditForm", CurrIds.length == 0) && MsIsValid(MagicSuggests)) SubmitEdits(CurrIds);
+        if (FormIsValid("EditForm", CurrIds.length == 0) && MsIsValid(MagicSuggests)) {
+
+            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+
+            SubmitEditsGeneric(CurrIds, "EditForm", MagicSuggests, CurrRecord, "POST", "/PersonLogEntrySrv/Edit")
+                .then(function (data) {
+
+                    var deferred0 = $.Deferred();
+
+                    var ids = (CurrIds.length == 0) ? data.ReturnIds : CurrIds;
+                    var idsAssysAdd = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name").data().toArray();
+                    var idsAssysRemove = TableLogEntryAssysRemove.cells(".ui-selected", "Id:name").data().toArray();
+                    var idsPersonsAdd = TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name").data().toArray();
+                    var idsPersonsRemove = TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name").data().toArray();
+
+                    $.when(
+                        SubmitEditsForRelatedGeneric(ids, idsAssysAdd, idsAssysRemove, "/PersonLogEntrySrv/EditPrsLogEntryAssys"),
+                        SubmitEditsForRelatedGeneric(ids, idsPersonsAdd, idsPersonsRemove, "/PersonLogEntrySrv/EditPrsLogEntryPersons")
+                        )
+                        .done(function () { deferred0.resolve(); })
+                        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
+
+                    return deferred0.promise();
+                })
+                .always(function () { $("#ModalWait").modal("hide"); })
+                .done(function () {
+                    RefreshMainView();
+                    $("#MainView").removeClass("hide");
+                    $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
+                })
+                .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        }
+
     });
 
     //------------------------------------DataTables - Log Entry Assemblies ---
