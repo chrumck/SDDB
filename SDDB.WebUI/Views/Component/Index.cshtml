@@ -58,6 +58,7 @@
                     <th>Position in Assy</th>
                     <th>Program Addr</th>
                     <th>Calib. Reqd</th>
+                    <th>Last Calib.</th>
                     <th>Comments</th>
                     <th>Is Active</th>
                     <th>ComponentType_Id</th>
@@ -145,9 +146,6 @@
                             @Html.ValidationMessageFor(x => x.ComponentModel_Id)
                         </div>
                     </div>
-                </div>
-
-                <div class="col-md-6">
                     <div class="form-group">
                         @Html.LabelFor(x => x.AssignedToProject_Id, "Project", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
@@ -155,6 +153,9 @@
                             @Html.ValidationMessageFor(x => x.AssignedToProject_Id)
                         </div>
                     </div>
+                </div>
+
+                <div class="col-md-6">
                     <div class="form-group">
                         @Html.LabelFor(x => x.AssignedToAssemblyDb_Id, "Assembly", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
@@ -180,6 +181,14 @@
                         <div class="col-sm-10 col-sm-offset-2">
                             @Html.CheckBoxFor(x => x.CalibrationReqd, new { @class = "modifiable" }) &nbsp;&nbsp;
                             @Html.LabelFor(x => x.CalibrationReqd, "Calibration Required")
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LastCalibrationDate, "Last Calib.", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" data-val="true" data-val-dbisdateiso="The field has to be in 'yyyy-MM-dd' format."
+                                   id="LastCalibrationDate" name="LastCalibrationDate" placeholder="Last Calibration Date" value="" type="text">
+                            @Html.ValidationMessageFor(x => x.LastCalibrationDate)
                         </div>
                     </div>
                     <div class="form-group">
@@ -221,6 +230,7 @@
     @Scripts.Render("~/bundles/DataTables")
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
+    @Scripts.Render("~/bundles/bootstrap-datetimepicker")
     <script src="~/Scripts/SDDB/Component.js"></script>
 }
 
@@ -228,6 +238,7 @@
     @Styles.Render("~/bundles/DataTables-CSS")
     @Styles.Render("~/bundles/bootstrap-toggle-CSS")
     @Styles.Render("~/bundles/magicsuggest-css")
+    @Styles.Render("~/bundles/bootstrap-datetimepicker-CSS")
 }
 
 

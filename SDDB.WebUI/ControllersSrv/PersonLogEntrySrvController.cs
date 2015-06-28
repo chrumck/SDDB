@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -6,8 +7,8 @@ using System.Web.Mvc;
 
 using SDDB.Domain.Entities;
 using SDDB.Domain.Services;
+using SDDB.Domain.Abstract;
 using SDDB.WebUI.Infrastructure;
-using System;
 
 namespace SDDB.WebUI.ControllersSrv
 {
@@ -16,11 +17,13 @@ namespace SDDB.WebUI.ControllersSrv
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
         private PersonLogEntryService prsLogEntryService;
+        private IFileRepoService fileRepoService;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
-        public PersonLogEntrySrvController(PersonLogEntryService prsLogEntryService)
+        public PersonLogEntrySrvController(PersonLogEntryService prsLogEntryService, IFileRepoService fileRepoService)
         {
             this.prsLogEntryService = prsLogEntryService;
+            this.fileRepoService = fileRepoService;
         }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
@@ -260,6 +263,21 @@ namespace SDDB.WebUI.ControllersSrv
                 Response.StatusCode = (int)serviceResult.StatusCode;
                 return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
             }
+        }
+
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        // GET: /PersonLogEntrySrv/GetFiles
+        [DBSrvAuth("PersonLogEntry_View")]
+        public async Task<ActionResult> GetFiles(string id)
+        {
+            var data = (await fileRepoService.Get(id).ConfigureAwait(false)).Select(x => new {
+                FileName = x
+            });
+
+            ViewBag.ServiceName = "IFileRepoService.Get"; ViewBag.StatusCode = HttpStatusCode.OK;
+
+            return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//

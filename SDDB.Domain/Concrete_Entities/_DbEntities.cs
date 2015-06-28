@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SDDB.Domain.Entities
 {
@@ -16,5 +12,12 @@ namespace SDDB.Domain.Entities
         public SessionSettings()
         {
         }
+    }
+
+    public class FtpFilesDetail
+    {
+        public string Name { get; set; }
+        public double Size { get; set; }
+        public DateTime Modified { get; set; }
     }
 }

@@ -43,14 +43,14 @@ $(document).ready(function () {
     $("#dropdownId1").click(function (event) {
         event.preventDefault();
         TableMain.columns([2, 3, 4, 5, 6, 7]).visible(true);
-        TableMain.columns([8, 9, 10, 11, 12]).visible(false);
+        TableMain.columns([8, 9, 10, 11, 12, 13]).visible(false);
     });
 
     //wire up dropdownId2
     $("#dropdownId2").click(function (event) {
         event.preventDefault();
         TableMain.columns([2, 3, 4, 5, 6, 7]).visible(false);
-        TableMain.columns([8, 9, 10, 11, 12]).visible(true);
+        TableMain.columns([8, 9, 10, 11, 12, 13]).visible(true);
     });
 
     //Initialize MagicSuggest MsFilterByType
@@ -114,24 +114,25 @@ $(document).ready(function () {
             { data: "PositionInAssy", name: "PositionInAssy" },//9
             { data: "ProgramAddress", name: "ProgramAddress" },//10
             { data: "CalibrationReqd", name: "CalibrationReqd" },//11
-            { data: "Comments", name: "Comments" },//12
+            { data: "LastCalibrationDate", name: "LastCalibrationDate" },//12
+            { data: "Comments", name: "Comments" },//13
             //------------------------------------------------never visible
-            { data: "IsActive", name: "IsActive" },//13
-            { data: "ComponentType_Id", name: "ComponentType_Id" },//14
-            { data: "ComponentStatus_Id", name: "ComponentStatus_Id" },//15
-            { data: "ComponentModel_Id", name: "ComponentModel_Id" },//16
-            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//17
-            { data: "AssignedToAssemblyDb_Id", name: "AssignedToAssemblyDb_Id" }//18
+            { data: "IsActive", name: "IsActive" },//14
+            { data: "ComponentType_Id", name: "ComponentType_Id" },//15
+            { data: "ComponentStatus_Id", name: "ComponentStatus_Id" },//16
+            { data: "ComponentModel_Id", name: "ComponentModel_Id" },//17
+            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//18
+            { data: "AssignedToAssemblyDb_Id", name: "AssignedToAssemblyDb_Id" }//19
         ],
         columnDefs: [
-            { targets: [0, 13, 14, 15, 16, 17, 18], visible: false }, // - never show
-            { targets: [0, 11, 13, 14, 15, 16, 17, 18], searchable: false },  //"orderable": false, "visible": false
+            { targets: [0, 14, 15, 16, 17, 18, 19], visible: false }, // - never show
+            { targets: [0, 11, 12, 14, 15, 16, 17, 18, 19], searchable: false },  //"orderable": false, "visible": false
             { targets: [4, 6, 7], className: "hidden-xs hidden-sm" }, // - first set of columns
             { targets: [2, 3], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
 
-            { targets: [8, 9, 10, 11, 12], visible: false }, // - second set of columns - to toggle with options
-            { targets: [9, 10, 11], className: "hidden-xs hidden-sm" }, // - second set of columns
-            { targets: [12], className: "hidden-xs hidden-sm hidden-md" } // - second set of columns
+            { targets: [8, 9, 10, 11, 12, 13], visible: false }, // - second set of columns - to toggle with options
+            { targets: [9, 11, 12], className: "hidden-xs hidden-sm" }, // - second set of columns
+            { targets: [10, 13], className: "hidden-xs hidden-sm hidden-md" } // - second set of columns
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
@@ -156,6 +157,10 @@ $(document).ready(function () {
     AddToMSArray(MagicSuggests, "ComponentModel_Id", "/ComponentModelSrv/Lookup", 1);
     AddToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
     AddToMSArray(MagicSuggests, "AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
+
+    //Enable DateTimePicker
+    $("[data-val-dbisdateiso]").datetimepicker({ format: "YYYY-MM-DD" })
+        .on("dp.change", function (e) { $(this).data("ismodified", true); });
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
@@ -215,6 +220,7 @@ function FillFormForEdit() {
             CurrRecord.PositionInAssy = data[0].PositionInAssy;
             CurrRecord.ProgramAddress = data[0].ProgramAddress;
             CurrRecord.CalibrationReqd = data[0].CalibrationReqd;
+            CurrRecord.LastCalibrationDate = data[0].LastCalibrationDate;
             CurrRecord.Comments = data[0].Comments;
             CurrRecord.IsActive = data[0].IsActive;
             CurrRecord.ComponentType_Id = data[0].ComponentType_Id;
@@ -231,6 +237,7 @@ function FillFormForEdit() {
                 if (FormInput.PositionInAssy != dbEntry.PositionInAssy) FormInput.PositionInAssy = "_VARIES_";
                 if (FormInput.ProgramAddress != dbEntry.ProgramAddress) FormInput.ProgramAddress = "_VARIES_";
                 if (FormInput.CalibrationReqd != dbEntry.CalibrationReqd) FormInput.CalibrationReqd = "_VARIES_";
+                if (FormInput.LastCalibrationDate != dbEntry.LastCalibrationDate) FormInput.LastCalibrationDate = "_VARIES_";
                 if (FormInput.Comments != dbEntry.Comments) FormInput.Comments = "_VARIES_";
                 if (FormInput.IsActive != dbEntry.IsActive) FormInput.IsActive = "_VARIES_";
 
@@ -255,6 +262,7 @@ function FillFormForEdit() {
             $("#PositionInAssy").val(FormInput.PositionInAssy);
             $("#ProgramAddress").val(FormInput.ProgramAddress);
             if (FormInput.CalibrationReqd == true) $("#CalibrationReqd").prop("checked", true);
+            $("#LastCalibrationDate").val(FormInput.LastCalibrationDate);
             $("#Comments").val(FormInput.Comments);
             if (FormInput.IsActive == true) $("#IsActive").prop("checked", true);
 
@@ -317,6 +325,7 @@ function SubmitEdits() {
         editRecord.PositionInAssy = ($("#PositionInAssy").data("ismodified")) ? $("#PositionInAssy").val() : CurrRecord.PositionInAssy;
         editRecord.ProgramAddress = ($("#ProgramAddress").data("ismodified")) ? $("#ProgramAddress").val() : CurrRecord.ProgramAddress;
         editRecord.CalibrationReqd = ($("#CalibrationReqd").data("ismodified")) ? (($("#CalibrationReqd").prop("checked")) ? true : false) : CurrRecord.CalibrationReqd;
+        editRecord.LastCalibrationDate = ($("#LastCalibrationDate").data("ismodified")) ? $("#LastCalibrationDate").val() : CurrRecord.LastCalibrationDate;
         editRecord.Comments = ($("#Comments").data("ismodified")) ? $("#Comments").val() : CurrRecord.Comments;
         editRecord.IsActive = ($("#IsActive").data("ismodified")) ? (($("#IsActive").prop("checked")) ? true : false) : CurrRecord.IsActive;
         editRecord.ComponentType_Id = (MagicSuggests[0].isModified) ? magicResults[0] : CurrRecord.ComponentType_Id;

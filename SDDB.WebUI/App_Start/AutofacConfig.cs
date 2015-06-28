@@ -48,7 +48,13 @@ namespace SDDB.WebUI
             //register infrastructure
 
             // register services
-            builder.RegisterType<DBLogger>().As<ILogger>().WithParameter("dbLogginglevel", dbLoggingLevel).WithParameter("procTooLongmSec", procTooLongmSec).InstancePerDependency();
+            builder.RegisterType<DBLogger>().As<ILogger>()
+                .WithParameter("dbLogginglevel", dbLoggingLevel).WithParameter("procTooLongmSec", procTooLongmSec).InstancePerDependency();
+
+            builder.RegisterType<DbFtpRepoService>().As<IFileRepoService>()
+                .WithParameter("ftpAddress", ftpAddress).WithParameter("ftpUserName", ftpUserName)
+                .WithParameter("ftpPwd", ftpPwd).WithParameter("ftpIsSSL", ftpIsSSL)
+                .WithParameter("ftpIsPassive", ftpIsPassive).InstancePerDependency();
             
             builder.RegisterType<DBUserService>().AsSelf().WithParameter("ldapAuthenticationEnabled", LDAPAuthenticationEnabled).InstancePerDependency();
             builder.RegisterType<PersonService>().AsSelf().InstancePerDependency();

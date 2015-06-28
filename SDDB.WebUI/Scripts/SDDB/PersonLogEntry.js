@@ -73,6 +73,11 @@ $(document).ready(function () {
                     $("#EditFormView").removeClass("hide");
                 })
                 .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+
+            if (CurrIds.length == 1) RefreshTblGenWrp(TableLogEntryFiles, "/PersonLogEntrySrv/GetFiles", { id: CurrIds[0] }, "GET");
+            else {
+                //add functionality to disable the files
+            }
         }
     });
 
@@ -366,6 +371,30 @@ $(document).ready(function () {
         pageLength: 10
     });
 
+    //------------------------------------DataTables - Log Entry Files ---
+
+    //TableLogEntryFiles
+    TableLogEntryFiles = $("#TableLogEntryFiles").DataTable({
+        columns: [
+            { data: "FileName", name: "FileName" },//0
+            { data: "Modified", name: "Modified" },//1
+        ],
+        columnDefs: [
+            { targets: [], visible: false }, // - never show
+            { targets: [], searchable: false },  //"orderable": false, "visible": false
+            { targets: [], className: "hidden-xs hidden-sm" }
+        ],
+        bAutoWidth: false,
+        language: {
+            search: "",
+            lengthMenu: "_MENU_",
+            info: "_START_ - _END_ of _TOTAL_",
+            infoEmpty: "",
+            infoFiltered: "(filtered)",
+            paginate: { previous: "", next: "" }
+        },
+        pageLength: 10
+    });
 
     //--------------------------------------View Initialization------------------------------------//
 
@@ -393,71 +422,6 @@ $(document).ready(function () {
 
 //--------------------------------------Main Methods---------------------------------------//
 
-//SubmitEdits to DB
-function SubmitEdits(ids) {
-
-    var modifiedProperties = [];
-    $(".modifiable").each(function (index) {
-        if ($(this).data("ismodified")) modifiedProperties.push($(this).prop("id"));
-    });
-
-    $.each(MagicSuggests, function (i, ms) {
-        if (ms.isModified == true) modifiedProperties.push(ms.id);
-    });
-
-    var editRecords = [];
-    if (ids.length == 0) ids = ["newEntryId"];
-
-    var magicResults = [];
-    $.each(MagicSuggests, function (i, ms) {
-        var msValue = (ms.getSelection().length != 0) ? (ms.getSelection())[0].id : null;
-        magicResults.push(msValue);
-    });
-
-    $.each(ids, function (i, id) {
-        var editRecord = {};
-        editRecord.Id = id;
-
-        editRecord.LogEntryDateTime = ($("#LogEntryDateTime").data("ismodified")) ? $("#LogEntryDateTime").val() : CurrRecord.LogEntryDateTime;
-        editRecord.ManHours = ($("#ManHours").data("ismodified")) ? $("#ManHours").val() : CurrRecord.ManHours;
-        editRecord.Comments = ($("#Comments").data("ismodified")) ? $("#Comments").val() : CurrRecord.Comments;
-        editRecord.IsActive = ($("#IsActive").data("ismodified")) ? (($("#IsActive").prop("checked")) ? true : false) : CurrRecord.IsActive;
-        editRecord.EnteredByPerson_Id = (MagicSuggests[0].isModified) ? magicResults[0] : CurrRecord.EnteredByPerson_Id;
-        editRecord.PersonActivityType_Id = (MagicSuggests[1].isModified) ? magicResults[1] : CurrRecord.PersonActivityType_Id;
-        editRecord.AssignedToProject_Id = (MagicSuggests[2].isModified) ? magicResults[2] : CurrRecord.AssignedToProject_Id;
-        editRecord.AssignedToLocation_Id = (MagicSuggests[3].isModified) ? magicResults[3] : CurrRecord.AssignedToLocation_Id;
-        editRecord.AssignedToProjectEvent_Id = (MagicSuggests[4].isModified) ? magicResults[4] : CurrRecord.AssignedToProjectEvent_Id;
-        
-        editRecord.ModifiedProperties = modifiedProperties;
-
-        editRecords.push(editRecord);
-    });
-
-    $.ajax({
-        type: "POST", url: "/PersonLogEntrySrv/Edit", timeout: 20000, data: { records: editRecords }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
-    })
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function (data) {
-            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-            EditLogEntryAssys((ids[0] == "newEntryId") ? data.ReturnIds : ids)
-            .always(function () { $("#ModalWait").modal("hide"); })
-            .done(function () {
-                $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-                EditLogEntryPersons((ids[0] == "newEntryId") ? data.ReturnIds : ids)
-                    .always(function () { $("#ModalWait").modal("hide"); })
-                    .done(function () {
-                        RefreshMainView();
-                        $("#MainView").removeClass("hide");
-                        $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
-                    })
-                    .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
-            })
-            .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
-        })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
-}
-
 //Delete Records from DB
 function DeleteRecords() {
     var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
@@ -467,178 +431,6 @@ function DeleteRecords() {
         .done(function () { RefreshMainView(); })
         .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
 }
-
-//---------------------------------------------------------------------------------------------
-
-//Fill Log Entry Assys to add and to remove
-
-function FillLogEntryAssys(isCreate) {
-
-    var deferred1 = $.Deferred(); 
-
-    if (CurrIds.length == 1) {
-        $.when(
-            $.ajax({
-                type: "GET", url: "/PersonLogEntrySrv/GetPrsLogEntryAssysNot", timeout: 20000,
-                data: { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue}, dataType: "json"
-            }),
-            $.ajax({
-                type: "GET", url: "/PersonLogEntrySrv/GetPrsLogEntryAssys", timeout: 20000,
-                data: { logEntryId: CurrIds[0] }, dataType: "json"
-            })
-        )
-        .done(function (done1, done2) {
-            TableLogEntryAssysAdd.clear().search(""); TableLogEntryAssysAdd.rows.add(done1[0].data).order([1, 'asc']).draw();
-            TableLogEntryAssysRemove.clear().search(""); TableLogEntryAssysRemove.rows.add(done2[0].data).order([1, 'asc']).draw();
-            deferred1.resolve();
-        })
-        .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
-    }
-    else {
-        $.when(
-            $.ajax({
-                type: "GET", url: "AssemblyDbSrv/LookupByLocDTables", timeout: 20000,
-                data: { locId: MagicSuggests[3].getValue, getActive: true }, dataType: "json"
-            }),
-            $.ajax({
-                type: "GET", url: "AssemblyDbSrv/LookupByLocDTables", timeout: 20000,
-                data: { getActive: true }, dataType: "json",
-            })
-        )
-        .done(function (done1, done2) {
-            TableLogEntryAssysAdd.clear().search(""); TableLogEntryAssysAdd.rows.add(done1[0]).order([1, 'asc']).draw();
-            if (!isCreate) { TableLogEntryAssysRemove.clear().search(""); TableLogEntryAssysRemove.rows.add(done2[0]).order([1, 'asc']).draw(); }
-            else TableLogEntryAssysRemove.clear().search("");
-
-            deferred1.resolve();
-        })
-        .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
-    }
-
-    return deferred1.promise();
-}
-
-//Submit Log Entry Assemblies Edits to SDDB
-function EditLogEntryAssys(logEntryIds) {
-
-    var deferred0 = $.Deferred(); 
-
-    var dbRecordsAdd = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name").data().toArray();
-    var dbRecordsRemove = TableLogEntryAssysRemove.cells(".ui-selected", "Id:name").data().toArray();
-
-    var deferred1 = $.Deferred();
-    if (dbRecordsAdd.length == 0) deferred1.resolve();
-    else {
-        $.ajax({
-            type: "POST", url: "/PersonLogEntrySrv/EditPrsLogEntryAssys", timeout: 20000,
-            data: { logEntryIds: logEntryIds, assyIds: dbRecordsAdd, isAdd: true }, dataType: "json"
-        })
-            .done(function () { deferred1.resolve(); })
-            .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
-    }
-
-    var deferred2 = $.Deferred();
-    if (dbRecordsRemove.length == 0) deferred2.resolve();
-    else {
-        setTimeout(function () {
-            $.ajax({
-                type: "POST", url: "/PersonLogEntrySrv/EditPrsLogEntryAssys", timeout: 20000,
-                data: { logEntryIds: logEntryIds, assyIds: dbRecordsRemove, isAdd: false }, dataType: "json"
-            })
-                .done(function () { deferred2.resolve(); })
-                .fail(function (xhr, status, error) { deferred2.reject(xhr, status, error); });
-        }, 500);
-    }
-
-    $.when(deferred1, deferred2)
-        .done(function () { deferred0.resolve();})
-        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
-
-    return deferred0.promise();
-}
-
-//---------------------------------------------------------------------------------------------
-
-//Fill Log Entry Persons to add and to remove
-function FillLogEntryPersons(isCreate) {
-
-    var deferred1 = $.Deferred();
-
-    if (CurrIds.length == 1) {
-        $.when(
-            $.ajax({
-                type: "GET", url: "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", timeout: 20000,
-                data: { logEntryId: CurrIds[0] }, dataType: "json"
-            }),
-            $.ajax({
-                type: "GET", url: "/PersonLogEntrySrv/GetPrsLogEntryPersons", timeout: 20000,
-                data: { logEntryId: CurrIds[0] }, dataType: "json"
-            })
-        )
-        .done(function (done1, done2) {
-            TableLogEntryPersonsAdd.clear().search(""); TableLogEntryPersonsAdd.rows.add(done1[0].data).order([1, 'asc']).draw();
-            TableLogEntryPersonsRemove.clear().search(""); TableLogEntryPersonsRemove.rows.add(done2[0].data).order([1, 'asc']).draw();
-            deferred1.resolve();
-        })
-        .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
-    }
-    else {
-        $.ajax({ type: "GET", url: "/PersonSrv/Get", timeout: 20000, data: { getActive: true }, dataType: "json" })
-            .done(function (data) {
-                TableLogEntryPersonsAdd.clear().search(""); TableLogEntryPersonsAdd.rows.add(data.data).order([1, 'asc']).draw();
-                if (!isCreate) { TableLogEntryPersonsRemove.clear().search(""); TableLogEntryPersonsRemove.rows.add(data.data).order([1, 'asc']).draw(); }
-                else TableLogEntryPersonsRemove.clear().search("");
-
-                deferred1.resolve();
-            })
-            .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
-    }
-
-    return deferred1.promise();
-}
-
-//Submit Log Entry Persons Edits to SDDB
-function EditLogEntryPersons(logEntryIds) {
-
-    var deferred0 = $.Deferred(); 
-
-    var dbRecordsAdd = TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name").data().toArray();
-    var dbRecordsRemove = TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name").data().toArray();
-
-    var deferred1 = $.Deferred();
-    if (dbRecordsAdd.length == 0) deferred1.resolve();
-    else {
-        $.ajax({
-            type: "POST", url: "/PersonLogEntrySrv/EditPrsLogEntryPersons", timeout: 20000,
-            data: { logEntryIds: logEntryIds, personIds: dbRecordsAdd, isAdd: true }, dataType: "json"
-        })
-            .done(function () { deferred1.resolve(); })
-            .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
-    }
-
-    var deferred2 = $.Deferred();
-    if (dbRecordsRemove.length == 0) deferred2.resolve();
-    else {
-        setTimeout(function () {
-            $.ajax({
-                type: "POST", url: "/PersonLogEntrySrv/EditPrsLogEntryPersons", timeout: 20000,
-                data: { logEntryIds: logEntryIds, personIds: dbRecordsRemove, isAdd: false }, dataType: "json"
-            })
-                .done(function () { deferred2.resolve(); })
-                .fail(function (xhr, status, error) { deferred2.reject(xhr, status, error); });
-        }, 500);
-    }
-
-    $.when(deferred1, deferred2)
-        .done(function () { deferred0.resolve(); })
-        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
-
-    return deferred0.promise();
-}
-
-
-//---------------------------------------------------------------------------------------------
-
 //refresh view after magicsuggest update
 function RefreshMainView() {
     if ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "" ||

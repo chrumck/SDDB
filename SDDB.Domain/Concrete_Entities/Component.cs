@@ -63,6 +63,9 @@ namespace SDDB.Domain.Entities
         [DefaultValue(false)]
         public bool CalibrationReqd { get; set; }
 
+        [DBIsDateISO]
+        public DateTime? LastCalibrationDate { get; set; }
+
         [Column(TypeName = "text")] [StringLength(65535)]
         public string Comments { get; set; }
 

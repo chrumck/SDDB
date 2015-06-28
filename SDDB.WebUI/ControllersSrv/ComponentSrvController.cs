@@ -33,7 +33,7 @@ namespace SDDB.WebUI.ControllersSrv
                 x.ComponentType.CompTypeName, x.ComponentStatus.CompStatusName, x.ComponentModel.CompModelName,
                 AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
                 AssignedToAssemblyDb = new { x.AssignedToAssemblyDb.AssyName, x.AssignedToAssemblyDb.AssyAltName },
-                x.PositionInAssy, x.ProgramAddress, x.CalibrationReqd, x.Comments, x.IsActive,
+                x.PositionInAssy, x.ProgramAddress, x.CalibrationReqd, x.LastCalibrationDate, x.Comments, x.IsActive,
                 x.ComponentExt.Attr01,x.ComponentExt.Attr02,x.ComponentExt.Attr03,x.ComponentExt.Attr04,x.ComponentExt.Attr05,
                 x.ComponentExt.Attr06,x.ComponentExt.Attr07,x.ComponentExt.Attr08,x.ComponentExt.Attr09,x.ComponentExt.Attr10,
                 x.ComponentExt.Attr11,x.ComponentExt.Attr12,x.ComponentExt.Attr13,x.ComponentExt.Attr14,x.ComponentExt.Attr15,
@@ -42,7 +42,8 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "ComponentService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(data, JsonRequestBehavior.AllowGet);
+            return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+
         }
         
         // GET: /ComponentSrv/GetByIds
@@ -55,7 +56,7 @@ namespace SDDB.WebUI.ControllersSrv
                 x.ComponentType.CompTypeName, x.ComponentStatus.CompStatusName, x.ComponentModel.CompModelName,
                 AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
                 AssignedToAssemblyDb = new { x.AssignedToAssemblyDb.AssyName, x.AssignedToAssemblyDb.AssyAltName },
-                x.PositionInAssy, x.ProgramAddress, x.CalibrationReqd, x.Comments, x.IsActive,
+                x.PositionInAssy, x.ProgramAddress, x.CalibrationReqd, x.LastCalibrationDate, x.Comments, x.IsActive,
                 x.ComponentExt.Attr01,x.ComponentExt.Attr02,x.ComponentExt.Attr03,x.ComponentExt.Attr04,x.ComponentExt.Attr05,
                 x.ComponentExt.Attr06,x.ComponentExt.Attr07,x.ComponentExt.Attr08,x.ComponentExt.Attr09,x.ComponentExt.Attr10,
                 x.ComponentExt.Attr11,x.ComponentExt.Attr12,x.ComponentExt.Attr13,x.ComponentExt.Attr14,x.ComponentExt.Attr15,
@@ -64,7 +65,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "ComponentService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json( data , JsonRequestBehavior.AllowGet);
+            return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // GET: /ComponentSrv/GetByModelIds
@@ -78,7 +79,7 @@ namespace SDDB.WebUI.ControllersSrv
                 x.ComponentType.CompTypeName, x.ComponentStatus.CompStatusName, x.ComponentModel.CompModelName,
                 AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
                 AssignedToAssemblyDb = new { x.AssignedToAssemblyDb.AssyName, x.AssignedToAssemblyDb.AssyAltName },
-                x.PositionInAssy, x.ProgramAddress, x.CalibrationReqd, x.Comments, x.IsActive,
+                x.PositionInAssy, x.ProgramAddress, x.CalibrationReqd, x.LastCalibrationDate, x.Comments, x.IsActive,
                 x.ComponentExt.Attr01,x.ComponentExt.Attr02,x.ComponentExt.Attr03,x.ComponentExt.Attr04,x.ComponentExt.Attr05,
                 x.ComponentExt.Attr06,x.ComponentExt.Attr07,x.ComponentExt.Attr08,x.ComponentExt.Attr09,x.ComponentExt.Attr10,
                 x.ComponentExt.Attr11,x.ComponentExt.Attr12,x.ComponentExt.Attr13,x.ComponentExt.Attr14,x.ComponentExt.Attr15,
@@ -87,7 +88,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "ComponentService.GetByProjectAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(data, JsonRequestBehavior.AllowGet);
+            return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // GET: /ComponentSrv/GetByTypeAssyIds
@@ -101,7 +102,7 @@ namespace SDDB.WebUI.ControllersSrv
                 x.ComponentType.CompTypeName, x.ComponentStatus.CompStatusName, x.ComponentModel.CompModelName,
                 AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
                 AssignedToAssemblyDb = new { x.AssignedToAssemblyDb.AssyName, x.AssignedToAssemblyDb.AssyAltName },
-                x.PositionInAssy, x.ProgramAddress, x.CalibrationReqd, x.Comments, x.IsActive,
+                x.PositionInAssy, x.ProgramAddress, x.CalibrationReqd, x.LastCalibrationDate, x.Comments, x.IsActive,
                 x.ComponentExt.Attr01,x.ComponentExt.Attr02,x.ComponentExt.Attr03,x.ComponentExt.Attr04,x.ComponentExt.Attr05,
                 x.ComponentExt.Attr06,x.ComponentExt.Attr07,x.ComponentExt.Attr08,x.ComponentExt.Attr09,x.ComponentExt.Attr10,
                 x.ComponentExt.Attr11,x.ComponentExt.Attr12,x.ComponentExt.Attr13,x.ComponentExt.Attr14,x.ComponentExt.Attr15,
@@ -110,7 +111,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "ComponentService.GetByTypeAssyAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
-            return Json(data, JsonRequestBehavior.AllowGet);
+            return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
 

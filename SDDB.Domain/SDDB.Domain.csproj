@@ -146,11 +146,11 @@
     <Compile Include="Concrete_Entities\DBUser.cs" />
     <Compile Include="Concrete_Entities\DBRole.cs" />
     <Compile Include="Concrete_Entities\Person.cs" />
-    <Compile Include="Concrete_Entities\_SessionSettings.cs" />
+    <Compile Include="Concrete_Entities\_DbEntities.cs" />
     <Compile Include="Concrete_Infrastructure\DbDataAnnotations.cs" />
     <Compile Include="Concrete_Infrastructure\DbHelpers.cs" />
     <Compile Include="Concrete_Services\PersonLogEntryService.cs" />
-    <Compile Include="Concrete_Services\_DBftpRepoService.cs" />
+    <Compile Include="Concrete_Services\_DbFtpRepoService.cs" />
     <Compile Include="Concrete_Services\ComponentService.cs" />
     <Compile Include="Concrete_Services\ComponentModelService.cs" />
     <Compile Include="Concrete_Services\AssemblyModelService.cs" />
@@ -384,6 +384,10 @@
     <Compile Include="Migrations\201506231236521_LogEntry7.Designer.cs">
       <DependentUpon>201506231236521_LogEntry7.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201506260954536_Component1.cs" />
+    <Compile Include="Migrations\201506260954536_Component1.Designer.cs">
+      <DependentUpon>201506260954536_Component1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -415,6 +419,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201505132219495_updateDBResult1.resx">
       <DependentUpon>201505132219495_updateDBResult1.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201505140024277_updateDBResult2.resx">
       <DependentUpon>201505140024277_updateDBResult2.cs</DependentUpon>
@@ -433,6 +438,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201505192324501_Projects2.resx">
       <DependentUpon>201505192324501_Projects2.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201505200428367_project3.resx">
       <DependentUpon>201505200428367_project3.cs</DependentUpon>
@@ -547,6 +553,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201506231236521_LogEntry7.resx">
       <DependentUpon>201506231236521_LogEntry7.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201506260954536_Component1.resx">
+      <DependentUpon>201506260954536_Component1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

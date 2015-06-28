@@ -10,7 +10,7 @@ namespace SDDB.Domain.Abstract
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
-        Task<List<string>> Get(string logEntryId);
+        Task<List<FtpFilesDetail>> Get(string id);
         
     }
 }
