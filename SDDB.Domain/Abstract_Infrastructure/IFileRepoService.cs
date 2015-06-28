@@ -10,7 +10,7 @@ namespace SDDB.Domain.Abstract
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
-        Task<List<FtpFilesDetail>> Get(string id);
+        Task<List<FtpFileDetail>> GetAsync(string id);
         
     }
 }

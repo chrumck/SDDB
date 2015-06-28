@@ -271,9 +271,7 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("PersonLogEntry_View")]
         public async Task<ActionResult> GetFiles(string id)
         {
-            var data = (await fileRepoService.Get(id).ConfigureAwait(false)).Select(x => new {
-                FileName = x
-            });
+            var data = (await fileRepoService.GetAsync(id).ConfigureAwait(false));
 
             ViewBag.ServiceName = "IFileRepoService.Get"; ViewBag.StatusCode = HttpStatusCode.OK;
 

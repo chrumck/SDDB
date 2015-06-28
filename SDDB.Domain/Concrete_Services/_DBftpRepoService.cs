@@ -15,6 +15,7 @@ using SDDB.Domain.DbContexts;
 using SDDB.Domain.Infrastructure;
 using SDDB.Domain.Abstract;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace SDDB.Domain.Services
 {
@@ -42,11 +43,11 @@ namespace SDDB.Domain.Services
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
-        //get files assigned to id 
+        //get files assigned to log entry id 
 
-        public virtual async Task<List<FtpFilesDetail>> Get(string id = null)
+        public virtual async Task<List<FtpFileDetail>> GetAsync(string id = null)
         {
-            if (String.IsNullOrEmpty(ftpAddress) || String.IsNullOrEmpty(id)) return new List<string>() ;
+            if (String.IsNullOrEmpty(ftpAddress) || String.IsNullOrEmpty(id)) return new List<FtpFileDetail>() ;
             
             var ftpRequest = (FtpWebRequest)WebRequest.Create(ftpAddress + "/" + id);
             ftpRequest.Credentials = new NetworkCredential(ftpUserName, ftpPwd);
@@ -64,65 +65,37 @@ namespace SDDB.Domain.Services
                 var message = e.GetBaseException().Message;
                 if (!message.Contains("550") && !message.Contains("450")) throw;
             }
-            if (ftpRespStream != "")
+            var ftpRespList = new List<FtpFileDetail>();
+
+            var patternName = @"-[rwx-]{9}\s+\d+\s+\w+\s+\w+\s+\d+\s+\w{3}\s\d{1,2}\s(?:\d\d:\d\d|\d{4})\s+([\w|\W]+)";
+            var patternModified = @"-[rwx-]{9}\s+\d+\s+\w+\s+\w+\s+\d+\s+(\w{3}\s\d{1,2}\s(?:\d\d:\d\d|\d{4}))";
+            var patternSize = @"-[rwx-]{9}\s+\d+\s+\w+\s+\w+\s+(\d+)";
+            Match matchName = null; Match matchSize = null; Match matchModified = null;
+            var formats = new string[] { "MMM dd HH:mm","MMM dd H:mm", "MMM d HH:mm","MMM d H:mm","MMM dd yyyy","MMM d yyyy"};
+
+            var ftpRespArray = ftpRespStream.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in ftpRespArray)
             {
-                var patternName = @"-[rwx-]{9}\s+\d+\s+\w+\s+\w+\s+\d+\s+\w{3}\s\d{1,2}\s(?:\d\d:\d\d|\d{4})\s+([\w|\W]+)";
-                var patternModified = @"-[rwx-]{9}\s+\d+\s+\w+\s+\w+\s+\d+\s+(\w{3}\s\d{1,2}\s(?:\d\d:\d\d|\d{4}))";
-                var patternSize = @"-[rwx-]{9}\s+\d+\s+\w+\s+\w+\s+(\d+)";
-                var matchName = new Match(); var matchSize = new Match(); var matchModified = new Match();
+                matchName = Regex.Match(line, patternName);
+                matchSize = Regex.Match(line, patternSize);
+                matchModified = Regex.Match(line, patternModified);
 
-                var ftpRespArray = ftpRespStream.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-                var ftpRespList = new List<FtpFilesDetail>();
-
-                foreach (var line in ftpRespArray)
+                if (matchName.Success && matchModified.Success && matchSize.Success)
                 {
-                    matchName = Regex.Match(line, patternName);
-                    matchSize = Regex.Match(line, patternSize);
-                    matchModified = Regex.Match(line, patternModified);
-
-                    if (matchName.Success && matchModified.Success && matchSize.Success)
+                    var fileDetail = new FtpFileDetail
                     {
-                        var fileDetail = new FtpFilesDetail
-                        {
-                            Name = matchName.Value,
-                            Size = double.Parse(matchSize.Value) / 1024,
-                            Modified = DateTime.Parse(matchModified.Value)
-                        };
-                        ftpRespList.Add(fileDetail);
-                    }
-                    else throw new InvalidOperationException("Failed to parse ftp LIST output string");
+                        Name = matchName.Groups[1].Value,
+                        Size = int.Parse(matchSize.Groups[1].Value) / 1024,
+                        Modified = DateTime.ParseExact(matchModified.Groups[1].Value,
+                            formats,CultureInfo.InvariantCulture, DateTimeStyles.None)
+                    };
+                    ftpRespList.Add(fileDetail);
                 }
-
-                return ftpRespStream.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries).ToList()
-                    .Select(x =>
-                    {
-                        matchName = Regex.Match(x, patternName);  
-                        matchSize = Regex.Match(x, patternSize);
-                        matchModified = Regex.Match(x, patternModified);
-      
-                        if (matchName.Success && matchModified.Success && matchSize.Success)
-                        {
-                            return new FtpFilesDetail { 
-                                Name = matchName.Value,
-                                Size = double.Parse(matchSize.Value) / 1024,
-                                Modified = DateTime.Parse(matchModified.Value) 
-                            };
-                        }
-                        else throw new InvalidOperationException("Failed to parse ftp LIST output string");
-                    }).ToList();
-
-
+                else throw new InvalidOperationException("Failed to parse ftp LIST output string");
             }
-            else
-            {
-                return new List<FtpFilesDetail>();
-            }
+            return ftpRespList;
         }
         
-        //-----------------------------------------------------------------------------------------------------------------------
-
-
-
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers

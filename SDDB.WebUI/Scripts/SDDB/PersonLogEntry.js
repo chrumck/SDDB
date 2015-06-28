@@ -58,6 +58,9 @@ $(document).ready(function () {
                     "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { logEntryId: CurrIds[0] },
                     "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { logEntryId: CurrIds[0] },
                     "GET", "/PersonSrv/Get", { getActive: true })
+
+
+
                 )
                 .then(function (currRecord) {
                     CurrRecord = currRecord;
@@ -73,11 +76,6 @@ $(document).ready(function () {
                     $("#EditFormView").removeClass("hide");
                 })
                 .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
-
-            if (CurrIds.length == 1) RefreshTblGenWrp(TableLogEntryFiles, "/PersonLogEntrySrv/GetFiles", { id: CurrIds[0] }, "GET");
-            else {
-                //add functionality to disable the files
-            }
         }
     });
 
@@ -376,13 +374,14 @@ $(document).ready(function () {
     //TableLogEntryFiles
     TableLogEntryFiles = $("#TableLogEntryFiles").DataTable({
         columns: [
-            { data: "FileName", name: "FileName" },//0
-            { data: "Modified", name: "Modified" },//1
+            { data: "Name", name: "Name" },//0
+            { data: "Size", name: "Size" },//1
+            { data: "Modified", name: "Modified" }//2
         ],
         columnDefs: [
             { targets: [], visible: false }, // - never show
             { targets: [], searchable: false },  //"orderable": false, "visible": false
-            { targets: [], className: "hidden-xs hidden-sm" }
+            { targets: [2], className: "hidden-xs" }
         ],
         bAutoWidth: false,
         language: {
@@ -455,6 +454,23 @@ function RefreshMainView() {
             .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
     }
 
+}
+
+function SetLogEntryFilesTable() {
+    var deferred0 = $.Deferred();
+
+    if (CurrIds.length == 1) {
+        $("#LogEntryFilesHeading").text("Files"); $("#LogEntryFilesBtnGroup").removeClass("hide");
+        RefreshTableGeneric(TableLogEntryFiles, "/PersonLogEntrySrv/GetFiles", { id: CurrIds[0] }, "GET")
+        .done(function () { deferred0.resolve(); })
+        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
+    }
+    else {
+        $("#LogEntryFilesHeading").text("Files - disabled if multiple"); $("#LogEntryFilesBtnGroup").addClass("hide");
+        deferred0.resolve();
+    }
+
+    return deferred0.promise();
 }
 
 

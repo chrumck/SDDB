@@ -14,7 +14,7 @@ namespace SDDB.Domain.Entities
         }
     }
 
-    public class FtpFilesDetail
+    public class FtpFileDetail
     {
         public string Name { get; set; }
         public double Size { get; set; }
