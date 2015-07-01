@@ -11,6 +11,7 @@ namespace SDDB.Domain.Abstract
         //Methods--------------------------------------------------------------------------------------------------------------//
 
         Task<List<FtpFileDetail>> GetAsync(string id);
+        Task<byte[]> DownloadAsync(string id, string[] names);
         
     }
 }

@@ -9,14 +9,15 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var TableMain = {};
-var TableLogEntryAssysAdd = {}; var TableLogEntryAssysRemove = {};
-var TableLogEntryPersonsAdd = {}; var TableLogEntryPersonsRemove = {};
-var MsFilterByProject = {}; var MsFilterByType = {}; var MsFilterByPerson = {};
+var TableMain;
+var TableLogEntryAssysAdd; var TableLogEntryAssysRemove;
+var TableLogEntryPersonsAdd; var TableLogEntryPersonsRemove;
+var MsFilterByProject; var MsFilterByType; var MsFilterByPerson;
 var MagicSuggests = [];
-var CurrRecord = {}; var CurrIds = [];
+var CurrRecord; var CurrIds = [];
 var GetActive = true;
-
+var SelectedRecord;
+var DlToken; var DlTimer; var DlAttempts;
 
 $(document).ready(function () {
 
@@ -25,46 +26,45 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         CurrIds = [];
-        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create Log Entry", "MainView");
+        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Log Entry", "MainView");
         MagicSuggests[3].disable(); MagicSuggests[4].disable();
         TableLogEntryAssysAdd.clear().search("").draw(); TableLogEntryAssysRemove.clear().search("").draw();
+        $("#EditFormBtnOkFiles").removeClass("disabled");
 
         $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-        FillFormForRelatedGeneric(TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
+        fillFormForRelatedGeneric(TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
             "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { logEntryId: CurrIds[0] },
             "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { logEntryId: CurrIds[0] },
             "GET", "/PersonSrv/Get", { getActive: true })
             .always(function () { $("#ModalWait").modal("hide"); })
-            .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-
-        if (GetActive) $("#EditFormGroupIsActive").addClass("hide"); 
-        else $("#EditFormGroupIsActive").removeClass("hide");
-
         CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-
-        if (CurrIds.length == 0) ShowModalNothingSelected();
+        if (CurrIds.length == 0) showModalNothingSelected();
         else {
+            if (GetActive) $("#EditFormGroupIsActive").addClass("hide");
+            else $("#EditFormGroupIsActive").removeClass("hide");
+
+            if (CurrIds.length > 1) $("#EditFormBtnOkFiles").addClass("disabled");
+            else $("#EditFormBtnOkFiles").removeClass("disabled");
+
             $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
 
             $.when(
-                FillFormForEditGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
+                fillFormForEditGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
                     GetActive, "EditForm", "Edit Person Log Entry", MagicSuggests),
 
-                FillFormForRelatedGeneric(TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
+                fillFormForRelatedGeneric(TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
                     "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { logEntryId: CurrIds[0] },
                     "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { logEntryId: CurrIds[0] },
                     "GET", "/PersonSrv/Get", { getActive: true })
-
-
-
                 )
                 .then(function (currRecord) {
                     CurrRecord = currRecord;
-                    return FillFormForRelatedGeneric(TableLogEntryAssysAdd, TableLogEntryAssysRemove, CurrIds,
+                    return fillFormForRelatedGeneric(TableLogEntryAssysAdd, TableLogEntryAssysRemove, CurrIds,
                         "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys", { logEntryId: CurrIds[0] },
                         "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot", { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] },
                         "GET", "AssemblyDbSrv/LookupByLocDTables", { getActive: true });
@@ -75,57 +75,67 @@ $(document).ready(function () {
                     $("#MainView").addClass("hide");
                     $("#EditFormView").removeClass("hide");
                 })
-                .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
         }
     });
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-        if (CurrIds == 0) ShowModalNothingSelected();
-        else ShowModalDelete(CurrIds.length);
+        if (CurrIds.length == 0) showModalNothingSelected();
+        else showModalDelete(CurrIds.length);
+    });
+
+    //Wire up BtnEditLogEntryFiles 
+    $("#BtnEditLogEntryFiles").click(function () {
+        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        if (CurrIds.length != 1) showModalSelectOne();
+        else {
+            SelectedRecord = TableMain.row(".ui-selected").data();
+            fillLogEntryFilesForm();
+        }
     });
 
     //Initialize DateTimePicker FilterDateStart
     $("#FilterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("dp.hide", function (e) { RefreshMainView(); });
+        .on("dp.hide", function (e) { refreshMainView(); });
 
     //Initialize DateTimePicker FilterDateEnd
     $("#FilterDateEnd").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("dp.hide", function (e) { RefreshMainView(); });
+        .on("dp.hide", function (e) { refreshMainView(); });
 
     //Initialize MagicSuggest MsFilterByType
     MsFilterByType = $("#MsFilterByType").magicSuggest({
         data: "/PersonActivityTypeSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
         style: "min-width: 240px;"
     });
-    $(MsFilterByType).on('selectionchange', function (e, m) { RefreshMainView(); });
+    $(MsFilterByType).on('selectionchange', function (e, m) { refreshMainView(); });
 
     //Initialize MagicSuggest MsFilterByProject
     MsFilterByProject = $("#MsFilterByProject").magicSuggest({
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
         style: "min-width: 240px;"
     });
-    $(MsFilterByProject).on('selectionchange', function (e, m) { RefreshMainView(); });
+    $(MsFilterByProject).on('selectionchange', function (e, m) { refreshMainView(); });
 
     //Initialize MagicSuggest MsFilterByPerson
     MsFilterByPerson = $("#MsFilterByPerson").magicSuggest({
         data: "/PersonSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
         style: "min-width: 240px;"
     });
-    $(MsFilterByPerson).on('selectionchange', function (e, m) { RefreshMainView(); });
+    $(MsFilterByPerson).on('selectionchange', function (e, m) { refreshMainView(); });
    
         
     //---------------------------------------DataTables------------
@@ -134,7 +144,7 @@ $(document).ready(function () {
     $("#ChBoxShowDeleted").change(function (event) {
         if (!$(this).prop("checked")) { GetActive = true; $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary"); }
         else { GetActive = false; $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger"); }
-        RefreshMainView();
+        refreshMainView();
     });
 
     //TableMain PersonLogEntrys
@@ -184,12 +194,12 @@ $(document).ready(function () {
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
-    AddToMSArray(MagicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
-    AddToMSArray(MagicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1);
-    AddToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    AddToMSArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/LookupByProj", 1, null,
+    addToMSArray(MagicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/LookupByProj", 1, null,
         { projectIds: MagicSuggests[2].getValue });
-    AddToMSArray(MagicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
+    addToMSArray(MagicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
         { projectIds: MagicSuggests[2].getValue });
     
     //Initialize MagicSuggest Array Event
@@ -214,12 +224,12 @@ $(document).ready(function () {
         else {
             
             if (CurrIds.length == 1) {
-                RefreshTblGenWrp(TableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
+                refreshTblGenWrp(TableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
                     { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] }, "GET")
                     .done(function () { $("#AssignedToLocation_Id input").focus(); });
             }
             else {
-                RefreshTblGenWrp(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
+                refreshTblGenWrp(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
                 { getActive: true, locId: MagicSuggests[3].getValue()[0] }, "GET")
                 .done(function () { $("#AssignedToLocation_Id input").focus(); });
             }
@@ -235,40 +245,25 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
-        MsValidate(MagicSuggests);
-        if (FormIsValid("EditForm", CurrIds.length == 0) && MsIsValid(MagicSuggests)) {
-
-            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-
-            SubmitEditsGeneric(CurrIds, "EditForm", MagicSuggests, CurrRecord, "POST", "/PersonLogEntrySrv/Edit")
-                .then(function (data) {
-
-                    var deferred0 = $.Deferred();
-
-                    var ids = (CurrIds.length == 0) ? data.ReturnIds : CurrIds;
-                    var idsAssysAdd = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name").data().toArray();
-                    var idsAssysRemove = TableLogEntryAssysRemove.cells(".ui-selected", "Id:name").data().toArray();
-                    var idsPersonsAdd = TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name").data().toArray();
-                    var idsPersonsRemove = TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name").data().toArray();
-
-                    $.when(
-                        SubmitEditsForRelatedGeneric(ids, idsAssysAdd, idsAssysRemove, "/PersonLogEntrySrv/EditPrsLogEntryAssys"),
-                        SubmitEditsForRelatedGeneric(ids, idsPersonsAdd, idsPersonsRemove, "/PersonLogEntrySrv/EditPrsLogEntryPersons")
-                        )
-                        .done(function () { deferred0.resolve(); })
-                        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
-
-                    return deferred0.promise();
-                })
-                .always(function () { $("#ModalWait").modal("hide"); })
-                .done(function () {
-                    RefreshMainView();
-                    $("#MainView").removeClass("hide");
-                    $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
-                })
-                .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        msValidate(MagicSuggests);
+        if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
+            submitEdits();
         }
+    });
 
+    //Wire Up EditFormBtnOkFiles
+    $("#EditFormBtnOkFiles").click(function () {
+        msValidate(MagicSuggests);
+        if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
+            SelectedRecord = TableMain.row(".ui-selected").data();
+            submitEdits()
+            .done(function () {
+                setTimeout(function () {
+                    fillLogEntryFilesForm();
+                }, 300);
+                
+            });
+        }
     });
 
     //------------------------------------DataTables - Log Entry Assemblies ---
@@ -369,6 +364,41 @@ $(document).ready(function () {
         pageLength: 10
     });
 
+    //--------------------------------------LogEntryFilesView---------------------------------------//
+
+    //Wire Up EditFormBtnCancel
+    $("#LogEntryFilesViewBtnCancel, #LogEntryFilesViewBtnBack").click(function () {
+        $("#MainView").removeClass("hide");
+        $("#LogEntryFilesView").addClass("hide"); window.scrollTo(0, 0);
+    });
+
+    //Wire Up LogEntryFilesBtnDload
+    $("#LogEntryFilesBtnDload").click(function () {
+        var names = TableLogEntryFiles.cells(".ui-selected", "Name:name").data().toArray();
+        if (names.length == 0) showModalNothingSelected();
+        else {
+            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+
+            DlToken = new Date().getTime(); DlAttempts = 60;
+            DlTimer = window.setInterval(function () {
+                if ((getCookie("DlToken") == DlToken) || (DlAttempts == 0)) {
+                    $("#ModalWait").modal("hide");
+                    window.clearInterval(DlTimer);
+                    expireCookie("DlToken");
+                    if (DlAttempts == 0) showModalFail("Server Error", "Server response timed out.");
+                }
+                else DlAttempts--;
+            }, 500);
+
+            var form = $('<form method="POST" action="/PersonLogEntrySrv/DownloadFiles" target="LogEntryFilesIframe">');
+            form.append($('<input type="hidden" name="DlToken" value="' + DlToken + '">'));
+            form.append($('<input type="hidden" name="id" value="' + CurrIds[0] + '">'));
+            $.each(names, function (i, name) {form.append($('<input type="hidden" name="names[' + i + ']" value="' + name + '">')); });
+            $('body').append(form);
+            form.submit();
+        }
+    });
+
     //------------------------------------DataTables - Log Entry Files ---
 
     //TableLogEntryFiles
@@ -410,7 +440,7 @@ $(document).ready(function () {
     //        .done(function (data) {
     //            MsFilterByAssy.setSelection([{ id: data[0].Id, name: data[0].AssyName,  }]);
     //        })
-    //        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+    //        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     //}
 
     
@@ -427,11 +457,11 @@ function DeleteRecords() {
     $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
     $.ajax({ type: "POST", url: "/PersonLogEntrySrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json"})
         .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function () { RefreshMainView(); })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .done(function () { refreshMainView(); })
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 //refresh view after magicsuggest update
-function RefreshMainView() {
+function refreshMainView() {
     if ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "" ||
             (MsFilterByType.getValue().length == 0 && MsFilterByProject.getValue().length == 0
                 && MsFilterByPerson.getValue().length == 0)
@@ -444,36 +474,85 @@ function RefreshMainView() {
 
         $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
 
-        RefreshTableGeneric(TableMain, "/PersonLogEntrySrv/GetByFilterIds", { personIds: MsFilterByPerson.getValue(), 
+        refreshTableGeneric(TableMain, "/PersonLogEntrySrv/GetByFilterIds", { personIds: MsFilterByPerson.getValue(), 
                 projectIds: MsFilterByProject.getValue(), typeIds: MsFilterByType.getValue(),
                 startDate: $("#FilterDateStart").val(), endDate: endDate, getActive: GetActive}, "POST")
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function () {
                 $("#ChBoxShowDeleted").bootstrapToggle("enable");
             })
-            .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }
-
 }
 
-function SetLogEntryFilesTable() {
+//submit edits to DB
+function submitEdits() {
     var deferred0 = $.Deferred();
 
-    if (CurrIds.length == 1) {
-        $("#LogEntryFilesHeading").text("Files"); $("#LogEntryFilesBtnGroup").removeClass("hide");
-        RefreshTableGeneric(TableLogEntryFiles, "/PersonLogEntrySrv/GetFiles", { id: CurrIds[0] }, "GET")
-        .done(function () { deferred0.resolve(); })
-        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
-    }
-    else {
-        $("#LogEntryFilesHeading").text("Files - disabled if multiple"); $("#LogEntryFilesBtnGroup").addClass("hide");
-        deferred0.resolve();
-    }
+    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+
+    submitEditsGeneric(CurrIds, "EditForm", MagicSuggests, CurrRecord, "POST", "/PersonLogEntrySrv/Edit")
+        .then(function (data) {
+
+            var deferred1 = $.Deferred();
+
+            var ids = (CurrIds.length == 0) ? data.ReturnIds : CurrIds;
+            var idsAssysAdd = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name").data().toArray();
+            var idsAssysRemove = TableLogEntryAssysRemove.cells(".ui-selected", "Id:name").data().toArray();
+            var idsPersonsAdd = TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name").data().toArray();
+            var idsPersonsRemove = TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name").data().toArray();
+
+            $.when(
+                submitEditsForRelatedGeneric(ids, idsAssysAdd, idsAssysRemove, "/PersonLogEntrySrv/EditPrsLogEntryAssys"),
+                submitEditsForRelatedGeneric(ids, idsPersonsAdd, idsPersonsRemove, "/PersonLogEntrySrv/EditPrsLogEntryPersons")
+                )
+                .done(function () { deferred1.resolve(); })
+                .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
+
+            return deferred1.promise();
+        })
+        .always(function () { $("#ModalWait").modal("hide"); })
+        .done(function () {
+            refreshMainView();
+            $("#MainView").removeClass("hide");
+            $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
+            deferred0.resolve();
+        })
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); deferred0.reject(); });
 
     return deferred0.promise();
 }
 
+function fillLogEntryFilesForm() {
+    var deferred0 = $.Deferred();
+
+    $("#LogEntryFilesViewPanel").text(SelectedRecord.EnteredByPerson_.FirstName + " " +
+        SelectedRecord.EnteredByPerson_.LastName + " - " + SelectedRecord.LogEntryDateTime);
+
+    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+
+    refreshTableGeneric(TableLogEntryFiles, "/PersonLogEntrySrv/GetFiles", { id: CurrIds[0] }, "GET")
+        .always(function () { $("#ModalWait").modal("hide"); })
+        .done(function () {
+            $("#MainView").addClass("hide");
+            $("#LogEntryFilesView").removeClass("hide");
+            deferred0.resolve();
+        })
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); deferred0.reject(); });
+
+    return deferred0.promise();
+}
 
 //---------------------------------------Helper Methods--------------------------------------//
+
+function getCookie(name) {
+    var parts = document.cookie.split(name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+}
+
+function expireCookie(name) {
+    document.cookie = encodeURIComponent(name) + "=deleted; expires=" + new Date(0).toUTCString();
+}
+
 
 

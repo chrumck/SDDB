@@ -22,21 +22,21 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create Component", "MainView");
+        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Component", "MainView");
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         var selectedRows = TableMain.rows(".ui-selected").data();
-        if (selectedRows.length == 0) ShowModalNothingSelected();
+        if (selectedRows.length == 0) showModalNothingSelected();
         else { IsCreate = false; FillFormForEdit(); }
     });
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
         var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) ShowModalNothingSelected();
-        else ShowModalDelete(noOfRows);
+        if (noOfRows == 0) showModalNothingSelected();
+        else showModalDelete(noOfRows);
     });
 
     //wire up dropdownId1
@@ -58,7 +58,7 @@ $(document).ready(function () {
         data: "/ComponentTypeSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
         style: "min-width: 240px;"
     });
@@ -69,7 +69,7 @@ $(document).ready(function () {
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
         style: "min-width: 240px;"
     });
@@ -81,7 +81,7 @@ $(document).ready(function () {
         allowFreeEntries: false,
         dataUrlParams: { projectIds: MsFilterByProject.getValue },
         ajaxConfig: {
-            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
         style: "min-width: 240px;"
     });
@@ -152,11 +152,11 @@ $(document).ready(function () {
     $(".modifiable").change(function () { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
-    AddToMSArray(MagicSuggests, "ComponentType_Id", "/ComponentTypeSrv/Lookup", 1);
-    AddToMSArray(MagicSuggests, "ComponentStatus_Id", "/ComponentStatusSrv/Lookup", 1);
-    AddToMSArray(MagicSuggests, "ComponentModel_Id", "/ComponentModelSrv/Lookup", 1);
-    AddToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    AddToMSArray(MagicSuggests, "AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "ComponentType_Id", "/ComponentTypeSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "ComponentStatus_Id", "/ComponentStatusSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "ComponentModel_Id", "/ComponentModelSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
 
     //Enable DateTimePicker
     $("[data-val-dbisdateiso]").datetimepicker({ format: "YYYY-MM-DD" })
@@ -171,8 +171,8 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
-        MsValidate(MagicSuggests);
-        if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
+        msValidate(MagicSuggests);
+        if (formIsValid("EditForm", IsCreate) && msIsValid(MagicSuggests)) SubmitEdits();
     });
 
     //--------------------------------------View Initialization------------------------------------//
@@ -187,7 +187,7 @@ $(document).ready(function () {
             .done(function (data) {
                 MsFilterByAssy.setSelection([{ id: data[0].Id, name: data[0].AssyName,  }]);
             })
-            .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }
 
 
@@ -253,7 +253,7 @@ function FillFormForEdit() {
                 else FormInput.AssignedToAssemblyDb = dbEntry.AssignedToAssemblyDb.AssyName;
             });
 
-            ClearFormInputs("EditForm", MagicSuggests);
+            clearFormInputs("EditForm", MagicSuggests);
             $("#EditFormLabel").text("Edit Component");
 
             $("#CompName").val(FormInput.CompName);
@@ -275,17 +275,17 @@ function FillFormForEdit() {
 
             if (data.length == 1) {
                 $("[data-val-dbisunique]").prop("disabled", false);
-                DisableUniqueMs(MagicSuggests, false);
+                disableUniqueMs(MagicSuggests, false);
             }
             else {
                 $("[data-val-dbisunique]").prop("disabled", true);
-                DisableUniqueMs(MagicSuggests, true);
+                disableUniqueMs(MagicSuggests, true);
             }
 
             $("#MainView").addClass("hide");
             $("#EditFormView").removeClass("hide");
         })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 //SubmitEdits to DB
@@ -350,7 +350,7 @@ function SubmitEdits() {
             $("#MainView").removeClass("hide");
             $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
         })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error);
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error);
         });
 }
 
@@ -363,7 +363,7 @@ function DeleteRecords() {
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () { RefreshMainView(); })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 //refresh view after magicsuggest update
@@ -374,7 +374,7 @@ function RefreshMainView() {
         TableMain.clear().search("").draw();
     }
     else {
-        RefreshTable(TableMain, "/ComponentSrv/GetByTypeAssyIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+        refreshTable(TableMain, "/ComponentSrv/GetByTypeAssyIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
             "POST", MsFilterByProject.getValue(), [], MsFilterByType.getValue(), [], MsFilterByAssy.getValue());
         $("#ChBoxShowDeleted").bootstrapToggle("enable")
     }

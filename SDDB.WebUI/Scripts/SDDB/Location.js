@@ -24,21 +24,21 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create Location", "MainView");
+        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Location", "MainView");
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         var selectedRows = TableMain.rows(".ui-selected").data();
-        if (selectedRows.length == 0) ShowModalNothingSelected();
+        if (selectedRows.length == 0) showModalNothingSelected();
         else { IsCreate = false; FillFormForEdit(); }
     });
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
         var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) ShowModalNothingSelected();
-        else ShowModalDelete(noOfRows);
+        if (noOfRows == 0) showModalNothingSelected();
+        else showModalDelete(noOfRows);
     });
 
     //wire up dropdownId1
@@ -69,7 +69,7 @@ $(document).ready(function () {
     $("#dropdownId4").click(function (event) {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows != 1) ShowModalSelectOne();
+        if (noOfRows != 1) showModalSelectOne();
         else window.open("/AssemblyDb?locId=" + TableMain.cell(".ui-selected", "Id:name").data())
     });
 
@@ -78,7 +78,7 @@ $(document).ready(function () {
         data: "/LocationTypeSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
         style: "min-width: 240px;"
     });
@@ -89,7 +89,7 @@ $(document).ready(function () {
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
         style: "min-width: 240px;"
     });
@@ -168,9 +168,9 @@ $(document).ready(function () {
     $(".modifiable").change(function () { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
-    AddToMSArray(MagicSuggests, "LocationType_Id", "/LocationTypeSrv/Lookup", 1);
-    AddToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    AddToMSArray(MagicSuggests, "ContactPerson_Id", "/PersonSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "LocationType_Id", "/LocationTypeSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "ContactPerson_Id", "/PersonSrv/Lookup", 1);
     
 
     //Wire Up EditFormBtnCancel
@@ -182,8 +182,8 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
-        MsValidate(MagicSuggests);
-        if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
+        msValidate(MagicSuggests);
+        if (formIsValid("EditForm", IsCreate) && msIsValid(MagicSuggests)) SubmitEdits();
     });
 
     //--------------------------------------View Initialization------------------------------------//
@@ -198,7 +198,7 @@ $(document).ready(function () {
             .done(function (data) {
                 MsFilterByProject.setSelection([{ id: data[0].Id, name: data[0].ProjectName, }]);
             })
-            .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }
 
 
@@ -271,7 +271,7 @@ function FillFormForEdit() {
                 else FormInput.ContactPerson = dbEntry.ContactPerson.FirstName + " " + dbEntry.ContactPerson.LastName;
             });
 
-            ClearFormInputs("EditForm", MagicSuggests);
+            clearFormInputs("EditForm", MagicSuggests);
             $("#EditFormLabel").text("Edit Location");
 
             $("#LocName").val(FormInput.LocName);
@@ -297,17 +297,17 @@ function FillFormForEdit() {
 
             if (data.length == 1) {
                 $("[data-val-dbisunique]").prop("disabled", false);
-                DisableUniqueMs(MagicSuggests, false);
+                disableUniqueMs(MagicSuggests, false);
             }
             else {
                 $("[data-val-dbisunique]").prop("disabled", true);
-                DisableUniqueMs(MagicSuggests, true);
+                disableUniqueMs(MagicSuggests, true);
             }
 
             $("#MainView").addClass("hide");
             $("#EditFormView").removeClass("hide");
         })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 //SubmitEdits to DB
@@ -378,7 +378,7 @@ function SubmitEdits() {
             $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
         })
         .fail(function (xhr, status, error) {
-            ShowModalAJAXFail(xhr, status, error);
+            showModalAJAXFail(xhr, status, error);
         });
 }
 
@@ -391,7 +391,7 @@ function DeleteRecords() {
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () { RefreshMainView(); })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 //refresh view after magicsuggest update
@@ -401,7 +401,7 @@ function RefreshMainView() {
         TableMain.clear().search("").draw();
     }
     else {
-        RefreshTable(TableMain, "/LocationSrv/GetByTypeIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+        refreshTable(TableMain, "/LocationSrv/GetByTypeIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
             "POST", MsFilterByProject.getValue(), [], MsFilterByType.getValue());
         $("#ChBoxShowDeleted").bootstrapToggle("enable")
     }

@@ -23,21 +23,21 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create Assembly", "MainView");
+        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Assembly", "MainView");
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         var selectedRows = TableMain.rows(".ui-selected").data();
-        if (selectedRows.length == 0) ShowModalNothingSelected();
+        if (selectedRows.length == 0) showModalNothingSelected();
         else { IsCreate = false; FillFormForEdit(); }
     });
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
         var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) ShowModalNothingSelected();
-        else ShowModalDelete(noOfRows);
+        if (noOfRows == 0) showModalNothingSelected();
+        else showModalDelete(noOfRows);
     });
 
     //wire up dropdownId1
@@ -80,7 +80,7 @@ $(document).ready(function () {
     $("#dropdownId5").click(function (event) {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows != 1) ShowModalSelectOne();
+        if (noOfRows != 1) showModalSelectOne();
         else window.open("/Component?assyId=" + TableMain.cell(".ui-selected", "Id:name").data())
     });
 
@@ -89,7 +89,7 @@ $(document).ready(function () {
         data: "/AssemblyTypeSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
         style: "min-width: 240px;"
     });
@@ -100,7 +100,7 @@ $(document).ready(function () {
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
         style: "min-width: 240px;"
     });
@@ -112,7 +112,7 @@ $(document).ready(function () {
         allowFreeEntries: false,
         dataUrlParams: { projectIds: MsFilterByProject.getValue },
         ajaxConfig: {
-            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
         style: "min-width: 240px;"
     });
@@ -206,11 +206,11 @@ $(document).ready(function () {
     $(".modifiable").change(function () { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
-    AddToMSArray(MagicSuggests, "AssemblyType_Id", "/AssemblyTypeSrv/Lookup", 1);
-    AddToMSArray(MagicSuggests, "AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup", 1);
-    AddToMSArray(MagicSuggests, "AssemblyModel_Id", "/AssemblyModelSrv/Lookup", 1);
-    AddToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    AddToMSArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "AssemblyType_Id", "/AssemblyTypeSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "AssemblyModel_Id", "/AssemblyModelSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/Lookup", 1);
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
@@ -221,8 +221,8 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
-        MsValidate(MagicSuggests);
-        if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
+        msValidate(MagicSuggests);
+        if (formIsValid("EditForm", IsCreate) && msIsValid(MagicSuggests)) SubmitEdits();
     });
 
     //--------------------------------------View Initialization------------------------------------//
@@ -237,7 +237,7 @@ $(document).ready(function () {
             .done(function (data) {
                 MsFilterByLoc.setSelection([{ id: data[0].Id, name: data[0].LocName, }]);
             })
-            .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }
 
 
@@ -326,7 +326,7 @@ function FillFormForEdit() {
                 else FormInput.AssignedToLocation = dbEntry.AssignedToLocation.LocName;
             });
 
-            ClearFormInputs("EditForm", MagicSuggests);
+            clearFormInputs("EditForm", MagicSuggests);
             $("#EditFormLabel").text("Edit Assembly");
 
             $("#AssyName").val(FormInput.AssyName);
@@ -360,17 +360,17 @@ function FillFormForEdit() {
 
             if (data.length == 1) {
                 $("[data-val-dbisunique]").prop("disabled", false);
-                DisableUniqueMs(MagicSuggests, false);
+                disableUniqueMs(MagicSuggests, false);
             }
             else {
                 $("[data-val-dbisunique]").prop("disabled", true);
-                DisableUniqueMs(MagicSuggests, true);
+                disableUniqueMs(MagicSuggests, true);
             }
 
             $("#MainView").addClass("hide");
             $("#EditFormView").removeClass("hide");
         })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 //SubmitEdits to DB
@@ -448,7 +448,7 @@ function SubmitEdits() {
             $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
         })
         .fail(function (xhr, status, error) {
-            ShowModalAJAXFail(xhr, status, error);
+            showModalAJAXFail(xhr, status, error);
         });
 }
 
@@ -461,7 +461,7 @@ function DeleteRecords() {
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () { RefreshMainView(); })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 //refresh main view
@@ -472,7 +472,7 @@ function RefreshMainView() {
         TableMain.clear().search("").draw();
     }
     else {
-        RefreshTable(TableMain, "/AssemblyDbSrv/GetByTypeLocIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+        refreshTable(TableMain, "/AssemblyDbSrv/GetByTypeLocIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
             "POST", MsFilterByProject.getValue(), [], MsFilterByType.getValue(), MsFilterByLoc.getValue());
         $("#ChBoxShowDeleted").bootstrapToggle("enable")
     }

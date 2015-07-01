@@ -231,8 +231,8 @@
                     <button class="btn btn-success pull-right" type="button" id="EditFormBtnOk">
                         &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
                     </button>
-                    <button class="btn btn-success pull-right margin-right-5px" type="button" id="EditFormBtnOkFiles">
-                    <span class="glyphicon glyphicon-ok"></span>&nbsp; Add Files
+                    <button class="btn btn-success pull-right margin-right-5px disabled" type="button" id="EditFormBtnOkFiles">
+                    <span class="glyphicon glyphicon-ok"></span> & Files
                     </button>
                 </div>
             </div>
@@ -242,37 +242,48 @@
 
 <!------- LogEntryFilesView ------->
 <div class="container-fluid hide" id="LogEntryFilesView">
-   <div class="well">
-       <div class="row">
-           <div class="col-xs-9 col-sm-6">
-               <div class="panel panel-warning margin-top-10px">
-                   <div class="panel-heading text-center" style="font-weight:bold" id="LogEntryFilesViewPanel">Dummy Log Entry</div>
-               </div>
-           </div>
-           <div class="col-xs-3 col-sm-6">
-               <h3><button class="btn btn-default pull-right" type="button" id="LogEntryFilesViewBtnBack">Back</button></h3>
-           </div>
-       </div>
-        <div class="panel panel-info">
-            <div class="panel-heading text-center clearfix" style="font-size:120%">
-                <div class="btn-group pull-left">
-                    <button class="btn btn-default" id="LogEntryFilesBtnAdd">Add</button>
+   
+    <div class="row">
+        <div class="col-xs-12 col-sm-5">
+            <h3 id="PrsProjViewLabel">Log Entry Files</h3>
+        </div>
+        <div class="col-xs-9 col-sm-4">
+            <div class="panel panel-warning margin-top-10px">
+                <div class="panel-heading text-center" style="font-weight:bold" id="LogEntryFilesViewPanel"> </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <h3><button class="btn btn-default pull-right" type="button" id="LogEntryFilesViewBtnBack">Back</button></h3>
+        </div>
+    </div>
+    
+    <div class="well">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="btn-group margin-bottom-2px">
+                    <button class="btn btn-default" id="LogEntryFilesBtnAdd">Upload</button>
                     <button class="btn btn-danger" id="LogEntryFilesBtnDelete">Delete</button>
                     <button class="btn btn-info" id="LogEntryFilesBtnDload">Download</button>
                 </div>
-                <strong>Log Entry Files</strong>
             </div>
-            <table class="table table-striped" id="TableLogEntryFiles">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Size kB</th>
-                        <th>Modified</th>
-                    </tr>
-                </thead>
-                <tbody class="selectable"></tbody>
-            </table>
         </div>
+       <div class="row">
+           <div class="col-xs-12">
+               <div class="panel panel-primary">
+                   <div class="panel-heading text-center"><strong>Log Entry Files</strong></div>
+                   <table class="table table-striped" id="TableLogEntryFiles">
+                       <thead>
+                           <tr>
+                               <th>Name</th>
+                               <th>Size kB</th>
+                               <th>Modified</th>
+                           </tr>
+                       </thead>
+                       <tbody class="selectable"></tbody>
+                   </table>
+               </div>
+           </div>
+       </div>
 
         <div class="row">
             <div class="col-xs-12">
@@ -280,6 +291,7 @@
             </div>
         </div>
     </div>
+    <iframe class="hide" id="LogEntryFilesIframe" name="LogEntryFilesIframe"></iframe>
 </div>
 
 

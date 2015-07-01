@@ -23,21 +23,21 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create Event", "MainView");
+        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Event", "MainView");
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         var selectedRows = TableMain.rows(".ui-selected").data();
-        if (selectedRows.length == 0) ShowModalNothingSelected();
+        if (selectedRows.length == 0) showModalNothingSelected();
         else { IsCreate = false; FillFormForEdit(); }
     });
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
         var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) ShowModalNothingSelected();
-        else ShowModalDelete(noOfRows);
+        if (noOfRows == 0) showModalNothingSelected();
+        else showModalDelete(noOfRows);
     });
 
 
@@ -46,7 +46,7 @@ $(document).ready(function () {
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
         style: "min-width: 240px;"
     });
@@ -106,9 +106,9 @@ $(document).ready(function () {
     $(".modifiable").change(function () { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
-    AddToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    AddToMSArray(MagicSuggests, "CreatedByPerson_Id", "/PersonSrv/Lookup", 1);
-    AddToMSArray(MagicSuggests, "ClosedByPerson_Id", "/PersonSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "CreatedByPerson_Id", "/PersonSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "ClosedByPerson_Id", "/PersonSrv/Lookup", 1);
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
@@ -123,8 +123,8 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
-        MsValidate(MagicSuggests);
-        if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
+        msValidate(MagicSuggests);
+        if (formIsValid("EditForm", IsCreate) && msIsValid(MagicSuggests)) SubmitEdits();
     });
 
 
@@ -179,7 +179,7 @@ function FillFormForEdit() {
                 else FormInput.ClosedByPerson = dbEntry.ClosedByPerson.FirstName + " " + dbEntry.ClosedByPerson.LastName;
             });
 
-            ClearFormInputs("EditForm", MagicSuggests);
+            clearFormInputs("EditForm", MagicSuggests);
             $("#EditFormLabel").text("Edit Event");
 
             $("#EventName").val(FormInput.EventName);
@@ -194,17 +194,17 @@ function FillFormForEdit() {
             
             if (data.length == 1) {
                 $("[data-val-dbisunique]").prop("disabled", false);
-                DisableUniqueMs(MagicSuggests, false);
+                disableUniqueMs(MagicSuggests, false);
             }
             else {
                 $("[data-val-dbisunique]").prop("disabled", true);
-                DisableUniqueMs(MagicSuggests, true);
+                disableUniqueMs(MagicSuggests, true);
             }
 
             $("#MainView").addClass("hide");
             $("#EditFormView").removeClass("hide");
         })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 //SubmitEdits to DB
@@ -260,7 +260,7 @@ function SubmitEdits() {
             $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
         })
         .fail(function (xhr, status, error) {
-            ShowModalAJAXFail(xhr, status, error);
+            showModalAJAXFail(xhr, status, error);
         });
 }
 
@@ -273,12 +273,12 @@ function DeleteRecords() {
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () { RefreshMainView(); })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 //refresh view after magicsuggest update
 function RefreshMainView() {
-    RefreshTable(TableMain, "/ProjectEventSrv/GetByProjectIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+    refreshTable(TableMain, "/ProjectEventSrv/GetByProjectIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
         "POST", MsFilterByProject.getValue());
     $("#ChBoxShowDeleted").bootstrapToggle("enable")
 }

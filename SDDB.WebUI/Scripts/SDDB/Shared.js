@@ -79,7 +79,7 @@ $(document).ready(function () {
 //------------------------------------Common Main Methods----------------------------------//
 
 //Show Modal Nothing Selected
-function ShowModalNothingSelected() {
+function showModalNothingSelected() {
     $("#ModalInfoLabel").text("Nothing Selected");
     $("#ModalInfoBody").text("Please select one or more rows.");
     $("#ModalInfoBodyPre").empty().hide();
@@ -87,15 +87,15 @@ function ShowModalNothingSelected() {
 }
 
 //Show Modal Selected other than one row
-function ShowModalSelectOne() {
-    $("#ModalInfoLabel").text("Selected One Row");
-    $("#ModalInfoBody").text("Please select only one row.");
+function showModalSelectOne() {
+    $("#ModalInfoLabel").text("Select One Row");
+    $("#ModalInfoBody").text("Please select one row.");
     $("#ModalInfoBodyPre").empty().hide();
     $("#ModalInfo").modal("show");
 }
 
 //Show Modal Delete
-function ShowModalDelete(noOfRows) {
+function showModalDelete(noOfRows) {
     $("#ModalDeleteBody").text("Confirm deleting " + noOfRows + " row(s).");
     $("#ModalDelete").modal("show");
 }
@@ -106,8 +106,8 @@ $("#ModalDeleteBtnOk").click(function () {
     DeleteRecords();
 });
 
-//ShowModalFail
-function ShowModalFail(label, body, bodyPre) {
+//showModalFail
+function showModalFail(label, body, bodyPre) {
     label = (typeof label !== "undefined") ? label : "Undefined Error";
     body = (typeof body !== "undefined") ? body : "";
     bodyPre = (typeof bodyPre !== "undefined") ? bodyPre : "";
@@ -115,11 +115,12 @@ function ShowModalFail(label, body, bodyPre) {
     $("#ModalInfoLabel").text(label);
     $("#ModalInfoBody").html(body);
     if (bodyPre != "") $("#ModalInfoBodyPre").text(bodyPre).show();
+    else $("#ModalInfoBodyPre").hide();
     $("#ModalInfo").modal("show");
 }
 
-//ShowModalAJAXFail
-function ShowModalAJAXFail(xhr, status, error) {
+//showModalAJAXFail
+function showModalAJAXFail(xhr, status, error) {
     if (typeof xhr.responseJSON !== "undefined") {
         var errMessage = xhr.responseJSON.responseText.substr(0, 512)
     }
@@ -134,7 +135,7 @@ function ShowModalAJAXFail(xhr, status, error) {
 }
 
 //Refresh  table from AJAX
-function RefreshTable(table, url, getActive, httpType, projectIds, modelIds, typeIds,
+function refreshTable(table, url, getActive, httpType, projectIds, modelIds, typeIds,
     locIds, assyIds, personIds, startDate, endDate) {
 
     getActive = (typeof getActive !== "undefined" && getActive == false) ? false : true;
@@ -163,12 +164,12 @@ function RefreshTable(table, url, getActive, httpType, projectIds, modelIds, typ
             table.rows.add(data).order([1, 'asc']).draw();
         })
         .fail(function (xhr, status, error) {
-            ShowModalAJAXFail(xhr, status, error);
+            showModalAJAXFail(xhr, status, error);
         });
 }
 
 //Refresh  table from AJAX - generic version
-function RefreshTableGeneric(table, url, data, httpType) {
+function refreshTableGeneric(table, url, data, httpType) {
 
     var deferred0 = $.Deferred(); 
 
@@ -188,17 +189,17 @@ function RefreshTableGeneric(table, url, data, httpType) {
 }
 
 //Refresh  table from AJAX - generic version - showing wait dialogs
-function RefreshTblGenWrp(table, url, data, httpType) {
+function refreshTblGenWrp(table, url, data, httpType) {
 
     var deferred0 = $.Deferred();
 
     $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
 
-    RefreshTableGeneric(table, url, data, httpType)
+    refreshTableGeneric(table, url, data, httpType)
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () { deferred0.resolve(); })
         .fail(function (xhr, status, error) {
-            ShowModalAJAXFail(xhr, status, error);
+            showModalAJAXFail(xhr, status, error);
             deferred0.reject(xhr, status, error);
         });
 
@@ -206,7 +207,7 @@ function RefreshTblGenWrp(table, url, data, httpType) {
 }
 
 //checking if form is valid
-function FormIsValid(id, isCreate) {
+function formIsValid(id, isCreate) {
     if ($("#" + id).valid()) return true;
     else if (isCreate) return false;
     else {
@@ -219,7 +220,7 @@ function FormIsValid(id, isCreate) {
 }
 
 //Clear inputs from forms and reset .ismodified to false
-function ClearFormInputs(formId, msArray) {
+function clearFormInputs(formId, msArray) {
     $("#" + formId + " :input").prop("checked", false).prop("selected", false)
         .not(":button, :submit, :reset, :radio, :checkbox").val("");
     $("#" + formId + " [data-valmsg-for]").empty();
@@ -232,12 +233,12 @@ function ClearFormInputs(formId, msArray) {
 }
 
 //Prepare Form For Create
-function FillFormForCreateGeneric(formId, msArray, labelText, mainViewId) {
+function fillFormForCreateGeneric(formId, msArray, labelText, mainViewId) {
 
-    ClearFormInputs(formId, msArray);
+    clearFormInputs(formId, msArray);
     $("#" + formId + "Label").text(labelText);
-    $("#" + formId + " [data-val-dbisunique]").prop("disabled", false); DisableUniqueMs(msArray, false);
-    $("#" + formId + " .modifiable").data("ismodified", true); SetMsAsModified(msArray, true);
+    $("#" + formId + " [data-val-dbisunique]").prop("disabled", false); disableUniqueMs(msArray, false);
+    $("#" + formId + " .modifiable").data("ismodified", true); setMsAsModified(msArray, true);
     $("#" + formId + "GroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true)
     $("#" + formId + "CreateMultiple").removeClass("hide");
     $("#" + mainViewId).addClass("hide");
@@ -245,11 +246,11 @@ function FillFormForCreateGeneric(formId, msArray, labelText, mainViewId) {
 }
 
 //FillFormForEdit Generic version
-function FillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText, msArray) {
+function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText, msArray) {
 
     var deferred0 = $.Deferred();
 
-    ClearFormInputs(formId, msArray);
+    clearFormInputs(formId, msArray);
     $("#" + formId + "Label").text(labelText);
 
     $.ajax({ type: httpType, url: url, timeout: 20000, data: { ids: ids, getActive: getActive }, dataType: "json" })
@@ -309,11 +310,11 @@ function FillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
 
             if (data.length == 1) {
                 $("[data-val-dbisunique]").prop("disabled", false);
-                DisableUniqueMs(msArray, false);
+                disableUniqueMs(msArray, false);
             }
             else {
                 $("[data-val-dbisunique]").prop("disabled", true);
-                DisableUniqueMs(msArray, true);
+                disableUniqueMs(msArray, true);
             }
 
             deferred0.resolve(currRecord);
@@ -324,7 +325,7 @@ function FillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
 }
 
 //SubmitEdits to DB - generic version
-function SubmitEditsGeneric(ids, formId, msArray, currRecord, httpType, url) {
+function submitEditsGeneric(ids, formId, msArray, currRecord, httpType, url) {
 
     var deferred0 = $.Deferred();
 
@@ -379,7 +380,7 @@ function SubmitEditsGeneric(ids, formId, msArray, currRecord, httpType, url) {
 }
 
 //Fill Form for Edit from n:n related table - generic version
-function FillFormForRelatedGeneric(tableAdd, tableRemove, ids,
+function fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
     httpType, url, data, httpTypeNot, urlNot, dataNot, httpTypeMany, urlMany, dataMany) {
 
     var deferred0 = $.Deferred();
@@ -412,7 +413,7 @@ function FillFormForRelatedGeneric(tableAdd, tableRemove, ids,
 }
 
 //Submit Edits for n:n related table - generic version
-function SubmitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
+function submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
 
     var deferred0 = $.Deferred();
     var deferred1 = $.Deferred(); var deferred2 = $.Deferred();
@@ -441,7 +442,7 @@ function SubmitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
 }
 
 //initialize MagicSuggest and add to MagicSuggest array
-function AddToMSArray(msArray, id, url, maxSelection, minChars, dataUrlParams, disabled) {
+function addToMSArray(msArray, id, url, maxSelection, minChars, dataUrlParams, disabled) {
 
     disabled = (typeof disabled !== "undefined" && disabled == false) ? false : true;
 
@@ -460,7 +461,7 @@ function AddToMSArray(msArray, id, url, maxSelection, minChars, dataUrlParams, d
         required: (typeof dataValRequired !== "undefined") ? true : false,
         resultAsString: true,
         ajaxConfig: {
-            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         }
     });
 
@@ -488,7 +489,7 @@ function AddToMSArray(msArray, id, url, maxSelection, minChars, dataUrlParams, d
 }
 
 //check if MagicSuggests in MagicSugest Array are valid
-function MsIsValid(msArray) {
+function msIsValid(msArray) {
     var msCheck = true;
     $.each(msArray, function (i, ms) {
         if (!ms.isValid()) msCheck = false;
@@ -497,7 +498,7 @@ function MsIsValid(msArray) {
 }
 
 //change formatting of invalid MagicSugest's
-function MsValidate(msArray) {
+function msValidate(msArray) {
     $.each(msArray, function (i, ms) {
         if (!ms.isValid()) {
             $("#" + ms.id).addClass("input-validation-error");
@@ -508,7 +509,7 @@ function MsValidate(msArray) {
 }
 
 //enable or disable DbUnique MagicSuggests
-function DisableUniqueMs(msArray, disable) {
+function disableUniqueMs(msArray, disable) {
     disable = (typeof disable !== "undefined" && disable == false) ? false : true;
     $.each(msArray, function (i, ms) {
         if (disable == true && typeof ms.dataValDbisunique !== "undefined" && ms.dataValDbisunique == "true") ms.disable();
@@ -517,7 +518,7 @@ function DisableUniqueMs(msArray, disable) {
 }
 
 //set MagicSuggests as modified ot not
-function SetMsAsModified(msArray, isModified) {
+function setMsAsModified(msArray, isModified) {
     isModified = (typeof isModified !== "undefined" && isModified == false) ? false : true;
     $.each(msArray, function (i, ms) { ms.isModified = isModified; });
 }

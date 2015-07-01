@@ -22,22 +22,22 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create Component Model", "MainView");
+        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Component Model", "MainView");
         $("#EditForm select").find("option:first").prop('selected', 'selected');
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         var selectedRows = TableMain.rows(".ui-selected").data();
-        if (selectedRows.length == 0) ShowModalNothingSelected();
+        if (selectedRows.length == 0) showModalNothingSelected();
         else { IsCreate = false; FillFormForEdit(); }
     });
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
         var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) ShowModalNothingSelected();
-        else ShowModalDelete(noOfRows);
+        if (noOfRows == 0) showModalNothingSelected();
+        else showModalDelete(noOfRows);
     });
 
 
@@ -98,7 +98,7 @@ $(document).ready(function () {
         if (($(this).prop("checked")) ? false : true)
             $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
         else $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
-        RefreshTable(TableMain, "/ComponentModelSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
+        refreshTable(TableMain, "/ComponentModelSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
     });
 
     //TableMain Component Models
@@ -194,14 +194,14 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
-        MsValidate(MagicSuggests);
-        if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
+        msValidate(MagicSuggests);
+        if (formIsValid("EditForm", IsCreate) && msIsValid(MagicSuggests)) SubmitEdits();
     });
 
 
     //--------------------------------------View Initialization------------------------------------//
 
-    RefreshTable(TableMain, "/ComponentModelSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
+    refreshTable(TableMain, "/ComponentModelSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
 
 
     //--------------------------------End of execution at Start-----------
@@ -283,7 +283,7 @@ function FillFormForEdit() {
                 if (FormInput.IsActive != dbEntry.IsActive) FormInput.IsActive = "_VARIES_";
             });
 
-            ClearFormInputs("EditForm", MagicSuggests);
+            clearFormInputs("EditForm", MagicSuggests);
             $("#EditFormLabel").text("Edit Component Model");
 
             $("#CompModelName").val(FormInput.CompModelName);
@@ -309,17 +309,17 @@ function FillFormForEdit() {
 
             if (data.length == 1) {
                 $("[data-val-dbisunique]").prop("disabled", false);
-                DisableUniqueMs(MagicSuggests, false);
+                disableUniqueMs(MagicSuggests, false);
             }
             else {
                 $("[data-val-dbisunique]").prop("disabled", true);
-                DisableUniqueMs(MagicSuggests, true);
+                disableUniqueMs(MagicSuggests, true);
             }
 
             $("#MainView").addClass("hide");
             $("#EditFormView").removeClass("hide");
         })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 //SubmitEdits to DB
@@ -394,13 +394,13 @@ function SubmitEdits() {
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
-            RefreshTable(TableMain, "/ComponentModelSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
+            refreshTable(TableMain, "/ComponentModelSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
             IsCreate = false;
             $("#MainView").removeClass("hide");
             $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
         })
         .fail(function (xhr, status, error) {
-            ShowModalAJAXFail(xhr, status, error);
+            showModalAJAXFail(xhr, status, error);
         });
 }
 
@@ -412,8 +412,8 @@ function DeleteRecords() {
         beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function () { RefreshTable(TableMain, "/ComponentModelSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true)); })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .done(function () { refreshTable(TableMain, "/ComponentModelSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true)); })
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 //---------------------------------------Helper Methods--------------------------------------//

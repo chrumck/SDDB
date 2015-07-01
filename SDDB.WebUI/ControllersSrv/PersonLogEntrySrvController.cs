@@ -9,6 +9,7 @@ using SDDB.Domain.Entities;
 using SDDB.Domain.Services;
 using SDDB.Domain.Abstract;
 using SDDB.WebUI.Infrastructure;
+using System.Web;
 
 namespace SDDB.WebUI.ControllersSrv
 {
@@ -276,6 +277,21 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "IFileRepoService.Get"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+        }
+
+        // POST: /PersonLogEntrySrv/DownloadFiles
+        [HttpPost]
+        [DBSrvAuth("PersonLogEntry_View",false)]
+        public async Task<ActionResult> DownloadFiles(long DlToken, string id, string[] names)
+        {
+            var data = (await fileRepoService.DownloadAsync(id, names).ConfigureAwait(false));
+
+            ViewBag.ServiceName = "IFileRepoService.DownloadAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+                        
+            var tokenCookie = new HttpCookie("DlToken", DlToken.ToString());
+            Response.Cookies.Set(tokenCookie);
+
+            return File(data, System.Net.Mime.MediaTypeNames.Application.Octet, names[0]);
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//

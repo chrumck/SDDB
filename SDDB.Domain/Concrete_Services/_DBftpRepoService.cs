@@ -28,17 +28,21 @@ namespace SDDB.Domain.Services
         private string ftpPwd;
         private bool ftpIsSSL;
         private bool ftpIsPassive;
+        private int maxDls;
+
+        private FtpWebRequest ftpReuest;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
 
         public DbFtpRepoService(string ftpAddress = "", string ftpUserName = "", string ftpPwd = "",
-            bool ftpIsSSL = false, bool ftpIsPassive = true)
+            bool ftpIsSSL = false, bool ftpIsPassive = true, int maxDls = 3)
         {
             this.ftpAddress = ftpAddress;
             this.ftpUserName = ftpUserName;
             this.ftpPwd = ftpPwd;
             this.ftpIsSSL = ftpIsSSL;
             this.ftpIsPassive = ftpIsPassive;
+            this.maxDls = maxDls;
         }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
@@ -49,16 +53,20 @@ namespace SDDB.Domain.Services
         {
             if (String.IsNullOrEmpty(ftpAddress) || String.IsNullOrEmpty(id)) return new List<FtpFileDetail>() ;
             
-            var ftpRequest = (FtpWebRequest)WebRequest.Create(ftpAddress + "/" + id);
+            var ftpRequest = (FtpWebRequest)WebRequest.Create(ftpAddress + @"/" + id);
             ftpRequest.Credentials = new NetworkCredential(ftpUserName, ftpPwd);
-            ftpRequest.EnableSsl = ftpIsSSL; ftpRequest.UsePassive = ftpIsPassive; ftpRequest.Timeout = 60000;
+            ftpRequest.EnableSsl = ftpIsSSL;
+            ftpRequest.UsePassive = ftpIsPassive;
+            ftpRequest.Timeout = 60000;
             ftpRequest.Method = WebRequestMethods.Ftp.ListDirectoryDetails;
 
-            FtpWebResponse ftpResponse = null; var ftpRespStream = "";
+            var ftpRespStreamText = "";
             try
             {
-                ftpResponse = (FtpWebResponse)(await ftpRequest.GetResponseAsync());
-                ftpRespStream = await (new StreamReader(ftpResponse.GetResponseStream()).ReadToEndAsync());
+                using (var ftpResponse = (FtpWebResponse)(await ftpRequest.GetResponseAsync()))
+                using (var respStream = ftpResponse.GetResponseStream())
+                using (var reader = new StreamReader(respStream))
+                    ftpRespStreamText = await reader.ReadToEndAsync();
             }
             catch (Exception e)
             {
@@ -73,7 +81,7 @@ namespace SDDB.Domain.Services
             Match matchName = null; Match matchSize = null; Match matchModified = null;
             var formats = new string[] { "MMM dd HH:mm","MMM dd H:mm", "MMM d HH:mm","MMM d H:mm","MMM dd yyyy","MMM d yyyy"};
 
-            var ftpRespArray = ftpRespStream.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            var ftpRespArray = ftpRespStreamText.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var line in ftpRespArray)
             {
                 matchName = Regex.Match(line, patternName);
@@ -94,6 +102,43 @@ namespace SDDB.Domain.Services
                 else throw new InvalidOperationException("Failed to parse ftp LIST output string");
             }
             return ftpRespList;
+        }
+
+        //public virtual async Task<byte[]> DownloadAsync(string id, string[] names)
+        //{
+        //    foreach (var name in names)
+        //    {
+
+        //    }
+        //}
+
+        public virtual async Task<byte[]> DownloadAsync(string id, string[] names)
+        {
+            var ftpRequest = (FtpWebRequest)WebRequest.Create(ftpAddress + @"/" + id + @"/" + names[0]);
+            ftpRequest.Credentials = new NetworkCredential(ftpUserName, ftpPwd);
+            ftpRequest.EnableSsl = ftpIsSSL;
+            ftpRequest.UsePassive = ftpIsPassive;
+            ftpRequest.Timeout = 60000;
+            ftpRequest.Method = WebRequestMethods.Ftp.DownloadFile;
+
+            byte[] outputFile = null;
+            try
+            {
+                using (var ftpResponse = (FtpWebResponse)(await ftpRequest.GetResponseAsync()))
+                using (var respStream = ftpResponse.GetResponseStream())
+                using (var memoryStream = new MemoryStream())
+                {
+                    await respStream.CopyToAsync(memoryStream);
+                    outputFile = memoryStream.ToArray();
+                }
+            }
+            catch (Exception e)
+            {
+                var message = e.GetBaseException().Message;
+                if (!message.Contains("550") && !message.Contains("450")) throw;
+            }
+
+            return outputFile;
         }
         
 

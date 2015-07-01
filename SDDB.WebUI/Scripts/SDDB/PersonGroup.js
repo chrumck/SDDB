@@ -23,27 +23,27 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create Person Group", "MainView");
+        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Person Group", "MainView");
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         var selectedRows = TableMain.rows(".ui-selected").data();
-        if (selectedRows.length == 0) ShowModalNothingSelected();
+        if (selectedRows.length == 0) showModalNothingSelected();
         else { IsCreate = false; FillFormForEdit(); }
     });
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
         var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) ShowModalNothingSelected();
-        else ShowModalDelete(noOfRows);
+        if (noOfRows == 0) showModalNothingSelected();
+        else showModalDelete(noOfRows);
     });
 
     //Wire Up BtnEditGroupManagers 
     $("#BtnEditGroupManagers").click(function () {
         var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) ShowModalNothingSelected();
+        if (noOfRows == 0) showModalNothingSelected();
         else FillGroupManagersForEdit(noOfRows);
     });
                
@@ -54,7 +54,7 @@ $(document).ready(function () {
         if (($(this).prop("checked")) ? false : true)
             $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
         else $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
-        RefreshTable(TableMain, "/PersonGroupSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
+        refreshTable(TableMain, "/PersonGroupSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
     });
 
     //TableMain PersonGroups
@@ -102,8 +102,8 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
-        MsValidate(MagicSuggests);
-        if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
+        msValidate(MagicSuggests);
+        if (formIsValid("EditForm", IsCreate) && msIsValid(MagicSuggests)) SubmitEdits();
     });
 
 
@@ -118,7 +118,7 @@ $(document).ready(function () {
     //Wire Up GroupManagersViewBtnOk
     $("#GroupManagersViewBtnOk").click(function () {
         if (TableGroupManagersAdd.rows(".ui-selected").data().length +
-            TableGroupManagersRemove.rows(".ui-selected").data().length == 0) ShowModalNothingSelected();
+            TableGroupManagersRemove.rows(".ui-selected").data().length == 0) showModalNothingSelected();
         else SubmitGroupManagersEdits();
     });
 
@@ -177,7 +177,7 @@ $(document).ready(function () {
 
     //--------------------------------------View Initialization------------------------------------//
 
-    RefreshTable(TableMain, "/PersonGroupSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
+    refreshTable(TableMain, "/PersonGroupSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
 
 
     //--------------------------------End of execution at Start-----------
@@ -213,7 +213,7 @@ function FillFormForEdit() {
                 if (FormInput.IsActive != dbEntry.IsActive) FormInput.IsActive = "_VARIES_";
             });
 
-            ClearFormInputs("EditForm");
+            clearFormInputs("EditForm");
             $("#EditFormLabel").text("Edit Person Group");
 
             $("#PrsGroupName").val(FormInput.PrsGroupName);
@@ -223,17 +223,17 @@ function FillFormForEdit() {
 
             if (data.length == 1) {
                 $("[data-val-dbisunique]").prop("disabled", false);
-                DisableUniqueMs(MagicSuggests, false);
+                disableUniqueMs(MagicSuggests, false);
             }
             else {
                 $("[data-val-dbisunique]").prop("disabled", true);
-                DisableUniqueMs(MagicSuggests, true);
+                disableUniqueMs(MagicSuggests, true);
             }
 
             $("#MainView").addClass("hide");
             $("#EditFormView").removeClass("hide");
         })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 //SubmitEdits to DB
@@ -278,13 +278,13 @@ function SubmitEdits() {
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
-            RefreshTable(TableMain, "/PersonGroupSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
+            refreshTable(TableMain, "/PersonGroupSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
             IsCreate = false;
             $("#MainView").removeClass("hide");
             $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
         })
         .fail(function (xhr, status, error) {
-            ShowModalAJAXFail(xhr, status, error);
+            showModalAJAXFail(xhr, status, error);
         });
 }
 
@@ -296,8 +296,8 @@ function DeleteRecords() {
         beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function () { RefreshTable(TableMain, "/PersonGroupSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true)); })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .done(function () { refreshTable(TableMain, "/PersonGroupSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true)); })
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 //---------------------------------------------------------------------------------------------
@@ -321,7 +321,7 @@ function FillGroupManagersForEdit(noOfRows) {
                 $("#MainView").addClass("hide");
                 $("#GroupManagersView").removeClass("hide");
             })
-            .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }
     else {
         $("#GroupManagersViewPanel").text("_MULTIPLE_")
@@ -337,7 +337,7 @@ function FillGroupManagersForEdit(noOfRows) {
                 $("#MainView").addClass("hide");
                 $("#GroupManagersView").removeClass("hide");
             })
-            .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }
 }
 
@@ -376,11 +376,11 @@ function SubmitGroupManagersEdits() {
     $.when(deferred1, deferred2)
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () {
-            RefreshTable(TableMain, "/PersonGroupSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
+            refreshTable(TableMain, "/PersonGroupSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
             $("#MainView").removeClass("hide");
             $("#GroupManagersView").addClass("hide"); window.scrollTo(0, 0);
         })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 

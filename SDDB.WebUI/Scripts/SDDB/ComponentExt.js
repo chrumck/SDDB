@@ -14,7 +14,7 @@ $(document).ready(function () {
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         var selectedRows = TableMain.rows(".ui-selected").data();
-        if (selectedRows.length == 0) ShowModalNothingSelected();
+        if (selectedRows.length == 0) showModalNothingSelected();
         else FillFormForEdit();
     });
 
@@ -61,7 +61,7 @@ $(document).ready(function () {
         required: true,
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
         style: "min-width: 240px;"
     });
@@ -74,7 +74,7 @@ $(document).ready(function () {
             TableMain.clear().search("").draw();
         }
         else {
-            RefreshTable(TableMain, "/ComponentSrv/GetByModelIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+            refreshTable(TableMain, "/ComponentSrv/GetByModelIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
                 "POST", MsFilterByProject.getValue(), MsFilterByModel.getValue());
             MsFilterByProject.enable();
             $("#ChBoxShowDeleted").bootstrapToggle("enable")
@@ -90,12 +90,12 @@ $(document).ready(function () {
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
         style: "min-width: 240px;"
     });
     $(MsFilterByProject).on('selectionchange', function (e, m) {
-        RefreshTable(TableMain, "/ComponentSrv/GetByModelIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+        refreshTable(TableMain, "/ComponentSrv/GetByModelIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
                     "POST", MsFilterByProject.getValue(), MsFilterByModel.getValue());
     });
 
@@ -107,7 +107,7 @@ $(document).ready(function () {
         if (($(this).prop("checked")) ? false : true)
             $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
         else $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
-        RefreshTable(TableMain, "/ComponentSrv/GetByModelIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+        refreshTable(TableMain, "/ComponentSrv/GetByModelIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
                     "POST", MsFilterByProject.getValue(), MsFilterByModel.getValue());
     });
 
@@ -189,7 +189,7 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
-        if (FormIsValid("EditForm", false) ) SubmitEdits();
+        if (formIsValid("EditForm", false) ) SubmitEdits();
     });
 
 
@@ -265,7 +265,7 @@ function FillFormForEdit() {
                 else FormInput.AssignedToProject = dbEntry.AssignedToProject.ProjectName + " " + dbEntry.AssignedToProject.ProjectCode;
             });
 
-            ClearFormInputs("EditForm");
+            clearFormInputs("EditForm");
 
 
             $("#CompName").val(FormInput.CompName);
@@ -299,7 +299,7 @@ function FillFormForEdit() {
             $("#MainView").addClass("hide");
             $("#EditFormView").removeClass("hide");
         })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 //SubmitEdits to DB
@@ -344,12 +344,12 @@ function SubmitEdits() {
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
-            RefreshTable(TableMain, "/ComponentSrv/GetByModelIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+            refreshTable(TableMain, "/ComponentSrv/GetByModelIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
                 "POST", MsFilterByProject.getValue(), MsFilterByModel.getValue());
             $("#MainView").removeClass("hide");
             $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
         })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 //Pulls Model Information and formats edit form and column names
@@ -430,7 +430,7 @@ function UpdateViewsForModel() {
             $("#EditForm").removeData("validator"); $("#EditForm").removeData('unobtrusiveValidation');
             $.validator.unobtrusive.parse("#EditForm")
         })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 
 }
 

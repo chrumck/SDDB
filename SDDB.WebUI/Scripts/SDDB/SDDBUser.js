@@ -23,27 +23,27 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         IsCreate = true;
-        FillFormForCreateGeneric("EditForm", MagicSuggests, "Create SDDB User", "MainView");
+        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create SDDB User", "MainView");
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         var selectedRows = TableMain.rows(".ui-selected").data();
-        if (selectedRows.length == 0) ShowModalNothingSelected();
+        if (selectedRows.length == 0) showModalNothingSelected();
         else { IsCreate = false; FillFormForEdit(); }
     });
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
         var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) ShowModalNothingSelected();
-        else ShowModalDelete(noOfRows);
+        if (noOfRows == 0) showModalNothingSelected();
+        else showModalDelete(noOfRows);
     });
 
     //Wire up BtnEditRoles 
     $("#BtnEditRoles").click(function () {
         var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) ShowModalNothingSelected();
+        if (noOfRows == 0) showModalNothingSelected();
         else FillDBRoleForEdit(noOfRows);
     });
 
@@ -83,7 +83,7 @@ $(document).ready(function () {
     $(".modifiable").change(function () { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
-    AddToMSArray(MagicSuggests, "Id", "/PersonSrv/PersonsWoDBUser", 1);
+    addToMSArray(MagicSuggests, "Id", "/PersonSrv/PersonsWoDBUser", 1);
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
@@ -95,8 +95,8 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
-        MsValidate(MagicSuggests);
-        if (FormIsValid("EditForm", IsCreate) && MsIsValid(MagicSuggests)) SubmitEdits();
+        msValidate(MagicSuggests);
+        if (formIsValid("EditForm", IsCreate) && msIsValid(MagicSuggests)) SubmitEdits();
     });
 
 
@@ -111,7 +111,7 @@ $(document).ready(function () {
     //Wire Up EditFormBtnOk
     $("#DBRolesViewBtnOk").click(function () {
         if (TableDBRolesAdd.rows(".ui-selected").data().length +
-            TableDBRolesRemove.rows(".ui-selected").data().length == 0) ShowModalNothingSelected();
+            TableDBRolesRemove.rows(".ui-selected").data().length == 0) showModalNothingSelected();
         else SubmitRolesEdits();
     });
 
@@ -154,7 +154,7 @@ $(document).ready(function () {
 
     //--------------------------------------View Initialization------------------------------------//
 
-    RefreshTblGenWrp(TableMain, "/DBUserSrv/Get", {},"GET");
+    refreshTblGenWrp(TableMain, "/DBUserSrv/Get", {},"GET");
 
 
     //--------------------------------End of execution at Start-----------
@@ -188,7 +188,7 @@ function FillFormForEdit() {
                 if (FormInput.LDAPAuthenticated != dbEntry.LDAPAuthenticated) FormInput.LDAPAuthenticated = "_VARIES_";
             });
 
-            ClearFormInputs("EditForm", MagicSuggests);
+            clearFormInputs("EditForm", MagicSuggests);
             $("#EditFormLabel").text("Edit SDDB User");
 
             if (FormInput.Id != null) MagicSuggests[0].addToSelection([{ id: FormInput.Id, name: FormInput.PersonName }], true);
@@ -198,19 +198,19 @@ function FillFormForEdit() {
 
             if (data.length == 1) {
                 $("[data-val-dbisunique]").prop("disabled", false);
-                DisableUniqueMs(MagicSuggests, false);
+                disableUniqueMs(MagicSuggests, false);
             }
             else {
 
                 $("[data-val-dbisunique]").prop("disabled", true);
-                DisableUniqueMs(MagicSuggests, true);
+                disableUniqueMs(MagicSuggests, true);
             }
 
             MagicSuggests[0].disable();
             $("#MainView").addClass("hide");
             $("#EditFormView").removeClass("hide");
         })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 //SubmitEdits to DB
@@ -257,13 +257,13 @@ function SubmitEdits() {
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
-            RefreshTblGenWrp(TableMain, "/DBUserSrv/Get", {}, "GET");
+            refreshTblGenWrp(TableMain, "/DBUserSrv/Get", {}, "GET");
             IsCreate = false;
             $("#MainView").removeClass("hide");
             $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
         })
         .fail(function (xhr, status, error) {
-            ShowModalAJAXFail(xhr, status, error);
+            showModalAJAXFail(xhr, status, error);
         });
 }
 
@@ -275,8 +275,8 @@ function DeleteRecords() {
         beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function () { RefreshTblGenWrp(TableMain, "/DBUserSrv/Get", {}, "GET"); })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .done(function () { refreshTblGenWrp(TableMain, "/DBUserSrv/Get", {}, "GET"); })
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 //---------------------------------------------------------------------------------------------
@@ -300,7 +300,7 @@ function FillDBRoleForEdit(noOfRows) {
                 $("#MainView").addClass("hide");
                 $("#DBRolesView").removeClass("hide");
             })
-            .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }
     else {
         $("#DBRolesViewPanel").text("_MULTIPLE_")
@@ -316,7 +316,7 @@ function FillDBRoleForEdit(noOfRows) {
                 $("#MainView").addClass("hide");
                 $("#DBRolesView").removeClass("hide");
             })
-            .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }
 }
 
@@ -355,11 +355,11 @@ function SubmitRolesEdits() {
     $.when(deferred1, deferred2)
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () {
-            RefreshTblGenWrp(TableMain, "/DBUserSrv/Get", {}, "GET");
+            refreshTblGenWrp(TableMain, "/DBUserSrv/Get", {}, "GET");
             $("#MainView").removeClass("hide");
             $("#DBRolesView").addClass("hide"); window.scrollTo(0, 0);
         })
-        .fail(function (xhr, status, error) { ShowModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 //---------------------------------------Helper Methods--------------------------------------//
