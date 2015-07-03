@@ -386,9 +386,13 @@ $(document).ready(function () {
                     window.clearInterval(DlTimer);
                     expireCookie("DlToken");
                     if (DlAttempts == 0) showModalFail("Server Error", "Server response timed out.");
+                    else if ($("#LogEntryFilesIframe").contents().find("body").html() != "")
+                        showModalFail("Server Error", $("#LogEntryFilesIframe").contents().find("body").html());
                 }
                 else DlAttempts--;
             }, 500);
+
+            $("#LogEntryFilesIframe").contents().find("body").html("");
 
             var form = $('<form method="POST" action="/PersonLogEntrySrv/DownloadFiles" target="LogEntryFilesIframe">');
             form.append($('<input type="hidden" name="DlToken" value="' + DlToken + '">'));

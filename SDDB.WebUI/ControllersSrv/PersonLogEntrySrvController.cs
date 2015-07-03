@@ -291,7 +291,14 @@ namespace SDDB.WebUI.ControllersSrv
             var tokenCookie = new HttpCookie("DlToken", DlToken.ToString());
             Response.Cookies.Set(tokenCookie);
 
-            return File(data, System.Net.Mime.MediaTypeNames.Application.Octet, names[0]);
+            var fileName = (names.Length == 1) ? names[0] : "SDDBFiles.zip";
+
+            if (data != null) return File(data, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+            else
+            {
+                Response.StatusCode = (int)HttpStatusCode.Gone;
+                return Content("File not found.");
+            }
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
