@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -10,6 +11,7 @@ using SDDB.Domain.Services;
 using SDDB.Domain.Abstract;
 using SDDB.WebUI.Infrastructure;
 using System.Web;
+using System.Collections.Generic;
 
 namespace SDDB.WebUI.ControllersSrv
 {
@@ -284,7 +286,7 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("PersonLogEntry_View",false)]
         public async Task<ActionResult> DownloadFiles(long DlToken, string id, string[] names)
         {
-            var data = (await fileRepoService.DownloadAsync(id, names).ConfigureAwait(false));
+            var data = await fileRepoService.DownloadAsync(id, names).ConfigureAwait(false);
 
             ViewBag.ServiceName = "IFileRepoService.DownloadAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
                         
@@ -293,11 +295,62 @@ namespace SDDB.WebUI.ControllersSrv
 
             var fileName = (names.Length == 1) ? names[0] : "SDDBFiles.zip";
 
-            if (data != null) return File(data, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+            if (data != null && data.LongLength != 0) return File(data, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
             else
             {
                 Response.StatusCode = (int)HttpStatusCode.Gone;
-                return Content("File not found.");
+                return Content("File(s) not found.");
+            }
+        }
+
+        // POST: /PersonLogEntrySrv/UploadFiles
+        [HttpPost]
+        [DBSrvAuth("PersonLogEntry_Edit")]
+        public async Task<ActionResult> UploadFiles(string id)
+        {
+            var filesList = new List<FileMemStream>();
+            foreach (string fileName in Request.Files)
+            {
+                var fileContent = Request.Files[fileName];
+                if (fileContent != null && fileContent.ContentLength > 0)
+                {
+                    var fileMemStream = new FileMemStream();
+                    await fileContent.InputStream.CopyToAsync(fileMemStream).ConfigureAwait(false);
+                    fileMemStream.FileName = fileContent.FileName;
+                    filesList.Add(fileMemStream);
+                }
+            }
+            
+            await fileRepoService.UploadAsync(id, filesList.ToArray()).ConfigureAwait(false);
+            var serviceResult = new DBResult();
+
+            ViewBag.ServiceName = "fileRepoService.UploadAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.StatusDescription = serviceResult.StatusDescription;
+
+            if (serviceResult.StatusCode == HttpStatusCode.OK) return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            else
+            {
+                Response.StatusCode = (int)serviceResult.StatusCode;
+                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // POST: /PersonLogEntrySrv/DeleteFiles
+        [HttpPost]
+        [DBSrvAuth("PersonLogEntry_Edit")]
+        public async Task<ActionResult> DeleteFiles(string id, string[] names)
+        {
+            await fileRepoService.DeleteAsync(id, names).ConfigureAwait(false);
+            var serviceResult = new DBResult();
+
+            ViewBag.ServiceName = "fileRepoService.DeleteAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.StatusDescription = serviceResult.StatusDescription;
+
+            if (serviceResult.StatusCode == HttpStatusCode.OK) return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            else
+            {
+                Response.StatusCode = (int)serviceResult.StatusCode;
+                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
             }
         }
 

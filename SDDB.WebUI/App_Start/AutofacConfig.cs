@@ -34,7 +34,7 @@ namespace SDDB.WebUI
             var ftpPwd = ConfigurationManager.AppSettings["ftpPwd"] ?? "";
             var ftpIsSSL = bool.Parse(ConfigurationManager.AppSettings["ftpIsSSL"] ?? "false");
             var ftpIsPassive = bool.Parse(ConfigurationManager.AppSettings["ftpIsPassive"] ?? "true");
-            var maxDls = int.Parse(ConfigurationManager.AppSettings["maxDls"] ?? "3");
+            var maxConnections = int.Parse(ConfigurationManager.AppSettings["maxConnections"] ?? "3");
 
             //register DB contexts
             builder.RegisterType<EFDbContext>().AsSelf().InstancePerDependency();
@@ -54,7 +54,7 @@ namespace SDDB.WebUI
 
             builder.RegisterType<DbFtpRepoService>().As<IFileRepoService>()
                 .WithParameter("ftpAddress", ftpAddress).WithParameter("ftpUserName", ftpUserName)
-                .WithParameter("ftpPwd", ftpPwd).WithParameter("ftpIsSSL", ftpIsSSL).WithParameter("maxDls", maxDls)
+                .WithParameter("ftpPwd", ftpPwd).WithParameter("ftpIsSSL", ftpIsSSL).WithParameter("maxConnections", maxConnections)
                 .WithParameter("ftpIsPassive", ftpIsPassive).InstancePerDependency();
             
             builder.RegisterType<DBUserService>().AsSelf().WithParameter("ldapAuthenticationEnabled", LDAPAuthenticationEnabled).InstancePerDependency();

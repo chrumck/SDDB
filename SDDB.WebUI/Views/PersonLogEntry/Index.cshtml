@@ -261,9 +261,9 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="btn-group margin-bottom-2px">
-                    <button class="btn btn-default" id="LogEntryFilesBtnAdd">Upload</button>
-                    <button class="btn btn-danger" id="LogEntryFilesBtnDelete">Delete</button>
+                    <span class="btn btn-default btn-file">Upload <input type="file" id="LogEntryFilesBtnUpload" multiple></span>
                     <button class="btn btn-info" id="LogEntryFilesBtnDload">Download</button>
+                    <button class="btn btn-danger" id="LogEntryFilesBtnDelete">Delete</button>
                 </div>
             </div>
         </div>
@@ -292,6 +292,43 @@
         </div>
     </div>
     <iframe class="hide" id="LogEntryFilesIframe" name="LogEntryFilesIframe"></iframe>
+</div>
+ 
+<!------------ ModalUpload dialog ------------>
+<div class="modal fade" id="ModalUpload" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="ModalUploadLabel">Uploading...</h4>
+            </div>
+            <div class="modal-body">
+                <div id="ModalUploadBody"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-warning" id="ModalUploadBtnAbort">Abort</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!----------- ModalDeleteFiles dialog ----------->
+<div class="modal fade" id="ModalDeleteFiles" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="ModalDeleteFilesLabel">Confirm Delete</h4>
+            </div>
+            <div class="modal-body">
+                <div id="ModalDeleteFilesBody"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default pull-left" id="ModalDeleteFilesBtnCancel">Cancel</button>
+                <button class="btn btn-warning" id="ModalDeleteFilesBtnOk">
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 

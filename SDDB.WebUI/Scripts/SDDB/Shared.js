@@ -161,7 +161,7 @@ function refreshTable(table, url, getActive, httpType, projectIds, modelIds, typ
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
-            table.rows.add(data).order([1, 'asc']).draw();
+            table.rows.add(data).order([1, "asc"]).draw();
         })
         .fail(function (xhr, status, error) {
             showModalAJAXFail(xhr, status, error);
@@ -180,7 +180,7 @@ function refreshTableGeneric(table, url, data, httpType) {
 
     $.ajax({ type: httpType, url: url, timeout: 20000, data: data, dataType: "json", })
         .done(function (data) {
-            table.rows.add(data).order([1, 'asc']).draw();
+            table.rows.add(data).order([1, "asc"]).draw();
             deferred0.resolve();
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
@@ -393,8 +393,8 @@ function fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
             $.ajax({type: httpType, url: url, timeout: 20000, data: data, dataType: "json" })
         )
         .done(function (done1, done2) {
-            tableAdd.rows.add(done1[0]).order([1, 'asc']).draw();
-            tableRemove.rows.add(done2[0]).order([1, 'asc']).draw();
+            tableAdd.rows.add(done1[0]).order([1, "asc"]).draw();
+            tableRemove.rows.add(done2[0]).order([1, "asc"]).draw();
             deferred0.resolve();
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
@@ -402,8 +402,8 @@ function fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
     else {
         $.ajax({ type: httpTypeMany, url: urlMany, timeout: 20000, data: dataMany, dataType: "json" })
             .done(function (data) {
-                tableAdd.rows.add(data).order([1, 'asc']).draw();
-                if (ids.length != 0) tableRemove.rows.add(data).order([1, 'asc']).draw();
+                tableAdd.rows.add(data).order([1, "asc"]).draw();
+                if (ids.length != 0) tableRemove.rows.add(data).order([1, "asc"]).draw();
                 deferred0.resolve();
             })
             .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
@@ -470,7 +470,7 @@ function addToMSArray(msArray, id, url, maxSelection, minChars, dataUrlParams, d
     ms.dataValDbisunique = dataValDbisunique;
     ms.isModified = false;
 
-    $(ms).on('blur', function (e, m) {
+    $(ms).on("blur", function (e, m) {
         if (!this.isValid()) {
             $("#" + this.id).addClass("input-validation-error");
             $("[data-valmsg-for=" + this.id + "]").text("Input missing or invalid.").removeClass("field-validation-valid")
@@ -483,7 +483,7 @@ function addToMSArray(msArray, id, url, maxSelection, minChars, dataUrlParams, d
         }
     });
 
-    $(ms).on('selectionchange', function (e, m) { this.isModified = true });
+    $(ms).on("selectionchange", function (e, m) { this.isModified = true });
 
     msArray.push(ms);
 }

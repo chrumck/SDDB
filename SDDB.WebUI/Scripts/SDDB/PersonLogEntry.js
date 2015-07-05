@@ -14,10 +14,11 @@ var TableLogEntryAssysAdd; var TableLogEntryAssysRemove;
 var TableLogEntryPersonsAdd; var TableLogEntryPersonsRemove;
 var MsFilterByProject; var MsFilterByType; var MsFilterByPerson;
 var MagicSuggests = [];
-var CurrRecord; var CurrIds = [];
+var CurrRecord; var CurrIds = []; var FileCurrNames = [];
 var GetActive = true;
 var SelectedRecord;
 var DlToken; var DlTimer; var DlAttempts;
+var XHR = new window.XMLHttpRequest();
 
 $(document).ready(function () {
 
@@ -113,7 +114,7 @@ $(document).ready(function () {
         },
         style: "min-width: 240px;"
     });
-    $(MsFilterByType).on('selectionchange', function (e, m) { refreshMainView(); });
+    $(MsFilterByType).on("selectionchange", function (e, m) { refreshMainView(); });
 
     //Initialize MagicSuggest MsFilterByProject
     MsFilterByProject = $("#MsFilterByProject").magicSuggest({
@@ -124,7 +125,7 @@ $(document).ready(function () {
         },
         style: "min-width: 240px;"
     });
-    $(MsFilterByProject).on('selectionchange', function (e, m) { refreshMainView(); });
+    $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
 
     //Initialize MagicSuggest MsFilterByPerson
     MsFilterByPerson = $("#MsFilterByPerson").magicSuggest({
@@ -135,7 +136,7 @@ $(document).ready(function () {
         },
         style: "min-width: 240px;"
     });
-    $(MsFilterByPerson).on('selectionchange', function (e, m) { refreshMainView(); });
+    $(MsFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
    
         
     //---------------------------------------DataTables------------
@@ -203,7 +204,7 @@ $(document).ready(function () {
         { projectIds: MagicSuggests[2].getValue });
     
     //Initialize MagicSuggest Array Event
-    $(MagicSuggests[2]).on('selectionchange', function (e, m) {
+    $(MagicSuggests[2]).on("selectionchange", function (e, m) {
         if (this.getValue().length == 0) {
             MagicSuggests[3].disable(); MagicSuggests[3].clear(true);
             MagicSuggests[4].disable(); MagicSuggests[4].clear(true);
@@ -217,7 +218,7 @@ $(document).ready(function () {
     });
 
     //Initialize MagicSuggest Array Event
-    $(MagicSuggests[3]).on('selectionchange', function (e, m) {
+    $(MagicSuggests[3]).on("selectionchange", function (e, m) {
         if (this.getValue().length == 0) {
             TableLogEntryAssysAdd.clear().search("").draw();
         }
@@ -256,13 +257,7 @@ $(document).ready(function () {
         msValidate(MagicSuggests);
         if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
             SelectedRecord = TableMain.row(".ui-selected").data();
-            submitEdits()
-            .done(function () {
-                setTimeout(function () {
-                    fillLogEntryFilesForm();
-                }, 300);
-                
-            });
+            submitEdits().done(function () { setTimeout(fillLogEntryFilesForm, 200); });
         }
     });
 
@@ -398,9 +393,73 @@ $(document).ready(function () {
             form.append($('<input type="hidden" name="DlToken" value="' + DlToken + '">'));
             form.append($('<input type="hidden" name="id" value="' + CurrIds[0] + '">'));
             $.each(names, function (i, name) {form.append($('<input type="hidden" name="names[' + i + ']" value="' + name + '">')); });
-            $('body').append(form);
+            $("body").append(form);
             form.submit();
         }
+    });
+
+    //wire up LogEntryFilesBtnUpload
+    $("#LogEntryFilesBtnUpload").on("change", function (e) {
+        var files = e.target.files;
+        if (files.length > 0) {
+            if (window.FormData !== undefined) {
+
+                var data = new FormData();
+                for (var x = 0; x < files.length; x++) {
+                    data.append("file" + x, files[x]);
+                }
+                $("#ModalUpload").modal({ show: true, backdrop: "static", keyboard: false });
+                $.ajax({
+                    type: "POST", url: "/PersonLogEntrySrv/UploadFiles?id=" + CurrIds[0],
+                    contentType: false, processData: false, data: data,
+                    xhr: function () {
+                        XHR.upload.addEventListener("progress", function (e) {
+                            if (e.lengthComputable) {
+                                var PROGRESS = "Progress: " + Math.round((e.loaded / e.total) * 100) + "%";
+                                $("#ModalUploadBody").text(PROGRESS);
+                            }
+                        }, false); return XHR;
+                    }
+                })
+                    .always(function () { $("#ModalUpload").modal("hide"); })
+                    .done(function () { setTimeout(fillLogEntryFilesForm, 200); })
+                    .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+
+            } else showModalFail("Browser Error","This browser doesn't support HTML5 file uploads!"); 
+        }
+        $(e.target).val("");
+    });
+
+    //Wire Up ModalUploadBtnAbort
+    $("#ModalUploadBtnAbort").click(function () { XHR.abort(); $("#ModalUpload").modal("hide"); });
+
+    //Wire Up LogEntryFilesBtnDelete 
+    $("#LogEntryFilesBtnDelete").click(function () {
+        FileCurrNames = TableLogEntryFiles.cells(".ui-selected", "Name:name").data().toArray();
+        if (FileCurrNames.length == 0) showModalNothingSelected();
+        else {
+            $("#ModalDeleteFilesBody").text("Confirm deleting " + FileCurrNames.length + " file(s).");
+            $("#ModalDeleteFiles").modal("show");
+        }
+    });
+
+    //Get focus on ModalDeleteBtnCancel
+    $("#ModalDeleteFiles").on("shown.bs.modal", function () { $("#ModalDeleteFilesBtnCancel").focus(); });
+
+    //Wire Up ModalDeleteBtnCancel 
+    $("#ModalDeleteFilesBtnCancel").click(function () { $("#ModalDeleteFiles").modal("hide"); });
+
+    //Wire Up ModalDeleteFilesBtnOk
+    $("#ModalDeleteFilesBtnOk").click(function () {
+        $("#ModalDeleteFiles").modal("hide");
+        $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+        $.ajax({
+            type: "POST", url: "/PersonLogEntrySrv/DeleteFiles", timeout: 20000,
+            data: { id: CurrIds[0], names: FileCurrNames }, dataType: "json"
+        })
+            .always(function () { $("#ModalWait").modal("hide"); })
+            .done(function () { setTimeout(fillLogEntryFilesForm, 200); })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //------------------------------------DataTables - Log Entry Files ---
@@ -464,6 +523,7 @@ function DeleteRecords() {
         .done(function () { refreshMainView(); })
         .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
+
 //refresh view after magicsuggest update
 function refreshMainView() {
     if ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "" ||
@@ -527,6 +587,7 @@ function submitEdits() {
     return deferred0.promise();
 }
 
+//Fill form showing log entry files
 function fillLogEntryFilesForm() {
     var deferred0 = $.Deferred();
 
@@ -549,11 +610,13 @@ function fillLogEntryFilesForm() {
 
 //---------------------------------------Helper Methods--------------------------------------//
 
+//gets cookie by name
 function getCookie(name) {
     var parts = document.cookie.split(name + "=");
     if (parts.length == 2) return parts.pop().split(";").shift();
 }
 
+//expires cookie by name
 function expireCookie(name) {
     document.cookie = encodeURIComponent(name) + "=deleted; expires=" + new Date(0).toUTCString();
 }
