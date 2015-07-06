@@ -334,7 +334,7 @@ namespace SDDB.UnitTests
             var componentService = new ComponentService(mockDbContextScopeFac.Object);
 
             //Act
-            var serviceResult = componentService.EditAsync(components).Result;
+            var serviceResult = componentService.EditAsync("DummyUserId", components).Result;
 
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
@@ -365,7 +365,7 @@ namespace SDDB.UnitTests
             var componentService = new ComponentService(mockDbContextScopeFac.Object);
 
             //Act
-            var serviceResult = componentService.EditAsync(components).Result;
+            var serviceResult = componentService.EditAsync("DummyUserId", components).Result;
 
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
@@ -400,7 +400,7 @@ namespace SDDB.UnitTests
             var componentService = new ComponentService(mockDbContextScopeFac.Object);
 
             //Act
-            var serviceResult = componentService.EditAsync(components).Result;
+            var serviceResult = componentService.EditAsync("DummyUserId", components).Result;
 
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
@@ -441,7 +441,7 @@ namespace SDDB.UnitTests
             var componentService = new ComponentService(mockDbContextScopeFac.Object);
 
             //Act
-            var serviceResult = componentService.EditAsync(components).Result;
+            var serviceResult = componentService.EditAsync("DummyUserId", components).Result;
 
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
@@ -453,6 +453,56 @@ namespace SDDB.UnitTests
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.Components.FindAsync(It.IsAny<string>()), Times.Exactly(2));
             mockEfDbContext.Verify(x => x.Components.Add(It.IsAny<Component>()), Times.Never);
+            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
+        }
+
+        [TestMethod]
+        public void ComponentService_EditAsync_AddsLogEntry()
+        {
+            // Arrange
+            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
+            var mockDbContextScope = new Mock<IDbContextScope>();
+            var mockEfDbContext = new Mock<EFDbContext>();
+            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
+            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
+
+            var component1 = new Component { Id = "dummyComponentId1", CompName = "Comp1", CompAltName = "CompAlt1", IsActive = false, ProgramAddress = "DummyInfo1",
+                            AssignedToAssemblyDb_Id = "dummyAssyId1", ModifiedProperties = new string[] { "CompName", "CompAltName", "AssignedToAssemblyDb_Id" }};
+            var component2 = new Component { Id = "dummyComponentId2", CompName = "Comp2", CompAltName = "CompAlt2", IsActive = true, ProgramAddress = "DummyInfo2",
+                            AssignedToAssemblyDb_Id = "dummyAssyId2"};
+            var components = new Component[] { component1, component2 };
+
+            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "DbEntry1", CompAltName = "DbEntryAlt1", IsActive = true, ProgramAddress = "DbEntryInfo1",
+                            AssignedToAssemblyDb_Id = "dummyAssyId3" };
+            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "DbEntry2", CompAltName = "DbEntryAlt2", IsActive = false, ProgramAddress = "DbEntryInfo2",
+                            AssignedToAssemblyDb_Id = "dummyAssyId4"};
+
+            mockEfDbContext.Setup(x => x.Components.FindAsync(component1.Id)).Returns(Task.FromResult(dbEntry1));
+            mockEfDbContext.Setup(x => x.Components.FindAsync(component2.Id)).Returns(Task.FromResult(dbEntry2));
+            mockEfDbContext.Setup(x => x.Components.Add(component1)).Verifiable();
+            var logEntry = new ComponentLogEntry();
+            mockEfDbContext.Setup(x => x.ComponentLogEntrys.Add(It.IsAny<ComponentLogEntry>())).Callback<ComponentLogEntry>( x => logEntry = x);
+            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
+
+            var componentService = new ComponentService(mockDbContextScopeFac.Object);
+
+            //Act
+            var serviceResult = componentService.EditAsync("DummyUserId", components).Result;
+
+            //Assert
+            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
+            Assert.IsTrue(component1.CompName == dbEntry1.CompName); Assert.IsTrue(component1.CompAltName == dbEntry1.CompAltName);
+            Assert.IsTrue(component1.ProgramAddress != dbEntry1.ProgramAddress); Assert.IsTrue(component1.IsActive != dbEntry1.IsActive);
+            Assert.IsTrue(component1.AssignedToAssemblyDb_Id == dbEntry1.AssignedToAssemblyDb_Id);
+            Assert.IsTrue(component2.CompName != dbEntry2.CompName); Assert.IsTrue(component2.CompAltName != dbEntry2.CompAltName);
+            Assert.IsTrue(component2.ProgramAddress != dbEntry2.ProgramAddress); Assert.IsTrue(component2.IsActive != dbEntry2.IsActive);
+            Assert.IsTrue(component2.AssignedToAssemblyDb_Id != dbEntry2.AssignedToAssemblyDb_Id);
+            Assert.IsTrue(logEntry.Component_Id == dbEntry1.Id); Assert.IsTrue(logEntry.AssignedToAssemblyDb_Id == dbEntry1.AssignedToAssemblyDb_Id);
+            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
+            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
+            mockEfDbContext.Verify(x => x.Components.FindAsync(It.IsAny<string>()), Times.Exactly(2));
+            mockEfDbContext.Verify(x => x.Components.Add(It.IsAny<Component>()), Times.Never);
+            mockEfDbContext.Verify(x => x.ComponentLogEntrys.Add(It.IsAny<ComponentLogEntry>()), Times.Once);
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
 
@@ -477,7 +527,7 @@ namespace SDDB.UnitTests
             var componentService = new ComponentService(mockDbContextScopeFac.Object);
 
             //Act
-            var serviceResult = componentService.EditAsync(components).Result;
+            var serviceResult = componentService.EditAsync("DummyUserId", components).Result;
 
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);

@@ -147,7 +147,7 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Component_Edit")]
         public async Task<ActionResult> Edit(Component[] records)
         {
-            var serviceResult = await componentService.EditAsync(records).ConfigureAwait(false);
+            var serviceResult = await componentService.EditAsync(UserId, records).ConfigureAwait(false);
 
             ViewBag.ServiceName = "ComponentService.EditAsync"; ViewBag.StatusCode = serviceResult.StatusCode; 
             ViewBag.StatusDescription = serviceResult.StatusDescription;

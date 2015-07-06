@@ -210,8 +210,10 @@ namespace SDDB.Domain.Services
         //-----------------------------------------------------------------------------------------------------------------------
 
         // Create and Update records given in []
-        public virtual async Task<DBResult> EditAsync(Component[] records)
+        public virtual async Task<DBResult> EditAsync(string userId, Component[] records)
         {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -238,6 +240,8 @@ namespace SDDB.Domain.Services
                         }
                         else
                         {
+                            var loggedProperties = new string[] { "ComponentStatus_Id", "AssignedToProject_Id", "AssignedToAssemblyDb_Id", "LastCalibrationDate" };
+                            var logChanges = false;
                             var excludedProperties = new string[] { "Id", "TSP" };
                             var properties = typeof(Component).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
                             foreach (var property in properties)
@@ -247,6 +251,27 @@ namespace SDDB.Domain.Services
                                 if (excludedProperties.Contains(property.Name)) continue;
 
                                 if (record.PropIsModified(property.Name)) property.SetValue(dbEntry, property.GetValue(record));
+                                
+                                if (record.PropIsModified(property.Name) && loggedProperties.Contains(property.Name)) logChanges = true;
+                            }
+
+                            if (logChanges)
+                            {
+                                dbContext.ComponentLogEntrys.Add(
+                                    new ComponentLogEntry
+                                    {
+                                        Id = Guid.NewGuid().ToString(),
+                                        Component_Id = dbEntry.Id,
+                                        EnteredByPerson_Id = userId,
+                                        LogEntryDate = DateTime.Now,
+                                        ComponentStatus_Id = dbEntry.ComponentStatus_Id,
+                                        AssignedToProject_Id = dbEntry.AssignedToProject_Id,
+                                        AssignedToAssemblyDb_Id = dbEntry.AssignedToAssemblyDb_Id,
+                                        LastCalibrationDate = dbEntry.LastCalibrationDate,
+                                        Comments = dbEntry.Comments,
+                                        IsActive_bl = true
+                                    }
+                                );
                             }
                         }
                     }

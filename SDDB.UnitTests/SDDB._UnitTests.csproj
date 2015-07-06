@@ -120,6 +120,7 @@
     <Compile Include="MockDbAsyncQueryProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MockDependencyResolver.cs" />
+    <Compile Include="Tests_ComponentLogEntryService.cs" />
     <Compile Include="Tests_ComponentService.cs" />
     <Compile Include="Tests_ComponentModelService.cs" />
     <Compile Include="Tests_AssemblyModelService.cs" />

@@ -45,12 +45,15 @@ namespace SDDB.Domain.Entities
         [ForeignKey("AssignedToAssemblyDb")]
         public string AssignedToAssemblyDb_Id { get; set; }
 
+        [DBIsDateISO]
+        public DateTime? LastCalibrationDate { get; set; }
+
         [Column(TypeName = "text")] [StringLength(65535)]
         public string Comments { get; set; }
 
         [Required]
         [DefaultValue(true)]
-        public bool IsActive { get; set; }
+        public bool IsActive_bl { get; set; }
 
         //TSP Column Wireup ---------------------------------------------------------------------------------------------------//
         [ConcurrencyCheck]
@@ -70,7 +73,6 @@ namespace SDDB.Domain.Entities
         //one to many
         public virtual Component Component { get; set; }
         public virtual Person EnteredByPerson { get; set; }
-
         public virtual ComponentStatus ComponentStatus { get; set; }
         public virtual Project AssignedToProject { get; set; }
         public virtual AssemblyDb AssignedToAssemblyDb { get; set; }

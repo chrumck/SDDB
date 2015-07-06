@@ -150,6 +150,7 @@
     <Compile Include="Concrete_Entities\_DbEntities.cs" />
     <Compile Include="Concrete_Infrastructure\DbDataAnnotations.cs" />
     <Compile Include="Concrete_Infrastructure\DbHelpers.cs" />
+    <Compile Include="Concrete_Services\ComponentLogEntryService.cs" />
     <Compile Include="Concrete_Services\PersonLogEntryService.cs" />
     <Compile Include="Concrete_Services\_DbFtpRepoService.cs" />
     <Compile Include="Concrete_Services\ComponentService.cs" />
@@ -389,6 +390,10 @@
     <Compile Include="Migrations\201506260954536_Component1.Designer.cs">
       <DependentUpon>201506260954536_Component1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201507060315341_LogEntry8.cs" />
+    <Compile Include="Migrations\201507060315341_LogEntry8.Designer.cs">
+      <DependentUpon>201507060315341_LogEntry8.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -557,6 +562,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201506260954536_Component1.resx">
       <DependentUpon>201506260954536_Component1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201507060315341_LogEntry8.resx">
+      <DependentUpon>201507060315341_LogEntry8.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

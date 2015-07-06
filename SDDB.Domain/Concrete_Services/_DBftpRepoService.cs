@@ -96,6 +96,9 @@ namespace SDDB.Domain.Services
         //DownloadAsync - download log entry files from FTP. Return file if only one or .zip if many
         public virtual async Task<byte[]> DownloadAsync(string id, string[] names)
         {
+            if (String.IsNullOrEmpty(id)) throw new ArgumentNullException("id");
+            if (names == null) throw new ArgumentNullException("names");
+            
             switch (names.Length)
             {
                 case 0:
@@ -146,6 +149,9 @@ namespace SDDB.Domain.Services
         //UploadAsync - upload received files to ftp
         public virtual async Task UploadAsync(string id, FileMemStream[] files)
         {
+            if (String.IsNullOrEmpty(id)) throw new ArgumentNullException("id");
+            if (files == null) throw new ArgumentNullException("files");
+
             var ftpRequest = (FtpWebRequest)WebRequest.Create(ftpAddress + @"/" + id);
             ftpRequest.Credentials = new NetworkCredential(ftpUserName, ftpPwd);
             ftpRequest.EnableSsl = ftpIsSSL;
@@ -188,6 +194,9 @@ namespace SDDB.Domain.Services
         //DeleteAsync - upload received files to ftp
         public virtual async Task DeleteAsync(string id, string[] names)
         {
+            if (String.IsNullOrEmpty(id)) throw new ArgumentNullException("id");
+            if (names == null) throw new ArgumentNullException("names");
+
             var i = 0; var deletedCount = 0; var delTasks = new List<Task>();
             while (deletedCount < names.Length)
             {
