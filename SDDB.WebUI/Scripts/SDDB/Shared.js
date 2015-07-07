@@ -239,7 +239,7 @@ function fillFormForCreateGeneric(formId, msArray, labelText, mainViewId) {
     $("#" + formId + "Label").text(labelText);
     $("#" + formId + " [data-val-dbisunique]").prop("disabled", false); disableUniqueMs(msArray, false);
     $("#" + formId + " .modifiable").data("ismodified", true); setMsAsModified(msArray, true);
-    $("#" + formId + "GroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true)
+    $("#" + formId + "GroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true); $("#IsActive_bl").prop("checked", true)
     $("#" + formId + "CreateMultiple").removeClass("hide");
     $("#" + mainViewId).addClass("hide");
     $("#" + formId + "View").removeClass("hide");

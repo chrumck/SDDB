@@ -41,7 +41,7 @@ namespace SDDB.WebUI.ControllersSrv
             return new DBJsonDateTimeISO { Data = new { data}, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
-        // GET: /ProjectEventSrv/GetByIds
+        // POST: /ProjectEventSrv/GetByIds
         [HttpPost]
         [DBSrvAuth("ProjectEvent_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
@@ -59,7 +59,7 @@ namespace SDDB.WebUI.ControllersSrv
             return new DBJsonDateTimeISO { Data =  data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
-        // GET: /ProjectEventSrv/GetByProjectIds
+        // POST: /ProjectEventSrv/GetByProjectIds
         [HttpPost]
         [DBSrvAuth("ProjectEvent_View")]
         public async Task<ActionResult> GetByProjectIds(string[] projectIds, bool getActive = true)

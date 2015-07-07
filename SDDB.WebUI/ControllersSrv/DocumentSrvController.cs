@@ -43,7 +43,7 @@ namespace SDDB.WebUI.ControllersSrv
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
-        // GET: /DocumentSrv/GetByIds
+        // POST: /DocumentSrv/GetByIds
         [HttpPost]
         [DBSrvAuth("Document_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
@@ -63,7 +63,7 @@ namespace SDDB.WebUI.ControllersSrv
             return Json( data , JsonRequestBehavior.AllowGet);
         }
 
-         // GET: /DocumentSrv/GetByTypeIds
+        // POST: /DocumentSrv/GetByTypeIds
         [HttpPost]
         [DBSrvAuth("Document_View")]
         public async Task<ActionResult> GetByTypeIds(string[] projectIds, string[] typeIds = null, bool getActive = true)

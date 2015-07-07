@@ -52,7 +52,7 @@ namespace SDDB.WebUI.ControllersSrv
             return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
         
-        // GET: /PersonLogEntrySrv/GetByIds
+        // POST: /PersonLogEntrySrv/GetByIds
         [HttpPost]
         [DBSrvAuth("PersonLogEntry_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
@@ -74,13 +74,13 @@ namespace SDDB.WebUI.ControllersSrv
             return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
-        // GET: /PersonLogEntrySrv/GetByFilterIds
+        // POST: /PersonLogEntrySrv/GetByAltIds
         [HttpPost]
         [DBSrvAuth("PersonLogEntry_View")]
-        public async Task<ActionResult> GetByFilterIds(string[] personIds = null, string[] projectIds = null, string[] typeIds = null,
+        public async Task<ActionResult> GetByAltIds(string[] personIds = null, string[] projectIds = null, string[] typeIds = null,
             DateTime? startDate = null, DateTime? endDate = null, bool getActive = true)
         {
-            var data = (await prsLogEntryService.GetByFiltersAsync(UserId, personIds, projectIds, typeIds, startDate, endDate, getActive)
+            var data = (await prsLogEntryService.GetByAltIdsAsync(UserId, personIds, projectIds, typeIds, startDate, endDate, getActive)
                 .ConfigureAwait(false)).Select(x => new {
                 x.Id, x.LogEntryDateTime,
                 EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
@@ -93,7 +93,7 @@ namespace SDDB.WebUI.ControllersSrv
                 x.EnteredByPerson_Id ,x.PersonActivityType_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id, x.AssignedToProjectEvent_Id
             });
 
-            ViewBag.ServiceName = "PersonLogEntryService.GetByFiltersAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "PersonLogEntryService.GetByAltIdsAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }

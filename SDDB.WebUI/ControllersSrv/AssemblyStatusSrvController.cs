@@ -36,7 +36,7 @@ namespace SDDB.WebUI.ControllersSrv
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
-        // GET: /AssemblyStatusSrv/GetByIds
+        // POST: /AssemblyStatusSrv/GetByIds
         [HttpPost]
         [DBSrvAuth("AssemblyStatus_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)

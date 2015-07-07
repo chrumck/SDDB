@@ -79,9 +79,6 @@ $(document).ready(function () {
 
     //---------------------------------------EditFormView----------------------------------------//
 
-    //Enable modified field detection
-    $(".modifiable").change(function () { $(this).data("ismodified", true); });
-
     //Initialize MagicSuggest Array
     addToMSArray(MagicSuggests, "Id", "/PersonSrv/PersonsWoDBUser", 1);
 

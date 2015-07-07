@@ -36,7 +36,7 @@ namespace SDDB.WebUI.ControllersSrv
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
-        // GET: /LocationTypeSrv/GetByIds
+        // POST: /LocationTypeSrv/GetByIds
         [HttpPost]
         [DBSrvAuth("LocationType_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)

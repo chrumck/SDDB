@@ -47,7 +47,7 @@ namespace SDDB.WebUI.ControllersSrv
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
-        // GET: /ComponentModelSrv/GetByIds
+        // POST: /ComponentModelSrv/GetByIds
         [HttpPost]
         [DBSrvAuth("ComponentModel_View,Component_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)

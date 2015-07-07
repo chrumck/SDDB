@@ -42,7 +42,7 @@ namespace SDDB.WebUI.ControllersSrv
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
-        // GET: /LocationSrv/GetByIds
+        // POST: /LocationSrv/GetByIds
         [HttpPost]
         [DBSrvAuth("Location_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
@@ -61,12 +61,12 @@ namespace SDDB.WebUI.ControllersSrv
             return Json( data , JsonRequestBehavior.AllowGet);
         }
 
-        // GET: /LocationSrv/GetByTypeIds
+        // POST: /LocationSrv/GetByAltIds
         [HttpPost]
         [DBSrvAuth("Location_View")]
-        public async Task<ActionResult> GetByTypeIds(string[] projectIds = null, string[] typeIds = null, bool getActive = true)
+        public async Task<ActionResult> GetByAltIds(string[] projectIds = null, string[] typeIds = null, bool getActive = true)
         {
-            var data = (await locationService.GetByTypeAsync(UserId, projectIds, typeIds, getActive).ConfigureAwait(false)).Select(x => new
+            var data = (await locationService.GetByAltIdsAsync(UserId, projectIds, typeIds, getActive).ConfigureAwait(false)).Select(x => new
             {
                 x.Id, x.LocName, x.LocAltName, x.LocationType.LocTypeName, 
                 AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
@@ -76,7 +76,7 @@ namespace SDDB.WebUI.ControllersSrv
                 x.LocationType_Id,x.AssignedToProject_Id, x.ContactPerson_Id
             });
 
-            ViewBag.ServiceName = "LocationService.GetByTypeAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "LocationService.GetByAltIdsAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(data, JsonRequestBehavior.AllowGet);
         }

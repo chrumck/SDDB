@@ -14,7 +14,19 @@ var TableLogEntryAssysAdd; var TableLogEntryAssysRemove;
 var TableLogEntryPersonsAdd; var TableLogEntryPersonsRemove;
 var MsFilterByProject; var MsFilterByType; var MsFilterByPerson;
 var MagicSuggests = [];
-var CurrRecord; var CurrIds = []; var FileCurrNames = [];
+var CurrRecord = {
+    Id: null,
+    LogEntryDateTime: null,
+    EnteredByPerson_Id: null,
+    PersonActivityType_Id: null,
+    ManHours: null,
+    AssignedToProject_Id: null,
+    AssignedToLocation_Id: null,
+    AssignedToProjectEvent_Id: null,
+    Comments: null,
+    IsActive_bl: null,
+};
+var CurrIds = []; var FileCurrNames = [];
 var GetActive = true;
 var SelectedRecord;
 var DlToken; var DlTimer; var DlAttempts;
@@ -538,7 +550,7 @@ function refreshMainView() {
 
         $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
 
-        refreshTableGeneric(TableMain, "/PersonLogEntrySrv/GetByFilterIds", { personIds: MsFilterByPerson.getValue(), 
+        refreshTableGeneric(TableMain, "/PersonLogEntrySrv/GetByAltIds", { personIds: MsFilterByPerson.getValue(), 
                 projectIds: MsFilterByProject.getValue(), typeIds: MsFilterByType.getValue(),
                 startDate: $("#FilterDateStart").val(), endDate: endDate, getActive: GetActive}, "POST")
             .always(function () { $("#ModalWait").modal("hide"); })

@@ -96,7 +96,7 @@ namespace SDDB.Domain.Services
         }
                 
         //get by projectIds and modelIds
-        public virtual async Task<List<Component>> GetByModelAsync(string userId, string[] projectIds = null, string[] modelIds = null, bool getActive = true)
+        public virtual async Task<List<Component>> GetByAltIdsAsync(string userId, string[] projectIds = null, string[] modelIds = null, bool getActive = true)
         {
             if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
 
@@ -133,7 +133,7 @@ namespace SDDB.Domain.Services
         }
 
         //get by projectIds, typeIds and assyIds
-        public virtual async Task<List<Component>> GetByTypeAssyAsync(string userId,
+        public virtual async Task<List<Component>> GetByAltIdsAsync(string userId,
             string[] projectIds = null, string[] typeIds = null, string[] assyIds = null, bool getActive = true)
         {
             if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
@@ -263,7 +263,7 @@ namespace SDDB.Domain.Services
                                         Id = Guid.NewGuid().ToString(),
                                         Component_Id = dbEntry.Id,
                                         EnteredByPerson_Id = userId,
-                                        LogEntryDate = DateTime.Now,
+                                        LogEntryDateTime = DateTime.Now,
                                         ComponentStatus_Id = dbEntry.ComponentStatus_Id,
                                         AssignedToProject_Id = dbEntry.AssignedToProject_Id,
                                         AssignedToAssemblyDb_Id = dbEntry.AssignedToAssemblyDb_Id,

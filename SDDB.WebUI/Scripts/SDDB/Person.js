@@ -124,14 +124,9 @@ $(document).ready(function () {
 
     //---------------------------------------EditFormView----------------------------------------//
 
-    //Enable modified field detection
-    $(".modifiable").change(function () { $(this).data("ismodified", true); });
-
     //Enable DatePicker
     $(".datepicker").datetimepicker({ format: "YYYY-MM-DD" })
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
-
-    //Initialize MagicSuggest Array
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {

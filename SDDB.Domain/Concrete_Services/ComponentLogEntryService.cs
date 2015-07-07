@@ -96,7 +96,7 @@ namespace SDDB.Domain.Services
         }
                 
         //get by projectIds and componentIds
-        public virtual async Task<List<ComponentLogEntry>> GetByProjCompAsync(string userId,
+        public virtual async Task<List<ComponentLogEntry>> GetByAltIdsAsync(string userId,
             string[] projectIds = null, string[] componentIds = null, string[] personIds = null, bool getActive = true)
         {
             if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");

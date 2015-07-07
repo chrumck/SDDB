@@ -164,14 +164,10 @@ $(document).ready(function () {
 
     //---------------------------------------EditFormView----------------------------------------//
 
-    //Enable modified field detection
-    $(".modifiable").change(function () { $(this).data("ismodified", true); });
-
     //Initialize MagicSuggest Array
     addToMSArray(MagicSuggests, "LocationType_Id", "/LocationTypeSrv/Lookup", 1);
     addToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
     addToMSArray(MagicSuggests, "ContactPerson_Id", "/PersonSrv/Lookup", 1);
-    
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
@@ -401,7 +397,7 @@ function RefreshMainView() {
         TableMain.clear().search("").draw();
     }
     else {
-        refreshTable(TableMain, "/LocationSrv/GetByTypeIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+        refreshTable(TableMain, "/LocationSrv/GetByAltIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
             "POST", MsFilterByProject.getValue(), [], MsFilterByType.getValue());
         $("#ChBoxShowDeleted").bootstrapToggle("enable")
     }

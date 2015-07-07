@@ -53,6 +53,14 @@ $(document).ready(function () {
         TableMain.columns([8, 9, 10, 11, 12, 13]).visible(true);
     });
 
+    //wire up dropdownId3
+    $("#dropdownId3").click(function (event) {
+        event.preventDefault();
+        var noOfRows = TableMain.rows(".ui-selected").data().length;
+        if (noOfRows != 1) showModalSelectOne();
+        else window.open("/ComponentLogEntry?compId=" + TableMain.cell(".ui-selected", "Id:name").data())
+    });
+
     //Initialize MagicSuggest MsFilterByType
     MsFilterByType = $("#MsFilterByType").magicSuggest({
         data: "/ComponentTypeSrv/Lookup",
@@ -147,9 +155,6 @@ $(document).ready(function () {
     });
 
     //---------------------------------------EditFormView----------------------------------------//
-
-    //Enable modified field detection
-    $(".modifiable").change(function () { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
     addToMSArray(MagicSuggests, "ComponentType_Id", "/ComponentTypeSrv/Lookup", 1);
@@ -374,7 +379,7 @@ function RefreshMainView() {
         TableMain.clear().search("").draw();
     }
     else {
-        refreshTable(TableMain, "/ComponentSrv/GetByTypeAssyIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+        refreshTable(TableMain, "/ComponentSrv/GetByAltIds2", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
             "POST", MsFilterByProject.getValue(), [], MsFilterByType.getValue(), [], MsFilterByAssy.getValue());
         $("#ChBoxShowDeleted").bootstrapToggle("enable")
     }

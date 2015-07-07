@@ -102,9 +102,6 @@ $(document).ready(function () {
 
     //---------------------------------------EditFormView----------------------------------------//
 
-    //Enable modified field detection
-    $(".modifiable").change(function () { $(this).data("ismodified", true); });
-
     //Initialize MagicSuggest Array
     addToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
     addToMSArray(MagicSuggests, "CreatedByPerson_Id", "/PersonSrv/Lookup", 1);

@@ -97,7 +97,7 @@ namespace SDDB.Domain.Services
         }
 
         //get by personIds, projectIds, typeIds, startDate, endDate
-        public virtual async Task<List<PersonLogEntry>> GetByFiltersAsync(string userId, string[] personIds = null, string[] projectIds = null,
+        public virtual async Task<List<PersonLogEntry>> GetByAltIdsAsync(string userId, string[] personIds = null, string[] projectIds = null,
             string[] typeIds = null, DateTime? startDate = null, DateTime? endDate = null, bool getActive = true)
         {
             if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");

@@ -94,7 +94,7 @@ namespace SDDB.Domain.Services
         }
 
         //get by projectIds and TypeIds
-        public virtual async Task<List<Location>> GetByTypeAsync(string userId, string[] projectIds = null, string[] typeIds = null, bool getActive = true)
+        public virtual async Task<List<Location>> GetByAltIdsAsync(string userId, string[] projectIds = null, string[] typeIds = null, bool getActive = true)
         {
             if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
 

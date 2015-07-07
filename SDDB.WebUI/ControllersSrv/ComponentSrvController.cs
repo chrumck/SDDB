@@ -46,7 +46,7 @@ namespace SDDB.WebUI.ControllersSrv
 
         }
         
-        // GET: /ComponentSrv/GetByIds
+        // POST: /ComponentSrv/GetByIds
         [HttpPost]
         [DBSrvAuth("Component_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
@@ -68,12 +68,12 @@ namespace SDDB.WebUI.ControllersSrv
             return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
-        // GET: /ComponentSrv/GetByModelIds
+        // POST: /ComponentSrv/GetByAltIds
         [HttpPost]
         [DBSrvAuth("Component_View")]
-        public async Task<ActionResult> GetByModelIds(string[] projectIds = null, string[] modelIds = null, bool getActive = true)
+        public async Task<ActionResult> GetByAltIds(string[] projectIds = null, string[] modelIds = null, bool getActive = true)
         {
-            var data = (await componentService.GetByModelAsync(UserId, projectIds, modelIds, getActive).ConfigureAwait(false)).Select(x => new
+            var data = (await componentService.GetByAltIdsAsync(UserId, projectIds, modelIds, getActive).ConfigureAwait(false)).Select(x => new
             {
                 x.Id, x.CompName, x.CompAltName, x.CompAltName2, 
                 x.ComponentType.CompTypeName, x.ComponentStatus.CompStatusName, x.ComponentModel.CompModelName,
@@ -86,17 +86,17 @@ namespace SDDB.WebUI.ControllersSrv
                 x.ComponentType_Id, x.ComponentStatus_Id, x.ComponentModel_Id, x.AssignedToProject_Id, x.AssignedToAssemblyDb_Id
             });
 
-            ViewBag.ServiceName = "ComponentService.GetByProjectAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "ComponentService.GetByAltIdsAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
-        // GET: /ComponentSrv/GetByTypeAssyIds
+        // POST: /ComponentSrv/GetByAltIds2
         [HttpPost]
         [DBSrvAuth("Component_View")]
-        public async Task<ActionResult> GetByTypeAssyIds(string[] projectIds = null, string[] typeIds = null, string[] assyIds = null, bool getActive = true)
+        public async Task<ActionResult> GetByAltIds2(string[] projectIds = null, string[] typeIds = null, string[] assyIds = null, bool getActive = true)
         {
-            var data = (await componentService.GetByTypeAssyAsync(UserId, projectIds, typeIds, assyIds, getActive).ConfigureAwait(false)).Select(x => new
+            var data = (await componentService.GetByAltIdsAsync(UserId, projectIds, typeIds, assyIds, getActive).ConfigureAwait(false)).Select(x => new
             {
                 x.Id, x.CompName, x.CompAltName, x.CompAltName2, 
                 x.ComponentType.CompTypeName, x.ComponentStatus.CompStatusName, x.ComponentModel.CompModelName,
@@ -109,7 +109,7 @@ namespace SDDB.WebUI.ControllersSrv
                 x.ComponentType_Id, x.ComponentStatus_Id, x.ComponentModel_Id, x.AssignedToProject_Id, x.AssignedToAssemblyDb_Id
             });
 
-            ViewBag.ServiceName = "ComponentService.GetByTypeAssyAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "ComponentService.GetByAltIdsAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }

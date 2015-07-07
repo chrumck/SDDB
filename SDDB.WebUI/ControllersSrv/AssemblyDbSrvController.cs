@@ -47,7 +47,7 @@ namespace SDDB.WebUI.ControllersSrv
             return Json(data, JsonRequestBehavior.AllowGet);
         }
         
-        // GET: /AssemblyDbSrv/GetByIds
+        // POST: /AssemblyDbSrv/GetByIds
         [HttpPost]
         [DBSrvAuth("Assembly_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
@@ -71,12 +71,12 @@ namespace SDDB.WebUI.ControllersSrv
             return Json( data , JsonRequestBehavior.AllowGet);
         }
 
-        // GET: /AssemblyDbSrv/GetByModelIds
+        // POST: /AssemblyDbSrv/GetByAltIds
         [HttpPost]
         [DBSrvAuth("Assembly_View")]
-        public async Task<ActionResult> GetByModelIds(string[] projectIds = null, string[] modelIds = null, bool getActive = true)
+        public async Task<ActionResult> GetByAltIds(string[] projectIds = null, string[] modelIds = null, bool getActive = true)
         {
-            var data = (await assemblyService.GetByModelAsync(UserId, projectIds, modelIds, getActive).ConfigureAwait(false)).Select(x => new
+            var data = (await assemblyService.GetByAltIdsAsync(UserId, projectIds, modelIds, getActive).ConfigureAwait(false)).Select(x => new
             {
                 x.Id, x.AssyName, x.AssyAltName, x.AssyAltName2, 
                 x.AssemblyType.AssyTypeName, x.AssemblyStatus.AssyStatusName, x.AssemblyModel.AssyModelName,
@@ -91,17 +91,17 @@ namespace SDDB.WebUI.ControllersSrv
                 x.AssemblyType_Id, x.AssemblyStatus_Id, x.AssemblyModel_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id
             });
 
-            ViewBag.ServiceName = "AssemblyDbService.GetByProjectAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "AssemblyDbService.GetByAltIdsAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
-        // GET: /AssemblyDbSrv/GetByTypeLocIds
+        // POST: /AssemblyDbSrv/GetByAltIds
         [HttpPost]
         [DBSrvAuth("Assembly_View")]
-        public async Task<ActionResult> GetByTypeLocIds(string[] projectIds = null, string[] typeIds = null, string[] locIds = null, bool getActive = true)
+        public async Task<ActionResult> GetByAltIds(string[] projectIds = null, string[] typeIds = null, string[] locIds = null, bool getActive = true)
         {
-            var data = (await assemblyService.GetByTypeLocAsync(UserId, projectIds, typeIds, locIds, getActive).ConfigureAwait(false)).Select(x => new
+            var data = (await assemblyService.GetByAltIdsAsync(UserId, projectIds, typeIds, locIds, getActive).ConfigureAwait(false)).Select(x => new
             {
                 x.Id, x.AssyName, x.AssyAltName, x.AssyAltName2, 
                 x.AssemblyType.AssyTypeName, x.AssemblyStatus.AssyStatusName, x.AssemblyModel.AssyModelName,
@@ -116,7 +116,7 @@ namespace SDDB.WebUI.ControllersSrv
                 x.AssemblyType_Id, x.AssemblyStatus_Id, x.AssemblyModel_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id
             });
 
-            ViewBag.ServiceName = "AssemblyDbService.GetByTypeLocAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "AssemblyDbService.GetByAltIdsAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(data, JsonRequestBehavior.AllowGet);
         }

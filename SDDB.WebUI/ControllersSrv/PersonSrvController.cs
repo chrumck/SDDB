@@ -35,7 +35,7 @@ namespace SDDB.WebUI.ControllersSrv
             return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
-        // GET: /PersonSrv/GetByIds
+        // POST: /PersonSrv/GetByIds
         [HttpPost]
         [DBSrvAuth("Person_View,PersonGroup_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)

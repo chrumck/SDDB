@@ -74,7 +74,7 @@ $(document).ready(function () {
             TableMain.clear().search("").draw();
         }
         else {
-            refreshTable(TableMain, "/ComponentSrv/GetByModelIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+            refreshTable(TableMain, "/ComponentSrv/GetByAltIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
                 "POST", MsFilterByProject.getValue(), MsFilterByModel.getValue());
             MsFilterByProject.enable();
             $("#ChBoxShowDeleted").bootstrapToggle("enable")
@@ -95,7 +95,7 @@ $(document).ready(function () {
         style: "min-width: 240px;"
     });
     $(MsFilterByProject).on('selectionchange', function (e, m) {
-        refreshTable(TableMain, "/ComponentSrv/GetByModelIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+        refreshTable(TableMain, "/ComponentSrv/GetByAltIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
                     "POST", MsFilterByProject.getValue(), MsFilterByModel.getValue());
     });
 
@@ -107,7 +107,7 @@ $(document).ready(function () {
         if (($(this).prop("checked")) ? false : true)
             $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
         else $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
-        refreshTable(TableMain, "/ComponentSrv/GetByModelIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+        refreshTable(TableMain, "/ComponentSrv/GetByAltIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
                     "POST", MsFilterByProject.getValue(), MsFilterByModel.getValue());
     });
 
@@ -175,11 +175,6 @@ $(document).ready(function () {
     });
 
     //---------------------------------------EditFormView----------------------------------------//
-
-    //Enable modified field detection
-    $(".modifiable").change(function () { $(this).data("ismodified", true); });
-
-    //Initialize MagicSuggest Array
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
@@ -344,7 +339,7 @@ function SubmitEdits() {
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
-            refreshTable(TableMain, "/ComponentSrv/GetByModelIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+            refreshTable(TableMain, "/ComponentSrv/GetByAltIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
                 "POST", MsFilterByProject.getValue(), MsFilterByModel.getValue());
             $("#MainView").removeClass("hide");
             $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);

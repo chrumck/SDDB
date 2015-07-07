@@ -95,7 +95,7 @@ namespace SDDB.Domain.Services
         }
 
         //get by projectIds and modelIds
-        public virtual async Task<List<AssemblyDb>> GetByModelAsync(string userId, string[] projectIds = null, string[] modelIds = null, bool getActive = true)
+        public virtual async Task<List<AssemblyDb>> GetByAltIdsAsync(string userId, string[] projectIds = null, string[] modelIds = null, bool getActive = true)
         {
             if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
 
@@ -132,7 +132,7 @@ namespace SDDB.Domain.Services
         }
 
         //get by projectIds, typeIds and locIds
-        public virtual async Task<List<AssemblyDb>> GetByTypeLocAsync(string userId,
+        public virtual async Task<List<AssemblyDb>> GetByAltIdsAsync(string userId,
             string[] projectIds = null, string[] typeIds = null, string[] locIds = null, bool getActive = true)
         {
             if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");

@@ -202,9 +202,6 @@ $(document).ready(function () {
 
     //---------------------------------------EditFormView----------------------------------------//
 
-    //Enable modified field detection
-    $(".modifiable").change(function () { $(this).data("ismodified", true); });
-
     //Initialize MagicSuggest Array
     addToMSArray(MagicSuggests, "AssemblyType_Id", "/AssemblyTypeSrv/Lookup", 1);
     addToMSArray(MagicSuggests, "AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup", 1);
@@ -472,7 +469,7 @@ function RefreshMainView() {
         TableMain.clear().search("").draw();
     }
     else {
-        refreshTable(TableMain, "/AssemblyDbSrv/GetByTypeLocIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+        refreshTable(TableMain, "/AssemblyDbSrv/GetByAltIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
             "POST", MsFilterByProject.getValue(), [], MsFilterByType.getValue(), MsFilterByLoc.getValue());
         $("#ChBoxShowDeleted").bootstrapToggle("enable")
     }

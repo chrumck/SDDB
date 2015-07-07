@@ -17,6 +17,10 @@ namespace SDDB.Domain.Entities
         [StringLength(40)]
         public string Id { get; set; }
 
+        [Required(ErrorMessage = "Entry Date field is required")]
+        [DBIsDateTimeISO]
+        public DateTime LogEntryDateTime { get; set; }
+                
         [Required(ErrorMessage = "Component field is required")]
         [StringLength(40)]
         [ForeignKey("Component")]
@@ -27,10 +31,6 @@ namespace SDDB.Domain.Entities
         [ForeignKey("EnteredByPerson")]
         public string EnteredByPerson_Id { get; set; }
 
-        [Required(ErrorMessage = "Entry Date field is required")]
-        [DBIsDateTimeISO]
-        public DateTime LogEntryDate { get; set; }
-                
         [Required(ErrorMessage = "Comp. Status field is required")]
         [StringLength(40)]
         [ForeignKey("ComponentStatus")]
