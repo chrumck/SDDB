@@ -230,7 +230,7 @@ namespace SDDB.Domain.Services
         //-----------------------------------------------------------------------------------------------------------------------
 
         // Create and Update records given in []
-        public virtual async Task<DBResult> EditAsync(AssemblyDb[] records)
+        public virtual async Task<DBResult> EditAsync(string userId, AssemblyDb[] records)
         {
             using (var dbContextScope = contextScopeFac.Create())
             {
@@ -258,6 +258,10 @@ namespace SDDB.Domain.Services
                         }
                         else
                         {
+                            var loggedProperties = new string[] { "AssemblyStatus_Id", "AssignedToProject_Id", "AssignedToLocation_Id",
+                                "AssyGlobalX", "AssyGlobalY", "AssyGlobalZ", "AssyLocalXDesign", "AssyLocalYDesign", "AssyLocalZDesign",
+                                "AssyLocalXAsBuilt", "AssyLocalYAsBuilt", "AssyLocalZAsBuilt", "AssyStationing", "AssyLength"};
+                            var logChanges = false;
                             var excludedProperties = new string[] { "Id", "TSP" };
                             var properties = typeof(AssemblyDb).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
                             foreach (var property in properties)
@@ -267,6 +271,37 @@ namespace SDDB.Domain.Services
                                 if (excludedProperties.Contains(property.Name)) continue;
 
                                 if (record.PropIsModified(property.Name)) property.SetValue(dbEntry, property.GetValue(record));
+
+                                if (record.PropIsModified(property.Name) && loggedProperties.Contains(property.Name)) logChanges = true;
+                            }
+
+                            if (logChanges)
+                            {
+                                dbContext.AssemblyLogEntrys.Add(
+                                    new AssemblyLogEntry
+                                    {
+                                        Id = Guid.NewGuid().ToString(),
+                                        LogEntryDateTime = DateTime.Now,
+                                        AssemblyDb_Id = dbEntry.Id,
+                                        EnteredByPerson_Id = userId,
+                                        AssemblyStatus_Id = dbEntry.AssemblyStatus_Id,
+                                        AssignedToProject_Id = dbEntry.AssignedToProject_Id,
+                                        AssignedToLocation_Id = dbEntry.AssignedToLocation_Id,
+                                        AssyGlobalX = dbEntry.AssyGlobalX,
+                                        AssyGlobalY = dbEntry.AssyGlobalY,
+                                        AssyGlobalZ = dbEntry.AssyGlobalZ,
+                                        AssyLocalXDesign = dbEntry.AssyLocalXDesign,
+                                        AssyLocalYDesign = dbEntry.AssyLocalYDesign,
+                                        AssyLocalZDesign = dbEntry.AssyLocalZDesign,
+                                        AssyLocalXAsBuilt = dbEntry.AssyLocalXAsBuilt,
+                                        AssyLocalYAsBuilt = dbEntry.AssyLocalYAsBuilt,
+                                        AssyLocalZAsBuilt = dbEntry.AssyLocalZAsBuilt,
+                                        AssyStationing = dbEntry.AssyStationing,
+                                        AssyLength = dbEntry.AssyLength,
+                                        Comments = dbEntry.Comments,
+                                        IsActive_bl = true
+                                    }
+                                );
                             }
                         }
                     }

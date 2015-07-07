@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using SDDB.Domain.Abstract;
 using SDDB.Domain.Infrastructure;
 
+
 namespace SDDB.Domain.Entities
 {
     [Table("ComponentLogEntrys")]

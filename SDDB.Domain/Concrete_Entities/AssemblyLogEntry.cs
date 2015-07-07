@@ -18,6 +18,10 @@ namespace SDDB.Domain.Entities
         [StringLength(40)]
         public string Id { get; set; }
 
+        [Required(ErrorMessage = "Entry Date field is required")]
+        [DBIsDateTimeISO]
+        public DateTime LogEntryDateTime { get; set; }
+
         [Required(ErrorMessage = "Assy field is required")]
         [StringLength(40)]
         [ForeignKey("AssemblyDb")]
@@ -27,11 +31,7 @@ namespace SDDB.Domain.Entities
         [StringLength(40)]
         [ForeignKey("EnteredByPerson")]
         public string EnteredByPerson_Id { get; set; }
-
-        [Required(ErrorMessage = "Entry Date field is required")]
-        [DBIsDateTimeISO]
-        public DateTime LogEntryDate { get; set; }
-
+        
         [Required(ErrorMessage = "Assy. Status field is required")]
         [StringLength(40)]
         [ForeignKey("AssemblyStatus")]
@@ -77,7 +77,7 @@ namespace SDDB.Domain.Entities
 
         [Required]
         [DefaultValue(true)]
-        public bool IsActive { get; set; }
+        public bool IsActive_bl { get; set; }
 
         //TSP Column Wireup ---------------------------------------------------------------------------------------------------//
         [ConcurrencyCheck]
@@ -101,8 +101,6 @@ namespace SDDB.Domain.Entities
         public virtual AssemblyStatus AssemblyStatus { get; set; }
         public virtual Project AssignedToProject { get; set; }
         public virtual Location AssignedToLocation { get; set; }
-       
-
 
         //many to many
         
