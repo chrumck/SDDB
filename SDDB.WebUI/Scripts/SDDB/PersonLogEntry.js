@@ -548,16 +548,10 @@ function refreshMainView() {
     else {
         var endDate = moment($("#FilterDateEnd").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
 
-        $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-
-        refreshTableGeneric(TableMain, "/PersonLogEntrySrv/GetByAltIds", { personIds: MsFilterByPerson.getValue(), 
+        refreshTblGenWrp(TableMain, "/PersonLogEntrySrv/GetByAltIds", { personIds: MsFilterByPerson.getValue(), 
                 projectIds: MsFilterByProject.getValue(), typeIds: MsFilterByType.getValue(),
                 startDate: $("#FilterDateStart").val(), endDate: endDate, getActive: GetActive}, "POST")
-            .always(function () { $("#ModalWait").modal("hide"); })
-            .done(function () {
-                $("#ChBoxShowDeleted").bootstrapToggle("enable");
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+            .done(function () { $("#ChBoxShowDeleted").bootstrapToggle("enable"); })
     }
 }
 

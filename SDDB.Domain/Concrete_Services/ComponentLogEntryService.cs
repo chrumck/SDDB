@@ -97,7 +97,8 @@ namespace SDDB.Domain.Services
                 
         //get by projectIds and componentIds
         public virtual async Task<List<ComponentLogEntry>> GetByAltIdsAsync(string userId,
-            string[] projectIds = null, string[] componentIds = null, string[] personIds = null, bool getActive = true)
+            string[] projectIds = null, string[] componentIds = null, string[] personIds = null,
+            DateTime? startDate = null, DateTime? endDate = null, bool getActive = true)
         {
             if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
 
@@ -105,14 +106,15 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
-                projectIds = projectIds ?? new string[] { }; componentIds = componentIds ?? new string[] { };
-                personIds = personIds ?? new string[] { };
+                projectIds = projectIds ?? new string[] { }; componentIds = componentIds ?? new string[] { }; personIds = personIds ?? new string[] { };
 
                 var records = await dbContext.ComponentLogEntrys
                     .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         (componentIds.Count() == 0 || componentIds.Contains(x.Component_Id)) &&
-                        (personIds.Count() == 0 || personIds.Contains(x.EnteredByPerson_Id)))
+                        (personIds.Count() == 0 || personIds.Contains(x.EnteredByPerson_Id)) &&
+                        (startDate == null || x.LogEntryDateTime >= startDate) &&
+                        (endDate == null || x.LogEntryDateTime <= endDate)  )
                     .Include(x => x.Component).Include(x => x.EnteredByPerson).Include(x => x.ComponentStatus).Include(x => x.AssignedToProject)
                     .Include(x => x.AssignedToAssemblyDb)
                     .ToListAsync().ConfigureAwait(false);

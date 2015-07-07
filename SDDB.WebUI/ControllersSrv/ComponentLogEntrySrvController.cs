@@ -70,9 +70,11 @@ namespace SDDB.WebUI.ControllersSrv
         // POST: /ComponentLogEntrySrv/GetByAltIds
         [HttpPost]
         [DBSrvAuth("Component_View")]
-        public async Task<ActionResult> GetByAltIds(string[] projectIds = null, string[] componentIds = null, string[] personIds = null, bool getActive = true)
+        public async Task<ActionResult> GetByAltIds(string[] projectIds = null, string[] componentIds = null, string[] personIds = null,
+            DateTime? startDate = null, DateTime? endDate = null, bool getActive = true)
         {
-            var data = (await compLogEntryService.GetByAltIdsAsync(UserId, projectIds, componentIds, personIds, getActive).ConfigureAwait(false)).Select(x => new
+            var data = (await compLogEntryService.GetByAltIdsAsync(UserId, projectIds, componentIds, personIds, startDate, endDate, getActive)
+                .ConfigureAwait(false)).Select(x => new
             {
                 x.Id,
                 x.LogEntryDateTime,

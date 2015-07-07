@@ -66,6 +66,14 @@ $(document).ready(function () {
         else showModalDelete(CurrIds.length);
     });
 
+    //Initialize DateTimePicker FilterDateStart
+    $("#FilterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
+        .on("dp.hide", function (e) { refreshMainView(); });
+
+    //Initialize DateTimePicker FilterDateEnd
+    $("#FilterDateEnd").datetimepicker({ format: "YYYY-MM-DD" })
+        .on("dp.hide", function (e) { refreshMainView(); });
+
     //Initialize MagicSuggest MsFilterByProject
     MsFilterByProject = $("#MsFilterByProject").magicSuggest({
         data: "/ProjectSrv/Lookup",
@@ -219,15 +227,21 @@ function DeleteRecords() {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
-    if (MsFilterByProject.getValue().length == 0 && MsFilterByComponent.getValue().length == 0 && 
-                MsFilterByPerson.getValue().length == 0) {
+
+    if ( ($("#FilterDateStart").val() == "" && $("#FilterDateEnd").val() == "") &&
+        (MsFilterByProject.getValue().length == 0 && MsFilterByComponent.getValue().length == 0 &&
+                MsFilterByPerson.getValue().length == 0) ) {
         $("#ChBoxShowDeleted").bootstrapToggle("disable")
         TableMain.clear().search("").draw();
     }
     else {
+        var endDate = ($("#FilterDateEnd").val() == "") ? "" : moment($("#FilterDateEnd").val())
+            .hour(23).minute(59).format("YYYY-MM-DD HH:mm");
+
         refreshTblGenWrp(TableMain, "/ComponentLogEntrySrv/GetByAltIds",
             {projectIds: MsFilterByProject.getValue(), componentIds: MsFilterByComponent.getValue(),
-             personIds: MsFilterByPerson.getValue(), getActive: GetActive }, "POST")
+            personIds: MsFilterByPerson.getValue(), startDate: $("#FilterDateStart").val(), endDate: endDate,
+            getActive: GetActive }, "POST")
             .done(function () { $("#ChBoxShowDeleted").bootstrapToggle("enable"); })
     }
 }
