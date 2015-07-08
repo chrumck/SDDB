@@ -1,0 +1,196 @@
+﻿@model SDDB.Domain.Entities.AssemblyLogEntry
+@{
+    ViewBag.Title = "Assembly Log Entries";
+}
+
+<!------- MainView ------->
+<div class="container-fluid" id="MainView">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="btn-group margin-bottom-2px">
+                <button class="btn btn-default" id="BtnCreate">Create</button>
+                <button class="btn btn-primary" id="BtnEdit">Edit</button>
+                <button class="btn btn-danger" id="BtnDelete">Delete</button>
+            </div>
+
+            <div class="btn-group margin-bottom-2px">
+                <input class="form-control input-tdo-warning" data-val="true" data-val-dbisdateiso="The field must have YYYY-MM-DD format."
+                       id="FilterDateStart" placeholder="Start Date" type="text" value="">
+            </div>
+            <div class="btn-group margin-bottom-2px">
+                <input class="form-control input-tdo-warning" data-val="true" data-val-dbisdateiso="The field must have YYYY-MM-DD format."
+                       id="FilterDateEnd" placeholder="End Date" type="text" value="">
+            </div>
+
+            <div class="btn-group margin-bottom-2px">
+                <div id="MsFilterByProject" placeholder="Select Project"></div>
+            </div>
+            <div class="btn-group margin-bottom-2px">
+                <div id="MsFilterByAssembly" placeholder="Select Assembly"></div>
+            </div>
+            <div class="btn-group margin-bottom-2px">
+                <div id="MsFilterByPerson" placeholder="Select Person"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="panel panel-primary" id="PanelTableMain">
+        <div class="panel-heading text-center" style="font-size:130%">
+            <strong>Assembly Log Entries</strong>
+            <div class="pull-right">
+                <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="100" data-onstyle="warning" data-on="Deleted Shown" data-off="Show Deleted" disabled>
+            </div>
+        </div>
+        <table class="table table-striped" id="TableMain">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Assembly</th>
+                    <th>Entered By</th>
+                    <th>Status</th>
+                    <th>Project</th>
+                    <th>Location</th>
+                    <th>GlobalX</th>
+                    <th>GlobalY</th>
+                    <th>GlobalZ</th>
+                    <th>LocalXDesign</th>
+                    <th>LocalYDesign</th>
+                    <th>LocalZDesign</th>
+                    <th>LocalXAsBuilt</th>
+                    <th>LocalYAsBuilt</th>
+                    <th>LocalZAsBuilt</th>
+                    <th>Stationing</th>
+                    <th>Length</th>
+                    <th>Comments</th>
+                    <th>Is Active</th>
+                    <th>AssemblyDb_Id</th>
+                    <th>EnteredByPerson_Id</th>
+                    <th>AssemblyStatus_Id</th>
+                    <th>AssignedToProject_Id</th>
+                    <th>AssignedToLocation_Id</th>
+                </tr>
+            </thead>
+            <tbody class="selectable"></tbody>
+        </table>
+    </div>
+</div>
+
+<!------- EditFormView ------->
+<div class="container-fluid hide" id="EditFormView">
+    <div class="row">
+        <div class="col-xs-6">
+            <h3 id="EditFormLabel">Create/Edit Log Entry</h3>
+        </div>
+        <div class="col-xs-6">
+            <h3><button class="btn btn-default pull-right" type="button" id="EditFormBtnBack">Cancel</button></h3>
+        </div>
+    </div>
+    <div class="well">
+        <form class="form-horizontal" role="form" id="EditForm">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LogEntryDateTime, "DateTime", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" data-val="true" data-val-dbisdatetimeiso="The field has to be in 'yyyy-MM-dd HH:mm' format."
+                                   data-val-required="Entry Date field is required" id="LogEntryDateTime" name="LogEntryDateTime" placeholder="Log Entry Date &amp; Time" value="" type="text">
+                            @Html.ValidationMessageFor(x => x.LogEntryDateTime)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Assembly_Id, "Assembly", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.Assembly_Id, new { @class = "form-control modifiable", placeholder = "Assembly" })
+                            @Html.ValidationMessageFor(x => x.Assembly_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.EnteredByPerson_Id, "Entered By", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.EnteredByPerson_Id, new { @class = "form-control modifiable", placeholder = "Entered By Person" })
+                            @Html.ValidationMessageFor(x => x.EnteredByPerson_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssemblyStatus_Id, "Status", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssemblyStatus_Id, new { @class = "form-control modifiable", placeholder = "Assembly Status" })
+                            @Html.ValidationMessageFor(x => x.AssemblyStatus_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssignedToProject_Id, "Project", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssignedToProject_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Project" })
+                            @Html.ValidationMessageFor(x => x.AssignedToProject_Id)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssignedToAssemblyDb_Id, "Assembly", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssignedToAssemblyDb_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Assembly" })
+                            @Html.ValidationMessageFor(x => x.AssignedToAssemblyDb_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LastCalibrationDate, "Last Calib.", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" data-val="true" data-val-dbisdateiso="The field has to be in 'yyyy-MM-dd' format."
+                                   id="LastCalibrationDate" name="LastCalibrationDate" placeholder="Last Calibration Date" value="" type="text">
+                            @Html.ValidationMessageFor(x => x.LastCalibrationDate)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.Comments, "Comments", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextAreaFor(x => x.Comments, 3, 10, new { @class = "form-control modifiable", placeholder = "Comments" })
+                            @Html.ValidationMessageFor(x => x.Comments)
+                        </div>
+                    </div>
+                    <div class="form-group hide" id="EditFormGroupIsActive">
+                        <div class="col-sm-10 col-sm-offset-2">
+                            @Html.CheckBoxFor(x => x.IsActive_bl, new { @class = "modifiable" }) &nbsp;&nbsp;
+                            @Html.LabelFor(x => x.IsActive_bl, "Is Active") &nbsp;&nbsp; <em>(Marking as 'Active' un-deletes record.)</em>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <div class="col-xs-6">
+                    <button class="btn btn-default" type="button" id="EditFormBtnCancel">Cancel</button>
+                </div>
+                <div class="col-xs-6">
+                    <button class="btn btn-success pull-right" type="button" id="EditFormBtnOk">
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!------- ScriptVariables ------->
+<script>var compId = "@ViewBag.compId";</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/DataTables")
+    @Scripts.Render("~/bundles/bootstrap-toggle")
+    @Scripts.Render("~/bundles/magicsuggest")
+    @Scripts.Render("~/bundles/bootstrap-datetimepicker")
+    <script src="~/Scripts/SDDB/AssemblyLogEntry.js"></script>
+}
+
+@section CSS {
+    @Styles.Render("~/bundles/DataTables-CSS")
+    @Styles.Render("~/bundles/bootstrap-toggle-CSS")
+    @Styles.Render("~/bundles/magicsuggest-css")
+    @Styles.Render("~/bundles/bootstrap-datetimepicker-CSS")
+}

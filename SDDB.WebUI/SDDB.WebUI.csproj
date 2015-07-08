@@ -461,6 +461,7 @@
     <Compile Include="ControllersSrv\ProjectSrvController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controllers\AssemblyLogEntryController.cs" />
     <Compile Include="Controllers\ComponentLogEntryController.cs" />
     <Compile Include="Controllers\ComponentExtController.cs" />
     <Compile Include="Controllers\ComponentController.cs" />
@@ -527,6 +528,7 @@
     <Content Include="Views\ProjectEvent\Index.cshtml" />
     <Content Include="Views\PersonLogEntry\Index.cshtml" />
     <Content Include="Views\ComponentLogEntry\Index.cshtml" />
+    <Content Include="Views\AssemblyLogEntry\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

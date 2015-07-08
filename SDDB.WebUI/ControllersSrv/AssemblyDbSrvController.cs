@@ -176,7 +176,7 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Assembly_Edit")]
         public async Task<ActionResult> Edit(AssemblyDb[] records)
         {
-            var serviceResult = await assemblyService.EditAsync(records).ConfigureAwait(false);
+            var serviceResult = await assemblyService.EditAsync(UserId, records).ConfigureAwait(false);
 
             ViewBag.ServiceName = "AssemblyDbService.EditAsync"; ViewBag.StatusCode = serviceResult.StatusCode; 
             ViewBag.StatusDescription = serviceResult.StatusDescription;
