@@ -101,10 +101,10 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.Assembly_Id, "Assembly", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.AssemblyDb_Id, "Assembly", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.Assembly_Id, new { @class = "form-control modifiable", placeholder = "Assembly" })
-                            @Html.ValidationMessageFor(x => x.Assembly_Id)
+                            @Html.TextBoxFor(x => x.AssemblyDb_Id, new { @class = "form-control modifiable", placeholder = "Assembly" })
+                            @Html.ValidationMessageFor(x => x.AssemblyDb_Id)
                         </div>
                     </div>
                     <div class="form-group">
@@ -128,22 +128,91 @@
                             @Html.ValidationMessageFor(x => x.AssignedToProject_Id)
                         </div>
                     </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssignedToLocation_Id, "Location", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssignedToLocation_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Location" })
+                            @Html.ValidationMessageFor(x => x.AssignedToLocation_Id)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssyGlobalX, "Global X", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssyGlobalX, new { @class = "form-control modifiable", placeholder = "Assy. Global X" })
+                            @Html.ValidationMessageFor(x => x.AssyGlobalX)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssyGlobalY, "Global Y", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssyGlobalY, new { @class = "form-control modifiable", placeholder = "Assy. Global Y" })
+                            @Html.ValidationMessageFor(x => x.AssyGlobalY)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssyGlobalZ, "Global Z", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssyGlobalZ, new { @class = "form-control modifiable", placeholder = "Assy. Global Z" })
+                            @Html.ValidationMessageFor(x => x.AssyGlobalZ)
+                        </div>
+                    </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        @Html.LabelFor(x => x.AssignedToAssemblyDb_Id, "Assembly", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.AssyLocalXDesign, "LocalX Design", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.AssignedToAssemblyDb_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Assembly" })
-                            @Html.ValidationMessageFor(x => x.AssignedToAssemblyDb_Id)
+                            @Html.TextBoxFor(x => x.AssyLocalXDesign, new { @class = "form-control modifiable", placeholder = "Local Design X" })
+                            @Html.ValidationMessageFor(x => x.AssyLocalXDesign)
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.LastCalibrationDate, "Last Calib.", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.AssyLocalYDesign, "LocalY Design", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
-                            <input class="form-control modifiable" data-val="true" data-val-dbisdateiso="The field has to be in 'yyyy-MM-dd' format."
-                                   id="LastCalibrationDate" name="LastCalibrationDate" placeholder="Last Calibration Date" value="" type="text">
-                            @Html.ValidationMessageFor(x => x.LastCalibrationDate)
+                            @Html.TextBoxFor(x => x.AssyLocalYDesign, new { @class = "form-control modifiable", placeholder = "Local Design Y" })
+                            @Html.ValidationMessageFor(x => x.AssyLocalYDesign)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssyLocalZDesign, "LocalZ Design", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssyLocalZDesign, new { @class = "form-control modifiable", placeholder = "Local Design Z" })
+                            @Html.ValidationMessageFor(x => x.AssyLocalZDesign)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssyLocalXAsBuilt, "LocalX AsBuilt", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssyLocalXAsBuilt, new { @class = "form-control modifiable", placeholder = "Local AsBuilt X" })
+                            @Html.ValidationMessageFor(x => x.AssyLocalXAsBuilt)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssyLocalYAsBuilt, "LocalY AsBuilt", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssyLocalYAsBuilt, new { @class = "form-control modifiable", placeholder = "Local AsBuilt Y" })
+                            @Html.ValidationMessageFor(x => x.AssyLocalYAsBuilt)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssyLocalZAsBuilt, "LocalZ AsBuilt", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssyLocalZAsBuilt, new { @class = "form-control modifiable", placeholder = "Local AsBuilt Z" })
+                            @Html.ValidationMessageFor(x => x.AssyLocalZAsBuilt)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssyStationing, "Stationing", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssyStationing, new { @class = "form-control modifiable", placeholder = "Assy. Stationing" })
+                            @Html.ValidationMessageFor(x => x.AssyStationing)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.AssyLength, "Length", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.AssyLength, new { @class = "form-control modifiable", placeholder = "Assy. Length" })
+                            @Html.ValidationMessageFor(x => x.AssyLength)
                         </div>
                     </div>
                     <div class="form-group">
@@ -178,7 +247,7 @@
 </div>
 
 <!------- ScriptVariables ------->
-<script>var compId = "@ViewBag.compId";</script>
+<script>var assyId = "@ViewBag.assyId";</script>
 
 @section Scripts {
     @Scripts.Render("~/bundles/DataTables")

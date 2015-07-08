@@ -1151,7 +1151,7 @@ namespace SDDB.UnitTests
 
             var prsLogEntryIds = new string[] { };
 
-            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive = true };
+            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive_bl = true };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<Person>>();
             mockDbSet2.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1204,7 +1204,7 @@ namespace SDDB.UnitTests
 
             var prsLogEntryIds = new string[] { "dummyEntryId2" };
 
-            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive = true };
+            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive_bl = true };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<Person>>();
             mockDbSet2.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1257,7 +1257,7 @@ namespace SDDB.UnitTests
 
             var prsLogEntryIds = new string[] { "EntryId1" };
 
-            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive = true };
+            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive_bl = true };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<Person>>();
             mockDbSet2.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1308,7 +1308,7 @@ namespace SDDB.UnitTests
 
             mockEfDbContext.Setup(x => x.PersonLogEntrys).Returns(mockDbSet.Object);
 
-            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive = true };
+            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive_bl = true };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<Person>>();
             mockDbSet2.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1363,7 +1363,7 @@ namespace SDDB.UnitTests
 
             var prsLogEntryIds = new string[] { "dummyEntryId1" };
 
-            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive = true };
+            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive_bl = true };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<Person>>();
             mockDbSet2.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1403,7 +1403,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive = true };
+            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive_bl = true };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<Person>>();
             mockDbSet2.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1464,7 +1464,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive = true };
+            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive_bl = true };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<Person>>();
             mockDbSet2.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1525,7 +1525,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive = true };
+            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive_bl = true };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<Person>>();
             mockDbSet2.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1580,7 +1580,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive = true };
+            var personDbEntry1 = new Person { Id = "PersonId1", FirstName = "Person1", LastName = "PersonAlt1", IsActive_bl = true };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<Person>>();
             mockDbSet2.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));

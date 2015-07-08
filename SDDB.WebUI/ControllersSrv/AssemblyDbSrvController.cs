@@ -99,7 +99,7 @@ namespace SDDB.WebUI.ControllersSrv
         // POST: /AssemblyDbSrv/GetByAltIds
         [HttpPost]
         [DBSrvAuth("Assembly_View")]
-        public async Task<ActionResult> GetByAltIds(string[] projectIds = null, string[] typeIds = null, string[] locIds = null, bool getActive = true)
+        public async Task<ActionResult> GetByAltIds2(string[] projectIds = null, string[] typeIds = null, string[] locIds = null, bool getActive = true)
         {
             var data = (await assemblyService.GetByAltIdsAsync(UserId, projectIds, typeIds, locIds, getActive).ConfigureAwait(false)).Select(x => new
             {

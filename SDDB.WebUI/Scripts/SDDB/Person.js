@@ -2,21 +2,39 @@
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
-/// <reference path="../jquery-2.1.3.js" />
-/// <reference path="../jquery-2.1.3.intellisense.js" />
+/// <reference path="../jquery-2.1.4.js" />
+/// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
 //--------------------------------------Global Properties------------------------------------//
 
 var TableMain = {};
-var TableProjectsAdd = {};
-var TableProjectsRemove = {};
-var TablePersonGroupsAdd = {};
-var TablePersonGroupsRemove = {};
+var TableProjectsAdd = {}; var TableProjectsRemove = {};
+var TablePersonGroupsAdd = {}; var TablePersonGroupsRemove = {};
+var TableManagedGroupsAdd = {}; var TableManagedGroupsRemove = {};
 var IsCreate = false;
 var MagicSuggests = [];
-var CurrRecord = {};
+var CurrRecord = {
+    Id: null,
+    FirstName: null,
+    LastName: null,
+    Initials: null,
+    Phone: null,
+    PhoneMobile: null,
+    Email: null,
+    Comments: null,
+    IsCurrentEmployee_bl: null,
+    EmployeePosition: null,
+    IsSalaried_bl: null,
+    EmployeeStart: null,
+    EmployeeEnd: null,
+    EmployeeDetails: null,
+    IsActive_bl: null
+};
+var CurrIds = [];
+var GetActive = true;
+var SelectedRecord;
 
 
 $(document).ready(function () {
@@ -25,60 +43,125 @@ $(document).ready(function () {
 
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
-        IsCreate = true;
+        CurrIds = [];
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Person", "MainView");
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-        var selectedRows = TableMain.rows(".ui-selected").data();
-        if (selectedRows.length == 0) showModalNothingSelected();
-        else { IsCreate = false; FillFormForEdit(); }
+        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        if (CurrIds.length == 0) showModalNothingSelected();
+        else {
+            if (GetActive) $("#EditFormGroupIsActive").addClass("hide");
+            else $("#EditFormGroupIsActive").removeClass("hide");
+
+            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+
+            fillFormForEditGeneric(CurrIds, "POST", "/PersonSrv/GetAllByIds", GetActive, "EditForm", "Edit Person", MagicSuggests)
+                .always(function () { $("#ModalWait").modal("hide"); })
+                .done(function (currRecord) {
+                    CurrRecord = currRecord;
+                    $("#MainView").addClass("hide");
+                    $("#EditFormView").removeClass("hide");
+                })
+                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        }
     });
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
-        var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) showModalNothingSelected();
-        else showModalDelete(noOfRows);
+        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        if (CurrIds.length == 0) showModalNothingSelected();
+        else showModalDelete(CurrIds.length);
     });
 
     //Wire Up BtnEditPrsProj 
     $("#BtnEditPrsProj").click(function () {
-        var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) showModalNothingSelected();
-        else FillPrsProjForEdit(noOfRows);
+        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        if (CurrIds.length == 0) showModalNothingSelected();
+        else {
+            SelectedRecord = TableMain.row(".ui-selected").data()
+            if (CurrIds.length == 1) $("#PrsProjViewPanel").text(SelectedRecord.FirstName + " " + SelectedRecord.LastName);
+            else $("#PrsProjViewPanel").text("_MULTIPLE_");
+
+            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+
+            fillFormForRelatedGeneric(TableProjectsAdd, TableProjectsRemove, CurrIds, "GET", "/PersonSrv/GetPersonProjects", { id: CurrIds[0] },
+            "GET", "/PersonSrv/GetPersonProjectsNot", { id: CurrIds[0] }, "GET", "/ProjectSrv/Get", { getActive: true })
+                .always(function () { $("#ModalWait").modal("hide"); })
+                .done(function () {
+                    $("#MainView").addClass("hide");
+                    $("#PrsProjView").removeClass("hide");
+                })
+                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        }
     });
 
     //Wire Up BtnEditPersonGroups 
     $("#BtnEditPersonGroups").click(function () {
-        var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) showModalNothingSelected();
-        else FillPersonGroupsForEdit(noOfRows);
+        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        if (CurrIds.length == 0) showModalNothingSelected();
+        else {
+            SelectedRecord = TableMain.row(".ui-selected").data()
+            if (CurrIds.length == 1) $("#PersonGroupsViewPanel").text(SelectedRecord.FirstName + " " + SelectedRecord.LastName);
+            else $("#PersonGroupsViewPanel").text("_MULTIPLE_");
+
+            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+
+            fillFormForRelatedGeneric(TablePersonGroupsAdd, TablePersonGroupsRemove, CurrIds, "GET", "/PersonSrv/GetPersonGroups", { id: CurrIds[0] },
+            "GET", "/PersonSrv/GetPersonGroupsNot", { id: CurrIds[0] }, "GET", "/PersonGroupSrv/Get", { getActive: true })
+                .always(function () { $("#ModalWait").modal("hide"); })
+                .done(function () {
+                    $("#MainView").addClass("hide");
+                    $("#PersonGroupsView").removeClass("hide");
+                })
+                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        }
+    });
+
+    //Wire Up BtnEditManagedGroups 
+    $("#BtnEditManagedGroups").click(function () {
+        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        if (CurrIds.length == 0) showModalNothingSelected();
+        else {
+            SelectedRecord = TableMain.row(".ui-selected").data()
+            if (CurrIds.length == 1) $("#ManagedGroupsViewPanel").text(SelectedRecord.FirstName + " " + SelectedRecord.LastName);
+            else $("#ManagedGroupsViewPanel").text("_MULTIPLE_");
+
+            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+
+            fillFormForRelatedGeneric(TableManagedGroupsAdd, TableManagedGroupsRemove, CurrIds, "GET", "/PersonSrv/GetManagedGroups", { id: CurrIds[0] },
+            "GET", "/PersonSrv/GetManagedGroupsNot", { id: CurrIds[0] }, "GET", "/PersonGroupSrv/Get", { getActive: true })
+                .always(function () { $("#ModalWait").modal("hide"); })
+                .done(function () {
+                    $("#MainView").addClass("hide");
+                    $("#ManagedGroupsView").removeClass("hide");
+                })
+                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        }
     });
 
     //wire up dropdownId1
     $("#dropdownId1").click(function (event) {
         event.preventDefault();
         TableMain.columns([3, 4, 5, 6, 7 ]).visible(true);
-        TableMain.columns([9, 10, 11, 12, 13, 14]).visible(false);
+        TableMain.columns([8, 9, 10, 11, 12, 13]).visible(false);
     });
 
     //wire up dropdownId2
     $("#dropdownId2").click(function (event) {
         event.preventDefault();
         TableMain.columns([3, 4, 5, 6, 7]).visible(false);
-        TableMain.columns([9, 10, 11, 12, 13, 14]).visible(true);
+        TableMain.columns([8, 9, 10, 11, 12, 13]).visible(true);
     });
 
     //---------------------------------------DataTables------------
 
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
-        if (($(this).prop("checked")) ? false : true)
-            $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
-        else $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
-        refreshTable(TableMain, "/PersonSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
+        if (!$(this).prop("checked")) { GetActive = true; $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary"); }
+        else { GetActive = false; $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger"); }
+        refreshTblGenWrp(TableMain, "/PersonSrv/GetAll", { getActive: GetActive });
     });
 
     //TableMain Persons
@@ -87,28 +170,31 @@ $(document).ready(function () {
             { data: "Id", name: "Id" },//0
             { data: "LastName", name: "LastName" },//1
             { data: "FirstName", name: "FirstName" },//2
+            //------------------------------------------------first set of columns
             { data: "Initials", name: "Initials" },//3
             { data: "Phone", name: "Phone" },//4
             { data: "PhoneMobile", name: "PhoneMobile" },//5
             { data: "Email", name: "Email" },//6
             { data: "Comments", name: "Comments" },//7
-            { data: "IsActive", name: "IsActive" },//8
-            { data: "IsCurrentEmployee", name: "IsCurrentEmployee" },//9
-            { data: "EmployeePosition", name: "EmployeePosition" },//10
-            { data: "IsSalaried", name: "IsSalaried" },//11
-            { data: "EmployeeStart", name: "EmployeeStart" },//12
-            { data: "EmployeeEnd", name: "EmployeeEnd" },//13
-            { data: "EmployeeDetails", name: "EmployeeDetails" }//14
+            //------------------------------------------------second set of columns
+            { data: "IsCurrentEmployee_bl", name: "IsCurrentEmployee_bl" },//8
+            { data: "EmployeePosition", name: "EmployeePosition" },//9
+            { data: "IsSalaried_bl", name: "IsSalaried_bl" },//10
+            { data: "EmployeeStart", name: "EmployeeStart" },//11
+            { data: "EmployeeEnd", name: "EmployeeEnd" },//12
+            { data: "EmployeeDetails", name: "EmployeeDetails" },//13
+            //------------------------------------------------never visible
+            { data: "IsActive_bl", name: "IsActive_bl" }//14
         ],
         columnDefs: [
-            { targets: [0, 8], visible: false }, // - never show
-            { targets: [0, 8, 9, 11, 12, 13], searchable: false },  //"orderable": false, "visible": false
+            { targets: [0, 14], visible: false }, // - never show
+            { targets: [0, 8, 10, 11, 12, 14], searchable: false },  //"orderable": false, "visible": false
             { targets: [4, 5, 6], className: "hidden-xs hidden-sm" }, // - first set of columns
             { targets: [7], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
 
-            { targets: [9, 10, 11, 12, 13, 14], visible: false }, // - second set of columns - to toggle with options
-            { targets: [10, 12, 13], className: "hidden-xs hidden-sm" }, // - second set of columns
-            { targets: [11, 14], className: "hidden-xs hidden-sm hidden-md" } // - second set of columns
+            { targets: [8, 9, 10, 11, 12, 13], visible: false }, // - second set of columns - to toggle with options
+            { targets: [9, 11, 12], className: "hidden-xs hidden-sm" }, // - second set of columns
+            { targets: [10, 13], className: "hidden-xs hidden-sm hidden-md" } // - second set of columns
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
@@ -130,7 +216,6 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        IsCreate = false;
         $("#MainView").removeClass("hide");
         $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
     });
@@ -138,7 +223,19 @@ $(document).ready(function () {
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
-        if (formIsValid("EditForm", IsCreate) && msIsValid(MagicSuggests)) SubmitEdits();
+        if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
+
+            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+
+            submitEditsGeneric(CurrIds, "EditForm", MagicSuggests, CurrRecord, "POST", "/PersonSrv/Edit")
+                .always(function () { $("#ModalWait").modal("hide"); })
+                .done(function () {
+                    refreshTableGeneric(TableMain, "/PersonSrv/GetAll", { getActive: GetActive });
+                    $("#MainView").removeClass("hide");
+                    $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
+                })
+                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+        }
     });
 
     //----------------------------------------PrsProjView----------------------------------------//
@@ -153,7 +250,19 @@ $(document).ready(function () {
     $("#PrsProjViewBtnOk").click(function () {
         if (TableProjectsAdd.rows(".ui-selected").data().length +
             TableProjectsRemove.rows(".ui-selected").data().length == 0) showModalNothingSelected();
-        else SubmitPrsProjEdits();
+        else {
+            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+
+            submitEditsForRelatedGeneric(CurrIds, TableProjectsAdd.cells(".ui-selected", "Id:name").data().toArray(),
+                    TableProjectsRemove.cells(".ui-selected", "Id:name").data().toArray(), "/PersonSrv/EditPersonProjects")
+                .always(function () { $("#ModalWait").modal("hide"); })
+                .done(function () {
+                    $("#MainView").removeClass("hide");
+                    $("#PrsProjView").addClass("hide"); window.scrollTo(0, 0);
+                    refreshTblGenWrp(TableMain, "/PersonSrv/GetAll", { getActive: GetActive });
+                })
+                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        }
     });
 
     //---------------------------------------DataTables------------
@@ -218,9 +327,21 @@ $(document).ready(function () {
     $("#PersonGroupsViewBtnOk").click(function () {
         if (TablePersonGroupsAdd.rows(".ui-selected").data().length +
             TablePersonGroupsRemove.rows(".ui-selected").data().length == 0) showModalNothingSelected();
-        else SubmitPersonGroupsEdits();
-    });
+        else {
+            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
 
+            submitEditsForRelatedGeneric(CurrIds, TablePersonGroupsAdd.cells(".ui-selected", "Id:name").data().toArray(),
+                    TablePersonGroupsRemove.cells(".ui-selected", "Id:name").data().toArray(), "/PersonSrv/EditPersonGroups")
+                .always(function () { $("#ModalWait").modal("hide"); })
+                .done(function () {
+                    $("#MainView").removeClass("hide");
+                    $("#PersonGroupsView").addClass("hide"); window.scrollTo(0, 0);
+                    refreshTblGenWrp(TableMain, "/PersonSrv/GetAll", { getActive: GetActive });
+                })
+                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        }
+    });
+    
     //---------------------------------------DataTables------------
 
     //TablePersonGroupsAdd
@@ -271,10 +392,87 @@ $(document).ready(function () {
         pageLength: 100
     });
 
+    //----------------------------------------ManagedGroupsView----------------------------------------//
+
+    //Wire Up ManagedGroupsViewBtnCancel
+    $("#ManagedGroupsViewBtnCancel, #ManagedGroupsViewBtnBack").click(function () {
+        $("#MainView").removeClass("hide");
+        $("#ManagedGroupsView").addClass("hide"); window.scrollTo(0, 0);
+    });
+
+    //Wire Up ManagedGroupsViewBtnOk
+    $("#ManagedGroupsViewBtnOk").click(function () {
+        if (TableManagedGroupsAdd.rows(".ui-selected").data().length +
+            TableManagedGroupsRemove.rows(".ui-selected").data().length == 0) showModalNothingSelected();
+        else {
+            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+
+            submitEditsForRelatedGeneric(CurrIds, TableManagedGroupsAdd.cells(".ui-selected", "Id:name").data().toArray(),
+                    TableManagedGroupsRemove.cells(".ui-selected", "Id:name").data().toArray(), "/PersonSrv/EditManagedGroups")
+                .always(function () { $("#ModalWait").modal("hide"); })
+                .done(function () {
+                    $("#MainView").removeClass("hide");
+                    $("#ManagedGroupsView").addClass("hide"); window.scrollTo(0, 0);
+                    refreshTblGenWrp(TableMain, "/PersonSrv/GetAll", { getActive: GetActive });
+                })
+                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        }
+    });
+
+    //---------------------------------------DataTables------------
+
+    //TableManagedGroupsAdd
+    TableManagedGroupsAdd = $("#TableManagedGroupsAdd").DataTable({
+        columns: [
+            { data: "Id", name: "Id" },//0
+            { data: "PrsGroupName", name: "PrsGroupName" },//1
+            { data: "PrsGroupAltName", name: "PrsGroupAltName" }//2
+        ],
+        columnDefs: [
+            { targets: [0], visible: false }, // - never show
+            { targets: [0], searchable: false },  //"orderable": false, "visible": false
+            { targets: [2], className: "hidden-xs hidden-sm" }
+        ],
+        bAutoWidth: false,
+        language: {
+            search: "",
+            lengthMenu: "_MENU_",
+            info: "_START_ - _END_ of _TOTAL_",
+            infoEmpty: "",
+            infoFiltered: "(filtered)",
+            paginate: { previous: "", next: "" }
+        },
+        pageLength: 100
+    });
+
+    //TableManagedGroupsRemove
+    TableManagedGroupsRemove = $("#TableManagedGroupsRemove").DataTable({
+        columns: [
+            { data: "Id", name: "Id" },//0
+            { data: "PrsGroupName", name: "PrsGroupName" },//1
+            { data: "PrsGroupAltName", name: "PrsGroupAltName" }//2
+        ],
+        columnDefs: [
+            { targets: [0], visible: false }, // - never show
+            { targets: [0], searchable: false },  //"orderable": false, "visible": false
+            { targets: [2], className: "hidden-xs hidden-sm" }
+        ],
+        bAutoWidth: false,
+        language: {
+            search: "",
+            lengthMenu: "_MENU_",
+            info: "_START_ - _END_ of _TOTAL_",
+            infoEmpty: "",
+            infoFiltered: "(filtered)",
+            paginate: { previous: "", next: "" }
+        },
+        pageLength: 100
+    });
+
 
     //--------------------------------------View Initialization------------------------------------//
 
-    refreshTable(TableMain, "/PersonSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
+    refreshTblGenWrp(TableMain, "/PersonSrv/GetAll", { getActive: GetActive });
 
 
     //--------------------------------End of execution at Start-----------
@@ -283,325 +481,17 @@ $(document).ready(function () {
 
 //--------------------------------------Main Methods---------------------------------------//
 
-//FillFormForEdit
-function FillFormForEdit() {
-    if ($("#ChBoxShowDeleted").prop("checked")) $("#EditFormGroupIsActive").removeClass("hide");
-    else $("#EditFormGroupIsActive").addClass("hide");
-
-    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    $.ajax({
-        type: "POST", url: "/PersonSrv/GetByIds", timeout: 20000,
-        data: { ids: ids, getActive: (($("#ChBoxShowDeleted").prop("checked")) ? false : true) }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
-    })
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function (data) {
-
-            CurrRecord.LastName = data[0].LastName;
-            CurrRecord.FirstName = data[0].FirstName;
-            CurrRecord.Initials = data[0].Initials;
-            CurrRecord.Phone = data[0].Phone;
-            CurrRecord.PhoneMobile = data[0].PhoneMobile;
-            CurrRecord.Email = data[0].Email;
-            CurrRecord.Comments = data[0].Comments;
-            CurrRecord.IsActive = data[0].IsActive;
-            CurrRecord.IsCurrentEmployee = data[0].IsCurrentEmployee;
-            CurrRecord.EmployeePosition = data[0].EmployeePosition;
-            CurrRecord.IsSalaried = data[0].IsSalaried;
-            CurrRecord.EmployeeStart = data[0].EmployeeStart;
-            CurrRecord.EmployeeEnd = data[0].EmployeeEnd;
-            CurrRecord.EmployeeDetails = data[0].EmployeeDetails;
-
-            var FormInput = $.extend(true, {}, CurrRecord);
-            $.each(data, function (i, dbEntry) {
-                if (FormInput.LastName != dbEntry.LastName) FormInput.LastName = "_VARIES_";
-                if (FormInput.FirstName != dbEntry.FirstName) FormInput.FirstName = "_VARIES_";
-                if (FormInput.Initials != dbEntry.Initials) FormInput.Initials = "_VARIES_";
-                if (FormInput.Phone != dbEntry.Phone) FormInput.Phone = "_VARIES_";
-                if (FormInput.PhoneMobile != dbEntry.PhoneMobile) FormInput.PhoneMobile = "_VARIES_";
-                if (FormInput.Email != dbEntry.Email) FormInput.Email = "_VARIES_";
-                if (FormInput.Comments != dbEntry.Comments) FormInput.Comments = "_VARIES_";
-                if (FormInput.IsActive != dbEntry.IsActive) FormInput.IsActive = "_VARIES_";
-                if (FormInput.IsCurrentEmployee != dbEntry.IsCurrentEmployee) FormInput.IsCurrentEmployee = "_VARIES_";
-                if (FormInput.EmployeePosition != dbEntry.EmployeePosition) FormInput.EmployeePosition = "_VARIES_";
-                if (FormInput.IsSalaried != dbEntry.IsSalaried) FormInput.IsSalaried = "_VARIES_";
-                if (FormInput.EmployeeStart != dbEntry.EmployeeStart) FormInput.EmployeeStart = "_VARIES_";
-                if (FormInput.EmployeeEnd != dbEntry.EmployeeEnd) FormInput.EmployeeEnd = "_VARIES_";
-                if (FormInput.EmployeeDetails != dbEntry.EmployeeDetails) FormInput.EmployeeDetails = "_VARIES_";
-            });
-
-            clearFormInputs("EditForm");
-            $("#EditFormLabel").text("Edit Person");
-
-            $("#LastName").val(FormInput.LastName);
-            $("#FirstName").val(FormInput.FirstName);
-            $("#Initials").val(FormInput.Initials);
-            $("#Phone").val(FormInput.Phone);
-            $("#PhoneMobile").val(FormInput.PhoneMobile);
-            $("#Email").val(FormInput.Email);
-            $("#Comments").val(FormInput.Comments);
-            if (FormInput.IsActive == true) $("#IsActive").prop("checked", true);
-            if (FormInput.IsCurrentEmployee == true) $("#IsCurrentEmployee").prop("checked", true);
-            $("#EmployeePosition").val(FormInput.EmployeePosition);
-            if (FormInput.IsSalaried == true) $("#IsSalaried").prop("checked", true);
-            $("#EmployeeStart").val(FormInput.EmployeeStart);
-            $("#EmployeeEnd").val(FormInput.EmployeeEnd);
-            $("#EmployeeDetails").val(FormInput.EmployeeDetails);
-
-            if (data.length == 1) {
-                $("[data-val-dbisunique]").prop("disabled", false);
-                disableUniqueMs(MagicSuggests, false);
-            }
-            else {
-                $("[data-val-dbisunique]").prop("disabled", true);
-                disableUniqueMs(MagicSuggests, true);
-            }
-
-            $("#MainView").addClass("hide");
-            $("#EditFormView").removeClass("hide");
-        })
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-}
-
-//SubmitEdits to DB
-function SubmitEdits() {
-
-    var modifiedProperties = [];
-    $(".modifiable").each(function (index) {
-        if ($(this).data("ismodified")) modifiedProperties.push($(this).prop("id"));
-    });
-
-    $.each(MagicSuggests, function (i, ms) {
-        if (ms.isModified == true) modifiedProperties.push(ms.id);
-    });
-
-    var magicResults = [];
-    $.each(MagicSuggests, function (i, ms) {
-        var msValue = (ms.getSelection().length != 0) ? (ms.getSelection())[0].id : null;
-        magicResults.push(msValue);
-    });
-
-    var editRecords = [];
-    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    if (IsCreate == true) ids = ["newEntryId"];
-
-    $.each(ids, function (i, id) {
-        var editRecord = {};
-        editRecord.Id = id;
-
-        editRecord.LastName = ($("#LastName").data("ismodified")) ? $("#LastName").val() : CurrRecord.LastName;
-        editRecord.FirstName = ($("#FirstName").data("ismodified")) ? $("#FirstName").val() : CurrRecord.FirstName;
-        editRecord.Initials = ($("#Initials").data("ismodified")) ? $("#Initials").val() : CurrRecord.Initials;
-        editRecord.Phone = ($("#Phone").data("ismodified")) ? $("#Phone").val() : CurrRecord.Phone;
-        editRecord.PhoneMobile = ($("#PhoneMobile").data("ismodified")) ? $("#PhoneMobile").val() : CurrRecord.PhoneMobile;
-        editRecord.Email = ($("#Email").data("ismodified")) ? $("#Email").val() : CurrRecord.Email;
-        editRecord.Comments = ($("#Comments").data("ismodified")) ? $("#Comments").val() : CurrRecord.Comments;
-        editRecord.IsActive = ($("#IsActive").data("ismodified")) ? (($("#IsActive").prop("checked")) ? true : false) : CurrRecord.IsActive;
-        editRecord.IsCurrentEmployee = ($("#IsCurrentEmployee").data("ismodified")) ? (($("#IsCurrentEmployee").prop("checked")) ? true : false) : CurrRecord.IsCurrentEmployee;
-        editRecord.EmployeePosition = ($("#EmployeePosition").data("ismodified")) ? $("#EmployeePosition").val() : CurrRecord.EmployeePosition;
-        editRecord.IsSalaried = ($("#IsSalaried").data("ismodified")) ? (($("#IsSalaried").prop("checked")) ? true : false) : CurrRecord.IsSalaried;
-        editRecord.EmployeeStart = ($("#EmployeeStart").data("ismodified")) ? $("#EmployeeStart").val() : CurrRecord.EmployeeStart;
-        editRecord.EmployeeEnd = ($("#EmployeeEnd").data("ismodified")) ? $("#EmployeeEnd").val() : CurrRecord.EmployeeEnd;
-        editRecord.EmployeeDetails = ($("#EmployeeDetails").data("ismodified")) ? $("#EmployeeDetails").val() : CurrRecord.EmployeeDetails;
-
-        editRecord.ModifiedProperties = modifiedProperties;
-
-        editRecords.push(editRecord);
-    });
-
-    $.ajax({
-        type: "POST", url: "/PersonSrv/Edit", timeout: 20000, data: { records: editRecords }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
-    })
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function (data) {
-            refreshTable(TableMain, "/PersonSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
-            IsCreate = false;
-            $("#MainView").removeClass("hide");
-            $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
-        })
-        .fail(function (xhr, status, error) {
-            showModalAJAXFail(xhr, status, error);
-        });
-}
-
 //Delete Records from DB
 function DeleteRecords() {
-    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    $.ajax({
-        type: "POST", url: "/PersonSrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
-    })
+    CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+    $.ajax({ type: "POST", url: "/PersonSrv/Delete", timeout: 20000, data: { ids: CurrIds }, dataType: "json" })
         .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function () { refreshTable(TableMain, "/PersonSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true)); })
+        .done(function () { refreshTableGeneric(TableMain, "/PersonSrv/GetAll", { getActive: GetActive }); })
         .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
-//---------------------------------------------------------------------------------------------
 
-//Fill PrsProjects For Edit 
-function FillPrsProjForEdit(noOfRows) {
-    if (noOfRows == 1) {
-        var selectedRecord = TableMain.row(".ui-selected").data()
-        $("#PrsProjViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
-
-        $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-
-        $.when(
-            $.ajax({ type: "GET", url: "/PersonSrv/GetPersonProjectsNot", timeout: 20000, data: { id: selectedRecord.Id }, dataType: "json"}),
-            $.ajax({ type: "GET", url: "/PersonSrv/GetPersonProjects", timeout: 20000, data: { id: selectedRecord.Id }, dataType: "json"})
-            )
-            .always(function () { $("#ModalWait").modal("hide"); })
-            .done(function (done1, done2) {
-                TableProjectsAdd.clear().search(""); TableProjectsAdd.rows.add(done1[0]).order([1, 'asc']).draw();
-                TableProjectsRemove.clear().search(""); TableProjectsRemove.rows.add(done2[0]).order([1, 'asc']).draw();
-                $("#MainView").addClass("hide");
-                $("#PrsProjView").removeClass("hide");
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    }
-    else {
-        $("#PrsProjViewPanel").text("_MULTIPLE_")
-
-        $.ajax({
-            type: "GET", url: "/ProjectSrv/Get", timeout: 20000, data: { getActive: true }, dataType: "json",
-            beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
-        })
-            .always(function () { $("#ModalWait").modal("hide"); })
-            .done(function (data) {
-                TableProjectsAdd.clear().search(""); TableProjectsAdd.rows.add(data).order([1, 'asc']).draw();
-                TableProjectsRemove.clear().search(""); TableProjectsRemove.rows.add(data).order([1, 'asc']).draw();
-                $("#MainView").addClass("hide");
-                $("#PrsProjView").removeClass("hide");
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    }
-}
-
-//Submit Person Projects Edits to SDDB
-function SubmitPrsProjEdits() {
-    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    var dbRecordsAdd = TableProjectsAdd.cells(".ui-selected", "Id:name").data().toArray();
-    var dbRecordsRemove = TableProjectsRemove.cells(".ui-selected", "Id:name").data().toArray();
-
-    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-
-    var deferred1 = $.Deferred();
-    if (dbRecordsAdd.length == 0) deferred1.resolve();
-    else {
-        $.ajax({
-            type: "POST", url: "/PersonSrv/EditPersonProjects", timeout: 20000,
-            data: { personIds: ids, projectIds: dbRecordsAdd, isAdd: true }, dataType: "json"
-        })
-            .done( function () { deferred1.resolve();})
-            .fail( function (xhr, status, error) { deferred1.reject(xhr, status, error); } );
-    }
-
-    var deferred2 = $.Deferred();
-    if (dbRecordsRemove.length == 0) deferred2.resolve();
-    else {
-        setTimeout(function () {
-            $.ajax({
-                type: "POST", url: "/PersonSrv/EditPersonProjects", timeout: 20000,
-                data: { personIds: ids, projectIds: dbRecordsRemove, isAdd: false }, dataType: "json"
-            })
-                .done(function () { deferred2.resolve(); })
-                .fail(function (xhr, status, error) { deferred2.reject(xhr, status, error); });
-        }, 500);
-    }
-
-    $.when(deferred1, deferred2)
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function () {
-            refreshTable(TableMain, "/PersonSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
-            $("#MainView").removeClass("hide");
-            $("#PrsProjView").addClass("hide"); window.scrollTo(0, 0);
-        })
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); } );
-}
-
-//---------------------------------------------------------------------------------------------
-
-//Fill PersonGroups For Edit 
-function FillPersonGroupsForEdit(noOfRows) {
-    if (noOfRows == 1) {
-        var selectedRecord = TableMain.row(".ui-selected").data()
-        $("#PersonGroupsViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
-
-        $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-
-        $.when(
-            $.ajax({ type: "GET", url: "/PersonSrv/GetPersonGroupsNot", timeout: 20000, data: { id: selectedRecord.Id }, dataType: "json" }),
-            $.ajax({ type: "GET", url: "/PersonSrv/GetPersonGroups", timeout: 20000, data: { id: selectedRecord.Id }, dataType: "json" })
-            )
-            .always(function () { $("#ModalWait").modal("hide"); })
-            .done(function (done1, done2) {
-                TablePersonGroupsAdd.clear().search(""); TablePersonGroupsAdd.rows.add(done1[0]).order([1, 'asc']).draw();
-                TablePersonGroupsRemove.clear().search(""); TablePersonGroupsRemove.rows.add(done2[0]).order([1, 'asc']).draw();
-                $("#MainView").addClass("hide");
-                $("#PersonGroupsView").removeClass("hide");
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    }
-    else {
-        $("#PersonGroupsViewPanel").text("_MULTIPLE_")
-
-        $.ajax({
-            type: "GET", url: "/PersonGroupSrv/Get", timeout: 20000, data: { getActive: true }, dataType: "json",
-            beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
-        })
-            .always(function () { $("#ModalWait").modal("hide"); })
-            .done(function (data) {
-                TablePersonGroupsAdd.clear().search(""); TablePersonGroupsAdd.rows.add(data).order([1, 'asc']).draw();
-                TablePersonGroupsRemove.clear().search(""); TablePersonGroupsRemove.rows.add(data).order([1, 'asc']).draw();
-                $("#MainView").addClass("hide");
-                $("#PersonGroupsView").removeClass("hide");
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    }
-}
-
-//Submit Person PersonGroups Edits to SDDB
-function SubmitPersonGroupsEdits() {
-    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    var dbRecordsAdd = TablePersonGroupsAdd.cells(".ui-selected", "Id:name").data().toArray();
-    var dbRecordsRemove = TablePersonGroupsRemove.cells(".ui-selected", "Id:name").data().toArray();
-
-    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-
-    var deferred1 = $.Deferred();
-    if (dbRecordsAdd.length == 0) deferred1.resolve();
-    else {
-        $.ajax({
-            type: "POST", url: "/PersonSrv/EditPersonGroups", timeout: 20000,
-            data: { personIds: ids, groupIds: dbRecordsAdd, isAdd: true }, dataType: "json"
-        })
-            .done(function () { deferred1.resolve(); })
-            .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
-    }
-
-    var deferred2 = $.Deferred();
-    if (dbRecordsRemove.length == 0) deferred2.resolve();
-    else {
-        setTimeout(function () {
-            $.ajax({
-                type: "POST", url: "/PersonSrv/EditPersonGroups", timeout: 20000,
-                data: { personIds: ids, groupIds: dbRecordsRemove, isAdd: false }, dataType: "json"
-            })
-                .done(function () { deferred2.resolve(); })
-                .fail(function (xhr, status, error) { deferred2.reject(xhr, status, error); });
-        }, 500);
-    }
-
-    $.when(deferred1, deferred2)
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function () {
-            refreshTable(TableMain, "/PersonSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
-            $("#MainView").removeClass("hide");
-            $("#PersonGroupsView").addClass("hide"); window.scrollTo(0, 0);
-        })
-        .fail(function (xhr, status, error) {showModalAJAXFail(xhr, status, error); });
-}
 
 //---------------------------------------Helper Methods--------------------------------------//
 

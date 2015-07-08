@@ -15,8 +15,9 @@
             </div>
 
             <div class="btn-group margin-bottom-2px">
-                <button class="btn btn-success" id="BtnEditPrsProj">Projects</button>
-                <button class="btn btn-warning" id="BtnEditPersonGroups">Prs. Groups</button>
+                <button class="btn btn-warning" id="BtnEditPrsProj">Projects</button>
+                <button class="btn btn-info" id="BtnEditPersonGroups">Prs. Groups</button>
+                <button class="btn btn-success" id="BtnEditManagedGroups">Managed Grps</button>
             </div>
 
             <div class="pull-right">
@@ -135,8 +136,8 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <div class="col-sm-10 col-sm-offset-2">
-                            @Html.CheckBoxFor(x => x.IsCurrentEmployee, new { @class = "modifiable" }) &nbsp;&nbsp;
-                            @Html.LabelFor(x => x.IsCurrentEmployee, "Is Current Employee")
+                            @Html.CheckBoxFor(x => x.IsCurrentEmployee_bl, new { @class = "modifiable" }) &nbsp;&nbsp;
+                            @Html.LabelFor(x => x.IsCurrentEmployee_bl, "Is Current Employee")
                         </div>
                     </div>
                     <div class="form-group">
@@ -148,8 +149,8 @@
                     </div>
                     <div class="form-group">
                         <div class="col-sm-10 col-sm-offset-2">
-                            @Html.CheckBoxFor(x => x.IsSalaried, new { @class = "modifiable" }) &nbsp;&nbsp;
-                            @Html.LabelFor(x => x.IsSalaried, "Is Salaried")
+                            @Html.CheckBoxFor(x => x.IsSalaried_bl, new { @class = "modifiable" }) &nbsp;&nbsp;
+                            @Html.LabelFor(x => x.IsSalaried_bl, "Is Salaried")
                         </div>
                     </div>
                     <div class="form-group">
@@ -175,8 +176,8 @@
                     </div>
                     <div class="form-group hide" id="EditFormGroupIsActive">
                         <div class="col-sm-10 col-sm-offset-2">
-                            @Html.CheckBoxFor(x => x.IsActive, new { @class = "modifiable" }) &nbsp;&nbsp;
-                            @Html.LabelFor(x => x.IsActive, "Is Active") &nbsp;&nbsp; <em>(Marking as 'Active' un-deletes record.)</em>
+                            @Html.CheckBoxFor(x => x.IsActive_bl, new { @class = "modifiable" }) &nbsp;&nbsp;
+                            @Html.LabelFor(x => x.IsActive_bl, "Is Active") &nbsp;&nbsp; <em>(Marking as 'Active' un-deletes record.)</em>
                         </div>
                     </div>
                 </div>
@@ -311,6 +312,67 @@
             </div>
             <div class="col-xs-6">
                 <button class="btn btn-success pull-right" type="button" id="PersonGroupsViewBtnOk">
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!------- ManagedGroupsView ------->
+<div class="container-fluid hide" id="ManagedGroupsView">
+    <div class="row">
+        <div class="col-xs-12 col-sm-5">
+            <h3 id="ManagedGroupsViewLabel">Add/Remove Managed Groups</h3>
+        </div>
+        <div class="col-xs-9 col-sm-4">
+            <div class="panel panel-warning margin-top-10px">
+                <div class="panel-heading text-center" style="font-weight:bold" id="ManagedGroupsViewPanel"> </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <h3><button class="btn btn-default pull-right" type="button" id="ManagedGroupsViewBtnBack">Cancel</button></h3>
+        </div>
+    </div>
+    <div class="well">
+        <div class="row">
+            <div class="col-xs-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading" style="font-weight:bold">Add</div>
+                    <table class="table table-striped" id="TableManagedGroupsAdd">
+                        <thead class="hide">
+                            <tr>
+                                <th>ID</th>
+                                <th>Group Name</th>
+                                <th>Alt. Name</th>
+                            </tr>
+                        </thead>
+                        <tbody class="selectable"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading" style="font-weight:bold">Remove</div>
+                    <table class="table table-striped" id="TableManagedGroupsRemove">
+                        <thead class="hide">
+                            <tr>
+                                <th>ID</th>
+                                <th>Group Name</th>
+                                <th>Alt. Name</th>
+                            </tr>
+                        </thead>
+                        <tbody class="selectable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6">
+                <button class="btn btn-default" type="button" id="ManagedGroupsViewBtnCancel">Cancel</button>
+            </div>
+            <div class="col-xs-6">
+                <button class="btn btn-success pull-right" type="button" id="ManagedGroupsViewBtnOk">
                     &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
                 </button>
             </div>

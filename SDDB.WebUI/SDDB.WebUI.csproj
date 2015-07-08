@@ -403,6 +403,7 @@
     <Content Include="Scripts\respond.matchmedia.addListener.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.min.js" />
     <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\SDDB\AssemblyLogEntry.js" />
     <Content Include="Scripts\SDDB\ComponentLogEntry.js" />
     <Content Include="Scripts\SDDB\PersonLogEntry.js" />
     <Content Include="Scripts\SDDB\ComponentExt.js" />
@@ -436,6 +437,7 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\InitialDBSetup.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="ControllersSrv\AssemblyLogEntrySrvController.cs" />
     <Compile Include="ControllersSrv\ComponentLogEntrySrvController.cs" />
     <Compile Include="ControllersSrv\PersonLogEntrySrvController.cs" />
     <Compile Include="ControllersSrv\ComponentSrvController.cs" />

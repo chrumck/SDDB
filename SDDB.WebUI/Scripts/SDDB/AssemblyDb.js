@@ -469,7 +469,7 @@ function RefreshMainView() {
         TableMain.clear().search("").draw();
     }
     else {
-        refreshTable(TableMain, "/AssemblyDbSrv/GetByAltIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
+        refreshTable(TableMain, "/AssemblyDbSrv/GetByAltIds2", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
             "POST", MsFilterByProject.getValue(), [], MsFilterByType.getValue(), MsFilterByLoc.getValue());
         $("#ChBoxShowDeleted").bootstrapToggle("enable")
     }

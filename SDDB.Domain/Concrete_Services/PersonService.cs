@@ -33,13 +33,13 @@ namespace SDDB.Domain.Services
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
-        //get all 
-        public virtual async Task<List<Person>> GetAsync(bool getActive = true)
+        //get all : no by-group filtering
+        public virtual async Task<List<Person>> GetAllAsync(bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                var records = await dbContext.Persons.Where(x => x.IsActive == getActive).ToListAsync().ConfigureAwait(false);
+                var records = await dbContext.Persons.Where(x => x.IsActive_bl == getActive).ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
                 {
@@ -59,15 +59,15 @@ namespace SDDB.Domain.Services
             }
         }
 
-        //get by ids
-        public virtual async Task<List<Person>> GetAsync(string[] ids, bool getActive = true)
+        //get by ids : no by-group filtering
+        public virtual async Task<List<Person>> GetAllAsync(string[] ids, bool getActive = true)
         {
             if (ids == null || ids.Length == 0) throw new ArgumentNullException("ids");
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                var records = await dbContext.Persons.Where(x => x.IsActive == getActive && ids.Contains(x.Id))
+                var records = await dbContext.Persons.Where(x => x.IsActive_bl == getActive && ids.Contains(x.Id))
                     .ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
@@ -87,13 +87,44 @@ namespace SDDB.Domain.Services
             }
         }
 
+        //get all : WITH by-group filtering
+        public virtual async Task<List<Person>> GetAsync(string userId, bool getActive = true)
+        {
+            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+                
+                var records = await dbContext.PersonGroups
+                    .Where(x => x.GroupManagers.Any(y => y.Id == userId)).SelectMany(x => x.GroupPersons).Distinct()
+                    .Where(x => x.IsActive_bl == getActive).ToListAsync().ConfigureAwait(false);
+
+                foreach (var record in records)
+                {
+                    var excludedProperties = new string[] { "Id", "TSP" };
+                    var properties = typeof(Person).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+                    foreach (var property in properties)
+                    {
+                        if (!property.GetMethod.IsVirtual) continue;
+                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
+                        if (excludedProperties.Contains(property.Name)) continue;
+
+                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
+                    }
+                }
+
+                return records;
+            }
+        }
+        
         //get persons without DBUser
         public virtual async Task<List<Person>> GetWoDBUserAsync(bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                var records = await dbContext.Persons.Where(x => x.DBUser == null && x.IsActive == getActive).ToListAsync().ConfigureAwait(false);
+                var records = await dbContext.Persons.Where(x => x.DBUser == null && x.IsActive_bl == getActive).ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records)
                 {
@@ -118,7 +149,7 @@ namespace SDDB.Domain.Services
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.Persons.Where(x => x.IsActive == getActive &&
+                return dbContext.Persons.Where(x => x.IsActive_bl == getActive &&
                     (x.LastName.Contains(query) || x.FirstName.Contains(query) || x.Initials.Contains(query))).ToListAsync();
             }
         }
@@ -133,8 +164,8 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 return dbContext.PersonGroups
-                    .Where(x => x.GroupManagers.Any(y => y.Id == userId)).SelectMany(x => x.GroupPersons)
-                    .Distinct().Where(x => x.IsActive == getActive &&
+                    .Where(x => x.GroupManagers.Any(y => y.Id == userId)).SelectMany(x => x.GroupPersons).Distinct()
+                    .Where(x => x.IsActive_bl == getActive && 
                         (x.LastName.Contains(query) || x.FirstName.Contains(query) || x.Initials.Contains(query))).ToListAsync();
             }
         }
@@ -225,7 +256,7 @@ namespace SDDB.Domain.Services
                             var dbEntry = await dbContext.Persons.FindAsync(id).ConfigureAwait(false);
                             if (dbEntry != null)
                             {
-                                dbEntry.IsActive = false;
+                                dbEntry.IsActive_bl = false;
                             }
                             else
                             {
@@ -290,18 +321,21 @@ namespace SDDB.Domain.Services
         }
 
         //Add (or Remove  when set isAdd to false) projects to Person
-        public virtual async Task<DBResult> EditPersonProjectsAsync(string[] personIds, string[] projectIds, bool isAdd)
+        public virtual async Task<DBResult> EditPersonProjectsAsync(string[] ids, string[] idsAddRem, bool isAdd)
         {
+            if (ids == null || ids.Length == 0 || idsAddRem == null || idsAddRem.Length == 0)
+                return new DBResult { StatusCode = HttpStatusCode.BadRequest, StatusDescription = "arguments missing" };
+
             var errorMessage = ""; var serviceResult = new DBResult();
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    var persons = await dbContext.Persons.Include(x => x.PersonProjects).Where(x => personIds.Contains(x.Id))
+                    var persons = await dbContext.Persons.Include(x => x.PersonProjects).Where(x => ids.Contains(x.Id))
                        .ToListAsync().ConfigureAwait(false);
 
-                    var projects = await dbContext.Projects.Where(x => projectIds.Contains(x.Id)).ToListAsync().ConfigureAwait(false);
+                    var projects = await dbContext.Projects.Where(x => idsAddRem.Contains(x.Id)).ToListAsync().ConfigureAwait(false);
 
                     foreach (var person in persons)
                     {
@@ -370,18 +404,21 @@ namespace SDDB.Domain.Services
 
 
         //Add (or Remove  when set isAdd to false) Groups to Person
-        public virtual async Task<DBResult> EditPersonGroupsAsync(string[] personIds, string[] groupIds, bool isAdd)
+        public virtual async Task<DBResult> EditPersonGroupsAsync(string[] ids, string[] idsAddRem, bool isAdd)
         {
+            if (ids == null || ids.Length == 0 || idsAddRem == null || idsAddRem.Length == 0)
+                return new DBResult { StatusCode = HttpStatusCode.BadRequest, StatusDescription = "arguments missing" };
+
             var errorMessage = ""; var serviceResult = new DBResult();
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    var persons = await dbContext.Persons.Include(x => x.PersonGroups).Where(x => personIds.Contains(x.Id))
+                    var persons = await dbContext.Persons.Include(x => x.PersonGroups).Where(x => ids.Contains(x.Id))
                         .ToListAsync().ConfigureAwait(false);
 
-                    var groups = await dbContext.PersonGroups.Where(x => groupIds.Contains(x.Id)).ToListAsync().ConfigureAwait(false);
+                    var groups = await dbContext.PersonGroups.Where(x => idsAddRem.Contains(x.Id)).ToListAsync().ConfigureAwait(false);
 
                     foreach (var person in persons)
                     {
@@ -451,18 +488,21 @@ namespace SDDB.Domain.Services
         }
 
         //Add (or Remove  when set isAdd to false) managed Groups to Person
-        public virtual async Task<DBResult> EditManagedGroupsAsync(string[] personIds, string[] groupIds, bool isAdd)
+        public virtual async Task<DBResult> EditManagedGroupsAsync(string[] ids, string[] idsAddRem, bool isAdd)
         {
+            if (ids == null || ids.Length == 0 || idsAddRem == null || idsAddRem.Length == 0)
+                return new DBResult { StatusCode = HttpStatusCode.BadRequest, StatusDescription = "arguments missing" };
+
             var errorMessage = ""; var serviceResult = new DBResult();
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    var persons = await dbContext.Persons.Include(x => x.ManagedGroups).Where(x => personIds.Contains(x.Id))
+                    var persons = await dbContext.Persons.Include(x => x.ManagedGroups).Where(x => ids.Contains(x.Id))
                                         .ToListAsync().ConfigureAwait(false);
 
-                    var groups = await dbContext.PersonGroups.Where(x => groupIds.Contains(x.Id)).ToListAsync().ConfigureAwait(false);
+                    var groups = await dbContext.PersonGroups.Where(x => idsAddRem.Contains(x.Id)).ToListAsync().ConfigureAwait(false);
 
                     foreach (var person in persons)
                     {

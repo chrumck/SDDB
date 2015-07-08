@@ -344,6 +344,9 @@ namespace SDDB.Domain.Services
         //Add (or Remove  when set isAdd to false) Assemblies to Person Log Entry
         public virtual async Task<DBResult> EditPrsLogEntryAssysAsync(string[] ids, string[] idsAddRem, bool isAdd)
         {
+            if (ids == null || ids.Length == 0 || idsAddRem == null || idsAddRem.Length == 0)
+                return new DBResult { StatusCode = HttpStatusCode.BadRequest, StatusDescription = "arguments missing" };
+
             var errorMessage = ""; var serviceResult = new DBResult();
             using (var dbContextScope = contextScopeFac.Create())
             {
@@ -407,7 +410,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 return dbContext.Persons
-                    .Where(x => x.PersonPrsLogEntrys.Any(y => y.Id == logEntryId) && x.IsActive == true).ToListAsync();
+                    .Where(x => x.PersonPrsLogEntrys.Any(y => y.Id == logEntryId) && x.IsActive_bl == true).ToListAsync();
             }
         }
 
@@ -422,7 +425,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 return dbContext.PersonGroups.Where(x => x.GroupManagers.Any(y => y.Id == userId)).SelectMany(x => x.GroupPersons)
-                    .Distinct().Where(x => x.IsActive == true && !x.PersonPrsLogEntrys.Any(y => y.Id == logEntryId))
+                    .Distinct().Where(x => x.IsActive_bl == true && !x.PersonPrsLogEntrys.Any(y => y.Id == logEntryId))
                     .ToListAsync();
             }
         }
@@ -430,6 +433,9 @@ namespace SDDB.Domain.Services
         //Add (or Remove  when set isAdd to false) Persons to Person Log Entry
         public virtual async Task<DBResult> EditPrsLogEntryPersonsAsync(string[] ids, string[] idsAddRem, bool isAdd)
         {
+            if (ids == null || ids.Length == 0 || idsAddRem == null || idsAddRem.Length == 0)
+                return new DBResult { StatusCode = HttpStatusCode.BadRequest, StatusDescription = "arguments missing" };
+
             var errorMessage = ""; var serviceResult = new DBResult();
             using (var dbContextScope = contextScopeFac.Create())
             {

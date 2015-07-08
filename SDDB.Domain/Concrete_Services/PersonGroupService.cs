@@ -224,7 +224,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.Persons
-                    .Where(x => x.ManagedGroups.Select(y => y.Id).Contains(groupId) && x.IsActive == true).ToListAsync();
+                    .Where(x => x.ManagedGroups.Select(y => y.Id).Contains(groupId) && x.IsActive_bl == true).ToListAsync();
             }
         }
 
@@ -238,7 +238,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 return dbContext.Persons
-                    .Where(x => !x.ManagedGroups.Select(y => y.Id).Contains(groupId) && x.IsActive == true).ToListAsync();
+                    .Where(x => !x.ManagedGroups.Select(y => y.Id).Contains(groupId) && x.IsActive_bl == true).ToListAsync();
             }
         }
 

@@ -141,17 +141,20 @@ namespace SDDB.Domain.Services
         }
 
         //Add (or Remove  when set isAdd to false) roles to DBUSer
-        public virtual async Task<DBResult> EditRolesAsync(string[] userIds, string[] dbRoles, bool isAdd)
+        public virtual async Task<DBResult> EditRolesAsync(string[] ids, string[] idsAddRem, bool isAdd)
         {
+            if (ids == null || ids.Length == 0 || idsAddRem == null || idsAddRem.Length == 0)
+                return new DBResult { StatusCode = HttpStatusCode.BadRequest, StatusDescription = "arguments missing" };
+
             var errorMessage = ""; var identityResult = IdentityResult.Success;
-            foreach (var userId in userIds)
+            foreach (var userId in ids)
             {
                 var dbEntry = await appUserManager.FindByIdAsync(userId).ConfigureAwait(false);
                 if (dbEntry == null) errorMessage += String.Format("User with Id={0} not found.\n", userId);
                 else
                 {
                     var userRoles = await appUserManager.GetRolesAsync(userId).ConfigureAwait(false);
-                    foreach (var dbRole in dbRoles)
+                    foreach (var dbRole in idsAddRem)
                     {
                         if (isAdd)
                         {

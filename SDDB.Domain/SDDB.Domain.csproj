@@ -407,6 +407,10 @@
     <Compile Include="Migrations\201507080457287_LogEntry11.Designer.cs">
       <DependentUpon>201507080457287_LogEntry11.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201507082134346_person12.cs" />
+    <Compile Include="Migrations\201507082134346_person12.Designer.cs">
+      <DependentUpon>201507082134346_person12.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -587,6 +591,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201507080457287_LogEntry11.resx">
       <DependentUpon>201507080457287_LogEntry11.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201507082134346_person12.resx">
+      <DependentUpon>201507082134346_person12.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

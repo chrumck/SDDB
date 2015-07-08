@@ -24,26 +24,45 @@ namespace SDDB.WebUI.ControllersSrv
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
-        // GET: /PersonSrv/Get
+        // GET: /PersonSrv/GetAll
         [DBSrvAuth("Person_View,PersonGroup_View")]
-        public async Task<ActionResult> Get(bool getActive = true)
+        public async Task<ActionResult> GetAll(bool getActive = true)
         {
-            var data = await personService.GetAsync(getActive).ConfigureAwait(false);
+            var data = (await personService.GetAllAsync(getActive).ConfigureAwait(false)).Select(x => new {
+                x.Id, x.LastName, x.FirstName, x.Initials, x.Phone, x.PhoneMobile, x.Email, x.Comments, x.IsActive_bl,
+                x.IsCurrentEmployee_bl, x.EmployeePosition, x.IsSalaried_bl, x.EmployeeStart, x.EmployeeEnd, x.EmployeeDetails
+            });
 
-            ViewBag.ServiceName = "PersonService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            ViewBag.ServiceName = "PersonService.GetAllAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
-        // POST: /PersonSrv/GetByIds
+        // POST: /PersonSrv/GetAllByIds
         [HttpPost]
         [DBSrvAuth("Person_View,PersonGroup_View")]
-        public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
+        public async Task<ActionResult> GetAllByIds(string[] ids, bool getActive = true)
         {
-            var data = await personService.GetAsync(ids, getActive).ConfigureAwait(false);
+            var data = (await personService.GetAllAsync(ids, getActive).ConfigureAwait(false)).Select(x => new {
+                x.Id, x.LastName, x.FirstName, x.Initials, x.Phone, x.PhoneMobile, x.Email, x.Comments, x.IsActive_bl,
+                x.IsCurrentEmployee_bl, x.EmployeePosition, x.IsSalaried_bl, x.EmployeeStart, x.EmployeeEnd, x.EmployeeDetails
+            });
+
+            ViewBag.ServiceName = "PersonService.GetAllAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
+            
+            return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+        }
+
+        // GET: /PersonSrv/Get
+        public async Task<ActionResult> Get(bool getActive = true)
+        {
+            var data = (await personService.GetAsync(UserId, getActive).ConfigureAwait(false)).Select(x => new {
+                x.Id, x.LastName, x.FirstName, x.Initials, x.Phone, x.PhoneMobile, x.Email, x.Comments, x.IsActive_bl,
+                x.IsCurrentEmployee_bl, x.EmployeePosition, x.IsSalaried_bl, x.EmployeeStart, x.EmployeeEnd, x.EmployeeDetails
+            });
 
             ViewBag.ServiceName = "PersonService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-            
+
             return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
@@ -155,9 +174,9 @@ namespace SDDB.WebUI.ControllersSrv
         // POST: /PersonSrv/EditPersonProjects
         [HttpPost]
         [DBSrvAuth("Person_Edit,Project_Edit")]
-        public async Task<ActionResult> EditPersonProjects(string[] personIds, string[] projectIds, bool isAdd)
+        public async Task<ActionResult> EditPersonProjects(string[] ids, string[] idsAddRem, bool isAdd)
         {
-            var serviceResult = await personService.EditPersonProjectsAsync(personIds, projectIds, isAdd).ConfigureAwait(false);
+            var serviceResult = await personService.EditPersonProjectsAsync(ids, idsAddRem, isAdd).ConfigureAwait(false);
 
             ViewBag.ServiceName = "PersonService.EditPersonProjectsAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
@@ -202,9 +221,9 @@ namespace SDDB.WebUI.ControllersSrv
         // POST: /PersonSrv/EditPersonGroups
         [HttpPost]
         [DBSrvAuth("Person_Edit,PersonGroup_Edit")]
-        public async Task<ActionResult> EditPersonGroups(string[] personIds, string[] groupIds, bool isAdd)
+        public async Task<ActionResult> EditPersonGroups(string[] ids, string[] idsAddRem, bool isAdd)
         {
-            var serviceResult = await personService.EditPersonGroupsAsync(personIds, groupIds, isAdd).ConfigureAwait(false);
+            var serviceResult = await personService.EditPersonGroupsAsync(ids, idsAddRem, isAdd).ConfigureAwait(false);
 
             ViewBag.ServiceName = "PersonService.EditPersonGroupsAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
@@ -249,9 +268,9 @@ namespace SDDB.WebUI.ControllersSrv
         // POST: /PersonSrv/EditManagedGroups
         [HttpPost]
         [DBSrvAuth("Person_Edit,PersonGroup_Edit")]
-        public async Task<ActionResult> EditManagedGroups(string[] personIds, string[] groupIds, bool isAdd)
+        public async Task<ActionResult> EditManagedGroups(string[] ids, string[] idsAddRem, bool isAdd)
         {
-            var serviceResult = await personService.EditManagedGroupsAsync(personIds, groupIds, isAdd).ConfigureAwait(false);
+            var serviceResult = await personService.EditManagedGroupsAsync(ids, idsAddRem, isAdd).ConfigureAwait(false);
 
             ViewBag.ServiceName = "PersonService.EditManagedGroupsAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;

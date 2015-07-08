@@ -24,7 +24,7 @@ var CurrRecord = {
     AssignedToLocation_Id: null,
     AssignedToProjectEvent_Id: null,
     Comments: null,
-    IsActive_bl: null,
+    IsActive_bl: null
 };
 var CurrIds = []; var FileCurrNames = [];
 var GetActive = true;

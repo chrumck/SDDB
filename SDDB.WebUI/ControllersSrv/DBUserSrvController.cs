@@ -137,9 +137,9 @@ namespace SDDB.WebUI.ControllersSrv
         // POST: /DBUserSrv/EditRoles
         [HttpPost]
         [DBSrvAuth("DBUser_Edit")]
-        public async Task<ActionResult> EditRoles(string[] ids, string[] dbRoles, bool isAdd)
+        public async Task<ActionResult> EditRoles(string[] ids, string[] idsAddRem, bool isAdd)
         {
-            var serviceResult = await dbUserService.EditRolesAsync(ids, dbRoles, isAdd).ConfigureAwait(false);
+            var serviceResult = await dbUserService.EditRolesAsync(ids, idsAddRem, isAdd).ConfigureAwait(false);
 
             ViewBag.ServiceName = "DBUserService.EditRolesAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;

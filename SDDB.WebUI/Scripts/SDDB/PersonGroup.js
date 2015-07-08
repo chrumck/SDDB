@@ -320,7 +320,7 @@ function FillGroupManagersForEdit(noOfRows) {
         $("#GroupManagersViewPanel").text("_MULTIPLE_")
 
         $.ajax({
-            type: "GET", url: "/PersonSrv/Get", timeout: 20000, data: { getActive: true }, dataType: "json",
+            type: "GET", url: "/PersonSrv/GetAll", timeout: 20000, data: { getActive: true }, dataType: "json",
             beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
         })
             .always(function () { $("#ModalWait").modal("hide"); })

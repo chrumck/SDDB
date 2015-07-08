@@ -46,18 +46,18 @@ namespace SDDB.Domain.Entities
 
         [Required]
         [DefaultValue(true)]
-        public bool IsActive { get; set; }
+        public bool IsActive_bl { get; set; }
 
         [Required]
         [DefaultValue(false)]
-        public bool IsCurrentEmployee { get; set; }
+        public bool IsCurrentEmployee_bl { get; set; }
 
         [StringLength(255)]
         public string EmployeePosition { get; set; }
 
         [Required]
         [DefaultValue(false)]
-        public bool IsSalaried { get; set; }
+        public bool IsSalaried_bl { get; set; }
 
         [DBIsDateISO] 
         public DateTime? EmployeeStart { get; set; }

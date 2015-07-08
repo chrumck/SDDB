@@ -33,8 +33,8 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] {mockAppUserManager.Object, mockDbContextScopeFac.Object, true});
 
-            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
-            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive = true, Initials = "FLA2" };
+            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
+            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive_bl = true, Initials = "FLA2" };
             var dbEntries = (new List<Person> { dbEntry1, dbEntry2 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<Person>>();
@@ -50,7 +50,7 @@ namespace SDDB.UnitTests
             var personService = new PersonService(mockDbContextScopeFac.Object, mockDbUserService.Object);
 
             //Act
-            var resultPersons = personService.GetAsync().Result;
+            var resultPersons = personService.GetAllAsync().Result;
             
             //Assert
             Assert.IsTrue(resultPersons.Count == 1);
@@ -70,9 +70,9 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
-            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive = true, Initials = "FLA2" };
-            var dbEntry3 = new Person { Id = "dummyEntryId3", FirstName = "First3", LastName = "Last3", IsActive = true, Initials = "FLA3" };
+            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
+            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive_bl = true, Initials = "FLA2" };
+            var dbEntry3 = new Person { Id = "dummyEntryId3", FirstName = "First3", LastName = "Last3", IsActive_bl = true, Initials = "FLA3" };
             var dbEntries = (new List<Person> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
             
             var mockDbSet = new Mock<DbSet<Person>>();
@@ -87,7 +87,7 @@ namespace SDDB.UnitTests
             var personService = new PersonService(mockDbContextScopeFac.Object, mockDbUserService.Object);
 
             //Act
-            var serviceResult = personService.GetAsync(new string[] { "dummyEntryId3" }).Result;
+            var serviceResult = personService.GetAllAsync(new string[] { "dummyEntryId3" }).Result;
 
             //Assert
             Assert.IsTrue(serviceResult.Count == 1);
@@ -108,9 +108,9 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
-            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive = true, Initials = "FLA2" };
-            var dbEntry3 = new Person { Id = "dummyEntryId3", FirstName = "First3", LastName = "Last3", IsActive = false, Initials = "FLA3" };
+            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
+            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive_bl = true, Initials = "FLA2" };
+            var dbEntry3 = new Person { Id = "dummyEntryId3", FirstName = "First3", LastName = "Last3", IsActive_bl = false, Initials = "FLA3" };
             var dbEntries = (new List<Person> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<Person>>();
@@ -125,7 +125,7 @@ namespace SDDB.UnitTests
             var personService = new PersonService(mockDbContextScopeFac.Object, mockDbUserService.Object);
 
             //Act
-            var serviceResult = personService.GetAsync(new string[] { "dummyEntryId3" }).Result;
+            var serviceResult = personService.GetAllAsync(new string[] { "dummyEntryId3" }).Result;
 
             //Assert
             Assert.IsTrue(serviceResult.Count == 0);
@@ -146,9 +146,9 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
-            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive = true, Initials = "FLA2" };
-            var dbEntry3 = new Person { Id = "dummyEntryId3", FirstName = "First3", LastName = "Last3", IsActive = true, Initials = "FLA3", DBUser = new DBUser() };
+            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
+            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive_bl = true, Initials = "FLA2" };
+            var dbEntry3 = new Person { Id = "dummyEntryId3", FirstName = "First3", LastName = "Last3", IsActive_bl = true, Initials = "FLA3", DBUser = new DBUser() };
             var dbEntries = (new List<Person> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
             
             var mockDbSet = new Mock<DbSet<Person>>();
@@ -215,7 +215,7 @@ namespace SDDB.UnitTests
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
             var initialId = "dummyEntryId1";
-            var person1 = new Person { Id = initialId, FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var person1 = new Person { Id = initialId, FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var persons = new Person[] { person1 };
 
             mockEfDbContext.Setup(x => x.Persons.FindAsync(person1.Id)).Returns(Task.FromResult<Person>(null));
@@ -250,14 +250,14 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var person1 = new Person { Id = "dummyPersonId1", FirstName = "PersonFirst1", LastName = "PersonLast1", IsActive = true, Initials = "PersonFLA1", 
+            var person1 = new Person { Id = "dummyPersonId1", FirstName = "PersonFirst1", LastName = "PersonLast1", IsActive_bl = true, Initials = "PersonFLA1", 
                                         ModifiedProperties = new string[] {"FirstName", "LastName"} };
-            var person2 = new Person { Id = "dummyPersonId2", FirstName = "PersonFirst2", LastName = "PersonLast2", IsActive = false, Initials = "PersonFLA2" };
+            var person2 = new Person { Id = "dummyPersonId2", FirstName = "PersonFirst2", LastName = "PersonLast2", IsActive_bl = false, Initials = "PersonFLA2" };
             
             var persons = new Person[] { person1, person2 };
 
-            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
-            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive = true, Initials = "FLA2" };
+            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
+            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive_bl = true, Initials = "FLA2" };
 
             mockEfDbContext.Setup(x => x.Persons.FindAsync(person1.Id)).Returns(Task.FromResult(dbEntry1));
             mockEfDbContext.Setup(x => x.Persons.FindAsync(person2.Id)).Returns(Task.FromResult(dbEntry2));
@@ -272,9 +272,9 @@ namespace SDDB.UnitTests
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
             Assert.IsTrue(person1.FirstName == dbEntry1.FirstName); Assert.IsTrue(person1.LastName == dbEntry1.LastName);
-            Assert.IsTrue(person1.Initials != dbEntry1.Initials); Assert.IsTrue(person1.IsActive != dbEntry1.IsActive);
+            Assert.IsTrue(person1.Initials != dbEntry1.Initials); Assert.IsTrue(person1.IsActive_bl != dbEntry1.IsActive_bl);
             Assert.IsTrue(person2.FirstName != dbEntry2.FirstName); Assert.IsTrue(person2.LastName != dbEntry2.LastName);
-            Assert.IsTrue(person2.Initials != dbEntry2.Initials); Assert.IsTrue(person2.IsActive != dbEntry2.IsActive);
+            Assert.IsTrue(person2.Initials != dbEntry2.Initials); Assert.IsTrue(person2.IsActive_bl != dbEntry2.IsActive_bl);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once );
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.Persons.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -296,7 +296,7 @@ namespace SDDB.UnitTests
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
             var initialId = "dummyEntryId1";
-            var debEntry1 = new Person { Id = initialId, FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var debEntry1 = new Person { Id = initialId, FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var persons = new Person[] { debEntry1 };
 
             mockEfDbContext.Setup(x => x.Persons.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<Person>(null));
@@ -331,7 +331,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var personMockDbSet = new Mock<DbSet<Person>>();
             personMockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -411,7 +411,7 @@ namespace SDDB.UnitTests
             personGroupMockDbSet.As<IQueryable<PersonGroup>>().Setup(m => m.GetEnumerator()).Returns(personGroupDbEntries.GetEnumerator());
             personGroupMockDbSet.Setup(x => x.Include(It.IsAny<string>())).Returns(personGroupMockDbSet.Object);
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var personMockDbSet = new Mock<DbSet<Person>>();
             personMockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -471,8 +471,8 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
             
-            var personDbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
-            var personDbEntry2 = new Person { Id = "dummyEntryId1", FirstName = "First2", LastName = "Last2", IsActive = true, Initials = "FLA2" };
+            var personDbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
+            var personDbEntry2 = new Person { Id = "dummyEntryId1", FirstName = "First2", LastName = "Last2", IsActive_bl = true, Initials = "FLA2" };
             var personDbEntries = (new List<Person> { personDbEntry1, personDbEntry2 }).AsQueryable();
             var personMockDbSet = new Mock<DbSet<Person>>();
             personMockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -511,7 +511,7 @@ namespace SDDB.UnitTests
 
             var ids = new string[] { "dummyId1", "DummyId2" };
             
-            var dbEntry = new Person { IsActive = true };
+            var dbEntry = new Person { IsActive_bl = true };
             personMockDbSet.Setup(x => x.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
             personMockDbSet.Setup(x => x.FindAsync("dummyId2")).Returns(Task.FromResult<Person>(null));
 
@@ -528,7 +528,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Record with Id=DummyId2 not found\n"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.AtLeastOnce);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.AtLeastOnce);
             personMockDbSet.Verify(x => x.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -550,7 +550,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -606,7 +606,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -662,7 +662,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -718,7 +718,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -773,7 +773,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -842,7 +842,7 @@ namespace SDDB.UnitTests
 
             mockEfDbContext.Setup(x => x.Projects).Returns(mockDbSet2.Object);
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1", 
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1", 
                 PersonProjects = new List<Project> {dbEntry1} };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
@@ -899,7 +899,7 @@ namespace SDDB.UnitTests
 
             mockEfDbContext.Setup(x => x.Projects).Returns(mockDbSet2.Object);
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1", PersonProjects = new List<Project> { dbEntry1 } };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1", PersonProjects = new List<Project> { dbEntry1 } };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -944,7 +944,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1000,7 +1000,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1061,9 +1061,9 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
-            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive = true, Initials = "FLA2" };
-            var dbEntry3 = new Person { Id = "dummyEntryId3", FirstName = "First3", LastName = "Last3", IsActive = true, Initials = "FLA3" };
+            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
+            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive_bl = true, Initials = "FLA2" };
+            var dbEntry3 = new Person { Id = "dummyEntryId3", FirstName = "First3", LastName = "Last3", IsActive_bl = true, Initials = "FLA3" };
 
             var groupManager1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
@@ -1106,9 +1106,9 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
-            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive = true, Initials = "FLA2" };
-            var dbEntry3 = new Person { Id = "dummyEntryId3", FirstName = "First3", LastName = "Last3", IsActive = true, Initials = "FLA3" };
+            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
+            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive_bl = true, Initials = "FLA2" };
+            var dbEntry3 = new Person { Id = "dummyEntryId3", FirstName = "First3", LastName = "Last3", IsActive_bl = true, Initials = "FLA3" };
 
             var groupManager1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
@@ -1151,9 +1151,9 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
-            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive = true, Initials = "FLA2" };
-            var dbEntry3 = new Person { Id = "dummyEntryId3", FirstName = "First3", LastName = "Last3", IsActive = true, Initials = "FLA3" };
+            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
+            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive_bl = true, Initials = "FLA2" };
+            var dbEntry3 = new Person { Id = "dummyEntryId3", FirstName = "First3", LastName = "Last3", IsActive_bl = true, Initials = "FLA3" };
 
             var groupManager1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
@@ -1204,10 +1204,10 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
-            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive = true, Initials = "FLA2" };
-            var dbEntry3 = new Person { Id = "dummyEntryId3", FirstName = "First3", LastName = "Last3", IsActive = true, Initials = "FLA3" };
-            var dbEntry4 = new Person { Id = "dummyEntryId4", FirstName = "First4", LastName = "Last4", IsActive = false, Initials = "FLA4" };
+            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
+            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive_bl = true, Initials = "FLA2" };
+            var dbEntry3 = new Person { Id = "dummyEntryId3", FirstName = "First3", LastName = "Last3", IsActive_bl = true, Initials = "FLA3" };
+            var dbEntry4 = new Person { Id = "dummyEntryId4", FirstName = "First4", LastName = "Last4", IsActive_bl = false, Initials = "FLA4" };
 
             var groupManager1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
             var groupManager2 = new Person { Id = "dummyUserId2", FirstName = "Firs2", LastName = "Last2" };
@@ -1259,10 +1259,10 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
-            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive = true, Initials = "FLA2" };
-            var dbEntry3 = new Person { Id = "dummyEntryId3", FirstName = "First3", LastName = "Last3", IsActive = true, Initials = "FLA3" };
-            var dbEntry4 = new Person { Id = "dummyEntryId4", FirstName = "First4", LastName = "Last4", IsActive = false, Initials = "FLA4" };
+            var dbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
+            var dbEntry2 = new Person { Id = "dummyEntryId2", FirstName = "First2", LastName = "Last2", IsActive_bl = true, Initials = "FLA2" };
+            var dbEntry3 = new Person { Id = "dummyEntryId3", FirstName = "First3", LastName = "Last3", IsActive_bl = true, Initials = "FLA3" };
+            var dbEntry4 = new Person { Id = "dummyEntryId4", FirstName = "First4", LastName = "Last4", IsActive_bl = false, Initials = "FLA4" };
 
             var groupManager1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
             var groupManager2 = new Person { Id = "dummyUserId2", FirstName = "Firs2", LastName = "Last2" };
@@ -1308,7 +1308,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1364,7 +1364,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1420,7 +1420,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1476,7 +1476,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1531,7 +1531,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1600,7 +1600,7 @@ namespace SDDB.UnitTests
 
             mockEfDbContext.Setup(x => x.PersonGroups).Returns(mockDbSet2.Object);
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1", PersonGroups = new List<PersonGroup> { dbEntry1 } };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1", PersonGroups = new List<PersonGroup> { dbEntry1 } };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1656,7 +1656,7 @@ namespace SDDB.UnitTests
 
             mockEfDbContext.Setup(x => x.PersonGroups).Returns(mockDbSet2.Object);
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1", PersonGroups = new List<PersonGroup> { dbEntry1 } };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1", PersonGroups = new List<PersonGroup> { dbEntry1 } };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1701,7 +1701,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1757,7 +1757,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1817,7 +1817,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1873,7 +1873,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1929,7 +1929,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -1985,7 +1985,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -2040,7 +2040,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -2109,7 +2109,7 @@ namespace SDDB.UnitTests
 
             mockEfDbContext.Setup(x => x.PersonGroups).Returns(mockDbSet2.Object);
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1", PersonGroups = new List<PersonGroup> { dbEntry1 } };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1", PersonGroups = new List<PersonGroup> { dbEntry1 } };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -2165,7 +2165,7 @@ namespace SDDB.UnitTests
 
             mockEfDbContext.Setup(x => x.PersonGroups).Returns(mockDbSet2.Object);
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1", PersonGroups = new List<PersonGroup> { dbEntry1 } };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1", PersonGroups = new List<PersonGroup> { dbEntry1 } };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -2210,7 +2210,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
@@ -2266,7 +2266,7 @@ namespace SDDB.UnitTests
             var mockAppUserManager = new Mock<IAppUserManager>();
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
 
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive = false, Initials = "FLA1" };
+            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var mockDbSet = new Mock<DbSet<Person>>();
             mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
