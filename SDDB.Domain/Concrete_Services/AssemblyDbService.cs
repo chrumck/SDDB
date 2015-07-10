@@ -103,12 +103,12 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
-                projectIds = projectIds ?? new string[] { }; modelIds = modelIds ?? new string[] { }; 
+                projectIds = projectIds ?? new string[] { }; modelIds = modelIds ?? new string[] { };
 
                 var records = await dbContext.AssemblyDbs
                     .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
-                        (modelIds.Count() == 0 || modelIds.Contains(x.AssemblyModel_Id)) )
+                        (modelIds.Count() == 0 || modelIds.Contains(x.AssemblyModel_Id)))
                     .Include(x => x.AssemblyType).Include(x => x.AssemblyStatus).Include(x => x.AssemblyModel).Include(x => x.AssignedToProject)
                     .Include(x => x.AssignedToLocation).Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssemblyExt)
                     .ToListAsync().ConfigureAwait(false);
@@ -169,7 +169,7 @@ namespace SDDB.Domain.Services
                 return records;
             }
         }
-        
+
         //lookup by query
         public virtual Task<List<AssemblyDb>> LookupAsync(string userId, string query = "", bool getActive = true)
         {
@@ -202,7 +202,7 @@ namespace SDDB.Domain.Services
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         (x.AssyName.Contains(query) || x.AssyAltName.Contains(query) || x.AssyAltName2.Contains(query)))
                     .Include(x => x.AssignedToProject).ToListAsync();
-                
+
                 return records;
             }
         }
@@ -232,12 +232,16 @@ namespace SDDB.Domain.Services
         // Create and Update records given in []
         public virtual async Task<DBResult> EditAsync(string userId, AssemblyDb[] records)
         {
+            if (string.IsNullOrEmpty(userId))
+                return new DBResult { StatusCode = HttpStatusCode.BadRequest, StatusDescription = "arguments missing" };
+
+            var errorMessage = "";
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    var newEntries = 1;  foreach (var record in records)
+                    var newEntries = 1; foreach (var record in records)
                     {
                         var dbEntry = await dbContext.AssemblyDbs.FindAsync(record.Id).ConfigureAwait(false);
                         if (dbEntry == null)
@@ -251,7 +255,7 @@ namespace SDDB.Domain.Services
                                 foreach (var property in properties)
                                 {
                                     if (property.GetCustomAttributes(typeof(DBIsUniqueAttribute), false).FirstOrDefault() == null) continue;
-                                    property.SetValue(record, property.GetValue(record) + String.Format("_{0:HHmm}_{1:D3}",DateTime.Now,newEntries));
+                                    property.SetValue(record, property.GetValue(record) + String.Format("_{0:D3}", newEntries));
                                 }
                             }
                             dbContext.AssemblyDbs.Add(record); newEntries++;
@@ -274,58 +278,58 @@ namespace SDDB.Domain.Services
 
                                 if (record.PropIsModified(property.Name) && loggedProperties.Contains(property.Name)) logChanges = true;
                             }
+                            if (logChanges) addLogEntry(dbContext, dbEntry, userId);
+                        }
+                    }
+                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
 
-                            if (logChanges)
-                            {
-                                dbContext.AssemblyLogEntrys.Add(
-                                    new AssemblyLogEntry
-                                    {
-                                        Id = Guid.NewGuid().ToString(),
-                                        LogEntryDateTime = DateTime.Now,
-                                        AssemblyDb_Id = dbEntry.Id,
-                                        EnteredByPerson_Id = userId,
-                                        AssemblyStatus_Id = dbEntry.AssemblyStatus_Id,
-                                        AssignedToProject_Id = dbEntry.AssignedToProject_Id,
-                                        AssignedToLocation_Id = dbEntry.AssignedToLocation_Id,
-                                        AssyGlobalX = dbEntry.AssyGlobalX,
-                                        AssyGlobalY = dbEntry.AssyGlobalY,
-                                        AssyGlobalZ = dbEntry.AssyGlobalZ,
-                                        AssyLocalXDesign = dbEntry.AssyLocalXDesign,
-                                        AssyLocalYDesign = dbEntry.AssyLocalYDesign,
-                                        AssyLocalZDesign = dbEntry.AssyLocalZDesign,
-                                        AssyLocalXAsBuilt = dbEntry.AssyLocalXAsBuilt,
-                                        AssyLocalYAsBuilt = dbEntry.AssyLocalYAsBuilt,
-                                        AssyLocalZAsBuilt = dbEntry.AssyLocalZAsBuilt,
-                                        AssyStationing = dbEntry.AssyStationing,
-                                        AssyLength = dbEntry.AssyLength,
-                                        Comments = dbEntry.Comments,
-                                        IsActive_bl = true
-                                    }
-                                );
-                            }
-                        }
-                    }
-                    for (int i = 1; i <= 10; i++)
-                    {
-                        try
-                        {
-                            await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                            break;
-                        }
-                        catch (Exception e)
-                        {
-                            var message = e.GetBaseException().Message;
-                            if (i == 10 || !message.Contains("Deadlock found when trying to get lock"))
-                            {
-                                return new DBResult { StatusCode = HttpStatusCode.Conflict, StatusDescription = message };
-                            }
-                        }
-                        await Task.Delay(200).ConfigureAwait(false);
-                    }
                     trans.Complete();
                 }
             }
-            return new DBResult { StatusCode = HttpStatusCode.OK };
+            if (errorMessage == "") return new DBResult();
+            else return new DBResult
+            {
+                StatusCode = HttpStatusCode.Conflict,
+                StatusDescription = "Errors editing records:\n" + errorMessage
+            };
+        }
+
+        // change status given as statusId of records given as recordIds[]
+        public virtual async Task<DBResult> EditStatusAsync(string userId, string[] ids, string statusId)
+        {
+            if (ids == null || ids.Length == 0 || string.IsNullOrEmpty(statusId) || string.IsNullOrEmpty(userId))
+                return new DBResult { StatusCode = HttpStatusCode.BadRequest, StatusDescription = "arguments missing" };
+
+            var errorMessage = "";
+            using (var dbContextScope = contextScopeFac.Create())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    foreach (var recordId in ids)
+                    {
+                        var dbEntry = await dbContext.AssemblyDbs.FindAsync(recordId).ConfigureAwait(false);
+                        if (dbEntry != null)
+                        {
+                            if (dbEntry.AssemblyStatus_Id != statusId)
+                            {
+                                dbEntry.AssemblyStatus_Id = statusId;
+                                addLogEntry(dbContext, dbEntry, userId);
+                            }
+                        }
+                        else errorMessage += string.Format("Record with id:{0} not found\n", recordId);
+                    }
+                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+
+                    trans.Complete();
+                }
+            }
+            if (errorMessage == "") return new DBResult();
+            else return new DBResult
+            {
+                StatusCode = HttpStatusCode.Conflict,
+                StatusDescription = "Errors editing records:\n" + errorMessage
+            };
         }
 
         // Delete records by their Ids
@@ -355,36 +359,21 @@ namespace SDDB.Domain.Services
                             errorMessage += string.Format("Record with Id={0} not found\n", id);
                         }
                     }
-                    for (int i = 1; i <= 10; i++)
-                    {
-                        try
-                        {
-                            await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                            break;
-                        }
-                        catch (Exception e)
-                        {
-                            var message = e.GetBaseException().Message;
-                            if (i == 10 || !message.Contains("Deadlock found when trying to get lock"))
-                            {
-                                errorMessage += string.Format("Error Saving changes: {0}\n", message);
-                                break;
-                            }
-                        }
-                        await Task.Delay(200).ConfigureAwait(false);
-                    }
+                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+
                     trans.Complete();
                 }
             }
             if (errorMessage == "") return new DBResult();
-            else return new DBResult {
+            else return new DBResult
+            {
                 StatusCode = HttpStatusCode.Conflict,
                 StatusDescription = "Errors deleting records:\n" + errorMessage
             };
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
-        
+
         // Create and Update records given in [] - AssemblyExt
         public virtual async Task<DBResult> EditExtAsync(AssemblyExt[] records)
         {
@@ -418,24 +407,8 @@ namespace SDDB.Domain.Services
                             }
                         }
                     }
-                    for (int i = 1; i <= 10; i++)
-                    {
-                        try
-                        {
-                            await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                            break;
-                        }
-                        catch (Exception e)
-                        {
-                            var message = e.GetBaseException().Message;
-                            if (i == 10 || !message.Contains("Deadlock found when trying to get lock"))
-                            {
-                                errorMessage += String.Format("Error saving records: {0}\n", message);
-                                break;
-                            }
-                        }
-                        await Task.Delay(200).ConfigureAwait(false);
-                    }
+                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+
                     trans.Complete();
                 }
             }
@@ -450,6 +423,36 @@ namespace SDDB.Domain.Services
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
+
+        //adds log entry to the dbContext based on assembly data and user Id
+        private void addLogEntry(EFDbContext dbContext, AssemblyDb assy, string userId)
+        {
+            dbContext.AssemblyLogEntrys.Add(
+                new AssemblyLogEntry
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    LogEntryDateTime = DateTime.Now,
+                    AssemblyDb_Id = assy.Id,
+                    EnteredByPerson_Id = userId,
+                    AssemblyStatus_Id = assy.AssemblyStatus_Id,
+                    AssignedToProject_Id = assy.AssignedToProject_Id,
+                    AssignedToLocation_Id = assy.AssignedToLocation_Id,
+                    AssyGlobalX = assy.AssyGlobalX,
+                    AssyGlobalY = assy.AssyGlobalY,
+                    AssyGlobalZ = assy.AssyGlobalZ,
+                    AssyLocalXDesign = assy.AssyLocalXDesign,
+                    AssyLocalYDesign = assy.AssyLocalYDesign,
+                    AssyLocalZDesign = assy.AssyLocalZDesign,
+                    AssyLocalXAsBuilt = assy.AssyLocalXAsBuilt,
+                    AssyLocalYAsBuilt = assy.AssyLocalYAsBuilt,
+                    AssyLocalZAsBuilt = assy.AssyLocalZAsBuilt,
+                    AssyStationing = assy.AssyStationing,
+                    AssyLength = assy.AssyLength,
+                    Comments = assy.Comments,
+                    IsActive_bl = true
+                }
+            );
+        }
 
         #endregion
     }

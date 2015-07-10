@@ -680,12 +680,13 @@ namespace SDDB.UnitTests
             var serviceResult = prsLogEntryService.EditPrsLogEntryAssysAsync(prsLogEntryIds, assyIds, true).Result;
 
             //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.PersonLogEntrys, Times.Once);
-            mockEfDbContext.Verify(x => x.AssemblyDbs, Times.Once);
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
+            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.BadRequest);
+            Assert.IsTrue(serviceResult.StatusDescription.Contains("arguments missing"));
+            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Never);
+            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Never);
+            mockEfDbContext.Verify(x => x.PersonLogEntrys, Times.Never);
+            mockEfDbContext.Verify(x => x.AssemblyDbs, Times.Never);
+            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Never);
         }
 
         [TestMethod]
@@ -723,7 +724,7 @@ namespace SDDB.UnitTests
 
             mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockDbSet2.Object);
 
-            var assyIds = new string[] { };
+            var assyIds = new string[] { "notExistingId" };
 
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
 
@@ -786,12 +787,13 @@ namespace SDDB.UnitTests
             var serviceResult = prsLogEntryService.EditPrsLogEntryAssysAsync(prsLogEntryIds, assyIds, true).Result;
 
             //Assert
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.PersonLogEntrys, Times.Once);
-            mockEfDbContext.Verify(x => x.AssemblyDbs, Times.Once);
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
+            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Never);
+            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Never);
+            mockEfDbContext.Verify(x => x.PersonLogEntrys, Times.Never);
+            mockEfDbContext.Verify(x => x.AssemblyDbs, Times.Never);
+            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Never);
+            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.BadRequest);
+            Assert.IsTrue(serviceResult.StatusDescription.Contains("arguments missing"));
         }
 
         [TestMethod]
@@ -1172,12 +1174,13 @@ namespace SDDB.UnitTests
             var serviceResult = prsLogEntryService.EditPrsLogEntryPersonsAsync(prsLogEntryIds, personIds, true).Result;
 
             //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.PersonLogEntrys, Times.Once);
-            mockEfDbContext.Verify(x => x.Persons, Times.Once);
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
+            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.BadRequest);
+            Assert.IsTrue(serviceResult.StatusDescription.Contains("arguments missing"));
+            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Never);
+            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Never);
+            mockEfDbContext.Verify(x => x.PersonLogEntrys, Times.Never);
+            mockEfDbContext.Verify(x => x.Persons, Times.Never);
+            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Never);
         }
 
         [TestMethod]
@@ -1215,7 +1218,7 @@ namespace SDDB.UnitTests
 
             mockEfDbContext.Setup(x => x.Persons).Returns(mockDbSet2.Object);
 
-            var personIds = new string[] { };
+            var personIds = new string[] { "notExistingId" };
 
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
 
@@ -1278,12 +1281,14 @@ namespace SDDB.UnitTests
             var serviceResult = prsLogEntryService.EditPrsLogEntryPersonsAsync(prsLogEntryIds, personIds, true).Result;
 
             //Assert
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.PersonLogEntrys, Times.Once);
-            mockEfDbContext.Verify(x => x.Persons, Times.Once);
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
+            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Never);
+            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Never);
+            mockEfDbContext.Verify(x => x.PersonLogEntrys, Times.Never);
+            mockEfDbContext.Verify(x => x.Persons, Times.Never);
+            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Never);
+            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.BadRequest);
+            Assert.IsTrue(serviceResult.StatusDescription.Contains("arguments missing"));
+
         }
 
         [TestMethod]

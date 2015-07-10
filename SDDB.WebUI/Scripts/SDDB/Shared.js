@@ -79,17 +79,19 @@ $(document).ready(function () {
 //------------------------------------Common Main Methods----------------------------------//
 
 //Show Modal Nothing Selected
-function showModalNothingSelected() {
+function showModalNothingSelected(bodyText) {
     $("#ModalInfoLabel").text("Nothing Selected");
-    $("#ModalInfoBody").text("Please select one or more rows.");
+    if (typeof bodyText !== "undefined") $("#ModalInfoBody").text(bodyText);
+    else $("#ModalInfoBody").text("Please select one or more rows.");
     $("#ModalInfoBodyPre").empty().hide();
     $("#ModalInfo").modal("show");
 }
 
 //Show Modal Selected other than one row
-function showModalSelectOne() {
+function showModalSelectOne(bodyText) {
     $("#ModalInfoLabel").text("Select One Row");
-    $("#ModalInfoBody").text("Please select one row.");
+    if (typeof bodyText !== "undefined") $("#ModalInfoBody").text(bodyText);
+    else $("#ModalInfoBody").text("Please select one row.");
     $("#ModalInfoBodyPre").empty().hide();
     $("#ModalInfo").modal("show");
 }
@@ -105,6 +107,20 @@ $("#ModalDeleteBtnOk").click(function () {
     $("#ModalDelete").modal("hide");
     DeleteRecords();
 });
+
+//showModalWait
+function showModalWait() {
+    $("#ModalWait").modal({
+        show: true,
+        backdrop: "static",
+        keyboard: false
+    });
+}
+
+//hideModalWait
+function hideModalWait() {
+    $("#ModalWait").modal("hide");
+}
 
 //showModalFail
 function showModalFail(label, body, bodyPre) {
@@ -190,14 +206,13 @@ function refreshTableGeneric(table, url, data, httpType) {
 
 //Refresh  table from AJAX - generic version - showing wait dialogs
 function refreshTblGenWrp(table, url, data, httpType) {
-
     var deferred0 = $.Deferred();
 
-    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+    showModalWait();
 
     refreshTableGeneric(table, url, data, httpType)
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function () { deferred0.resolve(); })
+        .always(hideModalWait)
+        .done(deferred0.resolve)
         .fail(function (xhr, status, error) {
             showModalAJAXFail(xhr, status, error);
             deferred0.reject(xhr, status, error);

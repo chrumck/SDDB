@@ -33,7 +33,7 @@ namespace SDDB.WebUI
                 new DBRole {Name = "Location_View" },new DBRole {Name = "Location_Edit" }, 
                 new DBRole {Name = "LocationType_View" },new DBRole {Name = "LocationType_Edit" }, 
                 
-                new DBRole {Name = "Assembly_View" },new DBRole {Name = "Assembly_Edit" },
+                new DBRole {Name = "Assembly_View" },new DBRole {Name = "Assembly_Edit" }, new DBRole {Name = "Assembly_EditStatus" },
                 new DBRole {Name = "AssemblyType_View" },new DBRole {Name = "AssemblyType_Edit" },
                 new DBRole {Name = "AssemblyModel_View" },new DBRole {Name = "AssemblyModel_Edit" },
                 new DBRole {Name = "AssemblyStatus_View" },new DBRole {Name = "AssemblyStatus_Edit" },

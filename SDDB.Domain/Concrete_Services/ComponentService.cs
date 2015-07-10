@@ -233,7 +233,7 @@ namespace SDDB.Domain.Services
                                 foreach (var property in properties)
                                 {
                                     if (property.GetCustomAttributes(typeof(DBIsUniqueAttribute), false).FirstOrDefault() == null) continue;
-                                    property.SetValue(record, property.GetValue(record) + String.Format("_{0:HHmm}_{1:D3}",DateTime.Now,newEntries));
+                                    property.SetValue(record, property.GetValue(record) + String.Format("_{0:D3}",newEntries));
                                 }
                             }
                             dbContext.Components.Add(record); newEntries++;

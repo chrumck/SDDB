@@ -10,9 +10,13 @@
 //--------------------------------------Global Properties------------------------------------//
 
 var TableMain;
-var TableLogEntryAssysAdd; var TableLogEntryAssysRemove;
-var TableLogEntryPersonsAdd; var TableLogEntryPersonsRemove;
-var MsFilterByProject; var MsFilterByType; var MsFilterByPerson;
+var TableLogEntryAssysAdd;
+var TableLogEntryAssysRemove;
+var TableLogEntryPersonsAdd;
+var TableLogEntryPersonsRemove;
+var MsFilterByProject;
+var MsFilterByType;
+var MsFilterByPerson;
 var MagicSuggests = [];
 var CurrRecord = {
     Id: null,
@@ -26,10 +30,14 @@ var CurrRecord = {
     Comments: null,
     IsActive_bl: null
 };
-var CurrIds = []; var FileCurrNames = [];
+var CurrIds = [];
+var FileCurrNames = [];
+var AddAssyIds = [];
 var GetActive = true;
 var SelectedRecord;
-var DlToken; var DlTimer; var DlAttempts;
+var DlToken;
+var DlTimer;
+var DlAttempts;
 var XHR = new window.XMLHttpRequest();
 
 $(document).ready(function () {
@@ -40,16 +48,18 @@ $(document).ready(function () {
     $("#BtnCreate").click(function () {
         CurrIds = [];
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Log Entry", "MainView");
-        MagicSuggests[3].disable(); MagicSuggests[4].disable();
-        TableLogEntryAssysAdd.clear().search("").draw(); TableLogEntryAssysRemove.clear().search("").draw();
+        MagicSuggests[3].disable();
+        MagicSuggests[4].disable();
+        TableLogEntryAssysAdd.clear().search("").draw();
+        TableLogEntryAssysRemove.clear().search("").draw();
         $("#EditFormBtnOkFiles").removeClass("disabled");
 
-        $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+        showModalWait();
         fillFormForRelatedGeneric(TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
             "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { logEntryId: CurrIds[0] },
             "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { logEntryId: CurrIds[0] },
             "GET", "/PersonSrv/Get", { getActive: true })
-            .always(function () { $("#ModalWait").modal("hide"); })
+            .always(hideModalWait)
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
@@ -248,8 +258,7 @@ $(document).ready(function () {
             }
         }
     });
-
-
+    
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
         $("#MainView").removeClass("hide");
@@ -271,6 +280,13 @@ $(document).ready(function () {
             SelectedRecord = TableMain.row(".ui-selected").data();
             submitEdits().done(function () { setTimeout(fillLogEntryFilesForm, 200); });
         }
+    });
+
+    //Wire Up EditFormBtnChngSts
+    $("#EditFormBtnChngSts").click(function () {
+        AddAssyIds = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name").data().toArray();
+        if (AddAssyIds.length == 0) showModalNothingSelected("Please select one or more rows from 'Add Assemblies' table.");
+        else showModalChngSts(AddAssyIds.length);
     });
 
     //------------------------------------DataTables - Log Entry Assemblies ---

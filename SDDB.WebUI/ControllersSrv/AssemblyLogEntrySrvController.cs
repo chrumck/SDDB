@@ -30,7 +30,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var data = (await assyLogEntryService.GetAsync(UserId, getActive).ConfigureAwait(false)).Select(x => new {
                 x.Id, x.LogEntryDateTime,
-                Assembly_ = new { x.AssemblyDb.AssyName, x.AssemblyDb.AssyAltName },
+                AssemblyDb_ = new { x.AssemblyDb.AssyName, x.AssemblyDb.AssyAltName },
                 EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
                 AssemblyStatus_ = new { x.AssemblyStatus.AssyStatusName },
                 AssignedToProject_ = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectCode },
@@ -54,7 +54,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var data = (await assyLogEntryService.GetAsync(UserId,ids, getActive).ConfigureAwait(false)).Select(x => new {
                 x.Id, x.LogEntryDateTime,
-                Assembly_ = new { x.AssemblyDb.AssyName, x.AssemblyDb.AssyAltName },
+                AssemblyDb_ = new { x.AssemblyDb.AssyName, x.AssemblyDb.AssyAltName },
                 EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
                 AssemblyStatus_ = new { x.AssemblyStatus.AssyStatusName },
                 AssignedToProject_ = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectCode },
@@ -80,7 +80,7 @@ namespace SDDB.WebUI.ControllersSrv
             var data = (await assyLogEntryService.GetByAltIdsAsync(UserId, projectIds, assyIds, personIds, startDate, endDate, getActive)
                 .ConfigureAwait(false)).Select(x => new {
                 x.Id, x.LogEntryDateTime,
-                Assembly_ = new { x.AssemblyDb.AssyName, x.AssemblyDb.AssyAltName },
+                AssemblyDb_ = new { x.AssemblyDb.AssyName, x.AssemblyDb.AssyAltName },
                 EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
                 AssemblyStatus_ = new { x.AssemblyStatus.AssyStatusName },
                 AssignedToProject_ = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectCode },

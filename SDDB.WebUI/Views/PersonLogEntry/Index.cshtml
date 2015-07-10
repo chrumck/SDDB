@@ -160,7 +160,17 @@
 
                 <div class="col-xs-12 col-sm-6">
                     <div class="panel panel-default">
-                        <div class="panel-heading" ><strong>Add Assemblies </strong><small><em> Choose Location first.</em></small></div>
+                        <div class="panel-heading" >
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    @if (User.IsInRole("Assembly_EditStatus"))
+                                    {
+                                        <button class="btn btn-sm btn-warning pull-right" id="EditFormBtnChngSts" type="button">Change Status</button>
+                                    }
+                                    <strong>Add Assemblies </strong><small><em> Choose Location first.</em></small>
+                                </div>
+                            </div>
+                        </div>
                         <table class="table table-striped" id="TableLogEntryAssysAdd">
                             <thead class="hide">
                                 <tr>

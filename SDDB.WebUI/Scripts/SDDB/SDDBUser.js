@@ -330,7 +330,7 @@ function SubmitRolesEdits() {
     else {
         $.ajax({
             type: "POST", url: "/DBUserSrv/EditRoles", timeout: 20000,
-            data: { ids: ids, dbRoles: dbRecordsAdd, isAdd: true }, dataType: "json"
+            data: { ids: ids, idsAddRem: dbRecordsAdd, isAdd: true }, dataType: "json"
         })
             .done(function () { deferred1.resolve(); })
             .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
@@ -342,7 +342,7 @@ function SubmitRolesEdits() {
         setTimeout(function () {
             $.ajax({
                 type: "POST", url: "/DBUserSrv/EditRoles", timeout: 20000,
-                data: { ids: ids, dbRoles: dbRecordsRemove, isAdd: false }, dataType: "json"
+                data: { ids: ids, idsAddRem: dbRecordsRemove, isAdd: false }, dataType: "json"
             })
                 .done(function () { deferred2.resolve(); })
                 .fail(function (xhr, status, error) { deferred2.reject(xhr, status, error); });

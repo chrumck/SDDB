@@ -192,6 +192,27 @@ namespace SDDB.WebUI.ControllersSrv
             }
         }
 
+        // POST: /AssemblyDbSrv/EditStatus
+        [HttpPost]
+        [DBSrvAuth("Assembly_EditStatus")]
+        public async Task<ActionResult> EditStatus(string[] ids, string statusId)
+        {
+            var serviceResult = await assemblyService.EditStatusAsync(UserId, ids, statusId).ConfigureAwait(false);
+
+            ViewBag.ServiceName = "AssemblyDbService.EditStatusAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.StatusDescription = serviceResult.StatusDescription;
+
+            if (serviceResult.StatusCode == HttpStatusCode.OK)
+            {
+                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                Response.StatusCode = (int)serviceResult.StatusCode;
+                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
         // POST: /AssemblyDbSrv/Delete
         [HttpPost]
         [DBSrvAuth("Assembly_Edit")]

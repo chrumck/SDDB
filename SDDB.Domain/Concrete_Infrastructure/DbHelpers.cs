@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using System.Reflection;
 
 using SDDB.Domain.Abstract;
@@ -28,5 +30,33 @@ namespace SDDB.Domain.Infrastructure
             return instance.ModifiedProperties == null ? false : instance.ModifiedProperties.Contains(propName);
         }
 
+        //attempt to save changes to DBContext, retry if exception on deadlock thrown
+        public static async Task<string> SaveChangesAsync(DbContext dbContext)
+        {
+            var errorMessage = "";
+            for (int i = 1; i <= 10; i++)
+            {
+                try
+                {
+                    await dbContext.SaveChangesAsync().ConfigureAwait(false);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    var message = e.GetBaseException().Message;
+                    if (i == 10 || !message.Contains("Deadlock found when trying to get lock"))
+                    {
+                        errorMessage += String.Format("Error saving records: {0}\n", message);
+                        break;
+                    }
+                }
+                await Task.Delay(200).ConfigureAwait(false);
+            }
+            return errorMessage;
+        }
+
+
     }
+
+
 }
