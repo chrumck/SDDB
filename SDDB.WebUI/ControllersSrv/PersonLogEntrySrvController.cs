@@ -77,10 +77,10 @@ namespace SDDB.WebUI.ControllersSrv
         // POST: /PersonLogEntrySrv/GetByAltIds
         [HttpPost]
         [DBSrvAuth("PersonLogEntry_View")]
-        public async Task<ActionResult> GetByAltIds(string[] personIds = null, string[] projectIds = null, string[] typeIds = null,
-            DateTime? startDate = null, DateTime? endDate = null, bool getActive = true)
+        public async Task<ActionResult> GetByAltIds( string[] personIds = null, string[] typeIds = null, 
+            string[] projectIds = null, string[] assyIds = null, DateTime? startDate = null, DateTime? endDate = null, bool getActive = true)
         {
-            var data = (await prsLogEntryService.GetByAltIdsAsync(UserId, personIds, projectIds, typeIds, startDate, endDate, getActive)
+            var data = (await prsLogEntryService.GetByAltIdsAsync(UserId, personIds, projectIds, assyIds, typeIds, startDate, endDate, getActive)
                 .ConfigureAwait(false)).Select(x => new {
                 x.Id, x.LogEntryDateTime,
                 EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },

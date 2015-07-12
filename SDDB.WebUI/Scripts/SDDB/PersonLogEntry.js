@@ -14,9 +14,11 @@ var TableLogEntryAssysAdd;
 var TableLogEntryAssysRemove;
 var TableLogEntryPersonsAdd;
 var TableLogEntryPersonsRemove;
-var MsFilterByProject;
-var MsFilterByType;
 var MsFilterByPerson;
+var MsFilterByType;
+var MsFilterByProject;
+var MsFilterByAssy;
+var ModalChngStsMs;
 var MagicSuggests = [];
 var CurrRecord = {
     Id: null,
@@ -32,7 +34,7 @@ var CurrRecord = {
 };
 var CurrIds = [];
 var FileCurrNames = [];
-var AddAssyIds = [];
+var ChngStsAssyIds = [];
 var GetActive = true;
 var SelectedRecord;
 var DlToken;
@@ -127,6 +129,18 @@ $(document).ready(function () {
     $("#FilterDateEnd").datetimepicker({ format: "YYYY-MM-DD" })
         .on("dp.hide", function (e) { refreshMainView(); });
 
+    //Initialize MagicSuggest MsFilterByPerson
+    MsFilterByPerson = $("#MsFilterByPerson").magicSuggest({
+        data: "/PersonSrv/Lookup",
+        allowFreeEntries: false,
+        ajaxConfig: {
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
+        },
+        style: "min-width: 240px;"
+    });
+        //Wire up on change event for MsFilterByPerson
+    $(MsFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
+
     //Initialize MagicSuggest MsFilterByType
     MsFilterByType = $("#MsFilterByType").magicSuggest({
         data: "/PersonActivityTypeSrv/Lookup",
@@ -136,6 +150,7 @@ $(document).ready(function () {
         },
         style: "min-width: 240px;"
     });
+    //Wire up on change event for MsFilterByType
     $(MsFilterByType).on("selectionchange", function (e, m) { refreshMainView(); });
 
     //Initialize MagicSuggest MsFilterByProject
@@ -147,19 +162,22 @@ $(document).ready(function () {
         },
         style: "min-width: 240px;"
     });
+    //Wire up on change event for MsFilterByProject
     $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
 
-    //Initialize MagicSuggest MsFilterByPerson
-    MsFilterByPerson = $("#MsFilterByPerson").magicSuggest({
-        data: "/PersonSrv/Lookup",
+    //Initialize MagicSuggest MsFilterByAssy
+    MsFilterByAssy = $("#MsFilterByAssy").magicSuggest({
+        data: "/AssemblyDbSrv/LookupByProj",
         allowFreeEntries: false,
+        dataUrlParams: { projectIds: MsFilterByProject.getValue },
         ajaxConfig: {
             error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
         style: "min-width: 240px;"
     });
-    $(MsFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
-   
+    //Wire up on change event for MsFilterByAssy
+    $(MsFilterByAssy).on('selectionchange', function (e, m) { refreshMainView(); });
+          
         
     //---------------------------------------DataTables------------
 
@@ -284,9 +302,11 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnChngSts
     $("#EditFormBtnChngSts").click(function () {
-        AddAssyIds = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name").data().toArray();
-        if (AddAssyIds.length == 0) showModalNothingSelected("Please select one or more rows from 'Add Assemblies' table.");
-        else showModalChngSts(AddAssyIds.length);
+        ChngStsAssyIds = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name").data().toArray();
+        if (ChngStsAssyIds.length == 0) {
+            showModalNothingSelected("Please select one or more rows from 'Add Assemblies' table.");
+        }
+        else { showModalChngSts(); }
     });
 
     //------------------------------------DataTables - Log Entry Assemblies ---
@@ -516,6 +536,31 @@ $(document).ready(function () {
         pageLength: 10
     });
 
+    //----------------------------------Modal Dialog - Change Assy Status -----------------------//
+
+    //Wire Up ModalDeleteBtnCancel 
+    $("#ModalChngStsBtnCancel").click(function () { $("#ModalChngSts").modal("hide"); });
+
+    //Get focus on ModalChngStsMs
+    $("#ModalChngSts").on("shown.bs.modal", function () { $("#ModalChngStsMs :input").focus(); });
+
+    //Wire up MagicSuggest ModalChngStsMs
+    ModalChngStsMs = $("#ModalChngStsMs").magicSuggest({
+        data: "/AssemblyStatusSrv/Lookup",
+        allowFreeEntries: false,
+        maxSelection: 1,
+        ajaxConfig: {
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
+        },
+        style: "min-width: 240px;"
+    });
+
+    //Wire Up ModalChngStsBtnOk
+    $("#ModalChngStsBtnOk").click(function () {
+        $("#ModalChngSts").modal("hide");
+        changeAssyStatus();
+    });
+
     //--------------------------------------View Initialization------------------------------------//
 
     $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
@@ -542,6 +587,32 @@ $(document).ready(function () {
 
 //--------------------------------------Main Methods---------------------------------------//
 
+//refresh view after magicsuggest update
+function refreshMainView() {
+    if ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "" ||
+            (MsFilterByType.getValue().length == 0 && MsFilterByProject.getValue().length == 0
+                && MsFilterByPerson.getValue().length == 0 && MsFilterByAssy.getValue().length == 0)
+        ) {
+        $("#ChBoxShowDeleted").bootstrapToggle("disable")
+        TableMain.clear().search("").draw();
+    }
+    else {
+        var endDate = moment($("#FilterDateEnd").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
+
+        refreshTblGenWrp(TableMain, "/PersonLogEntrySrv/GetByAltIds",
+            {
+                personIds: MsFilterByPerson.getValue(),
+                typeIds: MsFilterByType.getValue(),
+                projectIds: MsFilterByProject.getValue(),
+                assyIds: MsFilterByAssy.getValue(),
+                startDate: $("#FilterDateStart").val(),
+                endDate: endDate, getActive: GetActive
+            },
+            "POST")
+            .done(function () { $("#ChBoxShowDeleted").bootstrapToggle("enable"); })
+    }
+}
+
 //Delete Records from DB
 function DeleteRecords() {
     var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
@@ -550,25 +621,6 @@ function DeleteRecords() {
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () { refreshMainView(); })
         .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-}
-
-//refresh view after magicsuggest update
-function refreshMainView() {
-    if ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "" ||
-            (MsFilterByType.getValue().length == 0 && MsFilterByProject.getValue().length == 0
-                && MsFilterByPerson.getValue().length == 0)
-        ){
-        $("#ChBoxShowDeleted").bootstrapToggle("disable")
-        TableMain.clear().search("").draw();
-    }
-    else {
-        var endDate = moment($("#FilterDateEnd").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
-
-        refreshTblGenWrp(TableMain, "/PersonLogEntrySrv/GetByAltIds", { personIds: MsFilterByPerson.getValue(), 
-                projectIds: MsFilterByProject.getValue(), typeIds: MsFilterByType.getValue(),
-                startDate: $("#FilterDateStart").val(), endDate: endDate, getActive: GetActive}, "POST")
-            .done(function () { $("#ChBoxShowDeleted").bootstrapToggle("enable"); })
-    }
 }
 
 //submit edits to DB
@@ -630,6 +682,33 @@ function fillLogEntryFilesForm() {
     return deferred0.promise();
 }
 
+//-----------------Modal Dialog - Change Assy Status methods ------------------
+
+//Show modal for chagning assembly(ies) status
+function showModalChngSts() {
+    $("#ModalChngStsBody").text("Chagning status of " + ChngStsAssyIds.length + " assembly(ies).");
+    ModalChngStsMs.clear(true);
+    $("#ModalChngSts").modal("show");
+}
+
+function changeAssyStatus() {
+    if (ModalChngStsMs.getValue().length == 1) {
+        showModalWait();
+        $.ajax({
+            type: "POST", url: "/AssemblyDbSrv/EditStatus",
+            timeout: 20000,
+            data: {
+                ids: TableLogEntryAssysAdd.cells(".ui-selected", "Id:name").data().toArray(),
+                statusId: ModalChngStsMs.getValue()[0]
+            },
+            dataType: "json"
+        })
+        .always(hideModalWait)
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+    }
+}
+
+
 //---------------------------------------Helper Methods--------------------------------------//
 
 //gets cookie by name
@@ -642,6 +721,3 @@ function getCookie(name) {
 function expireCookie(name) {
     document.cookie = encodeURIComponent(name) + "=deleted; expires=" + new Date(0).toUTCString();
 }
-
-
-

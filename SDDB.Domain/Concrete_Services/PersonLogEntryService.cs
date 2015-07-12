@@ -98,7 +98,7 @@ namespace SDDB.Domain.Services
 
         //get by personIds, projectIds, typeIds, startDate, endDate
         public virtual async Task<List<PersonLogEntry>> GetByAltIdsAsync(string userId, string[] personIds = null, string[] projectIds = null,
-            string[] typeIds = null, DateTime? startDate = null, DateTime? endDate = null, bool getActive = true)
+            string[] assyIds = null, string[] typeIds = null, DateTime? startDate = null, DateTime? endDate = null, bool getActive = true)
         {
             if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
 
@@ -106,13 +106,17 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
-                personIds = personIds ?? new string[] { }; projectIds = projectIds ?? new string[] { }; typeIds = typeIds ?? new string[] { };
+                personIds = personIds ?? new string[] { };
+                projectIds = projectIds ?? new string[] { };
+                assyIds = assyIds ?? new string[] { };
+                typeIds = typeIds ?? new string[] { };
                 
                 var records = await dbContext.PersonLogEntrys
                        .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                             (personIds.Count() == 0 || x.PrsLogEntryPersons.Any(y => personIds.Contains(y.Id)) ||
                                 personIds.Contains(x.EnteredByPerson_Id)) &&
                             (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
+                            (assyIds.Count() == 0 || x.PrsLogEntryAssemblyDbs.Any(y => assyIds.Contains(y.Id))) &&
                             (typeIds.Count() == 0 || typeIds.Contains(x.PersonActivityType_Id)) &&
                             (startDate == null || x.LogEntryDateTime >= startDate) &&
                             (endDate == null || x.LogEntryDateTime <= endDate)  )

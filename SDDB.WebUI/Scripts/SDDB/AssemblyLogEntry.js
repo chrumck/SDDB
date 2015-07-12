@@ -117,7 +117,6 @@ $(document).ready(function () {
         },
         style: "min-width: 240px;"
     });
-
     //Wire up on change event for MsFilterByProject
     $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
 
@@ -130,7 +129,6 @@ $(document).ready(function () {
         },
         style: "min-width: 240px;"
     });
-
     //Wire up on change event for MsFilterByAssembly
     $(MsFilterByAssembly).on("selectionchange", function (e, m) { refreshMainView(); });
 
@@ -143,7 +141,6 @@ $(document).ready(function () {
         },
         style: "min-width: 240px;"
     });
-
     //Wire up on change event for MsFilterByPerson
     $(MsFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
    
