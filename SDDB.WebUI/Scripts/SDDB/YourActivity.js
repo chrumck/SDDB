@@ -49,49 +49,32 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         CurrIds = [];
-        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Log Entry", "MainView");
+        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Activity", "MainView");
         MagicSuggests[3].disable();
         MagicSuggests[4].disable();
         TableLogEntryAssysAdd.clear().search("").draw();
         TableLogEntryAssysRemove.clear().search("").draw();
-        $("#EditFormBtnOkFiles").removeClass("disabled");
-
-        showModalWait();
-        fillFormForRelatedGeneric(TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
-            "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", {  },
-            "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", {  },
-            "GET", "/PersonSrv/Get", { getActive: true })
-            .always(hideModalWait)
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-        if (CurrIds.length == 0) showModalNothingSelected();
+        if (CurrIds.length != 1) showModalSelectOne();
         else {
             if (GetActive) $("#EditFormGroupIsActive").addClass("hide");
             else $("#EditFormGroupIsActive").removeClass("hide");
-
-            if (CurrIds.length > 1) $("#EditFormBtnOkFiles").addClass("disabled");
-            else $("#EditFormBtnOkFiles").removeClass("disabled");
-
+            
             showModalWait();
 
             $.when(
-                fillFormForEditGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
-                    GetActive, "EditForm", "Edit Person Log Entry", MagicSuggests),
-
-                fillFormForRelatedGeneric(TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
-                    "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { logEntryId: CurrIds[0] },
-                    "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { logEntryId: CurrIds[0] },
-                    "GET", "/PersonSrv/Get", { getActive: true })
+                fillFormForEditGeneric(CurrIds, "POST", "/YourActivitySrv/GetByIds",
+                    GetActive, "EditForm", "Edit Activity", MagicSuggests)
                 )
                 .then(function (currRecord) {
                     CurrRecord = currRecord;
                     return fillFormForRelatedGeneric(TableLogEntryAssysAdd, TableLogEntryAssysRemove, CurrIds,
-                        "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys", { logEntryId: CurrIds[0] },
-                        "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot", { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] },
+                        "GET", "/YourActivitySrv/GetPrsLogEntryAssys", { logEntryId: CurrIds[0] },
+                        "GET", "/YourActivitySrv/GetPrsLogEntryAssysNot", { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] },
                         "GET", "AssemblyDbSrv/LookupByLocDTables", { getActive: true });
 
                 })
@@ -103,6 +86,8 @@ $(document).ready(function () {
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
         }
     });
+
+    //finish delow--------------------------------------------------------------------------------------------------------------------------------------
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
@@ -265,7 +250,7 @@ $(document).ready(function () {
         else {
             
             if (CurrIds.length == 1) {
-                refreshTblGenWrp(TableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
+                refreshTblGenWrp(TableLogEntryAssysAdd, "/YourActivitySrv/GetPrsLogEntryAssysNot",
                     { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] }, "GET")
                     .done(function () { $("#AssignedToLocation_Id input").focus(); });
             }
@@ -437,7 +422,7 @@ $(document).ready(function () {
 
             $("#LogEntryFilesIframe").contents().find("body").html("");
 
-            var form = $('<form method="POST" action="/PersonLogEntrySrv/DownloadFiles" target="LogEntryFilesIframe">');
+            var form = $('<form method="POST" action="/YourActivitySrv/DownloadFiles" target="LogEntryFilesIframe">');
             form.append($('<input type="hidden" name="DlToken" value="' + DlToken + '">'));
             form.append($('<input type="hidden" name="id" value="' + CurrIds[0] + '">'));
             $.each(names, function (i, name) {form.append($('<input type="hidden" name="names[' + i + ']" value="' + name + '">')); });
@@ -458,7 +443,7 @@ $(document).ready(function () {
                 }
                 $("#ModalUpload").modal({ show: true, backdrop: "static", keyboard: false });
                 $.ajax({
-                    type: "POST", url: "/PersonLogEntrySrv/UploadFiles?id=" + CurrIds[0],
+                    type: "POST", url: "/YourActivitySrv/UploadFiles?id=" + CurrIds[0],
                     contentType: false, processData: false, data: data,
                     xhr: function () {
                         XHR.upload.addEventListener("progress", function (e) {
@@ -502,7 +487,7 @@ $(document).ready(function () {
         $("#ModalDeleteFiles").modal("hide");
         showModalWait();
         $.ajax({
-            type: "POST", url: "/PersonLogEntrySrv/DeleteFiles", timeout: 20000,
+            type: "POST", url: "/YourActivitySrv/DeleteFiles", timeout: 20000,
             data: { id: CurrIds[0], names: FileCurrNames }, dataType: "json"
         })
             .always(hideModalWait)
@@ -567,10 +552,10 @@ $(document).ready(function () {
     $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
 
     //if (typeof assyId !== "undefined" && assyId != "") {
+    //    showModalWait();
     //    $.ajax({
     //        type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 20000,
-    //        data: { ids: [assyId], getActive: true }, dataType: "json",
-    //        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+    //        data: { ids: [assyId], getActive: true }, dataType: "json"
     //    })
     //        .always(hideModalWait)
     //        .done(function (data) {
@@ -599,7 +584,7 @@ function refreshMainView() {
     else {
         var endDate = moment($("#FilterDateEnd").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
 
-        refreshTblGenWrp(TableMain, "/PersonLogEntrySrv/GetByAltIds",
+        refreshTblGenWrp(TableMain, "/YourActivitySrv/GetByAltIds",
             {
                 personIds: MsFilterByPerson.getValue(),
                 typeIds: MsFilterByType.getValue(),
@@ -617,7 +602,7 @@ function refreshMainView() {
 function DeleteRecords() {
     var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
     showModalWait();
-    $.ajax({ type: "POST", url: "/PersonLogEntrySrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json"})
+    $.ajax({ type: "POST", url: "/YourActivitySrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json"})
         .always(hideModalWait)
         .done(function () { refreshMainView(); })
         .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -629,7 +614,7 @@ function submitEdits() {
 
     showModalWait();
 
-    submitEditsGeneric(CurrIds, "EditForm", MagicSuggests, CurrRecord, "POST", "/PersonLogEntrySrv/Edit")
+    submitEditsGeneric(CurrIds, "EditForm", MagicSuggests, CurrRecord, "POST", "/YourActivitySrv/Edit")
         .then(function (data) {
 
             var deferred1 = $.Deferred();
@@ -641,8 +626,8 @@ function submitEdits() {
             var idsPersonsRemove = TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name").data().toArray();
 
             $.when(
-                submitEditsForRelatedGeneric(ids, idsAssysAdd, idsAssysRemove, "/PersonLogEntrySrv/EditPrsLogEntryAssys"),
-                submitEditsForRelatedGeneric(ids, idsPersonsAdd, idsPersonsRemove, "/PersonLogEntrySrv/EditPrsLogEntryPersons")
+                submitEditsForRelatedGeneric(ids, idsAssysAdd, idsAssysRemove, "/YourActivitySrv/EditPrsLogEntryAssys"),
+                submitEditsForRelatedGeneric(ids, idsPersonsAdd, idsPersonsRemove, "/YourActivitySrv/EditPrsLogEntryPersons")
                 )
                 .done(function () { deferred1.resolve(); })
                 .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
@@ -670,7 +655,7 @@ function fillLogEntryFilesForm() {
 
     showModalWait();
 
-    refreshTableGeneric(TableLogEntryFiles, "/PersonLogEntrySrv/GetFiles", { id: CurrIds[0] }, "GET")
+    refreshTableGeneric(TableLogEntryFiles, "/YourActivitySrv/GetFiles", { id: CurrIds[0] }, "GET")
         .always(hideModalWait)
         .done(function () {
             $("#MainView").addClass("hide");

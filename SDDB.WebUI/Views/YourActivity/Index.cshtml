@@ -1,6 +1,7 @@
 ﻿@model SDDB.Domain.Entities.PersonLogEntry
+@using SDDB.WebUI.Infrastructure
 @{
-    ViewBag.Title = "Person Log Entries";
+    ViewBag.Title = "Your Activity";
 }
 
 <!------- MainView ------->
@@ -14,37 +15,18 @@
                 <button class="btn btn-danger" id="BtnDelete">Delete</button>
                 <button class="btn btn-success" id="BtnEditLogEntryFiles">&nbsp; Files &nbsp;</button>
             </div>
-
             <div class="btn-group margin-bottom-2px">
                 <input class="form-control input-tdo-warning" data-val="true" data-val-dbisdateiso="The field must have YYYY-MM-DD format."
-                       id="FilterDateStart" placeholder="Start Date" type="text" value="">
+                       id="FilterDateStart" placeholder="Select Day" type="text" value="">
             </div>
-            <div class="btn-group margin-bottom-2px">
-                <input class="form-control input-tdo-warning" data-val="true" data-val-dbisdateiso="The field must have YYYY-MM-DD format."
-                       id="FilterDateEnd" placeholder="End Date" type="text" value="">
-            </div>
-
-            <div class="btn-group margin-bottom-2px">
-                <div id="MsFilterByPerson" placeholder="Select Person"></div>
-            </div>
-            <div class="btn-group margin-bottom-2px">
-                <div id="MsFilterByType" placeholder="Select Type"></div>
-            </div>
-            <div class="btn-group margin-bottom-2px">
-                <div id="MsFilterByProject" placeholder="Select Project"></div>
-            </div>
-            <div class="btn-group margin-bottom-2px">
-                <div id="MsFilterByAssy" placeholder="Select Assembly"></div>
-            </div>
-
         </div>
     </div>
 
     <div class="panel panel-primary" id="PanelTableMain">
         <div class="panel-heading text-center" style="font-size:130%">
-            <strong>Person Log Entries</strong>
+            <strong>Your Activity</strong>
             <div class="pull-right">
-                <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="100" data-onstyle="warning" 
+                <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="100" data-onstyle="warning"
                        data-on="Deleted Shown" data-off="Show Deleted" disabled>
             </div>
         </div>
@@ -52,18 +34,13 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Entry Date</th>
-                    <th>Entered By</th>
-                    <th>Activity Type</th>
-                    <th>Man Hours</th>
+                    <th>Date</th>
+                    <th>Activity</th>
+                    <th>Hours</th>
                     <th>Project</th>
                     <th>Location</th>
                     <th>Event</th>
                     <th>Comments</th>
-                    <th>Is Active</th>
-                    <th>PersonActivityType_Id</th>
-                    <th>AssignedToProject_Id</th>
-                    <th>AssignedToProjectEvent_Id</th>
                 </tr>
             </thead>
             <tbody class="selectable"></tbody>
@@ -75,7 +52,7 @@
 <div class="container-fluid hide" id="EditFormView">
     <div class="row">
         <div class="col-xs-6">
-            <h3 id="EditFormLabel">Create/Edit Person Log Entry</h3>
+            <h3 id="EditFormLabel">Create/Edit Activity</h3>
         </div>
         <div class="col-xs-6">
             <h3><button class="btn btn-default pull-right" type="button" id="EditFormBtnBack">Cancel</button></h3>
@@ -87,14 +64,18 @@
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        @Html.LabelFor(x => x.LogEntryDateTime, "DateTime", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            <input class="form-control modifiable" data-val="true" data-val-dbisdatetimeiso="The field has to be in 'yyyy-MM-dd HH:mm' format." 
-                                   data-val-required="Entry Date field is required" id="LogEntryDateTime" name="LogEntryDateTime" placeholder="Log Entry Date &amp; Time" value="" type="text">
-                            @Html.ValidationMessageFor(x => x.LogEntryDateTime)
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h4>Select Time</h4>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div id="LogEntryTime"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group hide">
                         @Html.LabelFor(x => x.EnteredByPerson_Id, "Entered By", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.EnteredByPerson_Id, new { @class = "form-control modifiable", placeholder = "Entered By Person" })
@@ -130,7 +111,7 @@
                         <div class="col-sm-10">
                             <div class="small"><em> Choose Project first</em></div>
                             @Html.TextBoxFor(x => x.AssignedToLocation_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Location" })
-                            @Html.ValidationMessageFor(x => x.AssignedToLocation_Id) 
+                            @Html.ValidationMessageFor(x => x.AssignedToLocation_Id)
                         </div>
                     </div>
                     <div class="form-group">
@@ -159,7 +140,7 @@
             <div class="row" id="LogEntryAssysView">
                 <div class="col-xs-12 col-sm-6">
                     <div class="panel panel-default">
-                        <div class="panel-heading" >
+                        <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-12">
                                     @if (User.IsInRole("Assembly_EditStatus"))
@@ -197,41 +178,16 @@
                 </div>
             </div>
 
-            <div class="row" id="LogEntryPersonsView">
-                <div class="col-xs-12 col-sm-6">
-                    <div class="panel panel-tdo-info">
-                        <div class="panel-heading" style="font-weight:bold">Add People</div>
-                        <table class="table table-striped" id="TableLogEntryPersonsAdd">
-                            <thead class="hide">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Last Name</th>
-                                    <th>First Name</th>
-                                    <th>Initials</th>
-                                </tr>
-                            </thead>
-                            <tbody class="selectable"></tbody>
-                        </table>
+            @if (Html.UserIsGrManager())
+            {
+                <div class="row">
+                    <div class="col-xs-12">
+                        <button class="btn btn-primary margin-bottom-2px pull-right" id="EditFormBtnPrsAddRemove" type="button">
+                            Add Other Persons
+                        </button>
                     </div>
                 </div>
-                <div class="col-xs-12 col-sm-6">
-                    <div class="panel panel-tdo-info">
-                        <div class="panel-heading" style="font-weight:bold">Remove People</div>
-                        <table class="table table-striped" id="TableLogEntryPersonsRemove">
-                            <thead class="hide">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Last Name</th>
-                                    <th>First Name</th>
-                                    <th>Initials</th>
-                                </tr>
-                            </thead>
-                            <tbody class="selectable"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-                        
+            }
             <div class="row">
                 <div class="col-xs-4">
                     <button class="btn btn-default" type="button" id="EditFormBtnCancel">Cancel</button>
@@ -240,8 +196,8 @@
                     <button class="btn btn-success pull-right" type="button" id="EditFormBtnOk">
                         &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
                     </button>
-                    <button class="btn btn-success pull-right margin-right-5px disabled" type="button" id="EditFormBtnOkFiles">
-                    <span class="glyphicon glyphicon-ok"></span> & Files
+                    <button class="btn btn-success pull-right margin-right-5px" type="button" id="EditFormBtnOkFiles">
+                        <span class="glyphicon glyphicon-ok"></span> & Files
                     </button>
                 </div>
             </div>
@@ -249,9 +205,66 @@
     </div>
 </div>
 
+<!------- LogEntryPersonsView ------->
+<div class="container-fluid hide" id="LogEntryPersonsView">
+
+    <div class="row">
+        <div class="col-xs-9">
+            <h3 id="PrsProjViewLabel">Other Persons</h3>
+        </div>
+        <div class="col-xs-3">
+            <h3><button class="btn btn-default pull-right" type="button" id="LogEntryPersonsViewBtnBack">Back</button></h3>
+        </div>
+    </div>
+
+    <div class="well">
+        <div class="row">
+            <div class="col-xs-12 col-sm-6">
+                <div class="panel panel-tdo-info">
+                    <div class="panel-heading" style="font-weight:bold">Add People</div>
+                    <table class="table table-striped" id="TableLogEntryPersonsAdd">
+                        <thead class="hide">
+                            <tr>
+                                <th>ID</th>
+                                <th>Last Name</th>
+                                <th>First Name</th>
+                                <th>Initials</th>
+                            </tr>
+                        </thead>
+                        <tbody class="selectable"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <div class="panel panel-tdo-info">
+                    <div class="panel-heading" style="font-weight:bold">Remove People</div>
+                    <table class="table table-striped" id="TableLogEntryPersonsRemove">
+                        <thead class="hide">
+                            <tr>
+                                <th>ID</th>
+                                <th>Last Name</th>
+                                <th>First Name</th>
+                                <th>Initials</th>
+                            </tr>
+                        </thead>
+                        <tbody class="selectable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-xs-12">
+            <button class="btn btn-default pull-right" type="button" id="LogEntryPersonsViewBtnCancel">Back</button>
+        </div>
+    </div>
+</div>
+
+
 <!------- LogEntryFilesView ------->
 <div class="container-fluid hide" id="LogEntryFilesView">
-   
+
     <div class="row">
         <div class="col-xs-12 col-sm-5">
             <h3 id="PrsProjViewLabel">Log Entry Files</h3>
@@ -265,7 +278,7 @@
             <h3><button class="btn btn-default pull-right" type="button" id="LogEntryFilesViewBtnBack">Back</button></h3>
         </div>
     </div>
-    
+
     <div class="well">
         <div class="row">
             <div class="col-xs-12">
@@ -276,23 +289,23 @@
                 </div>
             </div>
         </div>
-       <div class="row">
-           <div class="col-xs-12">
-               <div class="panel panel-primary">
-                   <div class="panel-heading text-center"><strong>Log Entry Files</strong></div>
-                   <table class="table table-striped" id="TableLogEntryFiles">
-                       <thead>
-                           <tr>
-                               <th>Name</th>
-                               <th>Size kB</th>
-                               <th>Modified</th>
-                           </tr>
-                       </thead>
-                       <tbody class="selectable"></tbody>
-                   </table>
-               </div>
-           </div>
-       </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading text-center"><strong>Log Entry Files</strong></div>
+                    <table class="table table-striped" id="TableLogEntryFiles">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Size kB</th>
+                                <th>Modified</th>
+                            </tr>
+                        </thead>
+                        <tbody class="selectable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
         <div class="row">
             <div class="col-xs-12">
@@ -302,7 +315,7 @@
     </div>
     <iframe class="hide" id="LogEntryFilesIframe" name="LogEntryFilesIframe"></iframe>
 </div>
- 
+
 <!------------ ModalUpload dialog ------------>
 <div class="modal fade" id="ModalUpload" tabindex="-1" role="dialog">
     <div class="modal-dialog">
@@ -369,7 +382,7 @@
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
     @Scripts.Render("~/bundles/bootstrap-datetimepicker")
-    <script src="~/Scripts/SDDB/PersonLogEntry.js"></script>
+    <script src="~/Scripts/SDDB/YourActivity.js"></script>
 }
 
 @section CSS {

@@ -7,6 +7,7 @@ using System.Web.Mvc.Html;
 
 using SDDB.Domain.DbContexts;
 using SDDB.Domain.Entities;
+using System.Security.Claims;
 
 namespace SDDB.WebUI.Infrastructure
 {
@@ -33,15 +34,16 @@ namespace SDDB.WebUI.Infrastructure
             }
         }
 
-        public static HtmlString EnumDropDownListFor<TModel, TProperty>(this HtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> modelExpression, string firstElement)
+        //Checks if person is a group manager
+        public static bool UserIsGrManager(this HtmlHelper html)
         {
-            var typeOfProperty = modelExpression.ReturnType;
-            if (!typeOfProperty.IsEnum)
-                throw new ArgumentException(string.Format("Type {0} is not an enum", typeOfProperty));
-            var test = Enum.GetValues(typeof(MAttrTypes));
-            var enumValues = new SelectList(test);
-            return htmlHelper.DropDownListFor(modelExpression, enumValues, firstElement);
-        } 
+            var dbContext = DependencyResolver.Current.GetService<EFDbContext>();
 
+            var userId = ((ClaimsIdentity)html.ViewContext.HttpContext.User.Identity).FindFirst(ClaimTypes.Sid).Value;
+            if (string.IsNullOrEmpty(userId)) { return false; }
+            return dbContext.PersonGroups.Any(x => x.GroupManagers.Select( y => y.Id).Contains(userId));
+            
+        }
+        
     }
 }

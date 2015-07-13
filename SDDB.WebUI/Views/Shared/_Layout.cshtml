@@ -28,6 +28,7 @@
                 </a>
             </div>
             <div class="navbar-collapse collapse">
+                @*
                 <ul class="nav navbar-nav">
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">Common Tasks <span class="caret"></span></a>
@@ -38,7 +39,9 @@
                         </ul>
                     </li>
                     <li><a href="#"></a></li>
-                </ul>
+                </ul>    
+                *@ 
+                
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="@Url.Action("Logout","DBUSer",null)" title="Click to Log Out"><strong style="color:red">@Html.GetUserFullName()</strong>&nbsp;&nbsp;<span class="glyphicon glyphicon-log-out"></span></a></li>
                 </ul>

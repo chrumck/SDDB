@@ -405,6 +405,7 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\SDDB\AssemblyLogEntry.js" />
     <Content Include="Scripts\SDDB\ComponentLogEntry.js" />
+    <Content Include="Scripts\SDDB\YourActivity.js" />
     <Content Include="Scripts\SDDB\PersonLogEntry.js" />
     <Content Include="Scripts\SDDB\ComponentExt.js" />
     <Content Include="Scripts\SDDB\Component.js" />
@@ -439,6 +440,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="ControllersSrv\AssemblyLogEntrySrvController.cs" />
     <Compile Include="ControllersSrv\ComponentLogEntrySrvController.cs" />
+    <Compile Include="ControllersSrv\YourActivitySrvController.cs" />
     <Compile Include="ControllersSrv\PersonLogEntrySrvController.cs" />
     <Compile Include="ControllersSrv\ComponentSrvController.cs" />
     <Compile Include="ControllersSrv\ComponentModelSrvController.cs" />
@@ -471,6 +473,7 @@
     <Compile Include="Controllers\ComponentModelController.cs" />
     <Compile Include="Controllers\AssemblyModelController.cs" />
     <Compile Include="Controllers\AssemblyDbController.cs" />
+    <Compile Include="Controllers\YourActivityController.cs" />
     <Compile Include="Controllers\PersonLogEntryController.cs" />
     <Compile Include="Controllers\ProjectEventController.cs" />
     <Compile Include="Controllers\PersonActivityTypeController.cs" />
@@ -531,6 +534,7 @@
     <Content Include="Views\PersonLogEntry\Index.cshtml" />
     <Content Include="Views\ComponentLogEntry\Index.cshtml" />
     <Content Include="Views\AssemblyLogEntry\Index.cshtml" />
+    <Content Include="Views\YourActivity\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

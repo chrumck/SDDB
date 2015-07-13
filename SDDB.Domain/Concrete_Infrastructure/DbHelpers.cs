@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Reflection;
 
 using SDDB.Domain.Abstract;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SDDB.Domain.Infrastructure
 {
@@ -55,6 +57,35 @@ namespace SDDB.Domain.Infrastructure
             return errorMessage;
         }
 
+        //fill dbEntry with empty related entities to avoid having null objects at 1st nesting level
+        public static void FillRelatedIfNull<T>(this T instance) where T : IDbEntity
+        {
+            var excludedProperties = new string[] { "Id", "TSP" };
+            var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+            foreach (var property in properties)
+            {
+                if (!property.GetMethod.IsVirtual) continue;
+                if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
+                if (excludedProperties.Contains(property.Name)) continue;
+
+                if (property.GetValue(instance) == null) property.SetValue(instance, Activator.CreateInstance(property.PropertyType));
+            }
+        }
+
+        //copy modified properties from record to dbEntry (props listed in record's 'ModifiedProperties')
+        public static void CopyModifiedProps<T>(this T instance, T record) where T : IDbEntity
+        {
+            var excludedProperties = new string[] { "Id", "TSP" };
+            var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+            foreach (var property in properties)
+            {
+                if (property.GetMethod.IsVirtual) continue;
+                if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
+                if (excludedProperties.Contains(property.Name)) continue;
+
+                if (record.PropIsModified(property.Name)) property.SetValue(instance, property.GetValue(record));
+            }
+        }
 
     }
 

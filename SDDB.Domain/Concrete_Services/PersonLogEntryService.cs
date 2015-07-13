@@ -45,19 +45,8 @@ namespace SDDB.Domain.Services
                     .Include(x => x.AssignedToProject).Include(x => x.AssignedToLocation).Include(x => x.AssignedToProjectEvent)
                     .ToListAsync().ConfigureAwait(false);
 
-                foreach (var record in records)
-                {
-                    var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(PersonLogEntry).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                    foreach (var property in properties)
-                    {
-                        if (!property.GetMethod.IsVirtual) continue;
-                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                        if (excludedProperties.Contains(property.Name)) continue;
+                foreach (var record in records) { record.FillRelatedIfNull(); }
 
-                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
-                    }
-                }
                 return records;
             }
         }
@@ -77,20 +66,26 @@ namespace SDDB.Domain.Services
                     .Include(x => x.EnteredByPerson).Include(x => x.PersonActivityType)
                     .Include(x => x.AssignedToProject).Include(x => x.AssignedToLocation).Include(x => x.AssignedToProjectEvent)
                     .ToListAsync().ConfigureAwait(false);
-                
-                foreach (var record in records)
-                {
-                    var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(PersonLogEntry).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                    foreach (var property in properties)
-                    {
-                        if (!property.GetMethod.IsVirtual) continue;
-                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                        if (excludedProperties.Contains(property.Name)) continue;
 
-                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
-                    }
-                }
+                foreach (var record in records) { record.FillRelatedIfNull(); }
+
+                return records;
+            }
+        }
+
+        //get by ids - no filters on person Id and getActive
+        public virtual async Task<List<PersonLogEntry>> GetAsync(string[] ids)
+        {
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+                var records = await dbContext.PersonLogEntrys.Where(x => ids.Contains(x.Id))
+                    .Include(x => x.EnteredByPerson).Include(x => x.PersonActivityType)
+                    .Include(x => x.AssignedToProject).Include(x => x.AssignedToLocation).Include(x => x.AssignedToProjectEvent)
+                    .ToListAsync().ConfigureAwait(false);
+
+                foreach (var record in records) { record.FillRelatedIfNull(); }
 
                 return records;
             }
@@ -124,19 +119,7 @@ namespace SDDB.Domain.Services
                        .Include(x => x.AssignedToProject).Include(x => x.AssignedToLocation).Include(x => x.AssignedToProjectEvent)
                        .ToListAsync().ConfigureAwait(false);
 
-                foreach (var record in records)
-                {
-                    var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(PersonLogEntry).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                    foreach (var property in properties)
-                    {
-                        if (!property.GetMethod.IsVirtual) continue;
-                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                        if (excludedProperties.Contains(property.Name)) continue;
-
-                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
-                    }
-                }
+                foreach (var record in records) { record.FillRelatedIfNull(); }
 
                 return records;
             }
@@ -217,40 +200,15 @@ namespace SDDB.Domain.Services
                                 record.EnteredByPerson_Id = record.EnteredByPerson_Id ?? userId;
                                 dbContext.PersonLogEntrys.Add(record);
                                 serviceResult.ReturnIds.Add(record.Id);
-
                             }
                             else
                             {
-                                var excludedProperties = new string[] { "Id", "TSP" };
-                                var properties = typeof(PersonLogEntry).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                                foreach (var property in properties)
-                                {
-                                    if (property.GetMethod.IsVirtual) continue;
-                                    if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                                    if (excludedProperties.Contains(property.Name)) continue;
-
-                                    if (record.PropIsModified(property.Name)) property.SetValue(dbEntry, property.GetValue(record));
-                                }
+                                dbEntry.CopyModifiedProps(record);
                             }
                         }
                     }
-                    for (int i = 1; i <= 10; i++)
-                    {
-                        try
-                        {
-                            await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                            break;
-                        }
-                        catch (Exception e)
-                        {
-                            var message = e.GetBaseException().Message;
-                            if (i == 10 || !message.Contains("Deadlock found when trying to get lock"))
-                            {
-                                return new DBResult { StatusCode = HttpStatusCode.Conflict, StatusDescription = message };
-                            }
-                        }
-                        await Task.Delay(200).ConfigureAwait(false);
-                    }
+                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                   
                     trans.Complete();
                 }
             }
@@ -283,24 +241,8 @@ namespace SDDB.Domain.Services
                             errorMessage += string.Format("Record with Id={0} not found\n", id);
                         }
                     }
-                    for (int i = 1; i <= 10; i++)
-                    {
-                        try
-                        {
-                            await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                            break;
-                        }
-                        catch (Exception e)
-                        {
-                            var message = e.GetBaseException().Message;
-                            if (i == 10 || !message.Contains("Deadlock found when trying to get lock"))
-                            {
-                                errorMessage += string.Format("Error Saving changes: {0}\n", message);
-                                break;
-                            }
-                        }
-                        await Task.Delay(200).ConfigureAwait(false);
-                    }
+                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    
                     trans.Complete();
                 }
             }
@@ -372,24 +314,8 @@ namespace SDDB.Domain.Services
                             }
                         }
                     }
-                    for (int i = 1; i <= 10; i++)
-                    {
-                        try
-                        {
-                            await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                            break;
-                        }
-                        catch (Exception e)
-                        {
-                            var message = e.GetBaseException().Message;
-                            if (i == 10 || !message.Contains("Deadlock found when trying to get lock"))
-                            {
-                                errorMessage += string.Format("Error Saving changes: {0}\n", message);
-                                break;
-                            }
-                        }
-                        await Task.Delay(200).ConfigureAwait(false);
-                    }
+                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                   
                     trans.Complete();
                 }
             }
@@ -462,24 +388,8 @@ namespace SDDB.Domain.Services
                             }
                         }
                     }
-                    for (int i = 1; i <= 10; i++)
-                    {
-                        try
-                        {
-                            await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                            break;
-                        }
-                        catch (Exception e)
-                        {
-                            var message = e.GetBaseException().Message;
-                            if (i == 10 || !message.Contains("Deadlock found when trying to get lock"))
-                            {
-                                errorMessage += string.Format("Error Saving changes: {0}\n", message);
-                                break;
-                            }
-                        }
-                        await Task.Delay(200).ConfigureAwait(false);
-                    }
+                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+
                     trans.Complete();
                 }
             }
