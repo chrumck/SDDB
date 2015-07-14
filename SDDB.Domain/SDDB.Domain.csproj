@@ -149,7 +149,7 @@
     <Compile Include="Concrete_Entities\Person.cs" />
     <Compile Include="Concrete_Entities\_DbEntities.cs" />
     <Compile Include="Concrete_Infrastructure\DbDataAnnotations.cs" />
-    <Compile Include="Concrete_Infrastructure\DbHelpers.cs" />
+    <Compile Include="Concrete_Infrastructure\HelpersAndExtensions.cs" />
     <Compile Include="Concrete_Services\AssemblyLogEntryService.cs" />
     <Compile Include="Concrete_Services\ComponentLogEntryService.cs" />
     <Compile Include="Concrete_Services\PersonLogEntryService.cs" />

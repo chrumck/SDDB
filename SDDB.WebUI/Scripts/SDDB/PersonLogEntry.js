@@ -567,10 +567,10 @@ $(document).ready(function () {
     $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
 
     //if (typeof assyId !== "undefined" && assyId != "") {
+    //    showModalWait();
     //    $.ajax({
     //        type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 20000,
-    //        data: { ids: [assyId], getActive: true }, dataType: "json",
-    //        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+    //        data: { ids: [assyId], getActive: true }, dataType: "json"
     //    })
     //        .always(hideModalWait)
     //        .done(function (data) {

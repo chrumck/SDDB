@@ -440,7 +440,6 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="ControllersSrv\AssemblyLogEntrySrvController.cs" />
     <Compile Include="ControllersSrv\ComponentLogEntrySrvController.cs" />
-    <Compile Include="ControllersSrv\YourActivitySrvController.cs" />
     <Compile Include="ControllersSrv\PersonLogEntrySrvController.cs" />
     <Compile Include="ControllersSrv\ComponentSrvController.cs" />
     <Compile Include="ControllersSrv\ComponentModelSrvController.cs" />

@@ -94,17 +94,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("YourActivity_Edit")]
         public async Task<ActionResult> Edit(PersonLogEntry[] records)
         {
-            foreach (var record in records)
-            {
-                if (record.EnteredByPerson_Id != UserId)
-                {
-                    ViewBag.StatusCode = (int)HttpStatusCode.Forbidden;
-                    ViewBag.StatusDescription = "Editing or viewing other user's entries is not allowed through 'Your Activity' service.";
-                    Response.StatusCode = ViewBag.StatusCode;
-                    return Json(new { Success = "False", responseText = ViewBag.StatusDescription }, JsonRequestBehavior.AllowGet);
-                }
-            }
-
+            if (!(await isUserEntries(records).ConfigureAwait(false)))
+            { return Json(new { Success = "False", responseText = ViewBag.StatusDescription }, JsonRequestBehavior.AllowGet); }
+                        
             var serviceResult = await prsLogEntryService.EditAsync(UserId, records).ConfigureAwait(false);
 
             ViewBag.ServiceName = "PersonLogEntryService.EditAsync"; ViewBag.StatusCode = serviceResult.StatusCode; 
@@ -290,7 +282,7 @@ namespace SDDB.WebUI.ControllersSrv
             var tokenCookie = new HttpCookie("DlToken", DlToken.ToString());
             Response.Cookies.Set(tokenCookie);
 
-            var fileName = (names.Length == 1) ? names[0] : "SDDBFiles.zip";
+            var fileName = (names.Length == 1) ? names[0] : "SDDBFiles_" + String.Format("_{0:HHmmss}",DateTime.Now) + ".zip";
 
             if (data != null && data.LongLength != 0) return File(data, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
             else
@@ -369,6 +361,21 @@ namespace SDDB.WebUI.ControllersSrv
                 if (record.EnteredByPerson_Id != UserId) { return false; }
             }
             
+            ViewBag.StatusCode = (int)HttpStatusCode.Forbidden;
+            ViewBag.StatusDescription = "Editing or viewing other user's entries is not allowed through 'Your Activity' service.";
+            Response.StatusCode = ViewBag.StatusCode;
+
+            return true;
+        }
+
+        //check if person log entry belongs to user - overload for PersonLogEntry[]
+        private async Task<bool> isUserEntries(PersonLogEntry[] records)
+        {
+            foreach (var record in records)
+            {
+                if (record.EnteredByPerson_Id != UserId) { return false; }
+            }
+
             ViewBag.StatusCode = (int)HttpStatusCode.Forbidden;
             ViewBag.StatusDescription = "Editing or viewing other user's entries is not allowed through 'Your Activity' service.";
             Response.StatusCode = ViewBag.StatusCode;

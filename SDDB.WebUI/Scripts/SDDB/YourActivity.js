@@ -9,6 +9,7 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
+
 var TableMain;
 var TableLogEntryAssysAdd;
 var TableLogEntryAssysRemove;
@@ -67,14 +68,14 @@ $(document).ready(function () {
             showModalWait();
 
             $.when(
-                fillFormForEditGeneric(CurrIds, "POST", "/YourActivitySrv/GetByIds",
+                fillFormForEditGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
                     GetActive, "EditForm", "Edit Activity", MagicSuggests)
                 )
                 .then(function (currRecord) {
                     CurrRecord = currRecord;
                     return fillFormForRelatedGeneric(TableLogEntryAssysAdd, TableLogEntryAssysRemove, CurrIds,
-                        "GET", "/YourActivitySrv/GetPrsLogEntryAssys", { logEntryId: CurrIds[0] },
-                        "GET", "/YourActivitySrv/GetPrsLogEntryAssysNot", { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] },
+                        "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys", { logEntryId: CurrIds[0] },
+                        "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot", { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] },
                         "GET", "AssemblyDbSrv/LookupByLocDTables", { getActive: true });
 
                 })
@@ -86,8 +87,6 @@ $(document).ready(function () {
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
         }
     });
-
-    //finish delow--------------------------------------------------------------------------------------------------------------------------------------
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
@@ -109,60 +108,6 @@ $(document).ready(function () {
     //Initialize DateTimePicker FilterDateStart
     $("#FilterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
         .on("dp.hide", function (e) { refreshMainView(); });
-
-    //Initialize DateTimePicker FilterDateEnd
-    $("#FilterDateEnd").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("dp.hide", function (e) { refreshMainView(); });
-
-    //Initialize MagicSuggest MsFilterByPerson
-    MsFilterByPerson = $("#MsFilterByPerson").magicSuggest({
-        data: "/PersonSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
-        },
-        style: "min-width: 240px;"
-    });
-        //Wire up on change event for MsFilterByPerson
-    $(MsFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
-
-    //Initialize MagicSuggest MsFilterByType
-    MsFilterByType = $("#MsFilterByType").magicSuggest({
-        data: "/PersonActivityTypeSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
-        },
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for MsFilterByType
-    $(MsFilterByType).on("selectionchange", function (e, m) { refreshMainView(); });
-
-    //Initialize MagicSuggest MsFilterByProject
-    MsFilterByProject = $("#MsFilterByProject").magicSuggest({
-        data: "/ProjectSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
-        },
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for MsFilterByProject
-    $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
-
-    //Initialize MagicSuggest MsFilterByAssy
-    MsFilterByAssy = $("#MsFilterByAssy").magicSuggest({
-        data: "/AssemblyDbSrv/LookupByProj",
-        allowFreeEntries: false,
-        dataUrlParams: { projectIds: MsFilterByProject.getValue },
-        ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
-        },
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for MsFilterByAssy
-    $(MsFilterByAssy).on('selectionchange', function (e, m) { refreshMainView(); });
-          
         
     //---------------------------------------DataTables------------
 
@@ -195,11 +140,11 @@ $(document).ready(function () {
             { data: "AssignedToProjectEvent_Id", name: "AssignedToProjectEvent_Id" },//14
         ],
         columnDefs: [
-            { targets: [0, 9, 10, 11, 12, 13, 14], visible: false }, // - never show
-            { targets: [0, 1, 4, 9, 10, 11, 12, 13, 14], searchable: false },  //"orderable": false, "visible": false
+            { targets: [0, 1, 2, 9, 10, 11, 12, 13, 14], visible: false }, // - never show
+            { targets: [0, 1, 2, 4, 9, 10, 11, 12, 13, 14], searchable: false },  //"orderable": false, "visible": false
             { targets: [5, 6], className: "hidden-xs" }, // - first set of columns
-            { targets: [3, 4], className: "hidden-xs hidden-sm" }, // - first set of columns
-            { targets: [7, 8], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
+            { targets: [7, 8], className: "hidden-xs hidden-sm" }, // - first set of columns
+            { targets: [], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
@@ -216,7 +161,7 @@ $(document).ready(function () {
     //---------------------------------------EditFormView----------------------------------------//
 
     //Initialize DateTimePicker
-    $("#LogEntryDateTime").datetimepicker({ format: "YYYY-MM-DD HH:mm" })
+    $("#LogEntryTime").datetimepicker({ format: "HH", inline: true })
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
@@ -250,7 +195,7 @@ $(document).ready(function () {
         else {
             
             if (CurrIds.length == 1) {
-                refreshTblGenWrp(TableLogEntryAssysAdd, "/YourActivitySrv/GetPrsLogEntryAssysNot",
+                refreshTblGenWrp(TableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
                     { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] }, "GET")
                     .done(function () { $("#AssignedToLocation_Id input").focus(); });
             }
@@ -422,7 +367,7 @@ $(document).ready(function () {
 
             $("#LogEntryFilesIframe").contents().find("body").html("");
 
-            var form = $('<form method="POST" action="/YourActivitySrv/DownloadFiles" target="LogEntryFilesIframe">');
+            var form = $('<form method="POST" action="/PersonLogEntrySrv/DownloadFiles" target="LogEntryFilesIframe">');
             form.append($('<input type="hidden" name="DlToken" value="' + DlToken + '">'));
             form.append($('<input type="hidden" name="id" value="' + CurrIds[0] + '">'));
             $.each(names, function (i, name) {form.append($('<input type="hidden" name="names[' + i + ']" value="' + name + '">')); });
@@ -443,7 +388,7 @@ $(document).ready(function () {
                 }
                 $("#ModalUpload").modal({ show: true, backdrop: "static", keyboard: false });
                 $.ajax({
-                    type: "POST", url: "/YourActivitySrv/UploadFiles?id=" + CurrIds[0],
+                    type: "POST", url: "/PersonLogEntrySrv/UploadFiles?id=" + CurrIds[0],
                     contentType: false, processData: false, data: data,
                     xhr: function () {
                         XHR.upload.addEventListener("progress", function (e) {
@@ -487,7 +432,7 @@ $(document).ready(function () {
         $("#ModalDeleteFiles").modal("hide");
         showModalWait();
         $.ajax({
-            type: "POST", url: "/YourActivitySrv/DeleteFiles", timeout: 20000,
+            type: "POST", url: "/PersonLogEntrySrv/DeleteFiles", timeout: 20000,
             data: { id: CurrIds[0], names: FileCurrNames }, dataType: "json"
         })
             .always(hideModalWait)
@@ -584,7 +529,7 @@ function refreshMainView() {
     else {
         var endDate = moment($("#FilterDateEnd").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
 
-        refreshTblGenWrp(TableMain, "/YourActivitySrv/GetByAltIds",
+        refreshTblGenWrp(TableMain, "/PersonLogEntrySrv/GetByAltIds",
             {
                 personIds: MsFilterByPerson.getValue(),
                 typeIds: MsFilterByType.getValue(),
@@ -602,7 +547,7 @@ function refreshMainView() {
 function DeleteRecords() {
     var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
     showModalWait();
-    $.ajax({ type: "POST", url: "/YourActivitySrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json"})
+    $.ajax({ type: "POST", url: "/PersonLogEntrySrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json"})
         .always(hideModalWait)
         .done(function () { refreshMainView(); })
         .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -614,7 +559,7 @@ function submitEdits() {
 
     showModalWait();
 
-    submitEditsGeneric(CurrIds, "EditForm", MagicSuggests, CurrRecord, "POST", "/YourActivitySrv/Edit")
+    submitEditsGeneric(CurrIds, "EditForm", MagicSuggests, CurrRecord, "POST", "/PersonLogEntrySrv/Edit")
         .then(function (data) {
 
             var deferred1 = $.Deferred();
@@ -626,8 +571,8 @@ function submitEdits() {
             var idsPersonsRemove = TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name").data().toArray();
 
             $.when(
-                submitEditsForRelatedGeneric(ids, idsAssysAdd, idsAssysRemove, "/YourActivitySrv/EditPrsLogEntryAssys"),
-                submitEditsForRelatedGeneric(ids, idsPersonsAdd, idsPersonsRemove, "/YourActivitySrv/EditPrsLogEntryPersons")
+                submitEditsForRelatedGeneric(ids, idsAssysAdd, idsAssysRemove, "/PersonLogEntrySrv/EditPrsLogEntryAssys"),
+                submitEditsForRelatedGeneric(ids, idsPersonsAdd, idsPersonsRemove, "/PersonLogEntrySrv/EditPrsLogEntryPersons")
                 )
                 .done(function () { deferred1.resolve(); })
                 .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
@@ -655,7 +600,7 @@ function fillLogEntryFilesForm() {
 
     showModalWait();
 
-    refreshTableGeneric(TableLogEntryFiles, "/YourActivitySrv/GetFiles", { id: CurrIds[0] }, "GET")
+    refreshTableGeneric(TableLogEntryFiles, "/PersonLogEntrySrv/GetFiles", { id: CurrIds[0] }, "GET")
         .always(hideModalWait)
         .done(function () {
             $("#MainView").addClass("hide");

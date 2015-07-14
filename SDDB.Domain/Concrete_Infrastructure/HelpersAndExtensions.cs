@@ -11,27 +11,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SDDB.Domain.Infrastructure
 {
+    //DbHelpers----------------------------------------------------------------------------------------------------------------//
     public static class DbHelpers
     {
-
-        //checks if prop name is in  ModifiedPropeties array
-        public static bool PropIsModified<TIn, TOut>(this TIn instance, Expression<Func<TIn, TOut>> lambda) where TIn : IDbEntity
-        {
-            var body = (MemberExpression)lambda.Body;
-
-            if (body == null) throw new ArgumentException(string.Format("Expression '{0}' refers to a method, not a property.", lambda.ToString()));
-
-            string propName = body.Member.Name;
-
-            return instance.ModifiedProperties == null ? false : instance.ModifiedProperties.Contains(propName);
-        }
-
-        //checks if prop name is in  ModifiedPropeties array - overload
-        public static bool PropIsModified<TIn>(this TIn instance, string propName) where TIn : IDbEntity
-        {
-            return instance.ModifiedProperties == null ? false : instance.ModifiedProperties.Contains(propName);
-        }
-
         //attempt to save changes to DBContext, retry if exception on deadlock thrown
         public static async Task<string> SaveChangesAsync(DbContext dbContext)
         {
@@ -55,6 +37,28 @@ namespace SDDB.Domain.Infrastructure
                 await Task.Delay(200).ConfigureAwait(false);
             }
             return errorMessage;
+        }
+    }
+
+    //IDbEntityExtensions------------------------------------------------------------------------------------------------------//
+    public static class IDbEntityExtensions
+    {
+        //checks if prop name is in  ModifiedPropeties array
+        public static bool PropIsModified<TIn, TOut>(this TIn instance, Expression<Func<TIn, TOut>> lambda) where TIn : IDbEntity
+        {
+            var body = (MemberExpression)lambda.Body;
+            if (body == null) {
+                throw new ArgumentException(string.Format("Expression '{0}' refers to a method, not a property.", lambda.ToString()));
+            }
+            string propName = body.Member.Name;
+
+            return instance.ModifiedProperties == null ? false : instance.ModifiedProperties.Contains(propName);
+        }
+
+        //checks if prop name is in  ModifiedPropeties array - overload to get string propName
+        public static bool PropIsModified<TIn>(this TIn instance, string propName) where TIn : IDbEntity
+        {
+            return instance.ModifiedProperties == null ? false : instance.ModifiedProperties.Contains(propName);
         }
 
         //fill dbEntry with empty related entities to avoid having null objects at 1st nesting level
@@ -86,7 +90,6 @@ namespace SDDB.Domain.Infrastructure
                 if (record.PropIsModified(property.Name)) property.SetValue(instance, property.GetValue(record));
             }
         }
-
     }
 
 
