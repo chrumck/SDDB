@@ -457,9 +457,10 @@ function submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
 }
 
 //initialize MagicSuggest and add to MagicSuggest array
-function addToMSArray(msArray, id, url, maxSelection, minChars, dataUrlParams, disabled) {
+function addToMSArray(msArray, id, url, maxSelection, minChars, dataUrlParams, disabled, editable) {
 
     disabled = (typeof disabled !== "undefined" && disabled == false) ? false : true;
+    editable = (typeof editable !== "undefined" && editable == false) ? false : true;
 
     var element = $("#" + id);
     var dataValRequired = $(element).attr("data-val-required");
@@ -471,6 +472,7 @@ function addToMSArray(msArray, id, url, maxSelection, minChars, dataUrlParams, d
         dataUrlParams: dataUrlParams,
         allowFreeEntries: false,
         disabled: disabled,
+        editable: editable,
         minChars: minChars,
         maxSelection: maxSelection,
         required: (typeof dataValRequired !== "undefined") ? true : false,
@@ -499,6 +501,8 @@ function addToMSArray(msArray, id, url, maxSelection, minChars, dataUrlParams, d
     });
 
     $(ms).on("selectionchange", function (e, m) { this.isModified = true });
+
+    if (!editable) { $(ms).on("focus", function (e, m) { this.expand(); }); }
 
     msArray.push(ms);
 }

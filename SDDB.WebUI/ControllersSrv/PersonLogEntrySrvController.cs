@@ -363,7 +363,7 @@ namespace SDDB.WebUI.ControllersSrv
             var tokenCookie = new HttpCookie("DlToken", DlToken.ToString());
             Response.Cookies.Set(tokenCookie);
 
-            var fileName = (names.Length == 1) ? names[0] : "SDDBFiles_" + String.Format("_{0:HHmmss}", DateTime.Now) + ".zip";
+            var fileName = (names.Length == 1) ? names[0] : "SDDBFiles_" + String.Format("_{0:yyyyMMdd_HHmm}", DateTime.Now) + ".zip";
             ViewBag.ServiceName = "IFileRepoService.DownloadAsync";
             ViewBag.StatusCode = HttpStatusCode.OK;
             if (data != null && data.LongLength != 0) return File(data, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);

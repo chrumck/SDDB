@@ -36,7 +36,6 @@ var CurrIds = [];
 var FileCurrNames = [];
 var ChngStsAssyIds = [];
 var GetActive = true;
-var SelectedRecord;
 var DlToken;
 var DlTimer;
 var DlAttempts;
@@ -115,10 +114,7 @@ $(document).ready(function () {
     $("#BtnEditLogEntryFiles").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
         if (CurrIds.length != 1) showModalSelectOne();
-        else {
-            SelectedRecord = TableMain.row(".ui-selected").data();
-            fillLogEntryFilesForm();
-        }
+        else { fillLogEntryFilesForm(); }
     });
 
     //Initialize DateTimePicker FilterDateStart
@@ -243,21 +239,24 @@ $(document).ready(function () {
     addToMSArray(MagicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
         { projectIds: MagicSuggests[2].getValue });
     
-    //Initialize MagicSuggest Array Event
+    //Initialize MagicSuggest Array Event - AssignedToProject_Id
     $(MagicSuggests[2]).on("selectionchange", function (e, m) {
+        MagicSuggests[3].clear(true);
+        MagicSuggests[3].isModified = false;
+        MagicSuggests[4].clear(true);
+        MagicSuggests[4].isModified = false;
+        TableLogEntryAssysAdd.clear().search("").draw();
         if (this.getValue().length == 0) {
-            MagicSuggests[3].disable(); MagicSuggests[3].clear(true);
-            MagicSuggests[4].disable(); MagicSuggests[4].clear(true);
-            TableLogEntryAssysAdd.clear().search("").draw();
-            TableLogEntryAssysRemove.clear().search("").draw();
+            MagicSuggests[3].disable(); 
+            MagicSuggests[4].disable();
         }
         else {
-            MagicSuggests[3].enable(); MagicSuggests[3].clear(true);
-            MagicSuggests[4].enable(); MagicSuggests[4].clear(true);
+            MagicSuggests[3].enable(); 
+            MagicSuggests[4].enable();
         }
     });
 
-    //Initialize MagicSuggest Array Event
+    //Initialize MagicSuggest Array Event - AssignedToLocation_Id
     $(MagicSuggests[3]).on("selectionchange", function (e, m) {
         if (this.getValue().length == 0) {
             TableLogEntryAssysAdd.clear().search("").draw();
@@ -295,7 +294,6 @@ $(document).ready(function () {
     $("#EditFormBtnOkFiles").click(function () {
         msValidate(MagicSuggests);
         if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
-            SelectedRecord = TableMain.row(".ui-selected").data();
             submitEdits().done(function () { setTimeout(fillLogEntryFilesForm, 200); });
         }
     });
@@ -606,7 +604,8 @@ function refreshMainView() {
                 projectIds: MsFilterByProject.getValue(),
                 assyIds: MsFilterByAssy.getValue(),
                 startDate: $("#FilterDateStart").val(),
-                endDate: endDate, getActive: GetActive
+                endDate: endDate,
+                getActive: GetActive
             },
             "POST")
             .done(function () { $("#ChBoxShowDeleted").bootstrapToggle("enable"); })
@@ -634,15 +633,15 @@ function submitEdits() {
 
             var deferred1 = $.Deferred();
 
-            var ids = (CurrIds.length == 0) ? data.ReturnIds : CurrIds;
+            CurrIds = (CurrIds.length == 0) ? data.ReturnIds : CurrIds;
             var idsAssysAdd = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name").data().toArray();
             var idsAssysRemove = TableLogEntryAssysRemove.cells(".ui-selected", "Id:name").data().toArray();
             var idsPersonsAdd = TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name").data().toArray();
             var idsPersonsRemove = TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name").data().toArray();
 
             $.when(
-                submitEditsForRelatedGeneric(ids, idsAssysAdd, idsAssysRemove, "/PersonLogEntrySrv/EditPrsLogEntryAssys"),
-                submitEditsForRelatedGeneric(ids, idsPersonsAdd, idsPersonsRemove, "/PersonLogEntrySrv/EditPrsLogEntryPersons")
+                submitEditsForRelatedGeneric(CurrIds, idsAssysAdd, idsAssysRemove, "/PersonLogEntrySrv/EditPrsLogEntryAssys"),
+                submitEditsForRelatedGeneric(CurrIds, idsPersonsAdd, idsPersonsRemove, "/PersonLogEntrySrv/EditPrsLogEntryPersons")
                 )
                 .done(function () { deferred1.resolve(); })
                 .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
@@ -665,8 +664,13 @@ function submitEdits() {
 function fillLogEntryFilesForm() {
     var deferred0 = $.Deferred();
 
-    $("#LogEntryFilesViewPanel").text(SelectedRecord.EnteredByPerson_.FirstName + " " +
-        SelectedRecord.EnteredByPerson_.LastName + " - " + SelectedRecord.LogEntryDateTime);
+    var selectedRecord = TableMain.row(".ui-selected").data();
+    if (typeof selectedRecord === "undefined") { $("#LogEntryFilesViewPanel").text("New Log Entry"); }
+    else {
+        var selectedRecord = TableMain.row(".ui-selected").data();
+        $("#LogEntryFilesViewPanel").text(selectedRecord.EnteredByPerson_.FirstName + " " +
+            selectedRecord.EnteredByPerson_.LastName + " - " + selectedRecord.LogEntryDateTime);
+    }
 
     showModalWait();
 

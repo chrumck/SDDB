@@ -17,6 +17,12 @@ namespace SDDB.WebUI.Infrastructure
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
+        //returns userId string
+        public static string GetUserId(this HtmlHelper html)
+        {
+            return ((ClaimsIdentity)html.ViewContext.HttpContext.User.Identity).FindFirst(ClaimTypes.Sid).Value;
+        }
+
         //returns full Person name based on user name
         public static string GetUserFullName(this HtmlHelper html)
         {

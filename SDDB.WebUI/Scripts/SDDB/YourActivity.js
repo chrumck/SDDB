@@ -37,7 +37,6 @@ var CurrIds = [];
 var FileCurrNames = [];
 var ChngStsAssyIds = [];
 var GetActive = true;
-var SelectedRecord;
 var DlToken;
 var DlTimer;
 var DlAttempts;
@@ -55,6 +54,8 @@ $(document).ready(function () {
         MagicSuggests[4].disable();
         TableLogEntryAssysAdd.clear().search("").draw();
         TableLogEntryAssysRemove.clear().search("").draw();
+        MagicSuggests[0].setValue([UserId]);
+        $("#HoursWorkedPicker").data("DateTimePicker").date("00:00");
     });
 
     //Wire up BtnEdit
@@ -81,6 +82,8 @@ $(document).ready(function () {
                 })
                 .always(hideModalWait)
                 .done(function () {
+                    $("#LogEntryTime").data('DateTimePicker').date(moment($("#LogEntryDateTime").val()));
+                    $("#HoursWorkedPicker").data('DateTimePicker').date(moment($("#ManHours").val(),"HH"));
                     $("#MainView").addClass("hide");
                     $("#EditFormView").removeClass("hide");
                 })
@@ -99,10 +102,7 @@ $(document).ready(function () {
     $("#BtnEditLogEntryFiles").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
         if (CurrIds.length != 1) showModalSelectOne();
-        else {
-            SelectedRecord = TableMain.row(".ui-selected").data();
-            fillLogEntryFilesForm();
-        }
+        else { fillLogEntryFilesForm(); }
     });
 
     //Initialize DateTimePicker FilterDateStart
@@ -122,7 +122,7 @@ $(document).ready(function () {
     TableMain = $("#TableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
-            { data: "LogEntryDateTime", name: "LogEntryDateTime" },//1
+            { data: "LogEntryDateTime", render: function (data, type, full, meta) { return moment(data).format("HH:mm") }, name: "LogEntryDateTime" },//1
             //------------------------------------------------first set of columns
             { data: "EnteredByPerson_", render: function (data, type, full, meta) { return data.LastName + " " + data.Initials }, name: "EnteredByPerson_" }, //2
             { data: "PersonActivityType_", render: function (data, type, full, meta) { return data.ActivityTypeName }, name: "PersonActivityType_" }, //3
@@ -140,9 +140,9 @@ $(document).ready(function () {
             { data: "AssignedToProjectEvent_Id", name: "AssignedToProjectEvent_Id" },//14
         ],
         columnDefs: [
-            { targets: [0, 1, 2, 9, 10, 11, 12, 13, 14], visible: false }, // - never show
+            { targets: [0, 2, 9, 10, 11, 12, 13, 14], visible: false }, // - never show
             { targets: [0, 1, 2, 4, 9, 10, 11, 12, 13, 14], searchable: false },  //"orderable": false, "visible": false
-            { targets: [5, 6], className: "hidden-xs" }, // - first set of columns
+            { targets: [3, 6], className: "hidden-xs" }, // - first set of columns
             { targets: [7, 8], className: "hidden-xs hidden-sm" }, // - first set of columns
             { targets: [], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
         ],
@@ -162,28 +162,43 @@ $(document).ready(function () {
 
     //Initialize DateTimePicker
     $("#LogEntryTime").datetimepicker({ format: "HH", inline: true })
-        .on("dp.change", function (e) { $(this).data("ismodified", true); });
+        .on("dp.change", function (e) {
+            $("#LogEntryDateTime").val(moment($("#FilterDateStart").val()).hour($(this).data('DateTimePicker').date().hour()).format("YYYY-MM-DD HH:mm"));
+            $("#LogEntryDateTime").data("ismodified", true);
+        });
+
+    //Initialize DateTimePicker
+    $("#HoursWorkedPicker").datetimepicker({ format: "HH", inline: true })
+        .on("dp.change", function (e) {
+            $("#ManHours").val($(this).data('DateTimePicker').date().hour());
+            $("#ManHours").data("ismodified", true);
+        });
 
     //Initialize MagicSuggest Array
     addToMSArray(MagicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1, null, {},
+        false, false);
+    addToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1, null,
+        {}, false, false);
     addToMSArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/LookupByProj", 1, null,
         { projectIds: MagicSuggests[2].getValue });
     addToMSArray(MagicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
-        { projectIds: MagicSuggests[2].getValue });
+        { projectIds: MagicSuggests[2].getValue }, false, false);
     
     //Initialize MagicSuggest Array Event
     $(MagicSuggests[2]).on("selectionchange", function (e, m) {
+        MagicSuggests[3].clear(true);
+        MagicSuggests[3].isModified = false;
+        MagicSuggests[4].clear(true);
+        MagicSuggests[4].isModified = false;
+        TableLogEntryAssysAdd.clear().search("").draw();
         if (this.getValue().length == 0) {
-            MagicSuggests[3].disable(); MagicSuggests[3].clear(true);
-            MagicSuggests[4].disable(); MagicSuggests[4].clear(true);
-            TableLogEntryAssysAdd.clear().search("").draw();
-            TableLogEntryAssysRemove.clear().search("").draw();
+            MagicSuggests[3].disable(); 
+            MagicSuggests[4].disable();
         }
         else {
-            MagicSuggests[3].enable(); MagicSuggests[3].clear(true);
-            MagicSuggests[4].enable(); MagicSuggests[4].clear(true);
+            MagicSuggests[3].enable(); 
+            MagicSuggests[4].enable();
         }
     });
 
@@ -225,7 +240,6 @@ $(document).ready(function () {
     $("#EditFormBtnOkFiles").click(function () {
         msValidate(MagicSuggests);
         if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
-            SelectedRecord = TableMain.row(".ui-selected").data();
             submitEdits().done(function () { setTimeout(fillLogEntryFilesForm, 200); });
         }
     });
@@ -494,22 +508,8 @@ $(document).ready(function () {
     //--------------------------------------View Initialization------------------------------------//
 
     $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
-    $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
-
-    //if (typeof assyId !== "undefined" && assyId != "") {
-    //    showModalWait();
-    //    $.ajax({
-    //        type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 20000,
-    //        data: { ids: [assyId], getActive: true }, dataType: "json"
-    //    })
-    //        .always(hideModalWait)
-    //        .done(function (data) {
-    //            MsFilterByAssy.setSelection([{ id: data[0].Id, name: data[0].AssyName,  }]);
-    //        })
-    //        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    //}
-
-    
+    refreshMainView();
+  
 
     //--------------------------------End of execution at Start-----------
 });
@@ -519,24 +519,19 @@ $(document).ready(function () {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
-    if ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "" ||
-            (MsFilterByType.getValue().length == 0 && MsFilterByProject.getValue().length == 0
-                && MsFilterByPerson.getValue().length == 0 && MsFilterByAssy.getValue().length == 0)
-        ) {
+    if ($("#FilterDateStart").val() == "") {
         $("#ChBoxShowDeleted").bootstrapToggle("disable")
         TableMain.clear().search("").draw();
     }
     else {
-        var endDate = moment($("#FilterDateEnd").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
+        var endDate = moment($("#FilterDateStart").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
 
         refreshTblGenWrp(TableMain, "/PersonLogEntrySrv/GetByAltIds",
             {
-                personIds: MsFilterByPerson.getValue(),
-                typeIds: MsFilterByType.getValue(),
-                projectIds: MsFilterByProject.getValue(),
-                assyIds: MsFilterByAssy.getValue(),
+                personIds: [UserId],
                 startDate: $("#FilterDateStart").val(),
-                endDate: endDate, getActive: GetActive
+                endDate: endDate,
+                getActive: GetActive
             },
             "POST")
             .done(function () { $("#ChBoxShowDeleted").bootstrapToggle("enable"); })
@@ -564,15 +559,15 @@ function submitEdits() {
 
             var deferred1 = $.Deferred();
 
-            var ids = (CurrIds.length == 0) ? data.ReturnIds : CurrIds;
+            CurrIds = (CurrIds.length == 0) ? data.ReturnIds : CurrIds;
             var idsAssysAdd = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name").data().toArray();
             var idsAssysRemove = TableLogEntryAssysRemove.cells(".ui-selected", "Id:name").data().toArray();
             var idsPersonsAdd = TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name").data().toArray();
             var idsPersonsRemove = TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name").data().toArray();
 
             $.when(
-                submitEditsForRelatedGeneric(ids, idsAssysAdd, idsAssysRemove, "/PersonLogEntrySrv/EditPrsLogEntryAssys"),
-                submitEditsForRelatedGeneric(ids, idsPersonsAdd, idsPersonsRemove, "/PersonLogEntrySrv/EditPrsLogEntryPersons")
+                submitEditsForRelatedGeneric(CurrIds, idsAssysAdd, idsAssysRemove, "/PersonLogEntrySrv/EditPrsLogEntryAssys"),
+                submitEditsForRelatedGeneric(CurrIds, idsPersonsAdd, idsPersonsRemove, "/PersonLogEntrySrv/EditPrsLogEntryPersons")
                 )
                 .done(function () { deferred1.resolve(); })
                 .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
@@ -595,8 +590,13 @@ function submitEdits() {
 function fillLogEntryFilesForm() {
     var deferred0 = $.Deferred();
 
-    $("#LogEntryFilesViewPanel").text(SelectedRecord.EnteredByPerson_.FirstName + " " +
-        SelectedRecord.EnteredByPerson_.LastName + " - " + SelectedRecord.LogEntryDateTime);
+    var selectedRecord = TableMain.row(".ui-selected").data();
+    if ( typeof selectedRecord === "undefined") { $("#LogEntryFilesViewPanel").text("New Log Entry"); }
+    else {
+        var selectedRecord = TableMain.row(".ui-selected").data();
+        $("#LogEntryFilesViewPanel").text(selectedRecord.EnteredByPerson_.FirstName + " " +
+            selectedRecord.EnteredByPerson_.LastName + " - " + selectedRecord.LogEntryDateTime);
+    }
 
     showModalWait();
 
