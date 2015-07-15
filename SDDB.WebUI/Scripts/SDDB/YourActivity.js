@@ -55,7 +55,10 @@ $(document).ready(function () {
         TableLogEntryAssysAdd.clear().search("").draw();
         TableLogEntryAssysRemove.clear().search("").draw();
         MagicSuggests[0].setValue([UserId]);
+        $("#LogEntryDateTime").val(moment().minute(0).format("YYYY-MM-DD HH:mm"));
+        $("#ManHours").val(0);
         $("#HoursWorkedPicker").data("DateTimePicker").date("00:00");
+
     });
 
     //Wire up BtnEdit
@@ -185,7 +188,7 @@ $(document).ready(function () {
     addToMSArray(MagicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
         { projectIds: MagicSuggests[2].getValue }, false, false);
     
-    //Initialize MagicSuggest Array Event
+    //Initialize MagicSuggest Array Event - AssignedToProject_Id
     $(MagicSuggests[2]).on("selectionchange", function (e, m) {
         MagicSuggests[3].clear(true);
         MagicSuggests[3].isModified = false;
@@ -202,7 +205,7 @@ $(document).ready(function () {
         }
     });
 
-    //Initialize MagicSuggest Array Event
+    //Initialize MagicSuggest Array Event - AssignedToLocation_Id
     $(MagicSuggests[3]).on("selectionchange", function (e, m) {
         if (this.getValue().length == 0) {
             TableLogEntryAssysAdd.clear().search("").draw();
@@ -251,6 +254,21 @@ $(document).ready(function () {
             showModalNothingSelected("Please select one or more rows from 'Add Assemblies' table.");
         }
         else { showModalChngSts(); }
+    });
+
+    //Wire Up EditFormBtnPrsAddRemove
+    $("#EditFormBtnPrsAddRemove").click(function () {
+        TableLogEntryPersonsAdd.clear().search("").draw();
+        TableLogEntryPersonsRemove.clear().search("").draw();
+
+        if ($("#LogEntryPersonsView").hasClass("hide")) {
+            alert("finish code here");
+            $("#LogEntryPersonsView").removeClass("hide");
+        }
+        else {
+            $("#LogEntryPersonsView").addClass("hide");
+
+        }
     });
 
     //------------------------------------DataTables - Log Entry Assemblies ---

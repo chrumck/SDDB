@@ -261,6 +261,54 @@ fieldset[disabled] .btn-tdo-warning.active {
   background-color: #fff;
 }
 
+/*custom buttons btn-tdo-success*/
+.btn-tdo-success {
+  color: #fff;
+  background-color: #2aac2a;
+  border-color: #189618;
+}
+.btn-tdo-success:hover,
+.btn-tdo-success:focus,
+.btn-tdo-success.focus,
+.btn-tdo-success:active,
+.btn-tdo-success.active,
+.open > .dropdown-toggle.btn-tdo-success {
+  color: #fff;
+  background-color: #198b19;
+  border-color: #107610;
+}
+.btn-tdo-success:active,
+.btn-tdo-success.active,
+.open > .dropdown-toggle.btn-tdo-success {
+  background-image: none;
+}
+.btn-tdo-success.disabled,
+.btn-tdo-success[disabled],
+fieldset[disabled] .btn-tdo-success,
+.btn-tdo-success.disabled:hover,
+.btn-tdo-success[disabled]:hover,
+fieldset[disabled] .btn-tdo-success:hover,
+.btn-tdo-success.disabled:focus,
+.btn-tdo-success[disabled]:focus,
+fieldset[disabled] .btn-tdo-success:focus,
+.btn-tdo-success.disabled.focus,
+.btn-tdo-success[disabled].focus,
+fieldset[disabled] .btn-tdo-success.focus,
+.btn-tdo-success.disabled:active,
+.btn-tdo-success[disabled]:active,
+fieldset[disabled] .btn-tdo-success:active,
+.btn-tdo-success.disabled.active,
+.btn-tdo-success[disabled].active,
+fieldset[disabled] .btn-tdo-success.active {
+  background-color: #87de87;
+  border-color: #6ccb6c;
+}
+.btn-tdo-success .badge {
+  color: #2aac2a;
+  background-color: #fff;
+}
+
+
 /*custom inputs*/
 input[class~=input-tdo-info],
 textarea[class~=input-tdo-info] {

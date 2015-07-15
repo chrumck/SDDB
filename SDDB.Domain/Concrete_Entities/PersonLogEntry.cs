@@ -32,7 +32,7 @@ namespace SDDB.Domain.Entities
         [ForeignKey("PersonActivityType")]
         public string PersonActivityType_Id { get; set; }
 
-        [Required(ErrorMessage = "Hours field is required")]
+        [Required(ErrorMessage = "Hours Worked field is required")]
         public decimal ManHours { get; set; }
 
         [Required(ErrorMessage = "Project field is required")]
