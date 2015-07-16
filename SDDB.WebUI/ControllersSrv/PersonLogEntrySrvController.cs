@@ -397,28 +397,22 @@ namespace SDDB.WebUI.ControllersSrv
         private async Task<bool> isUserActivity(string[] ids)
         {
             var dbEntries = await prsLogEntryService.GetAsync(ids).ConfigureAwait(false);
-
-            if (dbEntries.Count() == 0) { return false; }
-
-            foreach (var dbEntry in dbEntries)
-            {
-                if (dbEntry.EnteredByPerson_Id != UserId) { return false; }
-            }
-            return true;
+            if (dbEntries.Count() == 0) { return true; }
+            return dbEntries.All(x => x.EnteredByPerson_Id == UserId);
         }
 
         //check if person log entry belongs to user - overload for PersonLogEntry[]
         private async Task<bool> isUserActivity(PersonLogEntry[] records)
         {
             var ids = records.Select(x => x.Id).ToArray();
-            return await isUserActivity(ids);
+            return (await isUserActivity(ids) && records.All(x => x.EnteredByPerson_Id == UserId));
         }
 
         //set viewbag, response http code and return JSON if user does not have PersonLogEntry_ rights
         private JsonResult JsonResponseForNoRights()
         {
             ViewBag.StatusCode = HttpStatusCode.Conflict;
-            ViewBag.StatusDescription = "Editing or viewing other user's entries not allowed without 'PersonLogEntry_...' rights.\nPlease contact SDDB administrator.";
+            ViewBag.StatusDescription = "You have insufficient privileges to edit or view other person's entries.";
             Response.StatusCode = (int)ViewBag.StatusCode;
             return Json(new { Success = "False", responseText = ViewBag.StatusDescription }, JsonRequestBehavior.AllowGet); 
         }

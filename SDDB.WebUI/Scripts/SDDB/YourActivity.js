@@ -222,6 +222,8 @@ $(document).ready(function () {
 
     $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
     refreshMainView();
+    $("#InitialView").addClass("hide");
+    $("#MainView").removeClass("hide");
   
 
     //--------------------------------End of execution at Start-----------
