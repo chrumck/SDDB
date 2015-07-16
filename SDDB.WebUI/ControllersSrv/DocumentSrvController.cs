@@ -38,8 +38,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.DocumentType_Id, x.AuthorPerson_Id, x.ReviewerPerson_Id, x.AssignedToProject_Id, x.RelatesToAssyType_Id, x.RelatesToCompType_Id, 
             });
 
-            ViewBag.ServiceName = "DocumentService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "DocumentService.GetAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -58,8 +58,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.DocumentType_Id,x.AuthorPerson_Id,x.ReviewerPerson_Id,x.AssignedToProject_Id,x.RelatesToAssyType_Id,x.RelatesToCompType_Id, 
             });
 
-            ViewBag.ServiceName = "DocumentService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "DocumentService.GetAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json( data , JsonRequestBehavior.AllowGet);
         }
 
@@ -79,8 +79,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.DocumentType_Id,x.AuthorPerson_Id,x.ReviewerPerson_Id,x.AssignedToProject_Id,x.RelatesToAssyType_Id,x.RelatesToCompType_Id, 
             });
 
-            ViewBag.ServiceName = "DocumentService.GetByTypeAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "DocumentService.GetByTypeAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -89,8 +89,8 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var records = await docService.LookupAsync(UserId, query, getActive).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "DocumentService.LookupAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "DocumentService.LookupAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(records.OrderBy(x => x.DocName)
                 .Select(x => new { id = x.Id, name = x.DocName }), JsonRequestBehavior.AllowGet);
         }
@@ -104,12 +104,14 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await docService.EditAsync(records).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "DocumentService.EditAsync"; ViewBag.StatusCode = serviceResult.StatusCode; 
+            ViewBag.ServiceName = "DocumentService.EditAsync";
+            ViewBag.StatusCode = serviceResult.StatusCode; 
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
             {
-                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
             }
             else
             {
@@ -125,12 +127,14 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await docService.DeleteAsync(ids).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "DocumentService.DeleteAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.ServiceName = "DocumentService.DeleteAsync";
+            ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
             {
-                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
             }
             else
             {

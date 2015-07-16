@@ -11,10 +11,11 @@ namespace SDDB.WebUI.Controllers
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
-        // GET: Document
+        // GET: PersonLogEntry
         [Authorize(Roles = "PersonLogEntry_View")]
-        public ActionResult Index()
+        public ActionResult Index(string personId = null)
         {
+            ViewBag.personId = personId;
             return View();
         }
 

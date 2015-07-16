@@ -264,16 +264,18 @@ $(document).ready(function () {
 
     //--------------------------------------View Initialization------------------------------------//
 
-    if (typeof assyId !== "undefined" && assyId != "") {
+    if (typeof AssyId !== "undefined" && AssyId != "") {
         showModalWait();
         $.ajax({
-            type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 20000, data: { ids: [assyId], getActive: true }, dataType: "json"})
+            type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 20000, data: { ids: [AssyId], getActive: true }, dataType: "json"})
             .always(hideModalWait)
             .done(function (data) {
                 MsFilterByAssembly.setSelection([{ id: data[0].Id, name: data[0].AssyName, }]);
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }
+    $("#InitialView").addClass("hide");
+    $("#MainView").removeClass("hide");
     
     //--------------------------------End of execution at Start-----------
 });

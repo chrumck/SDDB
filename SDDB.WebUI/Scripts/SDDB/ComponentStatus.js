@@ -96,6 +96,8 @@ $(document).ready(function () {
 
     refreshTable(TableMain, "/ComponentStatusSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
 
+    $("#InitialView").addClass("hide");
+    $("#MainView").removeClass("hide");
 
     //--------------------------------End of execution at Start-----------
 });

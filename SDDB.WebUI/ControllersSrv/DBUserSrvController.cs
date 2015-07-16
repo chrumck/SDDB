@@ -34,8 +34,8 @@ namespace SDDB.WebUI.ControllersSrv
             var data = users.OrderBy(x => x.Person.LastName).Select(x => new {
                 x.Id, x.Person.LastName, x.Person.FirstName, x.UserName, x.Email, x.LDAPAuthenticated });
 
-            ViewBag.ServiceName = "DBUserService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "DBUserService.GetAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -49,8 +49,8 @@ namespace SDDB.WebUI.ControllersSrv
             var data = users.Where(x => ids.Contains((x.Id))).OrderBy(x => x.Person.LastName).Select(x => new {
                 x.Id, x.Person.LastName, x.Person.FirstName, x.UserName, x.Email, x.LDAPAuthenticated });
 
-            ViewBag.ServiceName = "DBUserService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "DBUserService.GetAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -63,12 +63,14 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await dbUserService.EditAsync(records).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "DBUserService.EditAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.ServiceName = "DBUserService.EditAsync";
+            ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
             {
-                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
             }
             else
             {
@@ -84,12 +86,14 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await dbUserService.DeleteAsync(ids).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "DBUserService.DeleteAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.ServiceName = "DBUserService.DeleteAsync";
+            ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
             {
-                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
             }
             else
             {
@@ -107,8 +111,8 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var data = (await dbUserService.GetAllRolesAsync().ConfigureAwait(false)).Select(x => new { Name = x });
 
-            ViewBag.ServiceName = "DBUserService.GetAllRolesAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "DBUserService.GetAllRolesAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -118,8 +122,8 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var data = (await dbUserService.GetUserRolesAsync(id).ConfigureAwait(false)).Select(x => new { Name = x });
 
-            ViewBag.ServiceName = "DBUserService.GetUserRolesAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "DBUserService.GetUserRolesAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -129,8 +133,8 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var data = (await dbUserService.GetUserRolesNotAsync(id).ConfigureAwait(false)).Select(x => new { Name = x });
 
-            ViewBag.ServiceName = "DBUserService.GetUserRolesNotAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "DBUserService.GetUserRolesNotAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -141,12 +145,14 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await dbUserService.EditRolesAsync(ids, idsAddRem, isAdd).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "DBUserService.EditRolesAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.ServiceName = "DBUserService.EditRolesAsync";
+            ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
             {
-                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
             }
             else
             {

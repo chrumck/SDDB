@@ -334,12 +334,13 @@ namespace SDDB.UnitTests
             var personDbEntry1 = new Person { Id = "dummyEntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
             var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
             var personMockDbSet = new Mock<DbSet<Person>>();
-            personMockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
+            personMockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(() => personDbEntries.GetEnumerator()));
             personMockDbSet.As<IQueryable<Person>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<Person>(personDbEntries.Provider));
             personMockDbSet.As<IQueryable<Person>>().Setup(m => m.Expression).Returns(personDbEntries.Expression);
             personMockDbSet.As<IQueryable<Person>>().Setup(m => m.ElementType).Returns(personDbEntries.ElementType);
-            personMockDbSet.As<IQueryable<Person>>().Setup(m => m.GetEnumerator()).Returns(personDbEntries.GetEnumerator());
+            personMockDbSet.As<IQueryable<Person>>().Setup(m => m.GetEnumerator()).Returns(() => personDbEntries.GetEnumerator());
             personMockDbSet.Setup(x => x.Include(It.IsAny<string>())).Returns(personMockDbSet.Object);
+            personMockDbSet.Setup(x => x.FindAsync(It.IsAny<string>())).Returns(Task.FromResult(personDbEntry1));
 
             var personGroupDbEntry1 = new PersonGroup { Id = "dummyEntryId1", PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive = false };
             var personGroupDbEntry2 = new PersonGroup { Id = "dummyEntryId2", PrsGroupName = "PersonGroup2", PrsGroupAltName = "PersonGroupAlt2", IsActive = true };
@@ -367,7 +368,7 @@ namespace SDDB.UnitTests
             mockEfDbContext.Setup(x => x.PersonGroups).Returns(personGroupMockDbSet.Object);
             mockEfDbContext.Setup(x => x.Projects).Returns(projectMockDbSet.Object);
 
-            var ids = new string[] { "dummyId1" };
+            var ids = new string[] { "dummyEntryId1" };
 
             mockDbUserService.Setup(x => x.DeleteAsync(ids)).Returns(Task.FromResult(new DBResult { StatusCode = HttpStatusCode.OK }));
 

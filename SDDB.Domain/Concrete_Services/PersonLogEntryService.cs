@@ -169,7 +169,9 @@ namespace SDDB.Domain.Services
         {
             if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
 
-            var errorMessage = ""; var serviceResult = new DBResult();
+            var errorMessage = ""; 
+            var serviceResult = new DBResult();
+
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -178,6 +180,7 @@ namespace SDDB.Domain.Services
                 {
                     foreach (var record in records)
                     {
+                        //checking if log entry, event and location belong to the same project
                         var projEvent = await dbContext.ProjectEvents.FindAsync(record.AssignedToProjectEvent_Id).ConfigureAwait(false);
                         var location = await dbContext.Locations.FindAsync(record.AssignedToLocation_Id).ConfigureAwait(false);
 
@@ -208,14 +211,14 @@ namespace SDDB.Domain.Services
                         }
                     }
                     errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
-                   
                     trans.Complete();
                 }
             }
-            if (errorMessage == "") return serviceResult;
+            if (errorMessage == "") { return serviceResult; }
             else
             {
-                serviceResult.StatusCode = HttpStatusCode.Conflict; serviceResult.StatusDescription = "Errors editing records:\n" + errorMessage;
+                serviceResult.StatusCode = HttpStatusCode.Conflict;
+                serviceResult.StatusDescription = "Errors editing records:\n" + errorMessage;
                 return serviceResult;
             } 
         }
@@ -224,6 +227,7 @@ namespace SDDB.Domain.Services
         public virtual async Task<DBResult> DeleteAsync(string[] ids)
         {
             var errorMessage = ""; 
+
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -242,15 +246,18 @@ namespace SDDB.Domain.Services
                         }
                     }
                     errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
-                    
                     trans.Complete();
                 }
             }
-            if (errorMessage == "") return new DBResult();
-            else return new DBResult {
-                StatusCode = HttpStatusCode.Conflict,
-                StatusDescription = "Errors deleting records:\n" + errorMessage
-            };
+            if (errorMessage == "") { return new DBResult(); }
+            else
+            {
+                return new DBResult
+                {
+                    StatusCode = HttpStatusCode.Conflict,
+                    StatusDescription = "Errors deleting records:\n" + errorMessage
+                };
+            }
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -263,7 +270,6 @@ namespace SDDB.Domain.Services
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-
                 return dbContext.AssemblyDbs
                     .Where(x => x.AssemblyDbPrsLogEntrys.Any(y => y.Id == logEntryId) && x.IsActive == true).ToListAsync();
             }
@@ -276,10 +282,9 @@ namespace SDDB.Domain.Services
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-
                 locId = locId ?? "";
 
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.AssemblyDbs
                     .Where(x => !x.AssemblyDbPrsLogEntrys.Any(y => y.Id == logEntryId) && x.IsActive == true && 
                         (locId == "" || x.AssignedToLocation_Id == locId))
@@ -293,7 +298,8 @@ namespace SDDB.Domain.Services
             if (ids == null || ids.Length == 0 || idsAddRem == null || idsAddRem.Length == 0)
                 return new DBResult { StatusCode = HttpStatusCode.BadRequest, StatusDescription = "arguments missing" };
 
-            var errorMessage = ""; var serviceResult = new DBResult();
+            var errorMessage = ""; 
+
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -315,17 +321,18 @@ namespace SDDB.Domain.Services
                         }
                     }
                     errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
-                   
                     trans.Complete();
                 }
             }
-
-            if (errorMessage == "" && serviceResult.StatusCode == HttpStatusCode.OK) return serviceResult;
-            else return new DBResult
+            if (errorMessage == "") { return new DBResult(); }
+            else
             {
-                StatusCode = HttpStatusCode.Conflict,
-                StatusDescription = "Errors editing records:\n" + errorMessage + serviceResult.StatusDescription
-            };
+                return new DBResult
+                {
+                    StatusCode = HttpStatusCode.Conflict,
+                    StatusDescription = "Errors editing records:\n" + errorMessage
+                };
+            }
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -338,7 +345,6 @@ namespace SDDB.Domain.Services
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-
                 return dbContext.Persons
                     .Where(x => x.PersonPrsLogEntrys.Any(y => y.Id == logEntryId) && x.IsActive_bl == true).ToListAsync();
             }
@@ -353,7 +359,6 @@ namespace SDDB.Domain.Services
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-
                 return dbContext.PersonGroups.Where(x => x.GroupManagers.Any(y => y.Id == userId)).SelectMany(x => x.GroupPersons)
                     .Distinct().Where(x => x.IsActive_bl == true && !x.PersonPrsLogEntrys.Any(y => y.Id == logEntryId))
                     .ToListAsync();
@@ -366,7 +371,7 @@ namespace SDDB.Domain.Services
             if (ids == null || ids.Length == 0 || idsAddRem == null || idsAddRem.Length == 0)
                 return new DBResult { StatusCode = HttpStatusCode.BadRequest, StatusDescription = "arguments missing" };
 
-            var errorMessage = ""; var serviceResult = new DBResult();
+            var errorMessage = "";
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -389,17 +394,18 @@ namespace SDDB.Domain.Services
                         }
                     }
                     errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
-
                     trans.Complete();
                 }
             }
-
-            if (errorMessage == "" && serviceResult.StatusCode == HttpStatusCode.OK) return serviceResult;
-            else return new DBResult
+            if (errorMessage == "") { return new DBResult(); }
+            else
             {
-                StatusCode = HttpStatusCode.Conflict,
-                StatusDescription = "Errors editing records:\n" + errorMessage + serviceResult.StatusDescription
-            };
+                return new DBResult
+                {
+                    StatusCode = HttpStatusCode.Conflict,
+                    StatusDescription = "Errors editing records:\n" + errorMessage
+                };
+            }
         }
 
 

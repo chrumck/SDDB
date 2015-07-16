@@ -90,6 +90,13 @@ namespace SDDB.Domain.Infrastructure
                 if (record.PropIsModified(property.Name)) property.SetValue(instance, property.GetValue(record));
             }
         }
+
+        //check is properites got modified and belong to logged properties
+        public static bool LoggedPropsModified<T>(this T instance, string[] loggedProperties) where T : IDbEntity
+        {
+            return instance.ModifiedProperties == null ? false : instance.ModifiedProperties.Any(x => loggedProperties.Contains(x));
+        }
+
     }
 
 

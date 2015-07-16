@@ -571,7 +571,7 @@ namespace SDDB.UnitTests
         }
 
         [TestMethod]
-        public void UserService_EditRolesAsync_ReturnOKIfNoUsers()
+        public void UserService_EditRolesAsync_ReturnErrorIfNoUsers()
         {
             // Arrange
             var userIds = new string[] { };
@@ -587,8 +587,8 @@ namespace SDDB.UnitTests
             var serviceResult = dbUserService.EditRolesAsync(userIds, dbRoles, true).Result;
 
             //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
-            Assert.IsTrue(serviceResult.StatusDescription == null);
+            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.BadRequest);
+            Assert.IsTrue(serviceResult.StatusDescription.Contains("arguments missing"));
         }
 
         [TestMethod]
@@ -596,7 +596,7 @@ namespace SDDB.UnitTests
         {
             // Arrange
             var userIds = new string[] { "dummyUserId1" };
-            var dbRoles = new string[] { };
+            var dbRoles = new string[] { "dummyRole"};
             DBUser dbUser1 = null;
 
             var mockAppUserManager = new Mock<IAppUserManager>();
@@ -632,8 +632,10 @@ namespace SDDB.UnitTests
 
             //Act   
             var serviceResult = await dbUserService.EditRolesAsync(userIds, dbRoles, true);
-                        
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
+
+            //Assert
+            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.BadRequest);
+            Assert.IsTrue(serviceResult.StatusDescription.Contains("arguments missing"));
             mockAppUserManager.Verify(x => x.AddToRoleAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 

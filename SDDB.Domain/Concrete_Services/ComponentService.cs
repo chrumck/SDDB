@@ -44,19 +44,7 @@ namespace SDDB.Domain.Services
                     .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt)
                     .ToListAsync().ConfigureAwait(false);
 
-                foreach (var record in records)
-                {
-                    var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(Component).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                    foreach (var property in properties)
-                    {
-                        if (!property.GetMethod.IsVirtual) continue;
-                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                        if (excludedProperties.Contains(property.Name)) continue;
-
-                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
-                    }
-                }
+                foreach (var record in records) { record.FillRelatedIfNull(); }
 
                 return records;
             }
@@ -77,19 +65,7 @@ namespace SDDB.Domain.Services
                     .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt)
                     .ToListAsync().ConfigureAwait(false);
 
-                foreach (var record in records)
-                {
-                    var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(Component).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                    foreach (var property in properties)
-                    {
-                        if (!property.GetMethod.IsVirtual) continue;
-                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                        if (excludedProperties.Contains(property.Name)) continue;
-
-                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
-                    }
-                }
+                foreach (var record in records) { record.FillRelatedIfNull(); }
 
                 return records;
             }
@@ -114,19 +90,7 @@ namespace SDDB.Domain.Services
                     .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt)
                     .ToListAsync().ConfigureAwait(false);
 
-                foreach (var record in records)
-                {
-                    var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(Component).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                    foreach (var property in properties)
-                    {
-                        if (!property.GetMethod.IsVirtual) continue;
-                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                        if (excludedProperties.Contains(property.Name)) continue;
-
-                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
-                    }
-                }
+                foreach (var record in records) { record.FillRelatedIfNull(); }
 
                 return records;
             }
@@ -153,19 +117,7 @@ namespace SDDB.Domain.Services
                    .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt)
                    .ToListAsync().ConfigureAwait(false);
 
-                foreach (var record in records)
-                {
-                    var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(Component).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                    foreach (var property in properties)
-                    {
-                        if (!property.GetMethod.IsVirtual) continue;
-                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                        if (excludedProperties.Contains(property.Name)) continue;
-
-                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
-                    }
-                }
+                foreach (var record in records) { record.FillRelatedIfNull(); }
 
                 return records;
             }
@@ -214,12 +166,16 @@ namespace SDDB.Domain.Services
         {
             if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
 
+            var errorMessage = "";
+            var newEntries = 1;
+            var loggedProperties = new string[] { "ComponentStatus_Id", "AssignedToProject_Id", "AssignedToAssemblyDb_Id", "LastCalibrationDate" }; 
+
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    var newEntries = 1;  foreach (var record in records)
+                    foreach (var record in records)
                     {
                         var dbEntry = await dbContext.Components.FindAsync(record.Id).ConfigureAwait(false);
                         if (dbEntry == null)
@@ -240,62 +196,23 @@ namespace SDDB.Domain.Services
                         }
                         else
                         {
-                            var loggedProperties = new string[] { "ComponentStatus_Id", "AssignedToProject_Id", "AssignedToAssemblyDb_Id", "LastCalibrationDate" };
-                            var logChanges = false;
-                            var excludedProperties = new string[] { "Id", "TSP" };
-                            var properties = typeof(Component).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                            foreach (var property in properties)
-                            {
-                                if (property.GetMethod.IsVirtual) continue;
-                                if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                                if (excludedProperties.Contains(property.Name)) continue;
-
-                                if (record.PropIsModified(property.Name)) property.SetValue(dbEntry, property.GetValue(record));
-                                
-                                if (record.PropIsModified(property.Name) && loggedProperties.Contains(property.Name)) logChanges = true;
-                            }
-
-                            if (logChanges)
-                            {
-                                dbContext.ComponentLogEntrys.Add(
-                                    new ComponentLogEntry
-                                    {
-                                        Id = Guid.NewGuid().ToString(),
-                                        Component_Id = dbEntry.Id,
-                                        EnteredByPerson_Id = userId,
-                                        LogEntryDateTime = DateTime.Now,
-                                        ComponentStatus_Id = dbEntry.ComponentStatus_Id,
-                                        AssignedToProject_Id = dbEntry.AssignedToProject_Id,
-                                        AssignedToAssemblyDb_Id = dbEntry.AssignedToAssemblyDb_Id,
-                                        LastCalibrationDate = dbEntry.LastCalibrationDate,
-                                        Comments = dbEntry.Comments,
-                                        IsActive_bl = true
-                                    }
-                                );
-                            }
+                            dbEntry.CopyModifiedProps(record);
+                            if (record.LoggedPropsModified(loggedProperties)) { addLogEntry(dbContext, dbEntry, userId); }
                         }
                     }
-                    for (int i = 1; i <= 10; i++)
-                    {
-                        try
-                        {
-                            await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                            break;
-                        }
-                        catch (Exception e)
-                        {
-                            var message = e.GetBaseException().Message;
-                            if (i == 10 || !message.Contains("Deadlock found when trying to get lock"))
-                            {
-                                return new DBResult { StatusCode = HttpStatusCode.Conflict, StatusDescription = message };
-                            }
-                        }
-                        await Task.Delay(200).ConfigureAwait(false);
-                    }
+                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
                     trans.Complete();
                 }
             }
-            return new DBResult { StatusCode = HttpStatusCode.OK };
+            if (errorMessage == "") { return new DBResult(); }
+            else
+            {
+                return new DBResult
+                {
+                    StatusCode = HttpStatusCode.Conflict,
+                    StatusDescription = "Errors editing records:\n" + errorMessage
+                };
+            }
         }
 
         // Delete records by their Ids
@@ -319,32 +236,19 @@ namespace SDDB.Domain.Services
                             errorMessage += string.Format("Record with Id={0} not found\n", id);
                         }
                     }
-                    for (int i = 1; i <= 10; i++)
-                    {
-                        try
-                        {
-                            await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                            break;
-                        }
-                        catch (Exception e)
-                        {
-                            var message = e.GetBaseException().Message;
-                            if (i == 10 || !message.Contains("Deadlock found when trying to get lock"))
-                            {
-                                errorMessage += string.Format("Error Saving changes: {0}\n", message);
-                                break;
-                            }
-                        }
-                        await Task.Delay(200).ConfigureAwait(false);
-                    }
+                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
                     trans.Complete();
                 }
             }
-            if (errorMessage == "") return new DBResult();
-            else return new DBResult {
-                StatusCode = HttpStatusCode.Conflict,
-                StatusDescription = "Errors deleting records:\n" + errorMessage
-            };
+            if (errorMessage == "") { return new DBResult(); }
+            else
+            {
+                return new DBResult
+                {
+                    StatusCode = HttpStatusCode.Conflict,
+                    StatusDescription = "Errors deleting records:\n" + errorMessage
+                };
+            }
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -370,50 +274,48 @@ namespace SDDB.Domain.Services
                         }
                         else
                         {
-                            var excludedProperties = new string[] { "Id", "TSP" };
-                            var properties = typeof(ComponentExt).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                            foreach (var property in properties)
-                            {
-                                if (property.GetMethod.IsVirtual) continue;
-                                if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                                if (excludedProperties.Contains(property.Name)) continue;
-
-                                if (record.PropIsModified(property.Name)) property.SetValue(dbEntry, property.GetValue(record));
-                            }
+                            dbEntry.CopyModifiedProps(record);
                         }
                     }
-                    for (int i = 1; i <= 10; i++)
-                    {
-                        try
-                        {
-                            await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                            break;
-                        }
-                        catch (Exception e)
-                        {
-                            var message = e.GetBaseException().Message;
-                            if (i == 10 || !message.Contains("Deadlock found when trying to get lock"))
-                            {
-                                errorMessage += String.Format("Error saving records: {0}\n", message);
-                                break;
-                            }
-                        }
-                        await Task.Delay(200).ConfigureAwait(false);
-                    }
+                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
                     trans.Complete();
                 }
             }
-            if (errorMessage == "") return new DBResult();
-            else return new DBResult
+            if (errorMessage == "") { return new DBResult(); }
+            else
             {
-                StatusCode = HttpStatusCode.Conflict,
-                StatusDescription = "Errors deleting records:\n" + errorMessage
-            };
+                return new DBResult
+                {
+                    StatusCode = HttpStatusCode.Conflict,
+                    StatusDescription = "Errors editing records:\n" + errorMessage
+                };
+            }
         }
 
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
+
+        //adds log entry to the dbContext based on assembly data and user Id
+        private void addLogEntry(EFDbContext dbContext, Component dbEntry, string userId)
+        {
+            dbContext.ComponentLogEntrys.Add(
+                new ComponentLogEntry
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Component_Id = dbEntry.Id,
+                    EnteredByPerson_Id = userId,
+                    LogEntryDateTime = DateTime.Now,
+                    ComponentStatus_Id = dbEntry.ComponentStatus_Id,
+                    AssignedToProject_Id = dbEntry.AssignedToProject_Id,
+                    AssignedToAssemblyDb_Id = dbEntry.AssignedToAssemblyDb_Id,
+                    LastCalibrationDate = dbEntry.LastCalibrationDate,
+                    Comments = dbEntry.Comments,
+                    IsActive_bl = true
+                }
+            );
+        }
+
 
         #endregion
     }

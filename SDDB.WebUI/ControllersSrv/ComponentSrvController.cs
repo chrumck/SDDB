@@ -40,8 +40,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.ComponentType_Id, x.ComponentStatus_Id, x.ComponentModel_Id, x.AssignedToProject_Id, x.AssignedToAssemblyDb_Id
             });
 
-            ViewBag.ServiceName = "ComponentService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "ComponentService.GetAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
 
         }
@@ -63,8 +63,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.ComponentType_Id, x.ComponentStatus_Id, x.ComponentModel_Id, x.AssignedToProject_Id, x.AssignedToAssemblyDb_Id
             });
 
-            ViewBag.ServiceName = "ComponentService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "ComponentService.GetAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
@@ -86,8 +86,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.ComponentType_Id, x.ComponentStatus_Id, x.ComponentModel_Id, x.AssignedToProject_Id, x.AssignedToAssemblyDb_Id
             });
 
-            ViewBag.ServiceName = "ComponentService.GetByAltIdsAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "ComponentService.GetByAltIdsAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
@@ -109,8 +109,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.ComponentType_Id, x.ComponentStatus_Id, x.ComponentModel_Id, x.AssignedToProject_Id, x.AssignedToAssemblyDb_Id
             });
 
-            ViewBag.ServiceName = "ComponentService.GetByAltIdsAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "ComponentService.GetByAltIdsAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
@@ -120,8 +120,8 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var records = await componentService.LookupAsync(UserId, query, getActive).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "ComponentService.LookupAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "ComponentService.LookupAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(records.OrderBy(x => x.CompName)
                 .Select(x => new { id = x.Id, name = x.CompName }), JsonRequestBehavior.AllowGet);
         }
@@ -134,8 +134,8 @@ namespace SDDB.WebUI.ControllersSrv
 
             var records = await componentService.LookupByProjAsync(UserId, projectIdsArray, query, getActive).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "ComponentService.LookupByProjAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "ComponentService.LookupByProjAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(records.OrderBy(x => x.CompName)
                 .Select(x => new { id = x.Id, name = x.CompName }), JsonRequestBehavior.AllowGet);
         }
@@ -149,12 +149,14 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await componentService.EditAsync(UserId, records).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "ComponentService.EditAsync"; ViewBag.StatusCode = serviceResult.StatusCode; 
+            ViewBag.ServiceName = "ComponentService.EditAsync";
+            ViewBag.StatusCode = serviceResult.StatusCode; 
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
             {
-                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
             }
             else
             {
@@ -170,12 +172,14 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await componentService.DeleteAsync(ids).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "ComponentService.DeleteAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.ServiceName = "ComponentService.DeleteAsync";
+            ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
             {
-                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
             }
             else
             {
@@ -193,12 +197,14 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await componentService.EditExtAsync(records).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "ComponentService.EditExtAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.ServiceName = "ComponentService.EditExtAsync";
+            ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
             {
-                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
             }
             else
             {

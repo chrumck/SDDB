@@ -155,6 +155,14 @@ $(document).ready(function () {
         TableMain.columns([8, 9, 10, 11, 12, 13]).visible(true);
     });
 
+    //wire up dropdownId3
+    $("#dropdownId3").click(function (event) {
+        event.preventDefault();
+        var noOfRows = TableMain.rows(".ui-selected").data().length;
+        if (noOfRows != 1) { showModalSelectOne(); }
+        else { window.open("/PersonLogEntry?personId=" + TableMain.cell(".ui-selected", "Id:name").data()); }
+    });
+
     //---------------------------------------DataTables------------
 
     //Wire up ChBoxShowDeleted
@@ -474,6 +482,8 @@ $(document).ready(function () {
 
     refreshTblGenWrp(TableMain, "/PersonSrv/GetAll", { getActive: GetActive });
 
+    $("#InitialView").addClass("hide");
+    $("#MainView").removeClass("hide");
 
     //--------------------------------End of execution at Start-----------
 });

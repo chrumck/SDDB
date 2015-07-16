@@ -32,8 +32,8 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var data = (await personGroupService.GetAsync(getActive).ConfigureAwait(false));
 
-            ViewBag.ServiceName = "PersonGroupService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "PersonGroupService.GetAsync"; 
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -44,8 +44,8 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var data = (await personGroupService.GetAsync(ids, getActive).ConfigureAwait(false));
 
-            ViewBag.ServiceName = "PersonGroupService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "PersonGroupService.GetAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json( data , JsonRequestBehavior.AllowGet);
         }
 
@@ -54,8 +54,8 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var records = (await personGroupService.LookupAsync(UserId, query, getActive).ConfigureAwait(false));
 
-            ViewBag.ServiceName = "PersonGroupService.LookupAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "PersonGroupService.LookupAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(records.OrderBy(x => x.PrsGroupName)
                 .Select(x => new { id = x.Id, name = x.PrsGroupName}), JsonRequestBehavior.AllowGet);
         }
@@ -69,12 +69,14 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await personGroupService.EditAsync(records).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "PersonGroupService.EditAsync"; ViewBag.StatusCode = serviceResult.StatusCode; 
+            ViewBag.ServiceName = "PersonGroupService.EditAsync";
+            ViewBag.StatusCode = serviceResult.StatusCode; 
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
             {
-                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
             }
             else
             {
@@ -90,12 +92,14 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await personGroupService.DeleteAsync(ids).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "PersonGroupService.DeleteAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.ServiceName = "PersonGroupService.DeleteAsync";
+            ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
             {
-                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
             }
             else
             {
@@ -113,8 +117,8 @@ namespace SDDB.WebUI.ControllersSrv
             var data = (await personGroupService.GetGroupManagersAsync(id).ConfigureAwait(false))
                 .Select(x => new { x.Id, x.LastName, x.FirstName, x.Initials });
 
-            ViewBag.ServiceName = "PersonGroupService.GetGroupManagersAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "PersonGroupService.GetGroupManagersAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -125,8 +129,8 @@ namespace SDDB.WebUI.ControllersSrv
             var data = (await personGroupService.GetGroupManagersNotAsync(id).ConfigureAwait(false))
                 .Select(x => new { x.Id, x.LastName, x.FirstName, x.Initials });
 
-            ViewBag.ServiceName = "PersonGroupService.GetGroupManagersNotAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "PersonGroupService.GetGroupManagersNotAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -137,12 +141,14 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await personService.EditManagedGroupsAsync(personIds, groupIds, isAdd).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "PersonService.EditManagedGroupsAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.ServiceName = "PersonService.EditManagedGroupsAsync";
+            ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
             {
-                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
             }
             else
             {

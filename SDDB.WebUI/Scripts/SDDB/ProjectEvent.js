@@ -129,6 +129,8 @@ $(document).ready(function () {
 
     RefreshMainView();
 
+    $("#InitialView").addClass("hide");
+    $("#MainView").removeClass("hide");
     //--------------------------------End of execution at Start-----------
 });
 

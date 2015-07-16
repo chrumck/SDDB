@@ -36,8 +36,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.Comments, x.IsActive, x.AssignedToProject_Id, x.CreatedByPerson_Id, x.ClosedByPerson_Id, 
             });
 
-            ViewBag.ServiceName = "ProjectEventService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "ProjectEventService.GetAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return new DBJsonDateTimeISO { Data = new { data}, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
@@ -54,8 +54,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.Comments, x.IsActive, x.AssignedToProject_Id, x.CreatedByPerson_Id, x.ClosedByPerson_Id, 
             });
 
-            ViewBag.ServiceName = "ProjectEventService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "ProjectEventService.GetAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return new DBJsonDateTimeISO { Data =  data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
@@ -73,8 +73,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.Comments, x.IsActive, x.AssignedToProject_Id, x.CreatedByPerson_Id, x.ClosedByPerson_Id, 
             });
 
-            ViewBag.ServiceName = "ProjectEventService.GetByProjectAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "ProjectEventService.GetByProjectAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
@@ -83,8 +83,8 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var records = await projectEventService.LookupAsync(UserId, query, getActive).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "ProjectEventService.LookupAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "ProjectEventService.LookupAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(records.OrderBy(x => x.EventName)
                 .Select(x => new { id = x.Id, name = x.EventName }), JsonRequestBehavior.AllowGet);
         }
@@ -97,8 +97,8 @@ namespace SDDB.WebUI.ControllersSrv
 
             var records = await projectEventService.LookupByProjAsync(UserId, projectIdsArray, query, getActive).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "ProjectEventService.LookupByProjAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "ProjectEventService.LookupByProjAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(records.OrderBy(x => x.EventName)
                 .Select(x => new { id = x.Id, name = x.EventName }), JsonRequestBehavior.AllowGet);
         }
@@ -112,12 +112,14 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await projectEventService.EditAsync(records).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "ProjectEventService.EditAsync"; ViewBag.StatusCode = serviceResult.StatusCode; 
+            ViewBag.ServiceName = "ProjectEventService.EditAsync";
+            ViewBag.StatusCode = serviceResult.StatusCode; 
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
             {
-                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
             }
             else
             {
@@ -133,12 +135,14 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await projectEventService.DeleteAsync(ids).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "ProjectEventService.DeleteAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.ServiceName = "ProjectEventService.DeleteAsync";
+            ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
             {
-                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
             }
             else
             {

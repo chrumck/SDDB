@@ -56,6 +56,8 @@ namespace SDDB.Domain.Services
             return Task.FromResult(appUserManager.Users.Include( x => x.Person).ToList());
         }
 
+        //-----------------------------------------------------------------------------------------------------------------------
+
         // Create and Update DBUsers given in DBUser[]
         public virtual async Task<DBResult> EditAsync(DBUser[] records)
         {
@@ -86,8 +88,15 @@ namespace SDDB.Domain.Services
                     errorMessage += (identityResult.Succeeded) ? "" : String.Format("User {0}:{1}\n", record.UserName, getErrorsFromIdResult(identityResult));
                 }
             }
-            if (errorMessage == "") return new DBResult { StatusCode = HttpStatusCode.OK };
-            else return new DBResult { StatusCode = HttpStatusCode.Conflict, StatusDescription = "Errors editing records:\n" + errorMessage };
+            if (errorMessage == "") { return new DBResult(); }
+            else
+            {
+                return new DBResult
+                {
+                    StatusCode = HttpStatusCode.Conflict,
+                    StatusDescription = "Errors editing records:\n" + errorMessage
+                };
+            }
         }
 
         // Delete DBUsers by their IDs
@@ -103,8 +112,15 @@ namespace SDDB.Domain.Services
                     if (!result.Succeeded) { errorMessage += string.Format("Id={0}: {1}\n", id, getErrorsFromIdResult(result)); }
                 }
             }
-            if (errorMessage == "") return new DBResult { StatusCode = HttpStatusCode.OK };
-            else return new DBResult { StatusCode = HttpStatusCode.Conflict, StatusDescription = "Errors deleting records:\n" + errorMessage };
+            if (errorMessage == "") { return new DBResult(); }
+            else
+            {
+                return new DBResult
+                {
+                    StatusCode = HttpStatusCode.Conflict,
+                    StatusDescription = "Errors deleting records:\n" + errorMessage
+                };
+            }
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -146,7 +162,9 @@ namespace SDDB.Domain.Services
             if (ids == null || ids.Length == 0 || idsAddRem == null || idsAddRem.Length == 0)
                 return new DBResult { StatusCode = HttpStatusCode.BadRequest, StatusDescription = "arguments missing" };
 
-            var errorMessage = ""; var identityResult = IdentityResult.Success;
+            var errorMessage = "";
+            var identityResult = IdentityResult.Success;
+            
             foreach (var userId in ids)
             {
                 var dbEntry = await appUserManager.FindByIdAsync(userId).ConfigureAwait(false);
@@ -174,8 +192,15 @@ namespace SDDB.Domain.Services
                     }
                 }
             }
-            if (errorMessage == "") return new DBResult { StatusCode = HttpStatusCode.OK };
-            else return new DBResult { StatusCode = HttpStatusCode.Conflict, StatusDescription = "Errors editing records:\n" + errorMessage };
+            if (errorMessage == "") { return new DBResult(); }
+            else
+            {
+                return new DBResult
+                {
+                    StatusCode = HttpStatusCode.Conflict,
+                    StatusDescription = "Errors editing records:\n" + errorMessage
+                };
+            }
         }
 
 

@@ -31,8 +31,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.Id, x.AssyTypeName, x.AssyTypeAltName, x.Comments, x.IsActive
             });
 
-            ViewBag.ServiceName = "AssemblyTypeService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "AssemblyTypeService.GetAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -45,8 +45,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.Id, x.AssyTypeName, x.AssyTypeAltName, x.Comments, x.IsActive
             });
 
-            ViewBag.ServiceName = "AssemblyTypeService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "AssemblyTypeService.GetAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json( data , JsonRequestBehavior.AllowGet);
         }
 
@@ -55,8 +55,8 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var records = await assyTypeService.LookupAsync(query, getActive).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "AssemblyTypeService.LookupAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "AssemblyTypeService.LookupAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(records.OrderBy(x => x.AssyTypeName)
                 .Select(x => new { id = x.Id, name = x.AssyTypeName }), JsonRequestBehavior.AllowGet);
         }
@@ -70,7 +70,8 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await assyTypeService.EditAsync(records).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "AssemblyTypeService.EditAsync"; ViewBag.StatusCode = serviceResult.StatusCode; 
+            ViewBag.ServiceName = "AssemblyTypeService.EditAsync";
+            ViewBag.StatusCode = serviceResult.StatusCode; 
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
@@ -91,12 +92,14 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await assyTypeService.DeleteAsync(ids).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "AssemblyTypeService.DeleteAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.ServiceName = "AssemblyTypeService.DeleteAsync";
+            ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
             {
-                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
             }
             else
             {

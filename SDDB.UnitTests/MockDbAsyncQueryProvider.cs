@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
@@ -80,6 +81,11 @@ namespace SDDB.UnitTests
         public MockDbAsyncEnumerator(IEnumerator<T> inner)
         {
             _inner = inner;
+        }
+
+        public MockDbAsyncEnumerator(Func<IEnumerator<T>> valueFunction)
+        {
+            _inner = valueFunction();
         }
 
         public void Dispose()

@@ -194,8 +194,8 @@ $(document).ready(function () {
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }
-
-
+    $("#InitialView").addClass("hide");
+    $("#MainView").removeClass("hide");
 
     //--------------------------------End of execution at Start-----------
 });

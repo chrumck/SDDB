@@ -150,6 +150,8 @@ function showModalAJAXFail(xhr, status, error) {
     $("#ModalInfo").modal("show");
 }
 
+//-----------------------------------------------------------------------------
+
 //Refresh  table from AJAX
 function refreshTable(table, url, getActive, httpType, projectIds, modelIds, typeIds,
     locIds, assyIds, personIds, startDate, endDate) {
@@ -220,6 +222,8 @@ function refreshTblGenWrp(table, url, data, httpType) {
 
     return deferred0.promise();
 }
+
+//-----------------------------------------------------------------------------
 
 //checking if form is valid
 function formIsValid(id, isCreate) {
@@ -394,6 +398,8 @@ function submitEditsGeneric(ids, formId, msArray, currRecord, httpType, url) {
     return deferred0.promise();
 }
 
+//-----------------------------------------------------------------------------
+
 //Fill Form for Edit from n:n related table - generic version
 function fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
     httpType, url, data, httpTypeNot, urlNot, dataNot, httpTypeMany, urlMany, dataMany) {
@@ -455,6 +461,8 @@ function submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
 
     return deferred0.promise();
 }
+
+//-----------------------------------------------------------------------------
 
 //initialize MagicSuggest and add to MagicSuggest array
 function addToMSArray(msArray, id, url, maxSelection, minChars, dataUrlParams, disabled, editable) {

@@ -113,7 +113,8 @@ $(document).ready(function () {
 
     refreshTable(TableMain, "/ProjectSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
 
-
+    $("#InitialView").addClass("hide");
+    $("#MainView").removeClass("hide");
     //--------------------------------End of execution at Start-----------
 });
 

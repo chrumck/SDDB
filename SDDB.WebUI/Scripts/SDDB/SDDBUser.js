@@ -153,7 +153,8 @@ $(document).ready(function () {
 
     refreshTblGenWrp(TableMain, "/DBUserSrv/Get", {},"GET");
 
-
+    $("#InitialView").addClass("hide");
+    $("#MainView").removeClass("hide");
     //--------------------------------End of execution at Start-----------
 });
 

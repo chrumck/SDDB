@@ -42,8 +42,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.AssemblyDb_Id, x.EnteredByPerson_Id, x.AssemblyStatus_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id
             });
 
-            ViewBag.ServiceName = "AssemblyLogEntryService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "AssemblyLogEntryService.GetAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
@@ -66,8 +66,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.AssemblyDb_Id, x.EnteredByPerson_Id, x.AssemblyStatus_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id
             });
 
-            ViewBag.ServiceName = "AssemblyLogEntryService.GetAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "AssemblyLogEntryService.GetAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
@@ -92,8 +92,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.AssemblyDb_Id, x.EnteredByPerson_Id, x.AssemblyStatus_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id
             });
 
-            ViewBag.ServiceName = "AssemblyLogEntryService.GetByAltIdsAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
-
+            ViewBag.ServiceName = "AssemblyLogEntryService.GetByAltIdsAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK;
             return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
                 
@@ -107,12 +107,14 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await assyLogEntryService.EditAsync(records).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "AssemblyLogEntryService.EditAsync"; ViewBag.StatusCode = serviceResult.StatusCode; 
+            ViewBag.ServiceName = "AssemblyLogEntryService.EditAsync";
+            ViewBag.StatusCode = serviceResult.StatusCode; 
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
             {
-                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
             }
             else
             {
@@ -128,12 +130,14 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var serviceResult = await assyLogEntryService.DeleteAsync(ids).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "AssemblyLogEntryService.DeleteAsync"; ViewBag.StatusCode = serviceResult.StatusCode;
+            ViewBag.ServiceName = "AssemblyLogEntryService.DeleteAsync";
+            ViewBag.StatusCode = serviceResult.StatusCode;
             ViewBag.StatusDescription = serviceResult.StatusDescription;
 
             if (serviceResult.StatusCode == HttpStatusCode.OK)
             {
-                Response.StatusCode = (int)HttpStatusCode.OK; return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+                Response.StatusCode = (int)HttpStatusCode.OK;
+                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
             }
             else
             {

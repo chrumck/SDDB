@@ -7,6 +7,14 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
+//--------------------------------------Global Properties------------------------------------//
+
+var TableMain = {};
+var MsFilterByProject = {}; var MsFilterByModel = {};
+var CurrRecord = {};
+var DatePickers = [];
+
+
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
@@ -187,15 +195,14 @@ $(document).ready(function () {
         if (formIsValid("EditForm", false) ) SubmitEdits();
     });
 
+    //--------------------------------------View Initialization------------------------------------//
+    
+    $("#InitialView").addClass("hide");
+    $("#MainView").removeClass("hide");
+
+    //--------------------------------End of execution at Start-----------
 
 });
-
-//--------------------------------------Global Properties------------------------------------//
-
-var TableMain = {};
-var MsFilterByProject = {}; var MsFilterByModel = {};
-var CurrRecord = {};
-var DatePickers = [];
 
 //--------------------------------------Main Methods---------------------------------------//
 

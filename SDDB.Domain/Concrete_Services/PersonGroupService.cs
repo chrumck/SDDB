@@ -39,21 +39,6 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 var records = await dbContext.PersonGroups.Where(x => x.IsActive == getActive).ToListAsync().ConfigureAwait(false);
-
-                foreach (var record in records)
-                {
-                    var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(PersonGroup).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                    foreach (var property in properties)
-                    {
-                        if (!property.GetMethod.IsVirtual) continue;
-                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                        if (excludedProperties.Contains(property.Name)) continue;
-
-                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
-                    }
-                }
-
                 return records; 
             }
         }
@@ -67,21 +52,6 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 var records = await dbContext.PersonGroups.Where(x => x.IsActive == getActive && ids.Contains(x.Id)).ToListAsync().ConfigureAwait(false);
-
-                foreach (var record in records)
-                {
-                    var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(PersonGroup).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                    foreach (var property in properties)
-                    {
-                        if (!property.GetMethod.IsVirtual) continue;
-                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                        if (excludedProperties.Contains(property.Name)) continue;
-
-                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
-                    }
-                }
-
                 return records; 
             }
         }
@@ -104,6 +74,8 @@ namespace SDDB.Domain.Services
         // Create and Update records given in []
         public virtual async Task<DBResult> EditAsync(PersonGroup[] records)
         {
+            var errorMessage = "";
+
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -119,45 +91,29 @@ namespace SDDB.Domain.Services
                         }
                         else
                         {
-                            var excludedProperties = new string[] { "Id", "TSP" };
-                            var properties = typeof(PersonGroup).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                            foreach (var property in properties)
-                            {
-                                if (property.GetMethod.IsVirtual) continue;
-                                if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                                if (excludedProperties.Contains(property.Name)) continue;
-
-                                if (record.PropIsModified(property.Name)) property.SetValue(dbEntry, property.GetValue(record));
-                            }
+                            dbEntry.CopyModifiedProps(record);
                         }
                     }
-                    for (int i = 1; i <= 10; i++)
-                    {
-                        try
-                        {
-                            await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                            break;
-                        }
-                        catch (Exception e)
-                        {
-                            var message = e.GetBaseException().Message;
-                            if (i == 10 || !message.Contains("Deadlock found when trying to get lock"))
-                            {
-                                return new DBResult { StatusCode = HttpStatusCode.Conflict, StatusDescription = message };
-                            }
-                        }
-                        await Task.Delay(200).ConfigureAwait(false);
-                    }
+                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
                     trans.Complete();
                 }
             }
-            return new DBResult { StatusCode = HttpStatusCode.OK };
+            if (errorMessage == "") { return new DBResult(); }
+            else
+            {
+                return new DBResult
+                {
+                    StatusCode = HttpStatusCode.Conflict,
+                    StatusDescription = "Errors editing records:\n" + errorMessage
+                };
+            }
         }
 
         // Delete records by their Ids
         public virtual async Task<DBResult> DeleteAsync(string[] ids)
         {
-            var errorMessage = ""; var serviceResult = new DBResult();
+            var errorMessage = "";
+            
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -165,13 +121,17 @@ namespace SDDB.Domain.Services
                 //tasks prior to desactivating:
                 //running PersonService and deleting Persons from GroupPersons and GroupManagers
                 var personIds = await dbContext.Persons.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
-                serviceResult = await personService.EditPersonGroupsAsync(personIds, ids, false).ConfigureAwait(false);
+                var serviceResult = await personService.EditPersonGroupsAsync(personIds, ids, false).ConfigureAwait(false);
                 if (serviceResult.StatusCode == HttpStatusCode.OK)
-                    serviceResult = await personService.EditManagedGroupsAsync(personIds, ids, false).ConfigureAwait(false);
+                { serviceResult = await personService.EditManagedGroupsAsync(personIds, ids, false).ConfigureAwait(false); }
 
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                if (serviceResult.StatusCode != HttpStatusCode.OK) 
+                { 
+                    errorMessage += "Error running tasks before deleting:\n" + serviceResult.StatusDescription;
+                }
+                else
                 {
-                    if (serviceResult.StatusCode == HttpStatusCode.OK)
+                    using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                     {
                         foreach (var id in ids)
                         {
@@ -185,31 +145,20 @@ namespace SDDB.Domain.Services
                                 errorMessage += string.Format("Record with Id={0} not found\n", id);
                             }
                         }
-                        for (int i = 1; i <= 10; i++)
-                        {
-                            try
-                            {
-                                await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                                break;
-                            }
-                            catch (Exception e)
-                            {
-                                var message = e.GetBaseException().Message;
-                                if (i == 10 || !message.Contains("Deadlock found when trying to get lock"))
-                                {
-                                    errorMessage += string.Format("Error Saving changes: {0}\n", message);
-                                    break;
-                                }
-                            }
-                            await Task.Delay(200).ConfigureAwait(false);
-                        }
-                    }
-                    trans.Complete();
+                        errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                        trans.Complete();
+                    }                    
                 }
             }
-            if (errorMessage == "" && serviceResult.StatusCode == HttpStatusCode.OK) return serviceResult;
-            else return new DBResult { StatusCode = HttpStatusCode.Conflict, 
-                StatusDescription = "Errors deleting records:\n" + errorMessage + serviceResult.StatusDescription };
+            if (errorMessage == "") { return new DBResult(); }
+            else
+            {
+                return new DBResult
+                {
+                    StatusCode = HttpStatusCode.Conflict,
+                    StatusDescription = "Errors deleting records:\n" + errorMessage
+                };
+            }
         }
 
 

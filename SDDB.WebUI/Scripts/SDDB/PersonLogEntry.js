@@ -251,19 +251,21 @@ $(document).ready(function () {
     $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
     $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
 
-    //if (typeof assyId !== "undefined" && assyId != "") {
-    //    showModalWait();
-    //    $.ajax({
-    //        type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 20000,
-    //        data: { ids: [assyId], getActive: true }, dataType: "json"
-    //    })
-    //        .always(hideModalWait)
-    //        .done(function (data) {
-    //            MsFilterByAssy.setSelection([{ id: data[0].Id, name: data[0].AssyName,  }]);
-    //        })
-    //        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    //}
+    if (typeof PersonId !== "undefined" && PersonId != "") {
+        showModalWait();
+        $.ajax({
+            type: "POST", url: "/PersonSrv/GetAllByIds", timeout: 20000,
+            data: { ids: [PersonId], getActive: true }, dataType: "json"
+        })
+            .always(hideModalWait)
+            .done(function (data) {
+                MsFilterByPerson.setSelection([{ id: data[0].Id, name: data[0].FirstName + " " + data[0].LastName + " " + data[0].Initials }]);
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+    }
 
+    $("#InitialView").addClass("hide");
+    $("#MainView").removeClass("hide");
     
 
     //--------------------------------End of execution at Start-----------

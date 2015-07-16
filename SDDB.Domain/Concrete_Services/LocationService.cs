@@ -43,19 +43,7 @@ namespace SDDB.Domain.Services
                     .Include(x => x.LocationType).Include(x => x.AssignedToProject).Include(x => x.ContactPerson)
                     .ToListAsync().ConfigureAwait(false);
 
-                foreach (var record in records)
-                {
-                    var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(Location).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                    foreach (var property in properties)
-                    {
-                        if (!property.GetMethod.IsVirtual) continue;
-                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                        if (excludedProperties.Contains(property.Name)) continue;
-
-                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
-                    }
-                }
+                foreach (var record in records) { record.FillRelatedIfNull(); }
 
                 return records;
             }
@@ -75,19 +63,7 @@ namespace SDDB.Domain.Services
                     .Include(x => x.LocationType).Include(x => x.AssignedToProject).Include(x => x.ContactPerson)
                     .ToListAsync().ConfigureAwait(false);
 
-                foreach (var record in records)
-                {
-                    var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(Location).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                    foreach (var property in properties)
-                    {
-                        if (!property.GetMethod.IsVirtual) continue;
-                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                        if (excludedProperties.Contains(property.Name)) continue;
-
-                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
-                    }
-                }
+                foreach (var record in records) { record.FillRelatedIfNull(); }
 
                 return records;
             }
@@ -111,19 +87,8 @@ namespace SDDB.Domain.Services
                     .Include(x => x.LocationType).Include(x => x.AssignedToProject).Include(x => x.ContactPerson)
                     .ToListAsync().ConfigureAwait(false);
 
-                foreach (var record in records)
-                {
-                    var excludedProperties = new string[] { "Id", "TSP" };
-                    var properties = typeof(Location).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                    foreach (var property in properties)
-                    {
-                        if (!property.GetMethod.IsVirtual) continue;
-                        if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                        if (excludedProperties.Contains(property.Name)) continue;
+                foreach (var record in records) { record.FillRelatedIfNull(); }
 
-                        if (property.GetValue(record) == null) property.SetValue(record, Activator.CreateInstance(property.PropertyType));
-                    }
-                }
                 return records;
             }
         }
@@ -169,6 +134,8 @@ namespace SDDB.Domain.Services
         // Create and Update records given in []
         public virtual async Task<DBResult> EditAsync(Location[] records)
         {
+            var errorMessage = "";
+
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -195,45 +162,29 @@ namespace SDDB.Domain.Services
                         }
                         else
                         {
-                            var excludedProperties = new string[] { "Id", "TSP" };
-                            var properties = typeof(Location).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                            foreach (var property in properties)
-                            {
-                                if (property.GetMethod.IsVirtual) continue;
-                                if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) continue;
-                                if (excludedProperties.Contains(property.Name)) continue;
-
-                                if (record.PropIsModified(property.Name)) property.SetValue(dbEntry, property.GetValue(record));
-                            }
+                            dbEntry.CopyModifiedProps(record);
                         }
                     }
-                    for (int i = 1; i <= 10; i++)
-                    {
-                        try
-                        {
-                            await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                            break;
-                        }
-                        catch (Exception e)
-                        {
-                            var message = e.GetBaseException().Message;
-                            if (i == 10 || !message.Contains("Deadlock found when trying to get lock"))
-                            {
-                                return new DBResult { StatusCode = HttpStatusCode.Conflict, StatusDescription = message };
-                            }
-                        }
-                        await Task.Delay(200).ConfigureAwait(false);
-                    }
+                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
                     trans.Complete();
                 }
             }
-            return new DBResult { StatusCode = HttpStatusCode.OK };
+            if (errorMessage == "") { return new DBResult(); }
+            else
+            {
+                return new DBResult
+                {
+                    StatusCode = HttpStatusCode.Conflict,
+                    StatusDescription = "Errors editing records:\n" + errorMessage
+                };
+            }
         }
 
         // Delete records by their Ids
         public virtual async Task<DBResult> DeleteAsync(string[] ids)
         {
             var errorMessage = "";
+
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
@@ -257,32 +208,19 @@ namespace SDDB.Domain.Services
                             errorMessage += string.Format("Record with Id={0} not found\n", id);
                         }
                     }
-                    for (int i = 1; i <= 10; i++)
-                    {
-                        try
-                        {
-                            await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                            break;
-                        }
-                        catch (Exception e)
-                        {
-                            var message = e.GetBaseException().Message;
-                            if (i == 10 || !message.Contains("Deadlock found when trying to get lock"))
-                            {
-                                errorMessage += string.Format("Error Saving changes: {0}\n", message);
-                                break;
-                            }
-                        }
-                        await Task.Delay(200).ConfigureAwait(false);
-                    }
+                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
                     trans.Complete();
                 }
             }
-            if (errorMessage == "") return new DBResult();
-            else return new DBResult {
-                StatusCode = HttpStatusCode.Conflict,
-                StatusDescription = "Errors deleting records:\n" + errorMessage
-            };
+            if (errorMessage == "") { return new DBResult(); }
+            else
+            {
+                return new DBResult
+                {
+                    StatusCode = HttpStatusCode.Conflict,
+                    StatusDescription = "Errors deleting records:\n" + errorMessage
+                };
+            }
         }
 
 

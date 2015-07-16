@@ -95,6 +95,8 @@ $(document).ready(function () {
 
     refreshTable(TableMain, "/AssemblyStatusSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
 
+    $("#InitialView").addClass("hide");
+    $("#MainView").removeClass("hide");
 
     //--------------------------------End of execution at Start-----------
 });
