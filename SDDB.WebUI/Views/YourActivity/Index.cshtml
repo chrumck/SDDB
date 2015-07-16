@@ -90,13 +90,16 @@
                         </div>
                     </div>
 
-                    <div class="form-group hidden">
-                        @Html.TextBoxFor(x => x.EnteredByPerson_Id, new { @class = "form-control modifiable", placeholder = "Entered By Person" })
-                        @Html.ValidationMessageFor(x => x.EnteredByPerson_Id)
-                    </div>
                 </div>
 
                 <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.EnteredByPerson_Id, "Entered By", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.EnteredByPerson_Id, new { @class = "form-control modifiable", placeholder = "Entered By Person" })
+                            @Html.ValidationMessageFor(x => x.EnteredByPerson_Id)
+                        </div>
+                    </div>
                     <div class="form-group">
                         @Html.LabelFor(x => x.PersonActivityType_Id, "Activity", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
@@ -253,121 +256,12 @@
     </div>
 </div>
 
-<!------- LogEntryFilesView ------->
-<div class="container-fluid hide" id="LogEntryFilesView">
-
-    <div class="row">
-        <div class="col-xs-12 col-sm-5">
-            <h3 id="PrsProjViewLabel">Log Entry Files</h3>
-        </div>
-        <div class="col-xs-9 col-sm-4">
-            <div class="panel panel-warning margin-top-10px">
-                <div class="panel-heading text-center" style="font-weight:bold" id="LogEntryFilesViewPanel"> </div>
-            </div>
-        </div>
-        <div class="col-xs-3">
-            <h3><button class="btn btn-default pull-right" type="button" id="LogEntryFilesViewBtnBack">Back</button></h3>
-        </div>
-    </div>
-
-    <div class="well well-tdo">
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="btn-group margin-bottom-2px">
-                    <span class="btn btn-default btn-file">Upload <input type="file" id="LogEntryFilesBtnUpload" multiple></span>
-                    <button class="btn btn-info" id="LogEntryFilesBtnDload">Download</button>
-                    <button class="btn btn-danger" id="LogEntryFilesBtnDelete">Delete</button>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="panel panel-primary">
-                    <div class="panel-heading text-center"><strong>Log Entry Files</strong></div>
-                    <table class="table table-striped" id="TableLogEntryFiles">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Size kB</th>
-                                <th>Modified</th>
-                            </tr>
-                        </thead>
-                        <tbody class="selectable"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-xs-12">
-                <button class="btn btn-default pull-right" type="button" id="LogEntryFilesViewBtnCancel">Back</button>
-            </div>
-        </div>
-    </div>
-    <iframe class="hide" id="LogEntryFilesIframe" name="LogEntryFilesIframe"></iframe>
-</div>
-
-<!------------ ModalUpload dialog ------------>
-<div class="modal fade" id="ModalUpload" tabindex="-1" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="ModalUploadLabel">Uploading...</h4>
-            </div>
-            <div class="modal-body">
-                <div id="ModalUploadBody"></div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-warning" id="ModalUploadBtnAbort">Abort</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!----------- ModalDeleteFiles dialog ----------->
-<div class="modal fade" id="ModalDeleteFiles" tabindex="-1" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="ModalDeleteFilesLabel">Confirm Delete</h4>
-            </div>
-            <div class="modal-body">
-                <div id="ModalDeleteFilesBody"></div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-default pull-left" id="ModalDeleteFilesBtnCancel">Cancel</button>
-                <button class="btn btn-warning" id="ModalDeleteFilesBtnOk">
-                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!------------ ModalChngSts dialog ------------>
-<div class="modal fade" id="ModalChngSts" tabindex="-1" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="ModalChngStsLabel">Change Status</h4>
-            </div>
-            <div class="modal-body">
-                <div id="ModalChngStsBody"></div>
-                <br />
-                <div id="ModalChngStsMs" placeholder="Select Status"></div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-default pull-left" id="ModalChngStsBtnCancel">Cancel</button>
-                <button class="btn btn-warning" id="ModalChngStsBtnOk">
-                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+@Html.Partial("_PersonLogEntryShared")
 
 <!------- ScriptVariables ------->
 <script>var UserId = "@Html.GetUserId()";</script>
+<script>var UserFullName = "@Html.GetUserFullName()";</script>
+
 
 
 @section Scripts {
@@ -376,6 +270,7 @@
     @Scripts.Render("~/bundles/magicsuggest")
     @Scripts.Render("~/bundles/bootstrap-datetimepicker")
     <script src="~/Scripts/SDDB/YourActivity.js"></script>
+    <script src="~/Scripts/SDDB/PersonLogEntryShared.js"></script>
 }
 
 @section CSS {

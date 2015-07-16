@@ -405,6 +405,7 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\SDDB\AssemblyLogEntry.js" />
     <Content Include="Scripts\SDDB\ComponentLogEntry.js" />
+    <Content Include="Scripts\SDDB\PersonLogEntryShared.js" />
     <Content Include="Scripts\SDDB\YourActivity.js" />
     <Content Include="Scripts\SDDB\PersonLogEntry.js" />
     <Content Include="Scripts\SDDB\ComponentExt.js" />
@@ -534,6 +535,7 @@
     <Content Include="Views\ComponentLogEntry\Index.cshtml" />
     <Content Include="Views\AssemblyLogEntry\Index.cshtml" />
     <Content Include="Views\YourActivity\Index.cshtml" />
+    <Content Include="Views\Shared\_PersonLogEntryShared.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -130,7 +130,7 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "AssemblyDbService.LookupAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(records.OrderBy(x => x.AssyName)
-                .Select(x => new { id = x.Id, name = x.AssyName + " - " + x.AssignedToProject.ProjectCode }), JsonRequestBehavior.AllowGet);
+                .Select(x => new { id = x.Id, name = x.AssyName + " - " + x.AssignedToProject.ProjectName }), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /AssemblyDbSrv/LookupByProj
@@ -144,7 +144,7 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "AssemblyDbService.LookupByProjAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(records.OrderBy(x => x.AssyName)
-                .Select(x => new { id = x.Id, name = x.AssyName + " - " + x.AssignedToProject.ProjectCode }), JsonRequestBehavior.AllowGet);
+                .Select(x => new { id = x.Id, name = x.AssyName + " - " + x.AssignedToProject.ProjectName }), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /AssemblyDbSrv/LookupByLoc
@@ -155,7 +155,7 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "AssemblyDbService.LookupByLocAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(records.OrderBy(x => x.AssyName)
-                .Select(x => new { id = x.Id, name = x.AssyName + " - " + x.AssignedToProject.ProjectCode }), JsonRequestBehavior.AllowGet);
+                .Select(x => new { id = x.Id, name = x.AssyName + " - " + x.AssignedToProject.ProjectName }), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /AssemblyDbSrv/LookupByLocDTables

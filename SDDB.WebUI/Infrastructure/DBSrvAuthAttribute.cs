@@ -38,13 +38,17 @@ namespace SDDB.WebUI.Infrastructure
             var dbRolesArray = dbRoles.Split(','); var isInRole = false;
             foreach (var dbRole in dbRolesArray)
             {
-                if (context.Principal.IsInRole(dbRole)) isInRole = true; break;
+                if (context.Principal.IsInRole(dbRole)) 
+                { 
+                    isInRole = true; 
+                    break;
+                }
             }
 
 
             if (!context.HttpContext.Request.IsAuthenticated || (dbRoles != "" && !isInRole))
             {
-                filterResult.StatusCode = HttpStatusCode.Forbidden;
+                filterResult.StatusCode = HttpStatusCode.Conflict;
                 filterResult.StatusDescription = "Request not authorized, contact SDDB administrator to obtain appropriate privileges";
                 Logger.LogResult(filterResult);
                 context.HttpContext.Response.StatusCode = (int)filterResult.StatusCode;

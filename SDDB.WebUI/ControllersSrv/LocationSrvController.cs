@@ -89,7 +89,7 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "LocationService.LookupAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(records.OrderBy(x => x.LocName)
-                .Select(x => new { id = x.Id, name = x.LocName + " - " + x.AssignedToProject.ProjectCode }), JsonRequestBehavior.AllowGet);
+                .Select(x => new { id = x.Id, name = x.LocName + " - " + x.AssignedToProject.ProjectName }), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /LocationSrv/LookupByProj
@@ -103,7 +103,7 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "LocationService.LookupByProjAsync"; ViewBag.StatusCode = HttpStatusCode.OK;
 
             return Json(records.OrderBy(x => x.LocName)
-                .Select(x => new { id = x.Id, name = x.LocName + " - " + x.AssignedToProject.ProjectCode }), JsonRequestBehavior.AllowGet);
+                .Select(x => new { id = x.Id, name = x.LocName + " - " + x.AssignedToProject.ProjectName }), JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------

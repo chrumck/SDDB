@@ -47,13 +47,7 @@ namespace SDDB.WebUI.ControllersSrv
                 x.EnteredByPerson_Id ,x.PersonActivityType_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id, x.AssignedToProjectEvent_Id
             }).ToList();
 
-            if (!User.IsInRole("PersonLogEntry_View"))
-            {
-                foreach (var record in data)
-                {
-                    if (record.EnteredByPerson_Id != UserId) { data.Remove(record); }
-                }
-            }
+            if (!User.IsInRole("PersonLogEntry_View")) { data = data.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
 
             ViewBag.ServiceName = "PersonLogEntryService.GetAsync";
             ViewBag.StatusCode = HttpStatusCode.OK;
@@ -77,13 +71,7 @@ namespace SDDB.WebUI.ControllersSrv
                 x.EnteredByPerson_Id ,x.PersonActivityType_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id, x.AssignedToProjectEvent_Id
             }).ToList();
 
-            if (!User.IsInRole("PersonLogEntry_View"))
-            {
-                foreach (var record in data)
-                {
-                    if (record.EnteredByPerson_Id != UserId) { data.Remove(record); }
-                }
-            }
+            if (!User.IsInRole("PersonLogEntry_View")) { data = data.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
 
             ViewBag.ServiceName = "PersonLogEntryService.GetAsync";
             ViewBag.StatusCode = HttpStatusCode.OK;
@@ -109,13 +97,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.EnteredByPerson_Id ,x.PersonActivityType_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id, x.AssignedToProjectEvent_Id
             }).ToList();
 
-            if (!User.IsInRole("PersonLogEntry_View"))
-            {
-                foreach (var record in data)
-                {
-                    if (record.EnteredByPerson_Id != UserId) { data.Remove(record); }
-                }
-            }
+
+            if (!User.IsInRole("PersonLogEntry_View")) { data = data.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
 
             ViewBag.ServiceName = "PersonLogEntryService.GetByAltIdsAsync";
             ViewBag.StatusCode = HttpStatusCode.OK;
@@ -127,14 +110,9 @@ namespace SDDB.WebUI.ControllersSrv
         public async Task<ActionResult> Lookup(string query = "", bool getActive = true)
         {
             var records = await prsLogEntryService.LookupAsync(UserId, query, getActive).ConfigureAwait(false);
-            
-            if (!User.IsInRole("PersonLogEntry_View"))
-            {
-                foreach (var record in records)
-                {
-                    if (record.EnteredByPerson_Id != UserId) { records.Remove(record); }
-                }
-            }
+
+            if (!User.IsInRole("PersonLogEntry_View")) { records = records.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
+
             var data = records.OrderBy(x => x.LogEntryDateTime)
                 .Select(x => new { id = x.Id, name = x.LogEntryDateTime + " " + x.EnteredByPerson.LastName + " " + x.EnteredByPerson.Initials });
 
@@ -151,13 +129,8 @@ namespace SDDB.WebUI.ControllersSrv
 
             var records = await prsLogEntryService.LookupByProjAsync(UserId, projectIdsArray, query, getActive).ConfigureAwait(false);
 
-            if (!User.IsInRole("PersonLogEntry_View"))
-            {
-                foreach (var record in records)
-                {
-                    if (record.EnteredByPerson_Id != UserId) { records.Remove(record); }
-                }
-            }
+            if (!User.IsInRole("PersonLogEntry_View")) { records = records.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
+
             var data = records.OrderBy(x => x.LogEntryDateTime)
                 .Select(x => new { id = x.Id, name = x.LogEntryDateTime + " " + x.EnteredByPerson.LastName + " " + x.EnteredByPerson.Initials });
 
@@ -423,10 +396,13 @@ namespace SDDB.WebUI.ControllersSrv
         //check if person log entry belongs to user
         private async Task<bool> isUserActivity(string[] ids)
         {
-            var records = await prsLogEntryService.GetAsync(ids).ConfigureAwait(false);
-            foreach (var record in records)
+            var dbEntries = await prsLogEntryService.GetAsync(ids).ConfigureAwait(false);
+
+            if (dbEntries.Count() == 0) { return false; }
+
+            foreach (var dbEntry in dbEntries)
             {
-                if (record.EnteredByPerson_Id != UserId) { return false; }
+                if (dbEntry.EnteredByPerson_Id != UserId) { return false; }
             }
             return true;
         }
@@ -434,19 +410,16 @@ namespace SDDB.WebUI.ControllersSrv
         //check if person log entry belongs to user - overload for PersonLogEntry[]
         private async Task<bool> isUserActivity(PersonLogEntry[] records)
         {
-            foreach (var record in records)
-            {
-                if (record.EnteredByPerson_Id != UserId) { return false; }
-            }
-            return true;
+            var ids = records.Select(x => x.Id).ToArray();
+            return await isUserActivity(ids);
         }
 
         //set viewbag, response http code and return JSON if user does not have PersonLogEntry_ rights
         private JsonResult JsonResponseForNoRights()
         {
-            ViewBag.StatusCode = (int)HttpStatusCode.Forbidden;
-            ViewBag.StatusDescription = "Editing or viewing other user's entries not without 'PersonLogEntry_...' rights.";
-            Response.StatusCode = ViewBag.StatusCode;
+            ViewBag.StatusCode = HttpStatusCode.Conflict;
+            ViewBag.StatusDescription = "Editing or viewing other user's entries not allowed without 'PersonLogEntry_...' rights.\nPlease contact SDDB administrator.";
+            Response.StatusCode = (int)ViewBag.StatusCode;
             return Json(new { Success = "False", responseText = ViewBag.StatusDescription }, JsonRequestBehavior.AllowGet); 
         }
 
