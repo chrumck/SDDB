@@ -1,0 +1,10 @@
+﻿<Window x:Class="SDDB.ServerApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SDDB" Height="350" Width="525" ResizeMode="CanMinimize" Icon="SolDataIcon.ico">
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="SDDB_background.jpg" Opacity="0.3"/>
+        </Grid.Background>
+    </Grid>
+</Window>
