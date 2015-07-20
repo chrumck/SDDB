@@ -22,6 +22,8 @@ namespace SDDB.Domain.DbContexts
         public virtual DbSet<PersonGroup> PersonGroups { get; set; }
         public virtual DbSet<PersonActivityType> PersonActivityTypes { get; set; }
         public virtual DbSet<PersonLogEntry> PersonLogEntrys { get; set; }
+        public virtual DbSet<PersonLogEntryFile> PersonLogEntryFiles { get; set;}
+        public virtual DbSet<PersonLogEntryFileData> PersonLogEntryFileDatas { get; set; }
         
         public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<ProjectEvent> ProjectEvents { get; set; }

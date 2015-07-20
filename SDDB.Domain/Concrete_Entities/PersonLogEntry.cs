@@ -79,6 +79,9 @@ namespace SDDB.Domain.Entities
         public virtual Location AssignedToLocation { get; set; }
         public virtual ProjectEvent AssignedToProjectEvent { get; set; }
 
+        [InverseProperty("AssignedToPersonLogEntry")]
+        public virtual ICollection<PersonLogEntryFile> PersonLogEntryFiles { get; set; }
+
         //many to many
 
         [InverseProperty("PersonPrsLogEntrys")]
@@ -92,6 +95,7 @@ namespace SDDB.Domain.Entities
 
         public PersonLogEntry()
         {
+            this.PersonLogEntryFiles = new HashSet<PersonLogEntryFile>();
             this.PrsLogEntryPersons = new HashSet<Person>();
             this.PrsLogEntryAssemblyDbs = new HashSet<AssemblyDb>();
         }

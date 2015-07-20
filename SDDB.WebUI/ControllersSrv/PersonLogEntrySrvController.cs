@@ -312,9 +312,23 @@ namespace SDDB.WebUI.ControllersSrv
 
         //-----------------------------------------------------------------------------------------------------------------------
 
-        // GET: /PersonLogEntrySrv/GetFiles
+        //// GET: /PersonLogEntrySrv/GetFiles
+        //[DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
+        //public async Task<ActionResult> GetFiles(string id)
+        //{
+        //    if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { id }).ConfigureAwait(false)))
+        //    { return JsonResponseForNoRights(); }
+
+        //    var data = (await fileRepoService.GetAsync(id).ConfigureAwait(false));
+
+        //    ViewBag.ServiceName = "IFileRepoService.Get";
+        //    ViewBag.StatusCode = HttpStatusCode.OK;
+        //    return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+        //}
+
+        // GET: /PersonLogEntrySrv/ListFiles
         [DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
-        public async Task<ActionResult> GetFiles(string id)
+        public async Task<ActionResult> ListFiles(string id)
         {
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { id }).ConfigureAwait(false)))
             { return JsonResponseForNoRights(); }
@@ -326,76 +340,83 @@ namespace SDDB.WebUI.ControllersSrv
             return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
-        // POST: /PersonLogEntrySrv/DownloadFiles
-        [HttpPost]
-        [DBSrvAuth("PersonLogEntry_View,YourActivity_View", false)]
-        public async Task<ActionResult> DownloadFiles(long DlToken, string id, string[] names)
-        {
-            if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { id }).ConfigureAwait(false)))
-            { return JsonResponseForNoRights(); }
+        //// POST: /PersonLogEntrySrv/DownloadFiles
+        //[HttpPost]
+        //[DBSrvAuth("PersonLogEntry_View,YourActivity_View", false)]
+        //public async Task<ActionResult> DownloadFiles(long DlToken, string id, string[] names)
+        //{
+        //    if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { id }).ConfigureAwait(false)))
+        //    { return JsonResponseForNoRights(); }
 
-            var data = await fileRepoService.DownloadAsync(id, names).ConfigureAwait(false);
+        //    var data = await fileRepoService.DownloadAsync(id, names).ConfigureAwait(false);
                        
-            var tokenCookie = new HttpCookie("DlToken", DlToken.ToString());
-            Response.Cookies.Set(tokenCookie);
+        //    var tokenCookie = new HttpCookie("DlToken", DlToken.ToString());
+        //    Response.Cookies.Set(tokenCookie);
 
-            var fileName = (names.Length == 1) ? names[0] : "SDDBFiles_" + String.Format("_{0:yyyyMMdd_HHmm}", DateTime.Now) + ".zip";
-            ViewBag.ServiceName = "IFileRepoService.DownloadAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            if (data != null && data.LongLength != 0) return File(data, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
-            else
-            {
-                Response.StatusCode = (int)HttpStatusCode.Gone;
-                return Content("File(s) not found.");
-            }
-        }
+        //    var fileName = (names.Length == 1) ? names[0] : "SDDBFiles_" + String.Format("_{0:yyyyMMdd_HHmm}", DateTime.Now) + ".zip";
+        //    ViewBag.ServiceName = "IFileRepoService.DownloadAsync";
+        //    ViewBag.StatusCode = HttpStatusCode.OK;
+        //    if (data != null && data.LongLength != 0) return File(data, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+        //    else
+        //    {
+        //        Response.StatusCode = (int)HttpStatusCode.Gone;
+        //        return Content("File(s) not found.");
+        //    }
+        //}
 
-        // POST: /PersonLogEntrySrv/UploadFiles
-        [HttpPost]
-        [DBSrvAuth("PersonLogEntry_Edit,YourActivity_Edit")]
-        public async Task<ActionResult> UploadFiles(string id)
-        {
-            if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(new[] { id }).ConfigureAwait(false)))
-            { return JsonResponseForNoRights(); }
+        //// POST: /PersonLogEntrySrv/UploadFiles
+        //[HttpPost]
+        //[DBSrvAuth("PersonLogEntry_Edit,YourActivity_Edit")]
+        //public async Task<ActionResult> UploadFiles(string id)
+        //{
+        //    if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(new[] { id }).ConfigureAwait(false)))
+        //    { return JsonResponseForNoRights(); }
 
-            var filesList = new List<FileMemStream>();
-            foreach (string fileName in Request.Files)
-            {
-                var fileContent = Request.Files[fileName];
-                if (fileContent != null && fileContent.ContentLength > 0)
-                {
-                    var fileMemStream = new FileMemStream();
-                    await fileContent.InputStream.CopyToAsync(fileMemStream).ConfigureAwait(false);
-                    fileMemStream.FileName = fileContent.FileName;
-                    filesList.Add(fileMemStream);
-                }
-            }
+        //    var filesList = new List<FileMemStream>();
+        //    foreach (string fileName in Request.Files)
+        //    {
+        //        var fileContent = Request.Files[fileName];
+        //        if (fileContent != null && fileContent.ContentLength > 0)
+        //        {
+        //            var fileMemStream = new FileMemStream();
+        //            await fileContent.InputStream.CopyToAsync(fileMemStream).ConfigureAwait(false);
+        //            fileMemStream.FileName = fileContent.FileName;
+        //            filesList.Add(fileMemStream);
+        //        }
+        //    }
             
-            await fileRepoService.UploadAsync(id, filesList.ToArray()).ConfigureAwait(false);
+        //    await fileRepoService.UploadAsync(id, filesList.ToArray()).ConfigureAwait(false);
             
-            ViewBag.ServiceName = "fileRepoService.UploadAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-        }
+        //    ViewBag.ServiceName = "fileRepoService.UploadAsync";
+        //    ViewBag.StatusCode = HttpStatusCode.OK;
+        //    return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+        //}
 
-        // POST: /PersonLogEntrySrv/DeleteFiles
-        [HttpPost]
-        [DBSrvAuth("PersonLogEntry_Edit,YourActivity_Edit")]
-        public async Task<ActionResult> DeleteFiles(string id, string[] names)
-        {
-            if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(new[] { id }).ConfigureAwait(false)))
-            { return JsonResponseForNoRights(); }
+        //// POST: /PersonLogEntrySrv/DeleteFiles
+        //[HttpPost]
+        //[DBSrvAuth("PersonLogEntry_Edit,YourActivity_Edit")]
+        //public async Task<ActionResult> DeleteFiles(string id, string[] names)
+        //{
+        //    if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(new[] { id }).ConfigureAwait(false)))
+        //    { return JsonResponseForNoRights(); }
 
-            await fileRepoService.DeleteAsync(id, names).ConfigureAwait(false);
+        //    await fileRepoService.DeleteAsync(id, names).ConfigureAwait(false);
             
-            ViewBag.ServiceName = "fileRepoService.DeleteAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-        }
+        //    ViewBag.ServiceName = "fileRepoService.DeleteAsync";
+        //    ViewBag.StatusCode = HttpStatusCode.OK;
+        //    return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+        //}
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
 
+        //check if person log entry belongs to user - overload for single id
+        private async Task<bool> isUserActivity(string id)
+        {
+            var ids = new[] { id };
+            return await isUserActivity(ids).ConfigureAwait(false);
+        }
+        
         //check if person log entry belongs to user
         private async Task<bool> isUserActivity(string[] ids)
         {

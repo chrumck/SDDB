@@ -22,9 +22,13 @@ namespace SDDB.Domain.Entities
         public DateTime Modified { get; set; }
     }
 
-    //MemoryStream + file name
+    //MemoryStream + file metadata
     public class FileMemStream : MemoryStream
     {
         public string FileName { get; set; }
+        public string FileType { get; set; }
+        public Int64 FileSize { get; set; }
+        public DateTime FileDateTime { get; set; }
+
     }
 }

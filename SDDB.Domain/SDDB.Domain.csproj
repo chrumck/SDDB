@@ -122,6 +122,8 @@
     <Compile Include="Abstract_Services\IAppRoleManager.cs" />
     <Compile Include="Abstract_Services\IAppUserManager.cs" />
     <Compile Include="Concrete_DbContexts\EFDbContext.cs" />
+    <Compile Include="Concrete_Entities\PersonLogEntryFileData.cs" />
+    <Compile Include="Concrete_Entities\PersonLogEntryFile.cs" />
     <Compile Include="Concrete_Entities\AssemblyLogEntry.cs" />
     <Compile Include="Concrete_Entities\PersonLogEntry.cs" />
     <Compile Include="Concrete_Entities\ComponentLogEntry.cs" />
@@ -147,11 +149,14 @@
     <Compile Include="Concrete_Entities\DBUser.cs" />
     <Compile Include="Concrete_Entities\DBRole.cs" />
     <Compile Include="Concrete_Entities\Person.cs" />
-    <Compile Include="Concrete_Entities\_DbEntities.cs" />
+    <Compile Include="Concrete_Entities\_HelperEntities.cs" />
     <Compile Include="Concrete_Infrastructure\DbDataAnnotations.cs" />
     <Compile Include="Concrete_Infrastructure\HelpersAndExtensions.cs" />
     <Compile Include="Concrete_Services\AssemblyLogEntryService.cs" />
     <Compile Include="Concrete_Services\ComponentLogEntryService.cs" />
+    <Compile Include="Concrete_Services\PersonLogEntryFileService.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Concrete_Services\PersonLogEntryService.cs" />
     <Compile Include="Concrete_Services\_DbFtpRepoService.cs" />
     <Compile Include="Concrete_Services\ComponentService.cs" />
@@ -411,6 +416,18 @@
     <Compile Include="Migrations\201507082134346_person12.Designer.cs">
       <DependentUpon>201507082134346_person12.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201507201745486_PersonLogEntryFile0.cs" />
+    <Compile Include="Migrations\201507201745486_PersonLogEntryFile0.Designer.cs">
+      <DependentUpon>201507201745486_PersonLogEntryFile0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201507201801303_PersonLogEntryFile1.cs" />
+    <Compile Include="Migrations\201507201801303_PersonLogEntryFile1.Designer.cs">
+      <DependentUpon>201507201801303_PersonLogEntryFile1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201507201836301_PersonLogEntryFile2.cs" />
+    <Compile Include="Migrations\201507201836301_PersonLogEntryFile2.Designer.cs">
+      <DependentUpon>201507201836301_PersonLogEntryFile2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -594,6 +611,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201507082134346_person12.resx">
       <DependentUpon>201507082134346_person12.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201507201745486_PersonLogEntryFile0.resx">
+      <DependentUpon>201507201745486_PersonLogEntryFile0.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201507201801303_PersonLogEntryFile1.resx">
+      <DependentUpon>201507201801303_PersonLogEntryFile1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201507201836301_PersonLogEntryFile2.resx">
+      <DependentUpon>201507201836301_PersonLogEntryFile2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -81,8 +81,8 @@ $(document).ready(function () {
 //Show Modal Nothing Selected
 function showModalNothingSelected(bodyText) {
     $("#ModalInfoLabel").text("Nothing Selected");
-    if (typeof bodyText !== "undefined") $("#ModalInfoBody").text(bodyText);
-    else $("#ModalInfoBody").text("Please select one or more rows.");
+    if (typeof bodyText !== "undefined") { $("#ModalInfoBody").text(bodyText); }
+    else { $("#ModalInfoBody").text("Please select one or more rows."); }
     $("#ModalInfoBodyPre").empty().hide();
     $("#ModalInfo").modal("show");
 }
@@ -90,8 +90,8 @@ function showModalNothingSelected(bodyText) {
 //Show Modal Selected other than one row
 function showModalSelectOne(bodyText) {
     $("#ModalInfoLabel").text("Select One Row");
-    if (typeof bodyText !== "undefined") $("#ModalInfoBody").text(bodyText);
-    else $("#ModalInfoBody").text("Please select one row.");
+    if (typeof bodyText !== "undefined") { $("#ModalInfoBody").text(bodyText); }
+    else { $("#ModalInfoBody").text("Please select one row."); }
     $("#ModalInfoBodyPre").empty().hide();
     $("#ModalInfo").modal("show");
 }
@@ -130,20 +130,20 @@ function showModalFail(label, body, bodyPre) {
   
     $("#ModalInfoLabel").text(label);
     $("#ModalInfoBody").html(body);
-    if (bodyPre != "") $("#ModalInfoBodyPre").text(bodyPre).show();
-    else $("#ModalInfoBodyPre").hide();
+    if (bodyPre != "") { $("#ModalInfoBodyPre").text(bodyPre).show(); }
+    else { $("#ModalInfoBodyPre").hide(); }
     $("#ModalInfo").modal("show");
 }
 
 //showModalAJAXFail
 function showModalAJAXFail(xhr, status, error) {
     if (typeof xhr.responseJSON !== "undefined") {
-        var errMessage = xhr.responseJSON.responseText.substr(0, 512)
+        var errMessage = xhr.responseJSON.responseText.substr(0, 512);
     }
     else if (typeof xhr.responseText !== "undefined") {
-        var errMessage = xhr.responseText.substr(0, 512)
+        var errMessage = xhr.responseText.substr(0, 512);
     }
-    if (typeof errMessage == "undefined" || errMessage == "") { errMessage = "No error details available." }
+    if (typeof errMessage == "undefined" || errMessage == "") { errMessage = "No error details available."; }
     $("#ModalInfoLabel").text("Server Error");
     $("#ModalInfoBody").html("Error type: <strong>" + error + "</strong> , Status: <strong>" + status + "</strong>");
     $("#ModalInfoBodyPre").text(errMessage).show();
@@ -227,15 +227,12 @@ function refreshTblGenWrp(table, url, data, httpType) {
 
 //checking if form is valid
 function formIsValid(id, isCreate) {
-    if ($("#" + id).valid()) return true;
-    else if (isCreate) return false;
-    else {
-        var isValid = true;
-        $("#" + id + " input").each(function (index) {
-            if ($(this).data("ismodified") && $(this).hasClass("input-validation-error")) isValid = false;
-        });
-        return isValid;
-    }
+    if ($("#" + id).valid()) { return true; }
+    if (isCreate) { return false; }
+    $("#" + id + " input").each(function (index) {
+        if ($(this).data("ismodified") && $(this).hasClass("input-validation-error")) { return false; }
+    });
+    return true;
 }
 
 //Clear inputs from forms and reset .ismodified to false
@@ -258,7 +255,9 @@ function fillFormForCreateGeneric(formId, msArray, labelText, mainViewId) {
     $("#" + formId + "Label").text(labelText);
     $("#" + formId + " [data-val-dbisunique]").prop("disabled", false); disableUniqueMs(msArray, false);
     $("#" + formId + " .modifiable").data("ismodified", true); setMsAsModified(msArray, true);
-    $("#" + formId + "GroupIsActive").addClass("hide"); $("#IsActive").prop("checked", true); $("#IsActive_bl").prop("checked", true)
+    $("#" + formId + "GroupIsActive").addClass("hide");
+    $("#IsActive").prop("checked", true);
+    $("#IsActive_bl").prop("checked", true)
     $("#" + formId + "CreateMultiple").removeClass("hide");
     $("#" + mainViewId).addClass("hide");
     $("#" + formId + "View").removeClass("hide");
@@ -274,13 +273,8 @@ function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
 
     $.ajax({ type: httpType, url: url, timeout: 20000, data: { ids: ids, getActive: getActive }, dataType: "json" })
         .done(function (data) {
-
             var currRecord = {};
-            for (var property in data[0]) {
-                if (data[0].hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
-                    currRecord[property] = data[0][property];
-                }
-            }
+            copyFromDataToCurrRecord(currRecord, data);
 
             var formInput = $.extend(true, {}, currRecord);
 
@@ -342,6 +336,17 @@ function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
 
     return deferred0.promise();
 }
+
+//helper for FillFormForEdit Generic version
+function copyFromDataToCurrRecord(currRecord, data) {
+    for (var property in data[0]) {
+        if (data[0].hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
+            currRecord[property] = data[0][property];
+        }
+    }
+}
+
+
 
 //SubmitEdits to DB - generic version
 function submitEditsGeneric(ids, formId, msArray, currRecord, httpType, url) {
