@@ -28,7 +28,7 @@ namespace SDDB.WebUI.ControllersSrv
         public async Task<ActionResult> Get(bool getActive = true)
         {
             var data = (await locationTypeService.GetAsync(getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.LocTypeName, x.LocTypeAltName, x.Comments, x.IsActive
+                x.Id, x.LocTypeName, x.LocTypeAltName, x.Comments, IsActive = x.IsActive_bl
             });
 
             ViewBag.ServiceName = "LocationTypeService.GetAsync";
@@ -42,7 +42,7 @@ namespace SDDB.WebUI.ControllersSrv
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
             var data = (await locationTypeService.GetAsync(ids, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.LocTypeName, x.LocTypeAltName, x.Comments, x.IsActive
+                x.Id, x.LocTypeName, x.LocTypeAltName, x.Comments, IsActive = x.IsActive_bl
             });
 
             ViewBag.ServiceName = "LocationTypeService.GetAsync";

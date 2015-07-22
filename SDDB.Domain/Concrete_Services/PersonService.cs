@@ -135,7 +135,7 @@ namespace SDDB.Domain.Services
                             dbEntry.CopyModifiedProps(record);
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }
@@ -193,7 +193,7 @@ namespace SDDB.Domain.Services
                                 errorMessage += string.Format("Record with Id={0} not found\n", id);
                             }
                         }
-                        errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                        await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                         trans.Complete();
                     }
                 }
@@ -220,7 +220,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.Projects
-                    .Where(x => x.ProjectPersons.Any(y => y.Id == personId) && x.IsActive == true).ToListAsync();
+                    .Where(x => x.ProjectPersons.Any(y => y.Id == personId) && x.IsActive_bl == true).ToListAsync();
             }
         }
 
@@ -233,7 +233,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.Projects
-                    .Where(x => !x.ProjectPersons.Any(y => y.Id == personId) && x.IsActive == true).ToListAsync();
+                    .Where(x => !x.ProjectPersons.Any(y => y.Id == personId) && x.IsActive_bl == true).ToListAsync();
             }
         }
 
@@ -262,7 +262,7 @@ namespace SDDB.Domain.Services
                             else { if (person.PersonProjects.Contains(project)) person.PersonProjects.Remove(project); }
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }
@@ -288,7 +288,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.PersonGroups
-                    .Where(x => x.GroupPersons.Any(y => y.Id == personId) && x.IsActive == true).ToListAsync();
+                    .Where(x => x.GroupPersons.Any(y => y.Id == personId) && x.IsActive_bl == true).ToListAsync();
             }
         }
 
@@ -301,7 +301,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.PersonGroups
-                    .Where(x => !x.GroupPersons.Any(y => y.Id == personId) && x.IsActive == true).ToListAsync();
+                    .Where(x => !x.GroupPersons.Any(y => y.Id == personId) && x.IsActive_bl == true).ToListAsync();
             }
         }
 
@@ -330,7 +330,7 @@ namespace SDDB.Domain.Services
                             else { if (person.PersonGroups.Contains(group)) person.PersonGroups.Remove(group); }
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }
@@ -356,7 +356,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.PersonGroups
-                    .Where(x => x.GroupManagers.Any(y => y.Id == personId) && x.IsActive == true).ToListAsync();
+                    .Where(x => x.GroupManagers.Any(y => y.Id == personId) && x.IsActive_bl == true).ToListAsync();
             }
         }
 
@@ -369,7 +369,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.PersonGroups
-                    .Where(x => !x.GroupManagers.Any(y => y.Id == personId) && x.IsActive == true).ToListAsync();
+                    .Where(x => !x.GroupManagers.Any(y => y.Id == personId) && x.IsActive_bl == true).ToListAsync();
             }
         }
 
@@ -397,7 +397,7 @@ namespace SDDB.Domain.Services
                             else { if (person.ManagedGroups.Contains(group)) person.ManagedGroups.Remove(group); }
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }

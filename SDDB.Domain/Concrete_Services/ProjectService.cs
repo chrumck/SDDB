@@ -41,7 +41,7 @@ namespace SDDB.Domain.Services
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                var records = await dbContext.Projects.Where(x => x.IsActive == getActive)
+                var records = await dbContext.Projects.Where(x => x.IsActive_bl == getActive)
                     .Include(x => x.ProjectManager).ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records) { record.FillRelatedIfNull(); }
@@ -58,7 +58,7 @@ namespace SDDB.Domain.Services
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                var records = await dbContext.Projects.Where(x => x.IsActive == getActive && ids.Contains(x.Id))
+                var records = await dbContext.Projects.Where(x => x.IsActive_bl == getActive && ids.Contains(x.Id))
                     .Include(x => x.ProjectManager).ToListAsync().ConfigureAwait(false);
 
                 foreach (var record in records) { record.FillRelatedIfNull(); }
@@ -76,7 +76,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
-                return dbContext.Projects.Where(x => x.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                return dbContext.Projects.Where(x => x.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                     (x.ProjectName.Contains(query) || x.ProjectAltName.Contains(query) || x.ProjectCode.Contains(query))).ToListAsync();
             }
         }
@@ -106,7 +106,7 @@ namespace SDDB.Domain.Services
                             dbEntry.CopyModifiedProps(record);
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }
@@ -139,13 +139,13 @@ namespace SDDB.Domain.Services
                         if (dbEntry != null)
                         {
                             //tasks prior to desactivating: check if documents, locations, assemblies, components assigned to projects
-                            if ((await dbContext.Documents.Where(x => x.IsActive == true && x.AssignedToProject_Id == id).CountAsync().ConfigureAwait(false)) > 0)
+                            if ((await dbContext.Documents.Where(x => x.IsActive_bl == true && x.AssignedToProject_Id == id).CountAsync().ConfigureAwait(false)) > 0)
                                 errorMessage += string.Format("Project {0} not deleted, it has documents assigned to it\n", dbEntry.ProjectName);
-                            else if ((await dbContext.Locations.Where(x => x.IsActive == true && x.AssignedToProject_Id == id).CountAsync().ConfigureAwait(false)) > 0)
+                            else if ((await dbContext.Locations.Where(x => x.IsActive_bl == true && x.AssignedToProject_Id == id).CountAsync().ConfigureAwait(false)) > 0)
                                 errorMessage += string.Format("Project {0} not deleted, it has locations assigned to it\n", dbEntry.ProjectName);
-                            else if ((await dbContext.AssemblyDbs.Where(x => x.IsActive == true && x.AssignedToProject_Id == id).CountAsync().ConfigureAwait(false)) > 0)
+                            else if ((await dbContext.AssemblyDbs.Where(x => x.IsActive_bl == true && x.AssignedToProject_Id == id).CountAsync().ConfigureAwait(false)) > 0)
                                 errorMessage += string.Format("Project {0} not deleted, it has assemblies assigned to it\n", dbEntry.ProjectName);
-                            else if ((await dbContext.Components.Where(x => x.IsActive == true && x.AssignedToProject_Id == id).CountAsync().ConfigureAwait(false)) > 0)
+                            else if ((await dbContext.Components.Where(x => x.IsActive_bl == true && x.AssignedToProject_Id == id).CountAsync().ConfigureAwait(false)) > 0)
                                 errorMessage += string.Format("Project {0} not deleted, it has components assigned to it\n", dbEntry.ProjectName);
                             else
                             {
@@ -154,7 +154,7 @@ namespace SDDB.Domain.Services
                                 if (serviceResult.StatusCode != HttpStatusCode.OK)
                                     errorMessage += string.Format("Error Removing Persons from Project {0}: {1} \n", dbEntry.ProjectName, serviceResult.StatusDescription);
                                 else
-                                    dbEntry.IsActive = false;
+                                    dbEntry.IsActive_bl = false;
                             }
                         }
                         else
@@ -162,7 +162,7 @@ namespace SDDB.Domain.Services
                             errorMessage += string.Format("Record with Id={0} not found\n", id);
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
                 

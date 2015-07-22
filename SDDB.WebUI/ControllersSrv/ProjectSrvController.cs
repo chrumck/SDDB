@@ -31,7 +31,7 @@ namespace SDDB.WebUI.ControllersSrv
             var data = (await projectService.GetAsync(getActive).ConfigureAwait(false)).Select(x => new {
                 x.Id, x.ProjectName, x.ProjectAltName, x.ProjectCode, x.ProjectManager_Id, 
                 ProjectManager = new { x.ProjectManager.LastName, x.ProjectManager.FirstName } ,
-                x.Comments, x.IsActive});
+                x.Comments, IsActive = x.IsActive_bl});
 
             ViewBag.ServiceName = "ProjectService.GetAsync";
             ViewBag.StatusCode = HttpStatusCode.OK;
@@ -46,7 +46,7 @@ namespace SDDB.WebUI.ControllersSrv
             var data = (await projectService.GetAsync(ids, getActive).ConfigureAwait(false)).Select(x => new {
                 x.Id, x.ProjectName, x.ProjectAltName, x.ProjectCode, x.ProjectManager_Id,
                 ProjectManager = new { x.ProjectManager.LastName, x.ProjectManager.FirstName },
-                x.Comments, x.IsActive});
+                x.Comments, IsActive = x.IsActive_bl});
 
             ViewBag.ServiceName = "ProjectService.GetAsync";
             ViewBag.StatusCode = HttpStatusCode.OK;

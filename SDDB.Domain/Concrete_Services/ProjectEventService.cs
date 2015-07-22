@@ -40,7 +40,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 
                 var records = await dbContext.ProjectEvents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive)
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive)
                     .Include( x => x.AssignedToProject).Include( x => x.CreatedByPerson).Include( x => x.ClosedByPerson)
                     .ToListAsync().ConfigureAwait(false);
 
@@ -61,7 +61,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 
                 var records = await dbContext.ProjectEvents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive && ids.Contains(x.Id))
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive && ids.Contains(x.Id))
                     .Include(x => x.AssignedToProject).Include(x => x.CreatedByPerson).Include(x => x.ClosedByPerson)
                     .ToListAsync().ConfigureAwait(false);
 
@@ -82,7 +82,7 @@ namespace SDDB.Domain.Services
                 
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 var records = await dbContext.ProjectEvents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) )
                     .Include(x => x.AssignedToProject).Include(x => x.CreatedByPerson).Include(x => x.ClosedByPerson)
                     .ToListAsync().ConfigureAwait(false);
@@ -102,7 +102,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.ProjectEvents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                     (x.EventName.Contains(query) || x.EventAltName.Contains(query))).ToListAsync();
             }
         }
@@ -118,7 +118,7 @@ namespace SDDB.Domain.Services
 
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 var records = await dbContext.ProjectEvents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         (x.EventName.Contains(query) || x.EventAltName.Contains(query))).ToListAsync();
 
@@ -151,7 +151,7 @@ namespace SDDB.Domain.Services
                             dbEntry.CopyModifiedProps(record);
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }
@@ -184,14 +184,14 @@ namespace SDDB.Domain.Services
                             if (String.IsNullOrEmpty(dbEntry.ClosedByPerson_Id) || dbEntry.EventClosed == null)
                                 errorMessage += string.Format("Event {0} not deleted. Please close with date and person before deleting\n", dbEntry.EventName);
                             else
-                                dbEntry.IsActive = false;
+                                dbEntry.IsActive_bl = false;
                         }
                         else
                         {
                             errorMessage += string.Format("Record with Id={0} not found\n", id);
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }

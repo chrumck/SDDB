@@ -31,12 +31,12 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "Comp1", CompAltName = "CompAlt1", IsActive = false, Comments = "DummyComments1",
+            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "Comp1", CompAltName = "CompAlt1", IsActive_bl = false, Comments = "DummyComments1",
                 ProgramAddress = "DummyInfo1", AssignedToProject = project1 };
-            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "Comp2", CompAltName = "CompAlt2", IsActive = true, Comments = "DummyComments2",
+            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "Comp2", CompAltName = "CompAlt2", IsActive_bl = true, Comments = "DummyComments2",
                 ProgramAddress = "DummyInfo2", AssignedToProject = project1 };
             var dbEntries = (new List<Component> { dbEntry1, dbEntry2 }).AsQueryable();
 
@@ -73,14 +73,14 @@ namespace SDDB.UnitTests
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
             var projectPerson2 = new Person { Id = "dummyUserId2", FirstName = "Firs2", LastName = "Last2" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
-            var project2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive = false, ProjectCode = "CODE2", 
+            var project2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive_bl = false, ProjectCode = "CODE2", 
                 ProjectPersons = new List<Person> { projectPerson2 } };
 
-            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "Comp1", CompAltName = "CompAlt1", IsActive = false, Comments = "DummyComments1",
+            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "Comp1", CompAltName = "CompAlt1", IsActive_bl = false, Comments = "DummyComments1",
                 ProgramAddress = "DummyInfo1", AssignedToProject = project1 };
-            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "Comp2", CompAltName = "CompAlt2", IsActive = true, Comments = "DummyComments2",
+            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "Comp2", CompAltName = "CompAlt2", IsActive_bl = true, Comments = "DummyComments2",
                 ProgramAddress = "DummyInfo2", AssignedToProject = project2 };
             var dbEntries = (new List<Component> { dbEntry1, dbEntry2 }).AsQueryable();
 
@@ -115,14 +115,14 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "Comp1", CompAltName = "CompAlt1", IsActive = false, 
+            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "Comp1", CompAltName = "CompAlt1", IsActive_bl = false, 
                 ProgramAddress = "DummyInfo1" , AssignedToProject = project1 };
-            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "Comp2", CompAltName = "CompAlt2", IsActive = true,
+            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "Comp2", CompAltName = "CompAlt2", IsActive_bl = true,
                 ProgramAddress = "DummyInfo2" , AssignedToProject = project1 };
-            var dbEntry3 = new Component { Id = "dummyEntryId3", CompName = "Comp3", CompAltName = "CompAlt3", IsActive = true, 
+            var dbEntry3 = new Component { Id = "dummyEntryId3", CompName = "Comp3", CompAltName = "CompAlt3", IsActive_bl = true, 
                 ProgramAddress = "DummyInfo3" , AssignedToProject = project1 };
             var dbEntries = (new List<Component> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -159,14 +159,14 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "Comp1", CompAltName = "CompAlt1", IsActive = false, 
+            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "Comp1", CompAltName = "CompAlt1", IsActive_bl = false, 
                 ProgramAddress = "DummyInfo1" , AssignedToProject = project1 };
-            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "Comp2", CompAltName = "CompAlt2", IsActive = true,
+            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "Comp2", CompAltName = "CompAlt2", IsActive_bl = true,
                 ProgramAddress = "DummyInfo2" , AssignedToProject = project1 };
-            var dbEntry3 = new Component { Id = "dummyEntryId3", CompName = "Comp3", CompAltName = "CompAlt3", IsActive = false, 
+            var dbEntry3 = new Component { Id = "dummyEntryId3", CompName = "Comp3", CompAltName = "CompAlt3", IsActive_bl = false, 
                 ProgramAddress = "DummyInfo3" , AssignedToProject = project1 };
             var dbEntries = (new List<Component> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -203,14 +203,14 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "Comp1", CompAltName = "CompAlt1", IsActive = true, 
+            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "Comp1", CompAltName = "CompAlt1", IsActive_bl = true, 
                 ProgramAddress = "DummyInfo1" , AssignedToProject = project1 };
-            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "Comp2", CompAltName = "CompAlt2", IsActive = true,
+            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "Comp2", CompAltName = "CompAlt2", IsActive_bl = true,
                 ProgramAddress = "DummyInfo2" , AssignedToProject = project1 };
-            var dbEntry3 = new Component { Id = "dummyEntryId3", CompName = "Comp3", CompAltName = "CompAlt3", IsActive = false, 
+            var dbEntry3 = new Component { Id = "dummyEntryId3", CompName = "Comp3", CompAltName = "CompAlt3", IsActive_bl = false, 
                 ProgramAddress = "DummyInfo3" , AssignedToProject = project1 };
             var dbEntries = (new List<Component> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -245,14 +245,14 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "Comp1", CompAltName = "CompAlt1", CompAltName2 = "CompAlt1", IsActive = true, 
+            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "Comp1", CompAltName = "CompAlt1", CompAltName2 = "CompAlt1", IsActive_bl = true, 
                 ProgramAddress = "DummyInfo1" , AssignedToProject = project1 };
-            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "Comp2", CompAltName = "CompAlt2", CompAltName2 = "CompAlt2", IsActive = true,
+            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "Comp2", CompAltName = "CompAlt2", CompAltName2 = "CompAlt2", IsActive_bl = true,
                 ProgramAddress = "DummyInfo2" , AssignedToProject = project1 };
-            var dbEntry3 = new Component { Id = "dummyEntryId3", CompName = "Comp3", CompAltName = "CompAlt3", CompAltName2 = "CompAlt3", IsActive = false, 
+            var dbEntry3 = new Component { Id = "dummyEntryId3", CompName = "Comp3", CompAltName = "CompAlt3", CompAltName2 = "CompAlt3", IsActive_bl = false, 
                 ProgramAddress = "DummyInfo3" , AssignedToProject = project1 };
             var dbEntries = (new List<Component> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -287,14 +287,14 @@ namespace SDDB.UnitTests
 
                         var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "Comp1", CompAltName = "CompAlt1", CompAltName2 = "CompAlt1", IsActive = true, 
+            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "Comp1", CompAltName = "CompAlt1", CompAltName2 = "CompAlt1", IsActive_bl = true, 
                 ProgramAddress = "DummyInfo1" , AssignedToProject = project1 };
-            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "Comp2", CompAltName = "CompAlt2", CompAltName2 = "CompAlt2", IsActive = true,
+            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "Comp2", CompAltName = "CompAlt2", CompAltName2 = "CompAlt2", IsActive_bl = true,
                 ProgramAddress = "DummyInfo2" , AssignedToProject = project1 };
-            var dbEntry3 = new Component { Id = "dummyEntryId3", CompName = "Comp3", CompAltName = "CompAlt3", CompAltName2 = "CompAlt3", IsActive = false, 
+            var dbEntry3 = new Component { Id = "dummyEntryId3", CompName = "Comp3", CompAltName = "CompAlt3", CompAltName2 = "CompAlt3", IsActive_bl = false, 
                 ProgramAddress = "DummyInfo3" , AssignedToProject = project1 };
             var dbEntries = (new List<Component> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -355,7 +355,7 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var initialId = "dummyEntryId1";
-            var component1 = new Component { Id = initialId, CompName = "Comp1", CompAltName = "CompAlt1", IsActive = false, ProgramAddress = "DummyInfo1" };
+            var component1 = new Component { Id = initialId, CompName = "Comp1", CompAltName = "CompAlt1", IsActive_bl = false, ProgramAddress = "DummyInfo1" };
             var components = new Component[] { component1 };
 
             mockEfDbContext.Setup(x => x.Components.FindAsync(component1.Id)).Returns(Task.FromResult<Component>(null));
@@ -388,9 +388,9 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var initialId = "newEntryId1";
-            var component1 = new Component { Id = initialId, CompName = "Comp", IsActive = true, ProgramAddress = "DummyInfo" };
-            var component2 = new Component { Id = initialId, CompName = "Comp", IsActive = false, ProgramAddress = "DummyInfo" };
-            var component3 = new Component { Id = initialId, CompName = "Comp", IsActive = true, ProgramAddress = "DummyInfo" };
+            var component1 = new Component { Id = initialId, CompName = "Comp", IsActive_bl = true, ProgramAddress = "DummyInfo" };
+            var component2 = new Component { Id = initialId, CompName = "Comp", IsActive_bl = false, ProgramAddress = "DummyInfo" };
+            var component3 = new Component { Id = initialId, CompName = "Comp", IsActive_bl = true, ProgramAddress = "DummyInfo" };
             var components = new Component[] { component1, component2, component3 };
 
             mockEfDbContext.Setup(x => x.Components.FindAsync(It.IsAny<Component>())).Returns(Task.FromResult<Component>(null));
@@ -425,13 +425,13 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var component1 = new Component { Id = "dummyComponentId1", CompName = "Comp1", CompAltName = "CompAlt1", IsActive = false, ProgramAddress = "DummyInfo1",
+            var component1 = new Component { Id = "dummyComponentId1", CompName = "Comp1", CompAltName = "CompAlt1", IsActive_bl = false, ProgramAddress = "DummyInfo1",
                                       ModifiedProperties = new string[] { "CompName", "CompAltName" }};
-            var component2 = new Component { Id = "dummyComponentId2", CompName = "Comp2", CompAltName = "CompAlt2", IsActive = true, ProgramAddress = "DummyInfo2" };
+            var component2 = new Component { Id = "dummyComponentId2", CompName = "Comp2", CompAltName = "CompAlt2", IsActive_bl = true, ProgramAddress = "DummyInfo2" };
             var components = new Component[] { component1, component2 };
 
-            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "DbEntry1", CompAltName = "DbEntryAlt1", IsActive = true, ProgramAddress = "DbEntryInfo1" };
-            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "DbEntry2", CompAltName = "DbEntryAlt2", IsActive = false, ProgramAddress = "DbEntryInfo2" };
+            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "DbEntry1", CompAltName = "DbEntryAlt1", IsActive_bl = true, ProgramAddress = "DbEntryInfo1" };
+            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "DbEntry2", CompAltName = "DbEntryAlt2", IsActive_bl = false, ProgramAddress = "DbEntryInfo2" };
 
             mockEfDbContext.Setup(x => x.Components.FindAsync(component1.Id)).Returns(Task.FromResult(dbEntry1));
             mockEfDbContext.Setup(x => x.Components.FindAsync(component2.Id)).Returns(Task.FromResult(dbEntry2));
@@ -446,9 +446,9 @@ namespace SDDB.UnitTests
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
             Assert.IsTrue(component1.CompName == dbEntry1.CompName); Assert.IsTrue(component1.CompAltName == dbEntry1.CompAltName);
-            Assert.IsTrue(component1.ProgramAddress != dbEntry1.ProgramAddress); Assert.IsTrue(component1.IsActive != dbEntry1.IsActive);
+            Assert.IsTrue(component1.ProgramAddress != dbEntry1.ProgramAddress); Assert.IsTrue(component1.IsActive_bl != dbEntry1.IsActive_bl);
             Assert.IsTrue(component2.CompName != dbEntry2.CompName); Assert.IsTrue(component2.CompAltName != dbEntry2.CompAltName);
-            Assert.IsTrue(component2.ProgramAddress != dbEntry2.ProgramAddress); Assert.IsTrue(component2.IsActive != dbEntry2.IsActive);
+            Assert.IsTrue(component2.ProgramAddress != dbEntry2.ProgramAddress); Assert.IsTrue(component2.IsActive_bl != dbEntry2.IsActive_bl);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.Components.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -466,15 +466,15 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var component1 = new Component { Id = "dummyComponentId1", CompName = "Comp1", CompAltName = "CompAlt1", IsActive = false, ProgramAddress = "DummyInfo1",
+            var component1 = new Component { Id = "dummyComponentId1", CompName = "Comp1", CompAltName = "CompAlt1", IsActive_bl = false, ProgramAddress = "DummyInfo1",
                             AssignedToAssemblyDb_Id = "dummyAssyId1", ModifiedProperties = new string[] { "CompName", "CompAltName", "AssignedToAssemblyDb_Id" }};
-            var component2 = new Component { Id = "dummyComponentId2", CompName = "Comp2", CompAltName = "CompAlt2", IsActive = true, ProgramAddress = "DummyInfo2",
+            var component2 = new Component { Id = "dummyComponentId2", CompName = "Comp2", CompAltName = "CompAlt2", IsActive_bl = true, ProgramAddress = "DummyInfo2",
                             AssignedToAssemblyDb_Id = "dummyAssyId2"};
             var components = new Component[] { component1, component2 };
 
-            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "DbEntry1", CompAltName = "DbEntryAlt1", IsActive = true, ProgramAddress = "DbEntryInfo1",
+            var dbEntry1 = new Component { Id = "dummyEntryId1", CompName = "DbEntry1", CompAltName = "DbEntryAlt1", IsActive_bl = true, ProgramAddress = "DbEntryInfo1",
                             AssignedToAssemblyDb_Id = "dummyAssyId3" };
-            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "DbEntry2", CompAltName = "DbEntryAlt2", IsActive = false, ProgramAddress = "DbEntryInfo2",
+            var dbEntry2 = new Component { Id = "dummyEntryId2", CompName = "DbEntry2", CompAltName = "DbEntryAlt2", IsActive_bl = false, ProgramAddress = "DbEntryInfo2",
                             AssignedToAssemblyDb_Id = "dummyAssyId4"};
 
             mockEfDbContext.Setup(x => x.Components.FindAsync(component1.Id)).Returns(Task.FromResult(dbEntry1));
@@ -492,10 +492,10 @@ namespace SDDB.UnitTests
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
             Assert.IsTrue(component1.CompName == dbEntry1.CompName); Assert.IsTrue(component1.CompAltName == dbEntry1.CompAltName);
-            Assert.IsTrue(component1.ProgramAddress != dbEntry1.ProgramAddress); Assert.IsTrue(component1.IsActive != dbEntry1.IsActive);
+            Assert.IsTrue(component1.ProgramAddress != dbEntry1.ProgramAddress); Assert.IsTrue(component1.IsActive_bl != dbEntry1.IsActive_bl);
             Assert.IsTrue(component1.AssignedToAssemblyDb_Id == dbEntry1.AssignedToAssemblyDb_Id);
             Assert.IsTrue(component2.CompName != dbEntry2.CompName); Assert.IsTrue(component2.CompAltName != dbEntry2.CompAltName);
-            Assert.IsTrue(component2.ProgramAddress != dbEntry2.ProgramAddress); Assert.IsTrue(component2.IsActive != dbEntry2.IsActive);
+            Assert.IsTrue(component2.ProgramAddress != dbEntry2.ProgramAddress); Assert.IsTrue(component2.IsActive_bl != dbEntry2.IsActive_bl);
             Assert.IsTrue(component2.AssignedToAssemblyDb_Id != dbEntry2.AssignedToAssemblyDb_Id);
             Assert.IsTrue(logEntry.Component_Id == dbEntry1.Id); Assert.IsTrue(logEntry.AssignedToAssemblyDb_Id == dbEntry1.AssignedToAssemblyDb_Id);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
@@ -517,7 +517,7 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var initialId = "dummyEntryId1";
-            var component1 = new Component { Id = initialId, CompName = "Comp1", CompAltName = "CompAlt1", IsActive = false, ProgramAddress = "DummyInfo1" };
+            var component1 = new Component { Id = initialId, CompName = "Comp1", CompAltName = "CompAlt1", IsActive_bl = false, ProgramAddress = "DummyInfo1" };
             var components = new Component[] { component1 };
 
             mockEfDbContext.Setup(x => x.Components.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<Component>(null));
@@ -551,7 +551,7 @@ namespace SDDB.UnitTests
 
             var componentIds = new string[] { "dummyId1", "DummyId2" };
 
-            var dbEntry = new Component { IsActive = true };
+            var dbEntry = new Component { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.Components.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
             mockEfDbContext.Setup(x => x.Components.FindAsync("dummyId2")).Returns(Task.FromResult<Component>(null));
 
@@ -566,7 +566,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Record with Id=DummyId2 not found\n"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.Components.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -585,7 +585,7 @@ namespace SDDB.UnitTests
 
             var componentIds = new string[] { "dummyId1" };
 
-            var dbEntry = new Component { IsActive = true };
+            var dbEntry = new Component { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.Components.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
 
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
@@ -599,7 +599,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.Components.FindAsync(It.IsAny<string>()), Times.Once);

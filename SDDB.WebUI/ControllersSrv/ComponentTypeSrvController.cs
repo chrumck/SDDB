@@ -28,7 +28,7 @@ namespace SDDB.WebUI.ControllersSrv
         public async Task<ActionResult> Get(bool getActive = true)
         {
             var data = (await compTypeService.GetAsync(getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.CompTypeName, x.CompTypeAltName, x.Comments, x.IsActive
+                x.Id, x.CompTypeName, x.CompTypeAltName, x.Comments, IsActive = x.IsActive_bl
             });
 
             ViewBag.ServiceName = "ComponentTypeService.GetAsync";
@@ -42,7 +42,7 @@ namespace SDDB.WebUI.ControllersSrv
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
             var data = (await compTypeService.GetAsync(ids, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.CompTypeName, x.CompTypeAltName, x.Comments, x.IsActive
+                x.Id, x.CompTypeName, x.CompTypeAltName, x.Comments, IsActive = x.IsActive_bl
             });
 
             ViewBag.ServiceName = "ComponentTypeService.GetAsync";

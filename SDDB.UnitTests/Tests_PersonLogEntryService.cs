@@ -31,7 +31,7 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
             var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1), IsActive_bl = false, Comments = "DummyComments1", AssignedToProject = project1 };
@@ -72,9 +72,9 @@ namespace SDDB.UnitTests
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
             var projectPerson2 = new Person { Id = "dummyUserId2", FirstName = "Firs2", LastName = "Last2" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
-            var project2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive = false, ProjectCode = "CODE2", 
+            var project2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive_bl = false, ProjectCode = "CODE2", 
                 ProjectPersons = new List<Person> { projectPerson2 } };
 
             var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive_bl = false, Comments = "DummyComments1", AssignedToProject = project1 };
@@ -112,7 +112,7 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
             var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive_bl = false,  AssignedToProject = project1 };
@@ -153,7 +153,7 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
             var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive_bl = false, AssignedToProject = project1 };
@@ -194,7 +194,7 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1", Initials = "Initials1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
             var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive_bl = true, Comments="DummyComments1",
@@ -236,7 +236,7 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1", Initials = "Initials1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
             var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive_bl = true, Comments="DummyComments1",
@@ -278,7 +278,7 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1", Initials = "Initials1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
             var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2000,1,1),  IsActive_bl = true, Comments="DummyComments1",
@@ -659,7 +659,7 @@ namespace SDDB.UnitTests
 
             var prsLogEntryIds = new string[] { };
 
-            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true};
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive_bl = true};
             var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
             mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
@@ -713,7 +713,7 @@ namespace SDDB.UnitTests
 
             var prsLogEntryIds = new string[] { "dummyEntryId2" };
 
-            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true };
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive_bl = true };
             var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
             mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
@@ -766,7 +766,7 @@ namespace SDDB.UnitTests
 
             var prsLogEntryIds = new string[] { "EntryId1" };
 
-            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true };
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive_bl = true };
             var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
             mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
@@ -818,7 +818,7 @@ namespace SDDB.UnitTests
 
             mockEfDbContext.Setup(x => x.PersonLogEntrys).Returns(mockDbSet.Object);
 
-            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true };
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive_bl = true };
             var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
             mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
@@ -873,7 +873,7 @@ namespace SDDB.UnitTests
 
             var prsLogEntryIds = new string[] { "dummyEntryId1" };
 
-            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true };
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive_bl = true };
             var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
             mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
@@ -913,7 +913,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true };
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive_bl = true };
             var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
             mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
@@ -968,7 +968,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true };
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive_bl = true };
             var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
             mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
@@ -1023,7 +1023,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true };
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive_bl = true };
             var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
             mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
@@ -1079,7 +1079,7 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive = true };
+            var assyDbEntry1 = new AssemblyDb { Id = "AssemblyDbId1", AssyName = "AssemblyDb1", AssyAltName = "AssemblyDbAlt1", IsActive_bl = true };
             var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
             var mockDbSet2 = new Mock<DbSet<AssemblyDb>>();
             mockDbSet2.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));

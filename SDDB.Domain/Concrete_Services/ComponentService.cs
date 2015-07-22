@@ -39,7 +39,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 var records = await dbContext.Components
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive)
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive)
                     .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
                     .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt)
                     .ToListAsync().ConfigureAwait(false);
@@ -60,7 +60,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 var records = await dbContext.Components
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive && ids.Contains(x.Id))
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive && ids.Contains(x.Id))
                     .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
                     .Include(x => x.AssignedToAssemblyDb).Include(x => x.ComponentExt)
                     .ToListAsync().ConfigureAwait(false);
@@ -83,7 +83,7 @@ namespace SDDB.Domain.Services
                 projectIds = projectIds ?? new string[] { }; modelIds = modelIds ?? new string[] { }; 
 
                 var records = await dbContext.Components
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         (modelIds.Count() == 0 || modelIds.Contains(x.ComponentModel_Id)))
                     .Include(x => x.ComponentType).Include(x => x.ComponentStatus).Include(x => x.ComponentModel).Include(x => x.AssignedToProject)
@@ -109,7 +109,7 @@ namespace SDDB.Domain.Services
                 projectIds = projectIds ?? new string[] { }; typeIds = typeIds ?? new string[] { }; assyIds = assyIds ?? new string[] { };
 
                 var records = await dbContext.Components
-                   .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                   .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         (typeIds.Count() == 0 || typeIds.Contains(x.ComponentType_Id)) &&
                         (assyIds.Count() == 0 || assyIds.Contains(x.AssignedToAssemblyDb_Id)))
@@ -132,7 +132,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.Components
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                         (x.CompName.Contains(query) || x.CompAltName.Contains(query) || x.CompAltName2.Contains(query)))
                     .ToListAsync();
             }
@@ -150,7 +150,7 @@ namespace SDDB.Domain.Services
                 projectIds = projectIds ?? new string[] { };
 
                 var records = await dbContext.Components
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         (x.CompName.Contains(query) || x.CompAltName.Contains(query) || x.CompAltName2.Contains(query)))
                     .ToListAsync();
@@ -200,7 +200,7 @@ namespace SDDB.Domain.Services
                             if (record.LoggedPropsModified(loggedProperties)) { addLogEntry(dbContext, dbEntry, userId); }
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }
@@ -229,14 +229,14 @@ namespace SDDB.Domain.Services
                         var dbEntry = await dbContext.Components.FindAsync(id).ConfigureAwait(false);
                         if (dbEntry != null)
                         {
-                            dbEntry.IsActive = false;
+                            dbEntry.IsActive_bl = false;
                         }
                         else
                         {
                             errorMessage += string.Format("Record with Id={0} not found\n", id);
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }
@@ -277,7 +277,7 @@ namespace SDDB.Domain.Services
                             dbEntry.CopyModifiedProps(record);
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }

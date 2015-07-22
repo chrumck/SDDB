@@ -117,7 +117,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Abstract_Entities\IDbEntity.cs" />
-    <Compile Include="Abstract_Infrastructure\IFileRepoService.cs" />
     <Compile Include="Abstract_Infrastructure\ILogger.cs" />
     <Compile Include="Abstract_Services\IAppRoleManager.cs" />
     <Compile Include="Abstract_Services\IAppUserManager.cs" />
@@ -149,16 +148,15 @@
     <Compile Include="Concrete_Entities\DBUser.cs" />
     <Compile Include="Concrete_Entities\DBRole.cs" />
     <Compile Include="Concrete_Entities\Person.cs" />
-    <Compile Include="Concrete_Entities\_HelperEntities.cs" />
     <Compile Include="Concrete_Infrastructure\DbDataAnnotations.cs" />
-    <Compile Include="Concrete_Infrastructure\HelpersAndExtensions.cs" />
+    <Compile Include="Concrete_Infrastructure\IDbEntityExtensions.cs" />
     <Compile Include="Concrete_Services\AssemblyLogEntryService.cs" />
     <Compile Include="Concrete_Services\ComponentLogEntryService.cs" />
     <Compile Include="Concrete_Services\PersonLogEntryFileService.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Concrete_Services\_BaseDbService.cs" />
     <Compile Include="Concrete_Services\PersonLogEntryService.cs" />
-    <Compile Include="Concrete_Services\_DbFtpRepoService.cs" />
     <Compile Include="Concrete_Services\ComponentService.cs" />
     <Compile Include="Concrete_Services\ComponentModelService.cs" />
     <Compile Include="Concrete_Services\AssemblyModelService.cs" />

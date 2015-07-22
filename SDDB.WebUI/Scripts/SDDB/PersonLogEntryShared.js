@@ -363,7 +363,7 @@ function submitEdits() {
 
             var deferred1 = $.Deferred();
 
-            CurrIds = (CurrIds.length == 0) ? data.ReturnIds : CurrIds;
+            CurrIds = (CurrIds.length == 0) ? data.newEntryIds : CurrIds;
             var idsAssysAdd = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name").data().toArray();
             var idsAssysRemove = TableLogEntryAssysRemove.cells(".ui-selected", "Id:name").data().toArray();
             var idsPersonsAdd = TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name").data().toArray();

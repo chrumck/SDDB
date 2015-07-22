@@ -94,6 +94,9 @@ namespace SDDB.Domain.Entities
         [NotMapped]
         public string[] ModifiedProperties { get; set; }
 
+        [NotMapped]
+        public bool IsActive_bl { get; set; }
+
     }
   
 

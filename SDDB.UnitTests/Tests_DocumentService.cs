@@ -31,12 +31,12 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Document { Id = "dummyEntryId1", DocName = "Doc1", DocAltName = "DocAlt1", IsActive = false, Comments = "DummyComments1",
+            var dbEntry1 = new Document { Id = "dummyEntryId1", DocName = "Doc1", DocAltName = "DocAlt1", IsActive_bl = false, Comments = "DummyComments1",
                 DocFilePath = "DummyPath1", AssignedToProject = project1 };
-            var dbEntry2 = new Document { Id = "dummyEntryId2", DocName = "Doc2", DocAltName = "DocAlt2", IsActive = true, Comments = "DummyComments2",
+            var dbEntry2 = new Document { Id = "dummyEntryId2", DocName = "Doc2", DocAltName = "DocAlt2", IsActive_bl = true, Comments = "DummyComments2",
                 DocFilePath = "DummyPath2", AssignedToProject = project1 };
             var dbEntries = (new List<Document> { dbEntry1, dbEntry2 }).AsQueryable();
 
@@ -73,14 +73,14 @@ namespace SDDB.UnitTests
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
             var projectPerson2 = new Person { Id = "dummyUserId2", FirstName = "Firs2", LastName = "Last2" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
-            var project2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive = false, ProjectCode = "CODE2", 
+            var project2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive_bl = false, ProjectCode = "CODE2", 
                 ProjectPersons = new List<Person> { projectPerson2 } };
 
-            var dbEntry1 = new Document { Id = "dummyEntryId1", DocName = "Doc1", DocAltName = "DocAlt1", IsActive = false, Comments = "DummyComments1",
+            var dbEntry1 = new Document { Id = "dummyEntryId1", DocName = "Doc1", DocAltName = "DocAlt1", IsActive_bl = false, Comments = "DummyComments1",
                 DocFilePath = "DummyPath1", AssignedToProject = project1 };
-            var dbEntry2 = new Document { Id = "dummyEntryId2", DocName = "Doc2", DocAltName = "DocAlt2", IsActive = true, Comments = "DummyComments2",
+            var dbEntry2 = new Document { Id = "dummyEntryId2", DocName = "Doc2", DocAltName = "DocAlt2", IsActive_bl = true, Comments = "DummyComments2",
                 DocFilePath = "DummyPath2", AssignedToProject = project2 };
             var dbEntries = (new List<Document> { dbEntry1, dbEntry2 }).AsQueryable();
 
@@ -115,14 +115,14 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Document { Id = "dummyEntryId1", DocName = "Doc1", DocAltName = "DocAlt1", IsActive = false, 
+            var dbEntry1 = new Document { Id = "dummyEntryId1", DocName = "Doc1", DocAltName = "DocAlt1", IsActive_bl = false, 
                 DocFilePath = "DummyPath1" , AssignedToProject = project1 };
-            var dbEntry2 = new Document { Id = "dummyEntryId2", DocName = "Doc2", DocAltName = "DocAlt2", IsActive = true,
+            var dbEntry2 = new Document { Id = "dummyEntryId2", DocName = "Doc2", DocAltName = "DocAlt2", IsActive_bl = true,
                 DocFilePath = "DummyPath2" , AssignedToProject = project1 };
-            var dbEntry3 = new Document { Id = "dummyEntryId3", DocName = "Doc3", DocAltName = "DocAlt3", IsActive = true, 
+            var dbEntry3 = new Document { Id = "dummyEntryId3", DocName = "Doc3", DocAltName = "DocAlt3", IsActive_bl = true, 
                 DocFilePath = "DummyPath3" , AssignedToProject = project1 };
             var dbEntries = (new List<Document> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -159,14 +159,14 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Document { Id = "dummyEntryId1", DocName = "Doc1", DocAltName = "DocAlt1", IsActive = false, 
+            var dbEntry1 = new Document { Id = "dummyEntryId1", DocName = "Doc1", DocAltName = "DocAlt1", IsActive_bl = false, 
                 DocFilePath = "DummyPath1" , AssignedToProject = project1 };
-            var dbEntry2 = new Document { Id = "dummyEntryId2", DocName = "Doc2", DocAltName = "DocAlt2", IsActive = true,
+            var dbEntry2 = new Document { Id = "dummyEntryId2", DocName = "Doc2", DocAltName = "DocAlt2", IsActive_bl = true,
                 DocFilePath = "DummyPath2" , AssignedToProject = project1 };
-            var dbEntry3 = new Document { Id = "dummyEntryId3", DocName = "Doc3", DocAltName = "DocAlt3", IsActive = false, 
+            var dbEntry3 = new Document { Id = "dummyEntryId3", DocName = "Doc3", DocAltName = "DocAlt3", IsActive_bl = false, 
                 DocFilePath = "DummyPath3" , AssignedToProject = project1 };
             var dbEntries = (new List<Document> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -203,14 +203,14 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Document { Id = "dummyEntryId1", DocName = "Doc1", DocAltName = "DocAlt1", IsActive = true, 
+            var dbEntry1 = new Document { Id = "dummyEntryId1", DocName = "Doc1", DocAltName = "DocAlt1", IsActive_bl = true, 
                 DocFilePath = "DummyPath1" , AssignedToProject = project1 };
-            var dbEntry2 = new Document { Id = "dummyEntryId2", DocName = "Doc2", DocAltName = "DocAlt2", IsActive = true,
+            var dbEntry2 = new Document { Id = "dummyEntryId2", DocName = "Doc2", DocAltName = "DocAlt2", IsActive_bl = true,
                 DocFilePath = "DummyPath2" , AssignedToProject = project1 };
-            var dbEntry3 = new Document { Id = "dummyEntryId3", DocName = "Doc3", DocAltName = "DocAlt3", IsActive = false, 
+            var dbEntry3 = new Document { Id = "dummyEntryId3", DocName = "Doc3", DocAltName = "DocAlt3", IsActive_bl = false, 
                 DocFilePath = "DummyPath3" , AssignedToProject = project1 };
             var dbEntries = (new List<Document> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -245,14 +245,14 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Document { Id = "dummyEntryId1", DocName = "Doc1", DocAltName = "DocAlt1", IsActive = true, 
+            var dbEntry1 = new Document { Id = "dummyEntryId1", DocName = "Doc1", DocAltName = "DocAlt1", IsActive_bl = true, 
                 DocFilePath = "DummyPath1" , AssignedToProject = project1 };
-            var dbEntry2 = new Document { Id = "dummyEntryId2", DocName = "Doc2", DocAltName = "DocAlt2", IsActive = true,
+            var dbEntry2 = new Document { Id = "dummyEntryId2", DocName = "Doc2", DocAltName = "DocAlt2", IsActive_bl = true,
                 DocFilePath = "DummyPath2" , AssignedToProject = project1 };
-            var dbEntry3 = new Document { Id = "dummyEntryId3", DocName = "Doc3", DocAltName = "DocAlt3", IsActive = false, 
+            var dbEntry3 = new Document { Id = "dummyEntryId3", DocName = "Doc3", DocAltName = "DocAlt3", IsActive_bl = false, 
                 DocFilePath = "DummyPath3" , AssignedToProject = project1 };
             var dbEntries = (new List<Document> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -287,14 +287,14 @@ namespace SDDB.UnitTests
 
                         var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Document { Id = "dummyEntryId1", DocName = "Doc1", DocAltName = "DocAlt1", IsActive = true, 
+            var dbEntry1 = new Document { Id = "dummyEntryId1", DocName = "Doc1", DocAltName = "DocAlt1", IsActive_bl = true, 
                 DocFilePath = "DummyPath1" , AssignedToProject = project1 };
-            var dbEntry2 = new Document { Id = "dummyEntryId2", DocName = "Doc2", DocAltName = "DocAlt2", IsActive = true,
+            var dbEntry2 = new Document { Id = "dummyEntryId2", DocName = "Doc2", DocAltName = "DocAlt2", IsActive_bl = true,
                 DocFilePath = "DummyPath2" , AssignedToProject = project1 };
-            var dbEntry3 = new Document { Id = "dummyEntryId3", DocName = "Doc3", DocAltName = "DocAlt3", IsActive = false, 
+            var dbEntry3 = new Document { Id = "dummyEntryId3", DocName = "Doc3", DocAltName = "DocAlt3", IsActive_bl = false, 
                 DocFilePath = "DummyPath3" , AssignedToProject = project1 };
             var dbEntries = (new List<Document> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -355,7 +355,7 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var initialId = "dummyEntryId1";
-            var doc1 = new Document { Id = initialId, DocName = "Doc1", DocAltName = "DocAlt1", IsActive = false, DocFilePath = "DummyPath1" };
+            var doc1 = new Document { Id = initialId, DocName = "Doc1", DocAltName = "DocAlt1", IsActive_bl = false, DocFilePath = "DummyPath1" };
             var docs = new Document[] { doc1 };
 
             mockEfDbContext.Setup(x => x.Documents.FindAsync(doc1.Id)).Returns(Task.FromResult<Document>(null));
@@ -387,13 +387,13 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var doc1 = new Document { Id = "dummyDocumentId1", DocName = "Doc1", DocAltName = "DocAlt1", IsActive = false, DocFilePath = "DummyPath1",
+            var doc1 = new Document { Id = "dummyDocumentId1", DocName = "Doc1", DocAltName = "DocAlt1", IsActive_bl = false, DocFilePath = "DummyPath1",
                                       ModifiedProperties = new string[] { "DocName", "DocAltName" }};
-            var doc2 = new Document { Id = "dummyDocumentId2", DocName = "Doc2", DocAltName = "DocAlt2", IsActive = true, DocFilePath = "DummyPath2" };
+            var doc2 = new Document { Id = "dummyDocumentId2", DocName = "Doc2", DocAltName = "DocAlt2", IsActive_bl = true, DocFilePath = "DummyPath2" };
             var docs = new Document[] { doc1, doc2 };
 
-            var dbEntry1 = new Document { Id = "dummyEntryId1", DocName = "DbEntry1", DocAltName = "DbEntryAlt1", IsActive = true, DocFilePath = "DbEntryPath1" };
-            var dbEntry2 = new Document { Id = "dummyEntryId2", DocName = "DbEntry2", DocAltName = "DbEntryAlt2", IsActive = false, DocFilePath = "DbEntryPath2" };
+            var dbEntry1 = new Document { Id = "dummyEntryId1", DocName = "DbEntry1", DocAltName = "DbEntryAlt1", IsActive_bl = true, DocFilePath = "DbEntryPath1" };
+            var dbEntry2 = new Document { Id = "dummyEntryId2", DocName = "DbEntry2", DocAltName = "DbEntryAlt2", IsActive_bl = false, DocFilePath = "DbEntryPath2" };
 
             mockEfDbContext.Setup(x => x.Documents.FindAsync(doc1.Id)).Returns(Task.FromResult(dbEntry1));
             mockEfDbContext.Setup(x => x.Documents.FindAsync(doc2.Id)).Returns(Task.FromResult(dbEntry2));
@@ -408,9 +408,9 @@ namespace SDDB.UnitTests
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
             Assert.IsTrue(doc1.DocName == dbEntry1.DocName); Assert.IsTrue(doc1.DocAltName == dbEntry1.DocAltName);
-            Assert.IsTrue(doc1.DocFilePath != dbEntry1.DocFilePath); Assert.IsTrue(doc1.IsActive != dbEntry1.IsActive);
+            Assert.IsTrue(doc1.DocFilePath != dbEntry1.DocFilePath); Assert.IsTrue(doc1.IsActive_bl != dbEntry1.IsActive_bl);
             Assert.IsTrue(doc2.DocName != dbEntry2.DocName); Assert.IsTrue(doc2.DocAltName != dbEntry2.DocAltName);
-            Assert.IsTrue(doc2.DocFilePath != dbEntry2.DocFilePath); Assert.IsTrue(doc2.IsActive != dbEntry2.IsActive);
+            Assert.IsTrue(doc2.DocFilePath != dbEntry2.DocFilePath); Assert.IsTrue(doc2.IsActive_bl != dbEntry2.IsActive_bl);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.Documents.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -429,7 +429,7 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var initialId = "dummyEntryId1";
-            var doc1 = new Document { Id = initialId, DocName = "Doc1", DocAltName = "DocAlt1", IsActive = false, DocFilePath = "DummyPath1" };
+            var doc1 = new Document { Id = initialId, DocName = "Doc1", DocAltName = "DocAlt1", IsActive_bl = false, DocFilePath = "DummyPath1" };
             var docs = new Document[] { doc1 };
 
             mockEfDbContext.Setup(x => x.Documents.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<Document>(null));
@@ -463,7 +463,7 @@ namespace SDDB.UnitTests
 
             var docIds = new string[] { "dummyId1", "DummyId2" };
 
-            var dbEntry = new Document { IsActive = true };
+            var dbEntry = new Document { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.Documents.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
             mockEfDbContext.Setup(x => x.Documents.FindAsync("dummyId2")).Returns(Task.FromResult<Document>(null));
 
@@ -478,7 +478,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Record with Id=DummyId2 not found\n"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.Documents.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -497,7 +497,7 @@ namespace SDDB.UnitTests
 
             var docIds = new string[] { "dummyId1" };
 
-            var dbEntry = new Document { IsActive = true };
+            var dbEntry = new Document { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.Documents.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
 
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
@@ -511,7 +511,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.Documents.FindAsync(It.IsAny<string>()), Times.Once);

@@ -68,7 +68,6 @@ namespace SDDB.Domain.Entities
         public DBResult()
         {
             this.StatusCode = HttpStatusCode.OK;
-            this.ReturnIds = new List<string>();
         }
 
         //Non-persistent Properties----------------------------------------
@@ -77,7 +76,8 @@ namespace SDDB.Domain.Entities
         public string[] ModifiedProperties { get; set; }
 
         [NotMapped]
-        public List<string> ReturnIds { get; set; }
+        public bool IsActive_bl { get; set; }
+
     }
 
 }

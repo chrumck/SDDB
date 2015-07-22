@@ -31,7 +31,7 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyProjId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyProjId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
             var dbEntry1 = new ComponentLogEntry { Id = "dummyEntryId1", Component_Id = "dummyCompId1", AssignedToProject_Id = "dummyProjId1",
@@ -72,7 +72,7 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyProjId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyProjId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
             var dbEntry1 = new ComponentLogEntry { Id = "dummyEntryId1", Component_Id = "dummyCompId1", AssignedToProject_Id = "dummyProjId1",
@@ -117,9 +117,9 @@ namespace SDDB.UnitTests
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
             var projectPerson2 = new Person { Id = "dummyUserId2", FirstName = "Firs2", LastName = "Last2" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
-            var project2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive = false, ProjectCode = "CODE2", 
+            var project2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive_bl = false, ProjectCode = "CODE2", 
                 ProjectPersons = new List<Person> { projectPerson2 } };
 
             var dbEntry1 = new ComponentLogEntry { Id = "dummyEntryId1", Component_Id = "dummyCompId1", AssignedToProject_Id = "dummyProjId1",
@@ -159,7 +159,7 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyProjId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyProjId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
             var dbEntry1 = new ComponentLogEntry { Id = "dummyEntryId1", Component_Id = "dummyCompId1", AssignedToProject_Id = "dummyProjId1",

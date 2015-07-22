@@ -34,8 +34,8 @@ namespace SDDB.UnitTests
             var mockDbUserService = new Mock<DBUserService>(new object[] {mockAppUserManager.Object, mockDbContextScopeFac.Object, true});
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
-            var dbEntry1 = new PersonGroup { Id = "dummyEntryId1", PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive = false  };
-            var dbEntry2 = new PersonGroup { Id = "dummyEntryId2", PrsGroupName = "PersonGroup2", PrsGroupAltName = "PersonGroupAlt2", IsActive = true  };
+            var dbEntry1 = new PersonGroup { Id = "dummyEntryId1", PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive_bl = false  };
+            var dbEntry2 = new PersonGroup { Id = "dummyEntryId2", PrsGroupName = "PersonGroup2", PrsGroupAltName = "PersonGroupAlt2", IsActive_bl = true  };
             var dbEntries = (new List<PersonGroup> { dbEntry1, dbEntry2 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<PersonGroup>>();
@@ -72,9 +72,9 @@ namespace SDDB.UnitTests
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
-            var dbEntry1 = new PersonGroup { Id = "dummyEntryId1", PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive = false };
-            var dbEntry2 = new PersonGroup { Id = "dummyEntryId2", PrsGroupName = "PersonGroup2", PrsGroupAltName = "PersonGroupAlt2", IsActive = true };
-            var dbEntry3 = new PersonGroup { Id = "dummyEntryId3", PrsGroupName = "PersonGroup3", PrsGroupAltName = "PersonGroupAlt3", IsActive = true };
+            var dbEntry1 = new PersonGroup { Id = "dummyEntryId1", PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive_bl = false };
+            var dbEntry2 = new PersonGroup { Id = "dummyEntryId2", PrsGroupName = "PersonGroup2", PrsGroupAltName = "PersonGroupAlt2", IsActive_bl = true };
+            var dbEntry3 = new PersonGroup { Id = "dummyEntryId3", PrsGroupName = "PersonGroup3", PrsGroupAltName = "PersonGroupAlt3", IsActive_bl = true };
             var dbEntries = (new List<PersonGroup> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<PersonGroup>>();
@@ -112,9 +112,9 @@ namespace SDDB.UnitTests
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
-            var dbEntry1 = new PersonGroup { Id = "dummyEntryId1", PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive = false };
-            var dbEntry2 = new PersonGroup { Id = "dummyEntryId2", PrsGroupName = "PersonGroup2", PrsGroupAltName = "PersonGroupAlt2", IsActive = true };
-            var dbEntry3 = new PersonGroup { Id = "dummyEntryId3", PrsGroupName = "PersonGroup3", PrsGroupAltName = "PersonGroupAlt3", IsActive = false };
+            var dbEntry1 = new PersonGroup { Id = "dummyEntryId1", PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive_bl = false };
+            var dbEntry2 = new PersonGroup { Id = "dummyEntryId2", PrsGroupName = "PersonGroup2", PrsGroupAltName = "PersonGroupAlt2", IsActive_bl = true };
+            var dbEntry3 = new PersonGroup { Id = "dummyEntryId3", PrsGroupName = "PersonGroup3", PrsGroupAltName = "PersonGroupAlt3", IsActive_bl = false };
             var dbEntries = (new List<PersonGroup> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<PersonGroup>>();
@@ -182,7 +182,7 @@ namespace SDDB.UnitTests
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
             var initialId = "dummyEntryId1";
-            var PersonGroup1 = new PersonGroup { Id = initialId, PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive = false };
+            var PersonGroup1 = new PersonGroup { Id = initialId, PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive_bl = false };
             var PersonGroups = new PersonGroup[] { PersonGroup1 };
 
             mockEfDbContext.Setup(x => x.PersonGroups.FindAsync(PersonGroup1.Id)).Returns(Task.FromResult<PersonGroup>(null));
@@ -218,14 +218,14 @@ namespace SDDB.UnitTests
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
-            var PersonGroup1 = new PersonGroup {Id = "dummyPersonGroupId1", PrsGroupName = "dummyPersonGroup1", PrsGroupAltName = "DummyPersonGroupAlt1", IsActive = true, 
+            var PersonGroup1 = new PersonGroup {Id = "dummyPersonGroupId1", PrsGroupName = "dummyPersonGroup1", PrsGroupAltName = "DummyPersonGroupAlt1", IsActive_bl = true, 
                 ModifiedProperties = new string[] { "PrsGroupName", "PrsGroupAltName" } };
-            var PersonGroup2 = new PersonGroup { Id = "dummyPersonGroupId2", PrsGroupName = "dummyPersonGroup2", PrsGroupAltName = "DummyPersonGroupAlt2", IsActive = false };
+            var PersonGroup2 = new PersonGroup { Id = "dummyPersonGroupId2", PrsGroupName = "dummyPersonGroup2", PrsGroupAltName = "DummyPersonGroupAlt2", IsActive_bl = false };
 
             var PersonGroups = new PersonGroup[] { PersonGroup1, PersonGroup2 };
 
-            var dbEntry1 = new PersonGroup { Id = "dummyEntryId1", PrsGroupName = "entryPersonGroup1", PrsGroupAltName = "entryPersonGroupAlt1", IsActive = false };
-            var dbEntry2 = new PersonGroup { Id = "dummyEntryId2", PrsGroupName = "entryPersonGroup2", PrsGroupAltName = "entryPersonGroupAlt2", IsActive = true };
+            var dbEntry1 = new PersonGroup { Id = "dummyEntryId1", PrsGroupName = "entryPersonGroup1", PrsGroupAltName = "entryPersonGroupAlt1", IsActive_bl = false };
+            var dbEntry2 = new PersonGroup { Id = "dummyEntryId2", PrsGroupName = "entryPersonGroup2", PrsGroupAltName = "entryPersonGroupAlt2", IsActive_bl = true };
 
             mockEfDbContext.Setup(x => x.PersonGroups.FindAsync(PersonGroup1.Id)).Returns(Task.FromResult(dbEntry1));
             mockEfDbContext.Setup(x => x.PersonGroups.FindAsync(PersonGroup2.Id)).Returns(Task.FromResult(dbEntry2));
@@ -240,9 +240,9 @@ namespace SDDB.UnitTests
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
             Assert.IsTrue(PersonGroup1.PrsGroupName == dbEntry1.PrsGroupName); Assert.IsTrue(PersonGroup1.PrsGroupAltName == dbEntry1.PrsGroupAltName);
-            Assert.IsTrue(PersonGroup1.IsActive != dbEntry1.IsActive);
+            Assert.IsTrue(PersonGroup1.IsActive_bl != dbEntry1.IsActive_bl);
             Assert.IsTrue(PersonGroup2.PrsGroupName != dbEntry2.PrsGroupName); Assert.IsTrue(PersonGroup2.PrsGroupAltName != dbEntry2.PrsGroupAltName);
-            Assert.IsTrue(PersonGroup2.IsActive != dbEntry2.IsActive);
+            Assert.IsTrue(PersonGroup2.IsActive_bl != dbEntry2.IsActive_bl);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.PersonGroups.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -265,7 +265,7 @@ namespace SDDB.UnitTests
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
             var initialId = "dummyEntryId1";
-            var dbEntry1 = new PersonGroup { Id = initialId, PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive = false };
+            var dbEntry1 = new PersonGroup { Id = initialId, PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive_bl = false };
             var PersonGroups = new PersonGroup[] { dbEntry1 };
 
             mockEfDbContext.Setup(x => x.PersonGroups.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<PersonGroup>(null));
@@ -464,7 +464,7 @@ namespace SDDB.UnitTests
             mockDbSet.As<IQueryable<Person>>().Setup(m => m.GetEnumerator()).Returns(dbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.Persons).Returns(mockDbSet.Object);
 
-            var dbEntry = new PersonGroup { IsActive = true };
+            var dbEntry = new PersonGroup { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.PersonGroups.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
             mockEfDbContext.Setup(x => x.PersonGroups.FindAsync("dummyId2")).Returns(Task.FromResult<PersonGroup>(null));
 
@@ -485,7 +485,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Record with Id=DummyId2 not found\n"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.PersonGroups.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -513,15 +513,15 @@ namespace SDDB.UnitTests
             var groupManager1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
             var groupManager2 = new Person { Id = "dummyUserId2", FirstName = "Firs2", LastName = "Last2" };
 
-            var dbEntry1 = new PersonGroup { Id = "dummyId1", PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive = true,
+            var dbEntry1 = new PersonGroup { Id = "dummyId1", PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive_bl = true,
                 GroupManagers = new List<Person>{groupManager1} };
-            var dbEntry2 = new PersonGroup { Id = "dummyId2", PrsGroupName = "PersonGroup2", PrsGroupAltName = "PersonGroupAlt2", IsActive = false,
+            var dbEntry2 = new PersonGroup { Id = "dummyId2", PrsGroupName = "PersonGroup2", PrsGroupAltName = "PersonGroupAlt2", IsActive_bl = false,
                 GroupManagers = new List<Person>{groupManager1} };
-            var dbEntry3 = new PersonGroup { Id = "dummyId3", PrsGroupName = "PersonGroup3", PrsGroupAltName = "PersonGroupAlt3", IsActive = true,
+            var dbEntry3 = new PersonGroup { Id = "dummyId3", PrsGroupName = "PersonGroup3", PrsGroupAltName = "PersonGroupAlt3", IsActive_bl = true,
                 GroupManagers = new List<Person> { groupManager1 } };
-            var dbEntry4 = new PersonGroup { Id = "dummyId4", PrsGroupName = "PersonGroup4", PrsGroupAltName = "PersonGroupAlt4", IsActive = true, 
+            var dbEntry4 = new PersonGroup { Id = "dummyId4", PrsGroupName = "PersonGroup4", PrsGroupAltName = "PersonGroupAlt4", IsActive_bl = true, 
                 GroupManagers = new List<Person> { } };
-            var dbEntry5 = new PersonGroup { Id = "dummyId5", PrsGroupName = "PersonGroup5", PrsGroupAltName = "PersonGroupAlt5", IsActive = true, 
+            var dbEntry5 = new PersonGroup { Id = "dummyId5", PrsGroupName = "PersonGroup5", PrsGroupAltName = "PersonGroupAlt5", IsActive_bl = true, 
                 GroupManagers = new List<Person> { groupManager2 } };
 
             var dbEntries = (new List<PersonGroup> { dbEntry1, dbEntry2, dbEntry3, dbEntry4, dbEntry5 }).AsQueryable();
@@ -561,11 +561,11 @@ namespace SDDB.UnitTests
 
             var groupManager1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var dbEntry1 = new PersonGroup { Id = "dummyId1", PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive = true,
+            var dbEntry1 = new PersonGroup { Id = "dummyId1", PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive_bl = true,
                 GroupManagers = new List<Person>{groupManager1} };
-            var dbEntry2 = new PersonGroup { Id = "dummyId2", PrsGroupName = "PersonGroup2", PrsGroupAltName = "PersonGroupAlt2", IsActive = false,
+            var dbEntry2 = new PersonGroup { Id = "dummyId2", PrsGroupName = "PersonGroup2", PrsGroupAltName = "PersonGroupAlt2", IsActive_bl = false,
                 GroupManagers = new List<Person>{groupManager1} };
-            var dbEntry3 = new PersonGroup { Id = "dummyId3", PrsGroupName = "PersonGroup3", PrsGroupAltName = "PersonGroupAlt3", IsActive = true, 
+            var dbEntry3 = new PersonGroup { Id = "dummyId3", PrsGroupName = "PersonGroup3", PrsGroupAltName = "PersonGroupAlt3", IsActive_bl = true, 
                 GroupManagers = new List<Person>{groupManager1} };
 
             var dbEntries = (new List<PersonGroup> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
@@ -604,11 +604,11 @@ namespace SDDB.UnitTests
 
             var groupManager1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var dbEntry1 = new PersonGroup { Id = "dummyId1", PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive = true,
+            var dbEntry1 = new PersonGroup { Id = "dummyId1", PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive_bl = true,
                 GroupManagers = new List<Person>{groupManager1} };
-            var dbEntry2 = new PersonGroup { Id = "dummyId2", PrsGroupName = "PersonGroup2", PrsGroupAltName = "PersonGroupAlt2", IsActive = false,
+            var dbEntry2 = new PersonGroup { Id = "dummyId2", PrsGroupName = "PersonGroup2", PrsGroupAltName = "PersonGroupAlt2", IsActive_bl = false,
                 GroupManagers = new List<Person>{groupManager1} };
-            var dbEntry3 = new PersonGroup { Id = "dummyId3", PrsGroupName = "PersonGroup3", PrsGroupAltName = "PersonGroupAlt3", IsActive = true,
+            var dbEntry3 = new PersonGroup { Id = "dummyId3", PrsGroupName = "PersonGroup3", PrsGroupAltName = "PersonGroupAlt3", IsActive_bl = true,
                 GroupManagers = new List<Person>{groupManager1} };
 
             var dbEntries = (new List<PersonGroup> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();

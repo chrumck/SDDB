@@ -60,6 +60,9 @@ namespace SDDB.Domain.Entities
         [NotMapped]
         public const int DataLength = 65535;
 
+        [NotMapped]
+        public bool IsActive_bl { get; set; }
+
     }
   
 

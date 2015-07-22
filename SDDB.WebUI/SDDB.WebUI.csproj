@@ -503,7 +503,6 @@
     <Compile Include="Infrastructure\DBSrvValidateAttribute.cs" />
     <Compile Include="Infrastructure\DBLogAttribute.cs" />
     <Compile Include="Infrastructure\HtmlCustomHelpers.cs" />
-    <Compile Include="Infrastructure\SessionSettingsBinder.cs" />
     <Compile Include="Models\LoginViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

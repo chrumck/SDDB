@@ -126,7 +126,7 @@ namespace SDDB.Domain.Services
                             dbEntry.CopyModifiedProps(record);
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }
@@ -163,7 +163,7 @@ namespace SDDB.Domain.Services
                             errorMessage += string.Format("Record with Id={0} not found\n", id);
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }

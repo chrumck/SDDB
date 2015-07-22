@@ -29,8 +29,8 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new DocumentType { Id = "dummyEntryId1", DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive = false, Comments = "DummyComments1" };
-            var dbEntry2 = new DocumentType { Id = "dummyEntryId2", DocTypeName = "Name2", DocTypeAltName = "NameAlt2", IsActive = true, Comments = "DummyComments2" };
+            var dbEntry1 = new DocumentType { Id = "dummyEntryId1", DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive_bl = false, Comments = "DummyComments1" };
+            var dbEntry2 = new DocumentType { Id = "dummyEntryId2", DocTypeName = "Name2", DocTypeAltName = "NameAlt2", IsActive_bl = true, Comments = "DummyComments2" };
             var dbEntries = (new List<DocumentType> { dbEntry1, dbEntry2 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<DocumentType>>();
@@ -63,9 +63,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new DocumentType { Id = "dummyEntryId1", DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive = false };
-            var dbEntry2 = new DocumentType { Id = "dummyEntryId2", DocTypeName = "Name2", DocTypeAltName = "NameAlt2", IsActive = true };
-            var dbEntry3 = new DocumentType { Id = "dummyEntryId3", DocTypeName = "Name3", DocTypeAltName = "NameAlt3", IsActive = true };
+            var dbEntry1 = new DocumentType { Id = "dummyEntryId1", DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive_bl = false };
+            var dbEntry2 = new DocumentType { Id = "dummyEntryId2", DocTypeName = "Name2", DocTypeAltName = "NameAlt2", IsActive_bl = true };
+            var dbEntry3 = new DocumentType { Id = "dummyEntryId3", DocTypeName = "Name3", DocTypeAltName = "NameAlt3", IsActive_bl = true };
             var dbEntries = (new List<DocumentType> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<DocumentType>>();
@@ -99,9 +99,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new DocumentType { Id = "dummyEntryId1", DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive = false };
-            var dbEntry2 = new DocumentType { Id = "dummyEntryId2", DocTypeName = "Name2", DocTypeAltName = "NameAlt2", IsActive = true };
-            var dbEntry3 = new DocumentType { Id = "dummyEntryId3", DocTypeName = "Name3", DocTypeAltName = "NameAlt3", IsActive = false };
+            var dbEntry1 = new DocumentType { Id = "dummyEntryId1", DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive_bl = false };
+            var dbEntry2 = new DocumentType { Id = "dummyEntryId2", DocTypeName = "Name2", DocTypeAltName = "NameAlt2", IsActive_bl = true };
+            var dbEntry3 = new DocumentType { Id = "dummyEntryId3", DocTypeName = "Name3", DocTypeAltName = "NameAlt3", IsActive_bl = false };
             var dbEntries = (new List<DocumentType> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<DocumentType>>();
@@ -135,9 +135,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new DocumentType { Id = "dummyEntryId1", DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive = true };
-            var dbEntry2 = new DocumentType { Id = "dummyEntryId2", DocTypeName = "Name2", DocTypeAltName = "NameAlt2", IsActive = false };
-            var dbEntry3 = new DocumentType { Id = "dummyEntryId3", DocTypeName = "Name3", DocTypeAltName = "NameAlt3", IsActive = true };
+            var dbEntry1 = new DocumentType { Id = "dummyEntryId1", DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive_bl = true };
+            var dbEntry2 = new DocumentType { Id = "dummyEntryId2", DocTypeName = "Name2", DocTypeAltName = "NameAlt2", IsActive_bl = false };
+            var dbEntry3 = new DocumentType { Id = "dummyEntryId3", DocTypeName = "Name3", DocTypeAltName = "NameAlt3", IsActive_bl = true };
             var dbEntries = (new List<DocumentType> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<DocumentType>>();
@@ -170,9 +170,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new DocumentType { Id = "dummyEntryId1", DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive = true };
-            var dbEntry2 = new DocumentType { Id = "dummyEntryId2", DocTypeName = "Name2", DocTypeAltName = "NameAlt2", IsActive = false };
-            var dbEntry3 = new DocumentType { Id = "dummyEntryId3", DocTypeName = "Name3", DocTypeAltName = "NameAlt3", IsActive = true };
+            var dbEntry1 = new DocumentType { Id = "dummyEntryId1", DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive_bl = true };
+            var dbEntry2 = new DocumentType { Id = "dummyEntryId2", DocTypeName = "Name2", DocTypeAltName = "NameAlt2", IsActive_bl = false };
+            var dbEntry3 = new DocumentType { Id = "dummyEntryId3", DocTypeName = "Name3", DocTypeAltName = "NameAlt3", IsActive_bl = true };
             var dbEntries = (new List<DocumentType> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<DocumentType>>();
@@ -205,9 +205,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new DocumentType { Id = "dummyEntryId1", DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive = true };
-            var dbEntry2 = new DocumentType { Id = "dummyEntryId2", DocTypeName = "Name2", DocTypeAltName = "NameAlt2", IsActive = false };
-            var dbEntry3 = new DocumentType { Id = "dummyEntryId3", DocTypeName = "Name3", DocTypeAltName = "NameAlt3", IsActive = true };
+            var dbEntry1 = new DocumentType { Id = "dummyEntryId1", DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive_bl = true };
+            var dbEntry2 = new DocumentType { Id = "dummyEntryId2", DocTypeName = "Name2", DocTypeAltName = "NameAlt2", IsActive_bl = false };
+            var dbEntry3 = new DocumentType { Id = "dummyEntryId3", DocTypeName = "Name3", DocTypeAltName = "NameAlt3", IsActive_bl = true };
             var dbEntries = (new List<DocumentType> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<DocumentType>>();
@@ -267,7 +267,7 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var initialId = "dummyEntryId1";
-            var docType1 = new DocumentType { Id = initialId, DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive = false };
+            var docType1 = new DocumentType { Id = initialId, DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive_bl = false };
             var docTypes = new DocumentType[] { docType1 };
 
             mockEfDbContext.Setup(x => x.DocumentTypes.FindAsync(docType1.Id)).Returns(Task.FromResult<DocumentType>(null));
@@ -299,13 +299,13 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var docType1 = new DocumentType { Id = "dummyDocumentTypeId1", DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive = false,
+            var docType1 = new DocumentType { Id = "dummyDocumentTypeId1", DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive_bl = false,
                                       ModifiedProperties = new string[] { "DocTypeName", "DocTypeAltName" }};
-            var docType2 = new DocumentType { Id = "dummyDocumentTypeId2", DocTypeName = "Name2", DocTypeAltName = "NameAlt2", IsActive = true };
+            var docType2 = new DocumentType { Id = "dummyDocumentTypeId2", DocTypeName = "Name2", DocTypeAltName = "NameAlt2", IsActive_bl = true };
             var docTypes = new DocumentType[] { docType1, docType2 };
 
-            var dbEntry1 = new DocumentType { Id = "dummyEntryId1", DocTypeName = "DbEntry1", DocTypeAltName = "DbEntryAlt1", IsActive = true };
-            var dbEntry2 = new DocumentType { Id = "dummyEntryId2", DocTypeName = "DbEntry2", DocTypeAltName = "DbEntryAlt2", IsActive = false };
+            var dbEntry1 = new DocumentType { Id = "dummyEntryId1", DocTypeName = "DbEntry1", DocTypeAltName = "DbEntryAlt1", IsActive_bl = true };
+            var dbEntry2 = new DocumentType { Id = "dummyEntryId2", DocTypeName = "DbEntry2", DocTypeAltName = "DbEntryAlt2", IsActive_bl = false };
 
             mockEfDbContext.Setup(x => x.DocumentTypes.FindAsync(docType1.Id)).Returns(Task.FromResult(dbEntry1));
             mockEfDbContext.Setup(x => x.DocumentTypes.FindAsync(docType2.Id)).Returns(Task.FromResult(dbEntry2));
@@ -320,9 +320,9 @@ namespace SDDB.UnitTests
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
             Assert.IsTrue(docType1.DocTypeName == dbEntry1.DocTypeName); Assert.IsTrue(docType1.DocTypeAltName == dbEntry1.DocTypeAltName);
-            Assert.IsTrue(docType1.IsActive != dbEntry1.IsActive);
+            Assert.IsTrue(docType1.IsActive_bl != dbEntry1.IsActive_bl);
             Assert.IsTrue(docType2.DocTypeName != dbEntry2.DocTypeName); Assert.IsTrue(docType2.DocTypeAltName != dbEntry2.DocTypeAltName);
-            Assert.IsTrue(docType2.IsActive != dbEntry2.IsActive);
+            Assert.IsTrue(docType2.IsActive_bl != dbEntry2.IsActive_bl);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.DocumentTypes.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -341,7 +341,7 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var initialId = "dummyEntryId1";
-            var docType1 = new DocumentType { Id = initialId, DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive = false };
+            var docType1 = new DocumentType { Id = initialId, DocTypeName = "Name1", DocTypeAltName = "NameAlt1", IsActive_bl = false };
             var docTypes = new DocumentType[] { docType1 };
 
             mockEfDbContext.Setup(x => x.DocumentTypes.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<DocumentType>(null));
@@ -375,7 +375,7 @@ namespace SDDB.UnitTests
 
             var docTypeIds = new string[] { "dummyId1", "DummyId2" };
 
-            var dbEntry = new DocumentType { IsActive = true };
+            var dbEntry = new DocumentType { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.DocumentTypes.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
             mockEfDbContext.Setup(x => x.DocumentTypes.FindAsync("dummyId2")).Returns(Task.FromResult<DocumentType>(null));
 
@@ -390,7 +390,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Record with Id=DummyId2 not found\n"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.DocumentTypes.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -409,7 +409,7 @@ namespace SDDB.UnitTests
 
             var docTypeIds = new string[] { "dummyId1" };
 
-            var dbEntry = new DocumentType { IsActive = true };
+            var dbEntry = new DocumentType { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.DocumentTypes.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
 
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
@@ -423,7 +423,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.DocumentTypes.FindAsync(It.IsAny<string>()), Times.Once);

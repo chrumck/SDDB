@@ -34,7 +34,7 @@ namespace SDDB.WebUI.ControllersSrv
                 ReviewerPerson = new { x.ReviewerPerson.FirstName, x.ReviewerPerson.LastName, x.ReviewerPerson.Initials },
                 AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
                 x.RelatesToAssyType.AssyTypeName, x.RelatesToCompType.CompTypeName, x.DocFilePath, 
-                x.Comments, x.IsActive,
+                x.Comments, IsActive = x.IsActive_bl,
                 x.DocumentType_Id, x.AuthorPerson_Id, x.ReviewerPerson_Id, x.AssignedToProject_Id, x.RelatesToAssyType_Id, x.RelatesToCompType_Id, 
             });
 
@@ -54,7 +54,7 @@ namespace SDDB.WebUI.ControllersSrv
                 ReviewerPerson = new { x.ReviewerPerson.FirstName, x.ReviewerPerson.LastName, x.ReviewerPerson.Initials },
                 AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
                 x.RelatesToAssyType.AssyTypeName, x.RelatesToCompType.CompTypeName, x.DocFilePath, 
-                x.Comments, x.IsActive,
+                x.Comments, IsActive = x.IsActive_bl,
                 x.DocumentType_Id,x.AuthorPerson_Id,x.ReviewerPerson_Id,x.AssignedToProject_Id,x.RelatesToAssyType_Id,x.RelatesToCompType_Id, 
             });
 
@@ -75,7 +75,7 @@ namespace SDDB.WebUI.ControllersSrv
                 ReviewerPerson = new { x.ReviewerPerson.FirstName, x.ReviewerPerson.LastName, x.ReviewerPerson.Initials },
                 AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
                 x.RelatesToAssyType.AssyTypeName, x.RelatesToCompType.CompTypeName, x.DocFilePath, 
-                x.Comments, x.IsActive,
+                x.Comments, IsActive = x.IsActive_bl,
                 x.DocumentType_Id,x.AuthorPerson_Id,x.ReviewerPerson_Id,x.AssignedToProject_Id,x.RelatesToAssyType_Id,x.RelatesToCompType_Id, 
             });
 

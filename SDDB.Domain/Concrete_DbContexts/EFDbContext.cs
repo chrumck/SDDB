@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNet.Identity.EntityFramework;
 using System.Data.Entity;
 using System.Data.Entity.Migrations.History;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using MySql.Data.Entity;
 
 using SDDB.Domain.Entities;
 using SDDB.Domain.Abstract;
 using SDDB.Domain.Services;
+using System;
 
 
 namespace SDDB.Domain.DbContexts
@@ -70,5 +72,24 @@ namespace SDDB.Domain.DbContexts
         {
             this.Entry(entity).Reload();
         }
+
+        //attempt to save changes to DBContext, retry if exception on deadlock thrown
+        public async Task SaveChangesWithRetryAsync()
+        {
+            for (int i = 1; i <= 10; i++)
+            {
+                try
+                {
+                    await SaveChangesAsync().ConfigureAwait(false);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    if (i == 10 || !e.GetBaseException().Message.Contains("Deadlock found when trying to get lock")) { throw; }
+                }
+                await Task.Delay(200).ConfigureAwait(false);
+            }
+        }
+
     }
 }

@@ -39,7 +39,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 var records = await dbContext.Locations
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive)
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive)
                     .Include(x => x.LocationType).Include(x => x.AssignedToProject).Include(x => x.ContactPerson)
                     .ToListAsync().ConfigureAwait(false);
 
@@ -59,7 +59,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 var records = await dbContext.Locations
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive && ids.Contains(x.Id))
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive && ids.Contains(x.Id))
                     .Include(x => x.LocationType).Include(x => x.AssignedToProject).Include(x => x.ContactPerson)
                     .ToListAsync().ConfigureAwait(false);
 
@@ -81,7 +81,7 @@ namespace SDDB.Domain.Services
                 projectIds = projectIds ?? new string[] { }; typeIds = typeIds ?? new string[] { };
 
                 var records = await dbContext.Locations
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         (typeIds.Count() == 0 || typeIds.Contains(x.LocationType_Id)))
                     .Include(x => x.LocationType).Include(x => x.AssignedToProject).Include(x => x.ContactPerson)
@@ -102,7 +102,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.Locations
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                         (x.LocName.Contains(query) || x.LocAltName.Contains(query) || x.AssignedToProject.ProjectCode.Contains(query)))
                     .Include(x => x.AssignedToProject).ToListAsync();
             }
@@ -120,7 +120,7 @@ namespace SDDB.Domain.Services
                 projectIds = projectIds ?? new string[] { };
 
                 var records = await dbContext.Locations
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         (x.LocName.Contains(query) || x.LocAltName.Contains(query) || x.AssignedToProject.ProjectCode.Contains(query)))
                     .Include(x => x.AssignedToProject).ToListAsync();
@@ -165,7 +165,7 @@ namespace SDDB.Domain.Services
                             dbEntry.CopyModifiedProps(record);
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }
@@ -196,11 +196,11 @@ namespace SDDB.Domain.Services
                         if (dbEntry != null)
                         {
                             //tasks prior to desactivating: check if assemblies assigned to location
-                            if ((await dbContext.AssemblyDbs.Where(x => x.IsActive == true && x.AssignedToLocation_Id == id).CountAsync().ConfigureAwait(false)) > 0)
+                            if ((await dbContext.AssemblyDbs.Where(x => x.IsActive_bl == true && x.AssignedToLocation_Id == id).CountAsync().ConfigureAwait(false)) > 0)
                                 errorMessage += string.Format("Location {0} not deleted, it has assemblies assigned to it\n", dbEntry.LocName);
                             else
                             {
-                            dbEntry.IsActive = false;
+                            dbEntry.IsActive_bl = false;
                             }
                         }
                         else
@@ -208,7 +208,7 @@ namespace SDDB.Domain.Services
                             errorMessage += string.Format("Record with Id={0} not found\n", id);
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }

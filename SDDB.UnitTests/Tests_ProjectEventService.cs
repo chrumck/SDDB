@@ -31,12 +31,12 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new ProjectEvent { Id = "dummyEntryId1", EventName = "Event1", EventAltName = "EventAlt1", IsActive = false, Comments = "DummyComments1",
+            var dbEntry1 = new ProjectEvent { Id = "dummyEntryId1", EventName = "Event1", EventAltName = "EventAlt1", IsActive_bl = false, Comments = "DummyComments1",
                  AssignedToProject = project1 };
-            var dbEntry2 = new ProjectEvent { Id = "dummyEntryId2", EventName = "Event2", EventAltName = "EventAlt2", IsActive = true, Comments = "DummyComments2",
+            var dbEntry2 = new ProjectEvent { Id = "dummyEntryId2", EventName = "Event2", EventAltName = "EventAlt2", IsActive_bl = true, Comments = "DummyComments2",
                  AssignedToProject = project1 };
             var dbEntries = (new List<ProjectEvent> { dbEntry1, dbEntry2 }).AsQueryable();
 
@@ -73,14 +73,14 @@ namespace SDDB.UnitTests
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
             var projectPerson2 = new Person { Id = "dummyUserId2", FirstName = "Firs2", LastName = "Last2" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
-            var project2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive = false, ProjectCode = "CODE2", 
+            var project2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive_bl = false, ProjectCode = "CODE2", 
                 ProjectPersons = new List<Person> { projectPerson2 } };
 
-            var dbEntry1 = new ProjectEvent { Id = "dummyEntryId1", EventName = "Event1", EventAltName = "EventAlt1", IsActive = false, Comments = "DummyComments1",
+            var dbEntry1 = new ProjectEvent { Id = "dummyEntryId1", EventName = "Event1", EventAltName = "EventAlt1", IsActive_bl = false, Comments = "DummyComments1",
                  AssignedToProject = project1 };
-            var dbEntry2 = new ProjectEvent { Id = "dummyEntryId2", EventName = "Event2", EventAltName = "EventAlt2", IsActive = true, Comments = "DummyComments2",
+            var dbEntry2 = new ProjectEvent { Id = "dummyEntryId2", EventName = "Event2", EventAltName = "EventAlt2", IsActive_bl = true, Comments = "DummyComments2",
                  AssignedToProject = project2 };
             var dbEntries = (new List<ProjectEvent> { dbEntry1, dbEntry2 }).AsQueryable();
 
@@ -115,14 +115,14 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new ProjectEvent { Id = "dummyEntryId1", EventName = "Event1", EventAltName = "EventAlt1", IsActive = false, 
+            var dbEntry1 = new ProjectEvent { Id = "dummyEntryId1", EventName = "Event1", EventAltName = "EventAlt1", IsActive_bl = false, 
                  AssignedToProject = project1 };
-            var dbEntry2 = new ProjectEvent { Id = "dummyEntryId2", EventName = "Event2", EventAltName = "EventAlt2", IsActive = true,
+            var dbEntry2 = new ProjectEvent { Id = "dummyEntryId2", EventName = "Event2", EventAltName = "EventAlt2", IsActive_bl = true,
                  AssignedToProject = project1 };
-            var dbEntry3 = new ProjectEvent { Id = "dummyEntryId3", EventName = "Event3", EventAltName = "EventAlt3", IsActive = true, 
+            var dbEntry3 = new ProjectEvent { Id = "dummyEntryId3", EventName = "Event3", EventAltName = "EventAlt3", IsActive_bl = true, 
                  AssignedToProject = project1 };
             var dbEntries = (new List<ProjectEvent> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -159,14 +159,14 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new ProjectEvent { Id = "dummyEntryId1", EventName = "Event1", EventAltName = "EventAlt1", IsActive = false, 
+            var dbEntry1 = new ProjectEvent { Id = "dummyEntryId1", EventName = "Event1", EventAltName = "EventAlt1", IsActive_bl = false, 
                  AssignedToProject = project1 };
-            var dbEntry2 = new ProjectEvent { Id = "dummyEntryId2", EventName = "Event2", EventAltName = "EventAlt2", IsActive = true,
+            var dbEntry2 = new ProjectEvent { Id = "dummyEntryId2", EventName = "Event2", EventAltName = "EventAlt2", IsActive_bl = true,
                  AssignedToProject = project1 };
-            var dbEntry3 = new ProjectEvent { Id = "dummyEntryId3", EventName = "Event3", EventAltName = "EventAlt3", IsActive = false, 
+            var dbEntry3 = new ProjectEvent { Id = "dummyEntryId3", EventName = "Event3", EventAltName = "EventAlt3", IsActive_bl = false, 
                  AssignedToProject = project1 };
             var dbEntries = (new List<ProjectEvent> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -203,14 +203,14 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new ProjectEvent { Id = "dummyEntryId1", EventName = "Event1", EventAltName = "EventAlt1", IsActive = true, 
+            var dbEntry1 = new ProjectEvent { Id = "dummyEntryId1", EventName = "Event1", EventAltName = "EventAlt1", IsActive_bl = true, 
                  AssignedToProject = project1 };
-            var dbEntry2 = new ProjectEvent { Id = "dummyEntryId2", EventName = "Event2", EventAltName = "EventAlt2", IsActive = true,
+            var dbEntry2 = new ProjectEvent { Id = "dummyEntryId2", EventName = "Event2", EventAltName = "EventAlt2", IsActive_bl = true,
                  AssignedToProject = project1 };
-            var dbEntry3 = new ProjectEvent { Id = "dummyEntryId3", EventName = "Event3", EventAltName = "EventAlt3", IsActive = false, 
+            var dbEntry3 = new ProjectEvent { Id = "dummyEntryId3", EventName = "Event3", EventAltName = "EventAlt3", IsActive_bl = false, 
                  AssignedToProject = project1 };
             var dbEntries = (new List<ProjectEvent> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -245,14 +245,14 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new ProjectEvent { Id = "dummyEntryId1", EventName = "Event1", EventAltName = "EventAlt1", IsActive = true, 
+            var dbEntry1 = new ProjectEvent { Id = "dummyEntryId1", EventName = "Event1", EventAltName = "EventAlt1", IsActive_bl = true, 
                  AssignedToProject = project1 };
-            var dbEntry2 = new ProjectEvent { Id = "dummyEntryId2", EventName = "Event2", EventAltName = "EventAlt2", IsActive = true,
+            var dbEntry2 = new ProjectEvent { Id = "dummyEntryId2", EventName = "Event2", EventAltName = "EventAlt2", IsActive_bl = true,
                  AssignedToProject = project1 };
-            var dbEntry3 = new ProjectEvent { Id = "dummyEntryId3", EventName = "Event3", EventAltName = "EventAlt3", IsActive = false, 
+            var dbEntry3 = new ProjectEvent { Id = "dummyEntryId3", EventName = "Event3", EventAltName = "EventAlt3", IsActive_bl = false, 
                  AssignedToProject = project1 };
             var dbEntries = (new List<ProjectEvent> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -287,14 +287,14 @@ namespace SDDB.UnitTests
 
                         var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new ProjectEvent { Id = "dummyEntryId1", EventName = "Event1", EventAltName = "EventAlt1", IsActive = true, 
+            var dbEntry1 = new ProjectEvent { Id = "dummyEntryId1", EventName = "Event1", EventAltName = "EventAlt1", IsActive_bl = true, 
                  AssignedToProject = project1 };
-            var dbEntry2 = new ProjectEvent { Id = "dummyEntryId2", EventName = "Event2", EventAltName = "EventAlt2", IsActive = true,
+            var dbEntry2 = new ProjectEvent { Id = "dummyEntryId2", EventName = "Event2", EventAltName = "EventAlt2", IsActive_bl = true,
                  AssignedToProject = project1 };
-            var dbEntry3 = new ProjectEvent { Id = "dummyEntryId3", EventName = "Event3", EventAltName = "EventAlt3", IsActive = false, 
+            var dbEntry3 = new ProjectEvent { Id = "dummyEntryId3", EventName = "Event3", EventAltName = "EventAlt3", IsActive_bl = false, 
                  AssignedToProject = project1 };
             var dbEntries = (new List<ProjectEvent> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -355,7 +355,7 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var initialId = "dummyEntryId1";
-            var event1 = new ProjectEvent { Id = initialId, EventName = "Event1", EventAltName = "EventAlt1", IsActive = false,  };
+            var event1 = new ProjectEvent { Id = initialId, EventName = "Event1", EventAltName = "EventAlt1", IsActive_bl = false,  };
             var events = new ProjectEvent[] { event1 };
 
             mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync(event1.Id)).Returns(Task.FromResult<ProjectEvent>(null));
@@ -387,13 +387,13 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var event1 = new ProjectEvent { Id = "dummyProjectEventId1", EventName = "Event1", EventAltName = "EventAlt1", IsActive = false, 
+            var event1 = new ProjectEvent { Id = "dummyProjectEventId1", EventName = "Event1", EventAltName = "EventAlt1", IsActive_bl = false, 
                                       ModifiedProperties = new string[] { "EventName", "EventAltName" }};
-            var event2 = new ProjectEvent { Id = "dummyProjectEventId2", EventName = "Event2", EventAltName = "EventAlt2", IsActive = true,  };
+            var event2 = new ProjectEvent { Id = "dummyProjectEventId2", EventName = "Event2", EventAltName = "EventAlt2", IsActive_bl = true,  };
             var events = new ProjectEvent[] { event1, event2 };
 
-            var dbEntry1 = new ProjectEvent { Id = "dummyEntryId1", EventName = "DbEntry1", EventAltName = "DbEntryAlt1", IsActive = true };
-            var dbEntry2 = new ProjectEvent { Id = "dummyEntryId2", EventName = "DbEntry2", EventAltName = "DbEntryAlt2", IsActive = false };
+            var dbEntry1 = new ProjectEvent { Id = "dummyEntryId1", EventName = "DbEntry1", EventAltName = "DbEntryAlt1", IsActive_bl = true };
+            var dbEntry2 = new ProjectEvent { Id = "dummyEntryId2", EventName = "DbEntry2", EventAltName = "DbEntryAlt2", IsActive_bl = false };
 
             mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync(event1.Id)).Returns(Task.FromResult(dbEntry1));
             mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync(event2.Id)).Returns(Task.FromResult(dbEntry2));
@@ -408,9 +408,9 @@ namespace SDDB.UnitTests
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
             Assert.IsTrue(event1.EventName == dbEntry1.EventName); Assert.IsTrue(event1.EventAltName == dbEntry1.EventAltName);
-            Assert.IsTrue(event1.IsActive != dbEntry1.IsActive);
+            Assert.IsTrue(event1.IsActive_bl != dbEntry1.IsActive_bl);
             Assert.IsTrue(event2.EventName != dbEntry2.EventName); Assert.IsTrue(event2.EventAltName != dbEntry2.EventAltName);
-            Assert.IsTrue(event2.IsActive != dbEntry2.IsActive);
+            Assert.IsTrue(event2.IsActive_bl != dbEntry2.IsActive_bl);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.ProjectEvents.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -429,7 +429,7 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var initialId = "dummyEntryId1";
-            var event1 = new ProjectEvent { Id = initialId, EventName = "Event1", EventAltName = "EventAlt1", IsActive = false,  };
+            var event1 = new ProjectEvent { Id = initialId, EventName = "Event1", EventAltName = "EventAlt1", IsActive_bl = false,  };
             var events = new ProjectEvent[] { event1 };
 
             mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<ProjectEvent>(null));
@@ -463,7 +463,7 @@ namespace SDDB.UnitTests
 
             var eventIds = new string[] { "dummyId1", "DummyId2" };
 
-            var dbEntry = new ProjectEvent { IsActive = true, EventClosed = new DateTime(2015,10,10), ClosedByPerson_Id = "DummyId" };
+            var dbEntry = new ProjectEvent { IsActive_bl = true, EventClosed = new DateTime(2015,10,10), ClosedByPerson_Id = "DummyId" };
             mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
             mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync("dummyId2")).Returns(Task.FromResult<ProjectEvent>(null));
 
@@ -478,7 +478,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Record with Id=DummyId2 not found\n"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.ProjectEvents.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -497,7 +497,7 @@ namespace SDDB.UnitTests
 
             var eventIds = new string[] { "dummyId1" };
 
-            var dbEntry = new ProjectEvent { IsActive = true, EventClosed = new DateTime(2015, 10, 10), ClosedByPerson_Id = "DummyId" };
+            var dbEntry = new ProjectEvent { IsActive_bl = true, EventClosed = new DateTime(2015, 10, 10), ClosedByPerson_Id = "DummyId" };
             mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
 
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
@@ -511,7 +511,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.ProjectEvents.FindAsync(It.IsAny<string>()), Times.Once);
@@ -530,7 +530,7 @@ namespace SDDB.UnitTests
 
             var eventIds = new string[] { "dummyId1" };
 
-            var dbEntry = new ProjectEvent { IsActive = true, EventName = "Name", EventClosed = new DateTime(2015, 10, 10) };
+            var dbEntry = new ProjectEvent { IsActive_bl = true, EventName = "Name", EventClosed = new DateTime(2015, 10, 10) };
             mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
 
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
@@ -543,7 +543,7 @@ namespace SDDB.UnitTests
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Event Name not deleted. Please close with date and person before deleting\n"));
-            Assert.IsTrue(dbEntry.IsActive == true);
+            Assert.IsTrue(dbEntry.IsActive_bl == true);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.ProjectEvents.FindAsync(It.IsAny<string>()), Times.Once);

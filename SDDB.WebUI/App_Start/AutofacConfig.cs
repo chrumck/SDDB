@@ -16,6 +16,7 @@ using SDDB.Domain.Services;
 using SDDB.Domain.Infrastructure;
 using SDDB.WebUI.Infrastructure;
 using System;
+using System.Security.Claims;
 
 namespace SDDB.WebUI
 {
@@ -29,12 +30,14 @@ namespace SDDB.WebUI
             var LDAPAuthenticationEnabled = bool.Parse(ConfigurationManager.AppSettings["LDAPAuthenticationEnabled"] ?? "false");
             var dbLoggingLevel = int.Parse(ConfigurationManager.AppSettings["dbLoggingLevel"] ?? "1");
             var procTooLongmSec = int.Parse(ConfigurationManager.AppSettings["procTooLongmSec"] ?? "0");
-            var ftpAddress = ConfigurationManager.AppSettings["ftpAddress"] ?? "";
-            var ftpUserName = ConfigurationManager.AppSettings["ftpUserName"] ?? "";
-            var ftpPwd = ConfigurationManager.AppSettings["ftpPwd"] ?? "";
-            var ftpIsSSL = bool.Parse(ConfigurationManager.AppSettings["ftpIsSSL"] ?? "false");
-            var ftpIsPassive = bool.Parse(ConfigurationManager.AppSettings["ftpIsPassive"] ?? "true");
-            var maxConnections = int.Parse(ConfigurationManager.AppSettings["maxConnections"] ?? "3");
+            
+            //following Krystian's advice - file storage on FTP is discontinued
+            //var ftpAddress = ConfigurationManager.AppSettings["ftpAddress"] ?? "";
+            //var ftpUserName = ConfigurationManager.AppSettings["ftpUserName"] ?? "";
+            //var ftpPwd = ConfigurationManager.AppSettings["ftpPwd"] ?? "";
+            //var ftpIsSSL = bool.Parse(ConfigurationManager.AppSettings["ftpIsSSL"] ?? "false");
+            //var ftpIsPassive = bool.Parse(ConfigurationManager.AppSettings["ftpIsPassive"] ?? "true");
+            //var maxConnections = int.Parse(ConfigurationManager.AppSettings["maxConnections"] ?? "3");
 
             //register DB contexts
             builder.RegisterType<EFDbContext>().AsSelf().InstancePerDependency();
@@ -45,23 +48,31 @@ namespace SDDB.WebUI
 
             //register repositories
 
-
             //register infrastructure
 
             // register services
             builder.RegisterType<DBLogger>().As<ILogger>()
-                .WithParameter("dbLogginglevel", dbLoggingLevel).WithParameter("procTooLongmSec", procTooLongmSec).InstancePerDependency();
+                .WithParameter("dbLogginglevel", dbLoggingLevel)
+                .WithParameter("procTooLongmSec", procTooLongmSec)
+                .InstancePerDependency();
 
-            builder.RegisterType<DbFtpRepoService>().As<IFileRepoService>()
-                .WithParameter("ftpAddress", ftpAddress).WithParameter("ftpUserName", ftpUserName)
-                .WithParameter("ftpPwd", ftpPwd).WithParameter("ftpIsSSL", ftpIsSSL).WithParameter("maxConnections", maxConnections)
-                .WithParameter("ftpIsPassive", ftpIsPassive).InstancePerDependency();
+            //builder.RegisterType<DbFtpRepoService>().As<IFileRepoService>()
+            //    .WithParameter("ftpAddress", ftpAddress).WithParameter("ftpUserName", ftpUserName)
+            //    .WithParameter("ftpPwd", ftpPwd).WithParameter("ftpIsSSL", ftpIsSSL)
+            //    .WithParameter("maxConnections", maxConnections).WithParameter("ftpIsPassive", ftpIsPassive)
+            //    .InstancePerDependency();
             
-            builder.RegisterType<DBUserService>().AsSelf().WithParameter("ldapAuthenticationEnabled", LDAPAuthenticationEnabled).InstancePerDependency();
+            builder.RegisterType<DBUserService>().AsSelf()
+                .WithParameter("ldapAuthenticationEnabled", LDAPAuthenticationEnabled).InstancePerDependency();
             builder.RegisterType<PersonService>().AsSelf().InstancePerDependency();
             builder.RegisterType<PersonGroupService>().AsSelf().InstancePerDependency();
             builder.RegisterType<PersonActivityTypeService>().AsSelf().InstancePerDependency();
             builder.RegisterType<PersonLogEntryService>().AsSelf().InstancePerDependency();
+            builder.RegisterType<PersonLogEntryFileService>().AsSelf()
+                .WithParameter(new ResolvedParameter(
+                    (pi, ctx) => pi.Name == "userId",
+                    (pi, ctx) => ((ClaimsIdentity)HttpContext.Current.User.Identity).FindFirst(ClaimTypes.Sid).Value))
+                .InstancePerDependency();
             
             builder.RegisterType<ProjectService>().AsSelf().InstancePerDependency();
             builder.RegisterType<ProjectEventService>().AsSelf().InstancePerDependency();

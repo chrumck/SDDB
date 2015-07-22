@@ -39,7 +39,7 @@ namespace SDDB.Domain.Services
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.AssemblyStatuss.Where(x => x.IsActive == getActive).ToListAsync();
+                return dbContext.AssemblyStatuss.Where(x => x.IsActive_bl == getActive).ToListAsync();
             }
         }
 
@@ -51,7 +51,7 @@ namespace SDDB.Domain.Services
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.AssemblyStatuss.Where(x => x.IsActive == getActive && ids.Contains(x.Id)).ToListAsync();
+                return dbContext.AssemblyStatuss.Where(x => x.IsActive_bl == getActive && ids.Contains(x.Id)).ToListAsync();
             }
         }
 
@@ -62,7 +62,7 @@ namespace SDDB.Domain.Services
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.AssemblyStatuss.Where(x => x.IsActive == getActive &&
+                return dbContext.AssemblyStatuss.Where(x => x.IsActive_bl == getActive &&
                     (x.AssyStatusName.Contains(query) || x.AssyStatusAltName.Contains(query) )).ToListAsync();
             }
         }
@@ -92,7 +92,7 @@ namespace SDDB.Domain.Services
                             dbEntry.CopyModifiedProps(record);
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }
@@ -119,14 +119,14 @@ namespace SDDB.Domain.Services
                         var dbEntry = await dbContext.AssemblyStatuss.FindAsync(id).ConfigureAwait(false);
                         if (dbEntry != null)
                         {
-                            dbEntry.IsActive = false;
+                            dbEntry.IsActive_bl = false;
                         }
                         else
                         {
                             errorMessage += string.Format("Record with Id={0} not found\n", id);
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }

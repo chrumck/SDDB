@@ -29,8 +29,8 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new LocationType { Id = "dummyEntryId1", LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive = false, Comments = "DummyComments1" };
-            var dbEntry2 = new LocationType { Id = "dummyEntryId2", LocTypeName = "Name2", LocTypeAltName = "NameAlt2", IsActive = true, Comments = "DummyComments2" };
+            var dbEntry1 = new LocationType { Id = "dummyEntryId1", LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive_bl = false, Comments = "DummyComments1" };
+            var dbEntry2 = new LocationType { Id = "dummyEntryId2", LocTypeName = "Name2", LocTypeAltName = "NameAlt2", IsActive_bl = true, Comments = "DummyComments2" };
             var dbEntries = (new List<LocationType> { dbEntry1, dbEntry2 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<LocationType>>();
@@ -63,9 +63,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new LocationType { Id = "dummyEntryId1", LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive = false };
-            var dbEntry2 = new LocationType { Id = "dummyEntryId2", LocTypeName = "Name2", LocTypeAltName = "NameAlt2", IsActive = true };
-            var dbEntry3 = new LocationType { Id = "dummyEntryId3", LocTypeName = "Name3", LocTypeAltName = "NameAlt3", IsActive = true };
+            var dbEntry1 = new LocationType { Id = "dummyEntryId1", LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive_bl = false };
+            var dbEntry2 = new LocationType { Id = "dummyEntryId2", LocTypeName = "Name2", LocTypeAltName = "NameAlt2", IsActive_bl = true };
+            var dbEntry3 = new LocationType { Id = "dummyEntryId3", LocTypeName = "Name3", LocTypeAltName = "NameAlt3", IsActive_bl = true };
             var dbEntries = (new List<LocationType> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<LocationType>>();
@@ -99,9 +99,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new LocationType { Id = "dummyEntryId1", LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive = false };
-            var dbEntry2 = new LocationType { Id = "dummyEntryId2", LocTypeName = "Name2", LocTypeAltName = "NameAlt2", IsActive = true };
-            var dbEntry3 = new LocationType { Id = "dummyEntryId3", LocTypeName = "Name3", LocTypeAltName = "NameAlt3", IsActive = false };
+            var dbEntry1 = new LocationType { Id = "dummyEntryId1", LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive_bl = false };
+            var dbEntry2 = new LocationType { Id = "dummyEntryId2", LocTypeName = "Name2", LocTypeAltName = "NameAlt2", IsActive_bl = true };
+            var dbEntry3 = new LocationType { Id = "dummyEntryId3", LocTypeName = "Name3", LocTypeAltName = "NameAlt3", IsActive_bl = false };
             var dbEntries = (new List<LocationType> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<LocationType>>();
@@ -135,9 +135,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new LocationType { Id = "dummyEntryId1", LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive = false };
-            var dbEntry2 = new LocationType { Id = "dummyEntryId2", LocTypeName = "Name2", LocTypeAltName = "NameAlt2", IsActive = true };
-            var dbEntry3 = new LocationType { Id = "dummyEntryId3", LocTypeName = "Name3", LocTypeAltName = "NameAlt3", IsActive = true };
+            var dbEntry1 = new LocationType { Id = "dummyEntryId1", LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive_bl = false };
+            var dbEntry2 = new LocationType { Id = "dummyEntryId2", LocTypeName = "Name2", LocTypeAltName = "NameAlt2", IsActive_bl = true };
+            var dbEntry3 = new LocationType { Id = "dummyEntryId3", LocTypeName = "Name3", LocTypeAltName = "NameAlt3", IsActive_bl = true };
 
             var dbEntries = (new List<LocationType> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -169,9 +169,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new LocationType { Id = "dummyEntryId1", LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive = false };
-            var dbEntry2 = new LocationType { Id = "dummyEntryId2", LocTypeName = "Name2", LocTypeAltName = "NameAlt2", IsActive = true };
-            var dbEntry3 = new LocationType { Id = "dummyEntryId3", LocTypeName = "Name3", LocTypeAltName = "NameAlt3", IsActive = true };
+            var dbEntry1 = new LocationType { Id = "dummyEntryId1", LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive_bl = false };
+            var dbEntry2 = new LocationType { Id = "dummyEntryId2", LocTypeName = "Name2", LocTypeAltName = "NameAlt2", IsActive_bl = true };
+            var dbEntry3 = new LocationType { Id = "dummyEntryId3", LocTypeName = "Name3", LocTypeAltName = "NameAlt3", IsActive_bl = true };
 
             var dbEntries = (new List<LocationType> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -203,9 +203,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new LocationType { Id = "dummyEntryId1", LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive = false };
-            var dbEntry2 = new LocationType { Id = "dummyEntryId2", LocTypeName = "Name2", LocTypeAltName = "NameAlt2", IsActive = true };
-            var dbEntry3 = new LocationType { Id = "dummyEntryId3", LocTypeName = "Name3", LocTypeAltName = "NameAlt3", IsActive = true };
+            var dbEntry1 = new LocationType { Id = "dummyEntryId1", LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive_bl = false };
+            var dbEntry2 = new LocationType { Id = "dummyEntryId2", LocTypeName = "Name2", LocTypeAltName = "NameAlt2", IsActive_bl = true };
+            var dbEntry3 = new LocationType { Id = "dummyEntryId3", LocTypeName = "Name3", LocTypeAltName = "NameAlt3", IsActive_bl = true };
 
             var dbEntries = (new List<LocationType> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -264,7 +264,7 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var initialId = "dummyEntryId1";
-            var locationType1 = new LocationType { Id = initialId, LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive = false };
+            var locationType1 = new LocationType { Id = initialId, LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive_bl = false };
             var locationTypes = new LocationType[] { locationType1 };
 
             mockEfDbContext.Setup(x => x.LocationTypes.FindAsync(locationType1.Id)).Returns(Task.FromResult<LocationType>(null));
@@ -296,13 +296,13 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var locationType1 = new LocationType { Id = "dummyLocationTypeId1", LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive = false,
+            var locationType1 = new LocationType { Id = "dummyLocationTypeId1", LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive_bl = false,
                                       ModifiedProperties = new string[] { "LocTypeName", "LocTypeAltName" }};
-            var locationType2 = new LocationType { Id = "dummyLocationTypeId2", LocTypeName = "Name2", LocTypeAltName = "NameAlt2", IsActive = true };
+            var locationType2 = new LocationType { Id = "dummyLocationTypeId2", LocTypeName = "Name2", LocTypeAltName = "NameAlt2", IsActive_bl = true };
             var locationTypes = new LocationType[] { locationType1, locationType2 };
 
-            var dbEntry1 = new LocationType { Id = "dummyEntryId1", LocTypeName = "DbEntry1", LocTypeAltName = "DbEntryAlt1", IsActive = true };
-            var dbEntry2 = new LocationType { Id = "dummyEntryId2", LocTypeName = "DbEntry2", LocTypeAltName = "DbEntryAlt2", IsActive = false };
+            var dbEntry1 = new LocationType { Id = "dummyEntryId1", LocTypeName = "DbEntry1", LocTypeAltName = "DbEntryAlt1", IsActive_bl = true };
+            var dbEntry2 = new LocationType { Id = "dummyEntryId2", LocTypeName = "DbEntry2", LocTypeAltName = "DbEntryAlt2", IsActive_bl = false };
 
             mockEfDbContext.Setup(x => x.LocationTypes.FindAsync(locationType1.Id)).Returns(Task.FromResult(dbEntry1));
             mockEfDbContext.Setup(x => x.LocationTypes.FindAsync(locationType2.Id)).Returns(Task.FromResult(dbEntry2));
@@ -317,9 +317,9 @@ namespace SDDB.UnitTests
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
             Assert.IsTrue(locationType1.LocTypeName == dbEntry1.LocTypeName); Assert.IsTrue(locationType1.LocTypeAltName == dbEntry1.LocTypeAltName);
-            Assert.IsTrue(locationType1.IsActive != dbEntry1.IsActive);
+            Assert.IsTrue(locationType1.IsActive_bl != dbEntry1.IsActive_bl);
             Assert.IsTrue(locationType2.LocTypeName != dbEntry2.LocTypeName); Assert.IsTrue(locationType2.LocTypeAltName != dbEntry2.LocTypeAltName);
-            Assert.IsTrue(locationType2.IsActive != dbEntry2.IsActive);
+            Assert.IsTrue(locationType2.IsActive_bl != dbEntry2.IsActive_bl);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.LocationTypes.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -338,7 +338,7 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var initialId = "dummyEntryId1";
-            var locationType1 = new LocationType { Id = initialId, LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive = false };
+            var locationType1 = new LocationType { Id = initialId, LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive_bl = false };
             var locationTypes = new LocationType[] { locationType1 };
 
             mockEfDbContext.Setup(x => x.LocationTypes.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<LocationType>(null));
@@ -372,7 +372,7 @@ namespace SDDB.UnitTests
 
             var ids = new string[] { "dummyId1", "DummyId2" };
 
-            var dbEntry = new LocationType { IsActive = true };
+            var dbEntry = new LocationType { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.LocationTypes.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
             mockEfDbContext.Setup(x => x.LocationTypes.FindAsync("dummyId2")).Returns(Task.FromResult<LocationType>(null));
 
@@ -387,7 +387,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Record with Id=DummyId2 not found\n"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.LocationTypes.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -406,7 +406,7 @@ namespace SDDB.UnitTests
 
             var ids = new string[] { "dummyId1" };
 
-            var dbEntry = new LocationType { IsActive = true };
+            var dbEntry = new LocationType { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.LocationTypes.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
 
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
@@ -420,7 +420,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.LocationTypes.FindAsync(It.IsAny<string>()), Times.Once);

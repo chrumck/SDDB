@@ -120,30 +120,69 @@
     <Compile Include="MockDbAsyncQueryProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MockDependencyResolver.cs" />
-    <Compile Include="Tests_AssemblyLogEntryService.cs" />
-    <Compile Include="Tests_ComponentLogEntryService.cs" />
-    <Compile Include="Tests_ComponentService.cs" />
-    <Compile Include="Tests_ComponentModelService.cs" />
-    <Compile Include="Tests_AssemblyModelService.cs" />
-    <Compile Include="Tests_AssemblyDbService.cs" />
-    <Compile Include="Tests_PersonLogEntryService.cs" />
-    <Compile Include="Tests_ProjectEventService.cs" />
-    <Compile Include="Tests_PersonActivityService.cs" />
-    <Compile Include="Tests_LocationService.cs" />
-    <Compile Include="Tests_DocumentService.cs" />
-    <Compile Include="Tests_LocationTypeService .cs" />
-    <Compile Include="Tests_ComponentStatusService.cs" />
-    <Compile Include="Tests_AssemblyStatusService.cs" />
-    <Compile Include="Tests_ComponentTypeService.cs" />
+    <Compile Include="Tests_AssemblyDbService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_AssemblyLogEntryService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_AssemblyModelService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_AssemblyStatusService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_AssemblyTypeService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_ComponentLogEntryService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_ComponentModelService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_ComponentService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_ComponentStatusService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_ComponentTypeService.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Tests_DBLogger.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Tests_DBUserService.cs" />
-    <Compile Include="Tests_AssemblyTypeService.cs" />
-    <Compile Include="Tests_DocumentTypeService.cs" />
-    <Compile Include="Tests_PersonGroupService.cs" />
-    <Compile Include="Tests_PersonService.cs" />
-    <Compile Include="Tests_ProjectService.cs" />
+    <Compile Include="Tests_DBUserService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_DocumentService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_DocumentTypeService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_LocationService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_LocationTypeService .cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_PersonActivityService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_PersonGroupService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_PersonService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_ProjectEventService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests_ProjectService.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

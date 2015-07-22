@@ -29,8 +29,8 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new PersonActivityType { Id = "dummyEntryId1", ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive = false, Comments = "DummyComments1" };
-            var dbEntry2 = new PersonActivityType { Id = "dummyEntryId2", ActivityTypeName = "Name2", ActivityTypeAltName = "NameAlt2", IsActive = true, Comments = "DummyComments2" };
+            var dbEntry1 = new PersonActivityType { Id = "dummyEntryId1", ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive_bl = false, Comments = "DummyComments1" };
+            var dbEntry2 = new PersonActivityType { Id = "dummyEntryId2", ActivityTypeName = "Name2", ActivityTypeAltName = "NameAlt2", IsActive_bl = true, Comments = "DummyComments2" };
             var dbEntries = (new List<PersonActivityType> { dbEntry1, dbEntry2 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<PersonActivityType>>();
@@ -63,9 +63,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new PersonActivityType { Id = "dummyEntryId1", ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive = false };
-            var dbEntry2 = new PersonActivityType { Id = "dummyEntryId2", ActivityTypeName = "Name2", ActivityTypeAltName = "NameAlt2", IsActive = true };
-            var dbEntry3 = new PersonActivityType { Id = "dummyEntryId3", ActivityTypeName = "Name3", ActivityTypeAltName = "NameAlt3", IsActive = true };
+            var dbEntry1 = new PersonActivityType { Id = "dummyEntryId1", ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive_bl = false };
+            var dbEntry2 = new PersonActivityType { Id = "dummyEntryId2", ActivityTypeName = "Name2", ActivityTypeAltName = "NameAlt2", IsActive_bl = true };
+            var dbEntry3 = new PersonActivityType { Id = "dummyEntryId3", ActivityTypeName = "Name3", ActivityTypeAltName = "NameAlt3", IsActive_bl = true };
             var dbEntries = (new List<PersonActivityType> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<PersonActivityType>>();
@@ -99,9 +99,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new PersonActivityType { Id = "dummyEntryId1", ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive = false };
-            var dbEntry2 = new PersonActivityType { Id = "dummyEntryId2", ActivityTypeName = "Name2", ActivityTypeAltName = "NameAlt2", IsActive = true };
-            var dbEntry3 = new PersonActivityType { Id = "dummyEntryId3", ActivityTypeName = "Name3", ActivityTypeAltName = "NameAlt3", IsActive = false };
+            var dbEntry1 = new PersonActivityType { Id = "dummyEntryId1", ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive_bl = false };
+            var dbEntry2 = new PersonActivityType { Id = "dummyEntryId2", ActivityTypeName = "Name2", ActivityTypeAltName = "NameAlt2", IsActive_bl = true };
+            var dbEntry3 = new PersonActivityType { Id = "dummyEntryId3", ActivityTypeName = "Name3", ActivityTypeAltName = "NameAlt3", IsActive_bl = false };
             var dbEntries = (new List<PersonActivityType> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<PersonActivityType>>();
@@ -135,9 +135,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new PersonActivityType { Id = "dummyEntryId1", ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive = true };
-            var dbEntry2 = new PersonActivityType { Id = "dummyEntryId2", ActivityTypeName = "Name2", ActivityTypeAltName = "NameAlt2", IsActive = false };
-            var dbEntry3 = new PersonActivityType { Id = "dummyEntryId3", ActivityTypeName = "Name3", ActivityTypeAltName = "NameAlt3", IsActive = true };
+            var dbEntry1 = new PersonActivityType { Id = "dummyEntryId1", ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive_bl = true };
+            var dbEntry2 = new PersonActivityType { Id = "dummyEntryId2", ActivityTypeName = "Name2", ActivityTypeAltName = "NameAlt2", IsActive_bl = false };
+            var dbEntry3 = new PersonActivityType { Id = "dummyEntryId3", ActivityTypeName = "Name3", ActivityTypeAltName = "NameAlt3", IsActive_bl = true };
             var dbEntries = (new List<PersonActivityType> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<PersonActivityType>>();
@@ -170,9 +170,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new PersonActivityType { Id = "dummyEntryId1", ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive = true };
-            var dbEntry2 = new PersonActivityType { Id = "dummyEntryId2", ActivityTypeName = "Name2", ActivityTypeAltName = "NameAlt2", IsActive = false };
-            var dbEntry3 = new PersonActivityType { Id = "dummyEntryId3", ActivityTypeName = "Name3", ActivityTypeAltName = "NameAlt3", IsActive = true };
+            var dbEntry1 = new PersonActivityType { Id = "dummyEntryId1", ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive_bl = true };
+            var dbEntry2 = new PersonActivityType { Id = "dummyEntryId2", ActivityTypeName = "Name2", ActivityTypeAltName = "NameAlt2", IsActive_bl = false };
+            var dbEntry3 = new PersonActivityType { Id = "dummyEntryId3", ActivityTypeName = "Name3", ActivityTypeAltName = "NameAlt3", IsActive_bl = true };
             var dbEntries = (new List<PersonActivityType> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<PersonActivityType>>();
@@ -205,9 +205,9 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var dbEntry1 = new PersonActivityType { Id = "dummyEntryId1", ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive = true };
-            var dbEntry2 = new PersonActivityType { Id = "dummyEntryId2", ActivityTypeName = "Name2", ActivityTypeAltName = "NameAlt2", IsActive = false };
-            var dbEntry3 = new PersonActivityType { Id = "dummyEntryId3", ActivityTypeName = "Name3", ActivityTypeAltName = "NameAlt3", IsActive = true };
+            var dbEntry1 = new PersonActivityType { Id = "dummyEntryId1", ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive_bl = true };
+            var dbEntry2 = new PersonActivityType { Id = "dummyEntryId2", ActivityTypeName = "Name2", ActivityTypeAltName = "NameAlt2", IsActive_bl = false };
+            var dbEntry3 = new PersonActivityType { Id = "dummyEntryId3", ActivityTypeName = "Name3", ActivityTypeAltName = "NameAlt3", IsActive_bl = true };
             var dbEntries = (new List<PersonActivityType> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<PersonActivityType>>();
@@ -267,7 +267,7 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var initialId = "dummyEntryId1";
-            var prsActivityType1 = new PersonActivityType { Id = initialId, ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive = false };
+            var prsActivityType1 = new PersonActivityType { Id = initialId, ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive_bl = false };
             var prsActivityTypes = new PersonActivityType[] { prsActivityType1 };
 
             mockEfDbContext.Setup(x => x.PersonActivityTypes.FindAsync(prsActivityType1.Id)).Returns(Task.FromResult<PersonActivityType>(null));
@@ -299,13 +299,13 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var prsActivityType1 = new PersonActivityType { Id = "dummyPersonActivityTypeId1", ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive = false,
+            var prsActivityType1 = new PersonActivityType { Id = "dummyPersonActivityTypeId1", ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive_bl = false,
                                       ModifiedProperties = new string[] { "ActivityTypeName", "ActivityTypeAltName" }};
-            var prsActivityType2 = new PersonActivityType { Id = "dummyPersonActivityTypeId2", ActivityTypeName = "Name2", ActivityTypeAltName = "NameAlt2", IsActive = true };
+            var prsActivityType2 = new PersonActivityType { Id = "dummyPersonActivityTypeId2", ActivityTypeName = "Name2", ActivityTypeAltName = "NameAlt2", IsActive_bl = true };
             var prsActivityTypes = new PersonActivityType[] { prsActivityType1, prsActivityType2 };
 
-            var dbEntry1 = new PersonActivityType { Id = "dummyEntryId1", ActivityTypeName = "DbEntry1", ActivityTypeAltName = "DbEntryAlt1", IsActive = true };
-            var dbEntry2 = new PersonActivityType { Id = "dummyEntryId2", ActivityTypeName = "DbEntry2", ActivityTypeAltName = "DbEntryAlt2", IsActive = false };
+            var dbEntry1 = new PersonActivityType { Id = "dummyEntryId1", ActivityTypeName = "DbEntry1", ActivityTypeAltName = "DbEntryAlt1", IsActive_bl = true };
+            var dbEntry2 = new PersonActivityType { Id = "dummyEntryId2", ActivityTypeName = "DbEntry2", ActivityTypeAltName = "DbEntryAlt2", IsActive_bl = false };
 
             mockEfDbContext.Setup(x => x.PersonActivityTypes.FindAsync(prsActivityType1.Id)).Returns(Task.FromResult(dbEntry1));
             mockEfDbContext.Setup(x => x.PersonActivityTypes.FindAsync(prsActivityType2.Id)).Returns(Task.FromResult(dbEntry2));
@@ -320,9 +320,9 @@ namespace SDDB.UnitTests
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
             Assert.IsTrue(prsActivityType1.ActivityTypeName == dbEntry1.ActivityTypeName); Assert.IsTrue(prsActivityType1.ActivityTypeAltName == dbEntry1.ActivityTypeAltName);
-            Assert.IsTrue(prsActivityType1.IsActive != dbEntry1.IsActive);
+            Assert.IsTrue(prsActivityType1.IsActive_bl != dbEntry1.IsActive_bl);
             Assert.IsTrue(prsActivityType2.ActivityTypeName != dbEntry2.ActivityTypeName); Assert.IsTrue(prsActivityType2.ActivityTypeAltName != dbEntry2.ActivityTypeAltName);
-            Assert.IsTrue(prsActivityType2.IsActive != dbEntry2.IsActive);
+            Assert.IsTrue(prsActivityType2.IsActive_bl != dbEntry2.IsActive_bl);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.PersonActivityTypes.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -341,7 +341,7 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var initialId = "dummyEntryId1";
-            var prsActivityType1 = new PersonActivityType { Id = initialId, ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive = false };
+            var prsActivityType1 = new PersonActivityType { Id = initialId, ActivityTypeName = "Name1", ActivityTypeAltName = "NameAlt1", IsActive_bl = false };
             var prsActivityTypes = new PersonActivityType[] { prsActivityType1 };
 
             mockEfDbContext.Setup(x => x.PersonActivityTypes.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<PersonActivityType>(null));
@@ -375,7 +375,7 @@ namespace SDDB.UnitTests
 
             var prsActivityTypeIds = new string[] { "dummyId1", "DummyId2" };
 
-            var dbEntry = new PersonActivityType { IsActive = true };
+            var dbEntry = new PersonActivityType { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.PersonActivityTypes.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
             mockEfDbContext.Setup(x => x.PersonActivityTypes.FindAsync("dummyId2")).Returns(Task.FromResult<PersonActivityType>(null));
 
@@ -390,7 +390,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Record with Id=DummyId2 not found\n"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.PersonActivityTypes.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -409,7 +409,7 @@ namespace SDDB.UnitTests
 
             var prsActivityTypeIds = new string[] { "dummyId1" };
 
-            var dbEntry = new PersonActivityType { IsActive = true };
+            var dbEntry = new PersonActivityType { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.PersonActivityTypes.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
 
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
@@ -423,7 +423,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.PersonActivityTypes.FindAsync(It.IsAny<string>()), Times.Once);

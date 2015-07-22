@@ -31,12 +31,12 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Location { Id = "dummyEntryId1", LocName = "Loc1", LocAltName = "LocAlt1", IsActive = false, Comments = "DummyComments1",
+            var dbEntry1 = new Location { Id = "dummyEntryId1", LocName = "Loc1", LocAltName = "LocAlt1", IsActive_bl = false, Comments = "DummyComments1",
                 AccessInfo = "DummyInfo1", AssignedToProject = project1 };
-            var dbEntry2 = new Location { Id = "dummyEntryId2", LocName = "Loc2", LocAltName = "LocAlt2", IsActive = true, Comments = "DummyComments2",
+            var dbEntry2 = new Location { Id = "dummyEntryId2", LocName = "Loc2", LocAltName = "LocAlt2", IsActive_bl = true, Comments = "DummyComments2",
                 AccessInfo = "DummyInfo2", AssignedToProject = project1 };
             var dbEntries = (new List<Location> { dbEntry1, dbEntry2 }).AsQueryable();
 
@@ -73,14 +73,14 @@ namespace SDDB.UnitTests
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
             var projectPerson2 = new Person { Id = "dummyUserId2", FirstName = "Firs2", LastName = "Last2" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
-            var project2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive = false, ProjectCode = "CODE2", 
+            var project2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive_bl = false, ProjectCode = "CODE2", 
                 ProjectPersons = new List<Person> { projectPerson2 } };
 
-            var dbEntry1 = new Location { Id = "dummyEntryId1", LocName = "Loc1", LocAltName = "LocAlt1", IsActive = false, Comments = "DummyComments1",
+            var dbEntry1 = new Location { Id = "dummyEntryId1", LocName = "Loc1", LocAltName = "LocAlt1", IsActive_bl = false, Comments = "DummyComments1",
                 AccessInfo = "DummyInfo1", AssignedToProject = project1 };
-            var dbEntry2 = new Location { Id = "dummyEntryId2", LocName = "Loc2", LocAltName = "LocAlt2", IsActive = true, Comments = "DummyComments2",
+            var dbEntry2 = new Location { Id = "dummyEntryId2", LocName = "Loc2", LocAltName = "LocAlt2", IsActive_bl = true, Comments = "DummyComments2",
                 AccessInfo = "DummyInfo2", AssignedToProject = project2 };
             var dbEntries = (new List<Location> { dbEntry1, dbEntry2 }).AsQueryable();
 
@@ -115,14 +115,14 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Location { Id = "dummyEntryId1", LocName = "Loc1", LocAltName = "LocAlt1", IsActive = false, 
+            var dbEntry1 = new Location { Id = "dummyEntryId1", LocName = "Loc1", LocAltName = "LocAlt1", IsActive_bl = false, 
                 AccessInfo = "DummyInfo1" , AssignedToProject = project1 };
-            var dbEntry2 = new Location { Id = "dummyEntryId2", LocName = "Loc2", LocAltName = "LocAlt2", IsActive = true,
+            var dbEntry2 = new Location { Id = "dummyEntryId2", LocName = "Loc2", LocAltName = "LocAlt2", IsActive_bl = true,
                 AccessInfo = "DummyInfo2" , AssignedToProject = project1 };
-            var dbEntry3 = new Location { Id = "dummyEntryId3", LocName = "Loc3", LocAltName = "LocAlt3", IsActive = true, 
+            var dbEntry3 = new Location { Id = "dummyEntryId3", LocName = "Loc3", LocAltName = "LocAlt3", IsActive_bl = true, 
                 AccessInfo = "DummyInfo3" , AssignedToProject = project1 };
             var dbEntries = (new List<Location> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -159,14 +159,14 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Location { Id = "dummyEntryId1", LocName = "Loc1", LocAltName = "LocAlt1", IsActive = false, 
+            var dbEntry1 = new Location { Id = "dummyEntryId1", LocName = "Loc1", LocAltName = "LocAlt1", IsActive_bl = false, 
                 AccessInfo = "DummyInfo1" , AssignedToProject = project1 };
-            var dbEntry2 = new Location { Id = "dummyEntryId2", LocName = "Loc2", LocAltName = "LocAlt2", IsActive = true,
+            var dbEntry2 = new Location { Id = "dummyEntryId2", LocName = "Loc2", LocAltName = "LocAlt2", IsActive_bl = true,
                 AccessInfo = "DummyInfo2" , AssignedToProject = project1 };
-            var dbEntry3 = new Location { Id = "dummyEntryId3", LocName = "Loc3", LocAltName = "LocAlt3", IsActive = false, 
+            var dbEntry3 = new Location { Id = "dummyEntryId3", LocName = "Loc3", LocAltName = "LocAlt3", IsActive_bl = false, 
                 AccessInfo = "DummyInfo3" , AssignedToProject = project1 };
             var dbEntries = (new List<Location> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -203,14 +203,14 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Location { Id = "dummyEntryId1", LocName = "Loc1", LocAltName = "LocAlt1", IsActive = true, 
+            var dbEntry1 = new Location { Id = "dummyEntryId1", LocName = "Loc1", LocAltName = "LocAlt1", IsActive_bl = true, 
                 AccessInfo = "DummyInfo1" , AssignedToProject = project1 };
-            var dbEntry2 = new Location { Id = "dummyEntryId2", LocName = "Loc2", LocAltName = "LocAlt2", IsActive = true,
+            var dbEntry2 = new Location { Id = "dummyEntryId2", LocName = "Loc2", LocAltName = "LocAlt2", IsActive_bl = true,
                 AccessInfo = "DummyInfo2" , AssignedToProject = project1 };
-            var dbEntry3 = new Location { Id = "dummyEntryId3", LocName = "Loc3", LocAltName = "LocAlt3", IsActive = false, 
+            var dbEntry3 = new Location { Id = "dummyEntryId3", LocName = "Loc3", LocAltName = "LocAlt3", IsActive_bl = false, 
                 AccessInfo = "DummyInfo3" , AssignedToProject = project1 };
             var dbEntries = (new List<Location> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -245,14 +245,14 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Location { Id = "dummyEntryId1", LocName = "Loc1", LocAltName = "LocAlt1", IsActive = true, 
+            var dbEntry1 = new Location { Id = "dummyEntryId1", LocName = "Loc1", LocAltName = "LocAlt1", IsActive_bl = true, 
                 AccessInfo = "DummyInfo1" , AssignedToProject = project1 };
-            var dbEntry2 = new Location { Id = "dummyEntryId2", LocName = "Loc2", LocAltName = "LocAlt2", IsActive = true,
+            var dbEntry2 = new Location { Id = "dummyEntryId2", LocName = "Loc2", LocAltName = "LocAlt2", IsActive_bl = true,
                 AccessInfo = "DummyInfo2" , AssignedToProject = project1 };
-            var dbEntry3 = new Location { Id = "dummyEntryId3", LocName = "Loc3", LocAltName = "LocAlt3", IsActive = false, 
+            var dbEntry3 = new Location { Id = "dummyEntryId3", LocName = "Loc3", LocAltName = "LocAlt3", IsActive_bl = false, 
                 AccessInfo = "DummyInfo3" , AssignedToProject = project1 };
             var dbEntries = (new List<Location> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -287,14 +287,14 @@ namespace SDDB.UnitTests
 
                         var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
-            var dbEntry1 = new Location { Id = "dummyEntryId1", LocName = "Loc1", LocAltName = "LocAlt1", IsActive = true, 
+            var dbEntry1 = new Location { Id = "dummyEntryId1", LocName = "Loc1", LocAltName = "LocAlt1", IsActive_bl = true, 
                 AccessInfo = "DummyInfo1" , AssignedToProject = project1 };
-            var dbEntry2 = new Location { Id = "dummyEntryId2", LocName = "Loc2", LocAltName = "LocAlt2", IsActive = true,
+            var dbEntry2 = new Location { Id = "dummyEntryId2", LocName = "Loc2", LocAltName = "LocAlt2", IsActive_bl = true,
                 AccessInfo = "DummyInfo2" , AssignedToProject = project1 };
-            var dbEntry3 = new Location { Id = "dummyEntryId3", LocName = "Loc3", LocAltName = "LocAlt3", IsActive = false, 
+            var dbEntry3 = new Location { Id = "dummyEntryId3", LocName = "Loc3", LocAltName = "LocAlt3", IsActive_bl = false, 
                 AccessInfo = "DummyInfo3" , AssignedToProject = project1 };
             var dbEntries = (new List<Location> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -355,7 +355,7 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var initialId = "dummyEntryId1";
-            var location1 = new Location { Id = initialId, LocName = "Loc1", LocAltName = "LocAlt1", IsActive = false, AccessInfo = "DummyInfo1" };
+            var location1 = new Location { Id = initialId, LocName = "Loc1", LocAltName = "LocAlt1", IsActive_bl = false, AccessInfo = "DummyInfo1" };
             var locations = new Location[] { location1 };
 
             mockEfDbContext.Setup(x => x.Locations.FindAsync(location1.Id)).Returns(Task.FromResult<Location>(null));
@@ -388,9 +388,9 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var initialId = "newEntryId1";
-            var location1 = new Location { Id = initialId, LocName = "Loc", IsActive = true, AccessInfo = "DummyInfo" };
-            var location2 = new Location { Id = initialId, LocName = "Loc", IsActive = false, AccessInfo = "DummyInfo" };
-            var location3 = new Location { Id = initialId, LocName = "Loc", IsActive = true, AccessInfo = "DummyInfo" };
+            var location1 = new Location { Id = initialId, LocName = "Loc", IsActive_bl = true, AccessInfo = "DummyInfo" };
+            var location2 = new Location { Id = initialId, LocName = "Loc", IsActive_bl = false, AccessInfo = "DummyInfo" };
+            var location3 = new Location { Id = initialId, LocName = "Loc", IsActive_bl = true, AccessInfo = "DummyInfo" };
             var locations = new Location[] { location1, location2, location3 };
 
             mockEfDbContext.Setup(x => x.Locations.FindAsync(It.IsAny<Location>())).Returns(Task.FromResult<Location>(null));
@@ -425,13 +425,13 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
-            var location1 = new Location { Id = "dummyLocationId1", LocName = "Loc1", LocAltName = "LocAlt1", IsActive = false, AccessInfo = "DummyInfo1",
+            var location1 = new Location { Id = "dummyLocationId1", LocName = "Loc1", LocAltName = "LocAlt1", IsActive_bl = false, AccessInfo = "DummyInfo1",
                                       ModifiedProperties = new string[] { "LocName", "LocAltName" }};
-            var location2 = new Location { Id = "dummyLocationId2", LocName = "Loc2", LocAltName = "LocAlt2", IsActive = true, AccessInfo = "DummyInfo2" };
+            var location2 = new Location { Id = "dummyLocationId2", LocName = "Loc2", LocAltName = "LocAlt2", IsActive_bl = true, AccessInfo = "DummyInfo2" };
             var locations = new Location[] { location1, location2 };
 
-            var dbEntry1 = new Location { Id = "dummyEntryId1", LocName = "DbEntry1", LocAltName = "DbEntryAlt1", IsActive = true, AccessInfo = "DbEntryInfo1" };
-            var dbEntry2 = new Location { Id = "dummyEntryId2", LocName = "DbEntry2", LocAltName = "DbEntryAlt2", IsActive = false, AccessInfo = "DbEntryInfo2" };
+            var dbEntry1 = new Location { Id = "dummyEntryId1", LocName = "DbEntry1", LocAltName = "DbEntryAlt1", IsActive_bl = true, AccessInfo = "DbEntryInfo1" };
+            var dbEntry2 = new Location { Id = "dummyEntryId2", LocName = "DbEntry2", LocAltName = "DbEntryAlt2", IsActive_bl = false, AccessInfo = "DbEntryInfo2" };
 
             mockEfDbContext.Setup(x => x.Locations.FindAsync(location1.Id)).Returns(Task.FromResult(dbEntry1));
             mockEfDbContext.Setup(x => x.Locations.FindAsync(location2.Id)).Returns(Task.FromResult(dbEntry2));
@@ -446,9 +446,9 @@ namespace SDDB.UnitTests
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
             Assert.IsTrue(location1.LocName == dbEntry1.LocName); Assert.IsTrue(location1.LocAltName == dbEntry1.LocAltName);
-            Assert.IsTrue(location1.AccessInfo != dbEntry1.AccessInfo); Assert.IsTrue(location1.IsActive != dbEntry1.IsActive);
+            Assert.IsTrue(location1.AccessInfo != dbEntry1.AccessInfo); Assert.IsTrue(location1.IsActive_bl != dbEntry1.IsActive_bl);
             Assert.IsTrue(location2.LocName != dbEntry2.LocName); Assert.IsTrue(location2.LocAltName != dbEntry2.LocAltName);
-            Assert.IsTrue(location2.AccessInfo != dbEntry2.AccessInfo); Assert.IsTrue(location2.IsActive != dbEntry2.IsActive);
+            Assert.IsTrue(location2.AccessInfo != dbEntry2.AccessInfo); Assert.IsTrue(location2.IsActive_bl != dbEntry2.IsActive_bl);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.Locations.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -467,7 +467,7 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var initialId = "dummyEntryId1";
-            var location1 = new Location { Id = initialId, LocName = "Loc1", LocAltName = "LocAlt1", IsActive = false, AccessInfo = "DummyInfo1" };
+            var location1 = new Location { Id = initialId, LocName = "Loc1", LocAltName = "LocAlt1", IsActive_bl = false, AccessInfo = "DummyInfo1" };
             var locations = new Location[] { location1 };
 
             mockEfDbContext.Setup(x => x.Locations.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<Location>(null));
@@ -501,7 +501,7 @@ namespace SDDB.UnitTests
 
             var locationIds = new string[] { "dummyId1", "DummyId2" };
 
-            var assyDbEntry1 = new AssemblyDb { Id = "assyDummyId1", AssyName = "Name1", AssyAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var assyDbEntry1 = new AssemblyDb { Id = "assyDummyId1", AssyName = "Name1", AssyAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
             var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
             var mockAssyDbSet = new Mock<DbSet<AssemblyDb>>();
             mockAssyDbSet.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
@@ -511,7 +511,7 @@ namespace SDDB.UnitTests
             mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockAssyDbSet.Object);
 
-            var dbEntry = new Location { IsActive = true };
+            var dbEntry = new Location { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.Locations.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
             mockEfDbContext.Setup(x => x.Locations.FindAsync("dummyId2")).Returns(Task.FromResult<Location>(null));
 
@@ -526,7 +526,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Record with Id=DummyId2 not found\n"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.Locations.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -545,7 +545,7 @@ namespace SDDB.UnitTests
 
             var locationIds = new string[] { "dummyId1" };
 
-            var assyDbEntry1 = new AssemblyDb { Id = "assyDummyId1", AssyName = "Name1", AssyAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var assyDbEntry1 = new AssemblyDb { Id = "assyDummyId1", AssyName = "Name1", AssyAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
             var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
             var mockAssyDbSet = new Mock<DbSet<AssemblyDb>>();
             mockAssyDbSet.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
@@ -555,7 +555,7 @@ namespace SDDB.UnitTests
             mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockAssyDbSet.Object);
 
-            var dbEntry = new Location { IsActive = true };
+            var dbEntry = new Location { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.Locations.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
 
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
@@ -569,7 +569,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.Locations.FindAsync(It.IsAny<string>()), Times.Once);

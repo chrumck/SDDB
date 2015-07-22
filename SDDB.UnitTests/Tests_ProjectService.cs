@@ -34,8 +34,8 @@ namespace SDDB.UnitTests
             var mockDbUserService = new Mock<DBUserService>(new object[] {mockAppUserManager.Object, mockDbContextScopeFac.Object, true});
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
-            var dbEntry1 = new Project { Id = "dummyEntryId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = false, ProjectCode = "CODE1" };
-            var dbEntry2 = new Project { Id = "dummyEntryId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive = true, ProjectCode = "CODE2" };
+            var dbEntry1 = new Project { Id = "dummyEntryId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = false, ProjectCode = "CODE1" };
+            var dbEntry2 = new Project { Id = "dummyEntryId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive_bl = true, ProjectCode = "CODE2" };
             var dbEntries = (new List<Project> { dbEntry1, dbEntry2 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<Project>>();
@@ -72,9 +72,9 @@ namespace SDDB.UnitTests
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
-            var dbEntry1 = new Project { Id = "dummyEntryId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = false, ProjectCode = "CODE1" };
-            var dbEntry2 = new Project { Id = "dummyEntryId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive = true, ProjectCode = "CODE2" };
-            var dbEntry3 = new Project { Id = "dummyEntryId3", ProjectName = "Project3", ProjectAltName = "ProjectAlt3", IsActive = true, ProjectCode = "FLA3" };
+            var dbEntry1 = new Project { Id = "dummyEntryId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = false, ProjectCode = "CODE1" };
+            var dbEntry2 = new Project { Id = "dummyEntryId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive_bl = true, ProjectCode = "CODE2" };
+            var dbEntry3 = new Project { Id = "dummyEntryId3", ProjectName = "Project3", ProjectAltName = "ProjectAlt3", IsActive_bl = true, ProjectCode = "FLA3" };
             var dbEntries = (new List<Project> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<Project>>();
@@ -112,9 +112,9 @@ namespace SDDB.UnitTests
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
-            var dbEntry1 = new Project { Id = "dummyEntryId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = false, ProjectCode = "CODE1" };
-            var dbEntry2 = new Project { Id = "dummyEntryId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive = true, ProjectCode = "CODE2" };
-            var dbEntry3 = new Project { Id = "dummyEntryId3", ProjectName = "Project3", ProjectAltName = "ProjectAlt3", IsActive = false, ProjectCode = "FLA3" };
+            var dbEntry1 = new Project { Id = "dummyEntryId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = false, ProjectCode = "CODE1" };
+            var dbEntry2 = new Project { Id = "dummyEntryId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive_bl = true, ProjectCode = "CODE2" };
+            var dbEntry3 = new Project { Id = "dummyEntryId3", ProjectName = "Project3", ProjectAltName = "ProjectAlt3", IsActive_bl = false, ProjectCode = "FLA3" };
             var dbEntries = (new List<Project> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<Project>>();
@@ -182,7 +182,7 @@ namespace SDDB.UnitTests
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
             var initialId = "dummyEntryId1";
-            var project1 = new Project { Id = initialId, ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = false, ProjectCode = "CODE1" };
+            var project1 = new Project { Id = initialId, ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = false, ProjectCode = "CODE1" };
             var projects = new Project[] { project1 };
 
             mockEfDbContext.Setup(x => x.Projects.FindAsync(project1.Id)).Returns(Task.FromResult<Project>(null));
@@ -218,14 +218,14 @@ namespace SDDB.UnitTests
             var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
-            var project1 = new Project {Id = "dummyProjectId1", ProjectName = "dummyProject1", ProjectAltName = "DummyProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var project1 = new Project {Id = "dummyProjectId1", ProjectName = "dummyProject1", ProjectAltName = "DummyProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ModifiedProperties = new string[] { "ProjectName", "ProjectAltName" } };
-            var project2 = new Project { Id = "dummyProjectId2", ProjectName = "dummyProject2", ProjectAltName = "DummyProjectAlt2", IsActive = false, ProjectCode = "CODE2" };
+            var project2 = new Project { Id = "dummyProjectId2", ProjectName = "dummyProject2", ProjectAltName = "DummyProjectAlt2", IsActive_bl = false, ProjectCode = "CODE2" };
 
             var projects = new Project[] { project1, project2 };
 
-            var dbEntry1 = new Project { Id = "dummyEntryId1", ProjectName = "entryProject1", ProjectAltName = "entryProjectAlt1", IsActive = false, ProjectCode = "EntryCODE1" };
-            var dbEntry2 = new Project { Id = "dummyEntryId2", ProjectName = "entryProject2", ProjectAltName = "entryProjectAlt2", IsActive = true, ProjectCode = "EntryCODE2" };
+            var dbEntry1 = new Project { Id = "dummyEntryId1", ProjectName = "entryProject1", ProjectAltName = "entryProjectAlt1", IsActive_bl = false, ProjectCode = "EntryCODE1" };
+            var dbEntry2 = new Project { Id = "dummyEntryId2", ProjectName = "entryProject2", ProjectAltName = "entryProjectAlt2", IsActive_bl = true, ProjectCode = "EntryCODE2" };
 
             mockEfDbContext.Setup(x => x.Projects.FindAsync(project1.Id)).Returns(Task.FromResult(dbEntry1));
             mockEfDbContext.Setup(x => x.Projects.FindAsync(project2.Id)).Returns(Task.FromResult(dbEntry2));
@@ -240,9 +240,9 @@ namespace SDDB.UnitTests
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
             Assert.IsTrue(project1.ProjectName == dbEntry1.ProjectName); Assert.IsTrue(project1.ProjectAltName == dbEntry1.ProjectAltName);
-            Assert.IsTrue(project1.ProjectCode != dbEntry1.ProjectCode); Assert.IsTrue(project1.IsActive != dbEntry1.IsActive);
+            Assert.IsTrue(project1.ProjectCode != dbEntry1.ProjectCode); Assert.IsTrue(project1.IsActive_bl != dbEntry1.IsActive_bl);
             Assert.IsTrue(project2.ProjectName != dbEntry2.ProjectName); Assert.IsTrue(project2.ProjectAltName != dbEntry2.ProjectAltName);
-            Assert.IsTrue(project2.ProjectCode != dbEntry2.ProjectCode); Assert.IsTrue(project2.IsActive != dbEntry2.IsActive);
+            Assert.IsTrue(project2.ProjectCode != dbEntry2.ProjectCode); Assert.IsTrue(project2.IsActive_bl != dbEntry2.IsActive_bl);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.Projects.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -265,7 +265,7 @@ namespace SDDB.UnitTests
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
             var initialId = "dummyEntryId1";
-            var dbEntry1 = new Project { Id = initialId, ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = false, ProjectCode = "CODE1" };
+            var dbEntry1 = new Project { Id = initialId, ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = false, ProjectCode = "CODE1" };
             var projects = new Project[] { dbEntry1 };
 
             mockEfDbContext.Setup(x => x.Projects.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<Project>(null));
@@ -354,7 +354,7 @@ namespace SDDB.UnitTests
             mockDbSet.As<IQueryable<Person>>().Setup(m => m.GetEnumerator()).Returns(dbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.Persons).Returns(mockDbSet.Object);
 
-            var docDbEntry1 = new Document { Id = "docDummyId1", DocName = "Name1", DocAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var docDbEntry1 = new Document { Id = "docDummyId1", DocName = "Name1", DocAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
             var docDbEntries = (new List<Document> { docDbEntry1 }).AsQueryable();
             var mockDocDbSet = new Mock<DbSet<Document>>();
             mockDocDbSet.As<IDbAsyncEnumerable<Document>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Document>(docDbEntries.GetEnumerator()));
@@ -364,7 +364,7 @@ namespace SDDB.UnitTests
             mockDocDbSet.As<IQueryable<Document>>().Setup(m => m.GetEnumerator()).Returns(docDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.Documents).Returns(mockDocDbSet.Object);
 
-            var locDbEntry1 = new Location { Id = "locDummyId1", LocName = "Name1", LocAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var locDbEntry1 = new Location { Id = "locDummyId1", LocName = "Name1", LocAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
             var locDbEntries = (new List<Location> { locDbEntry1 }).AsQueryable();
             var mockLocDbSet = new Mock<DbSet<Location>>();
             mockLocDbSet.As<IDbAsyncEnumerable<Location>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Location>(locDbEntries.GetEnumerator()));
@@ -374,7 +374,7 @@ namespace SDDB.UnitTests
             mockLocDbSet.As<IQueryable<Location>>().Setup(m => m.GetEnumerator()).Returns(locDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.Locations).Returns(mockLocDbSet.Object);
 
-            var assyDbEntry1 = new AssemblyDb { Id = "assyDummyId1", AssyName = "Name1", AssyAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var assyDbEntry1 = new AssemblyDb { Id = "assyDummyId1", AssyName = "Name1", AssyAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
             var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
             var mockAssyDbSet = new Mock<DbSet<AssemblyDb>>();
             mockAssyDbSet.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
@@ -384,7 +384,7 @@ namespace SDDB.UnitTests
             mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockAssyDbSet.Object);
 
-            var compDbEntry1 = new Component { Id = "compDummyId1", CompName = "Name1", CompAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var compDbEntry1 = new Component { Id = "compDummyId1", CompName = "Name1", CompAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
             var compDbEntries = (new List<Component> { compDbEntry1 }).AsQueryable();
             var mockCompDbSet = new Mock<DbSet<Component>>();
             mockCompDbSet.As<IDbAsyncEnumerable<Component>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Component>(compDbEntries.GetEnumerator()));
@@ -394,7 +394,7 @@ namespace SDDB.UnitTests
             mockCompDbSet.As<IQueryable<Component>>().Setup(m => m.GetEnumerator()).Returns(compDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.Components).Returns(mockCompDbSet.Object);
 
-            var dbEntry = new Project { IsActive = true };
+            var dbEntry = new Project { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.Projects.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
 
             mockPersonService.Setup(x => x.EditPersonProjectsAsync(new string[] {dbEntry1.Id}, projectIds, false))
@@ -442,7 +442,7 @@ namespace SDDB.UnitTests
             mockDbSet.As<IQueryable<Person>>().Setup(m => m.GetEnumerator()).Returns(dbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.Persons).Returns(mockDbSet.Object);
 
-            var docDbEntry1 = new Document { Id = "docDummyId1", DocName = "Name1", DocAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var docDbEntry1 = new Document { Id = "docDummyId1", DocName = "Name1", DocAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
             var docDbEntries = (new List<Document> { docDbEntry1 }).AsQueryable();
             var mockDocDbSet = new Mock<DbSet<Document>>();
             mockDocDbSet.As<IDbAsyncEnumerable<Document>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Document>(docDbEntries.GetEnumerator()));
@@ -452,7 +452,7 @@ namespace SDDB.UnitTests
             mockDocDbSet.As<IQueryable<Document>>().Setup(m => m.GetEnumerator()).Returns(docDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.Documents).Returns(mockDocDbSet.Object);
 
-            var locDbEntry1 = new Location { Id = "locDummyId1", LocName = "Name1", LocAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var locDbEntry1 = new Location { Id = "locDummyId1", LocName = "Name1", LocAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
             var locDbEntries = (new List<Location> { locDbEntry1 }).AsQueryable();
             var mockLocDbSet = new Mock<DbSet<Location>>();
             mockLocDbSet.As<IDbAsyncEnumerable<Location>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Location>(locDbEntries.GetEnumerator()));
@@ -462,7 +462,7 @@ namespace SDDB.UnitTests
             mockLocDbSet.As<IQueryable<Location>>().Setup(m => m.GetEnumerator()).Returns(locDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.Locations).Returns(mockLocDbSet.Object);
 
-            var assyDbEntry1 = new AssemblyDb { Id = "assyDummyId1", AssyName = "Name1", AssyAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var assyDbEntry1 = new AssemblyDb { Id = "assyDummyId1", AssyName = "Name1", AssyAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
             var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
             var mockAssyDbSet = new Mock<DbSet<AssemblyDb>>();
             mockAssyDbSet.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
@@ -472,7 +472,7 @@ namespace SDDB.UnitTests
             mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockAssyDbSet.Object);
 
-            var compDbEntry1 = new Component { Id = "compDummyId1", CompName = "Name1", CompAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var compDbEntry1 = new Component { Id = "compDummyId1", CompName = "Name1", CompAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
             var compDbEntries = (new List<Component> { compDbEntry1 }).AsQueryable();
             var mockCompDbSet = new Mock<DbSet<Component>>();
             mockCompDbSet.As<IDbAsyncEnumerable<Component>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Component>(compDbEntries.GetEnumerator()));
@@ -482,7 +482,7 @@ namespace SDDB.UnitTests
             mockCompDbSet.As<IQueryable<Component>>().Setup(m => m.GetEnumerator()).Returns(compDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.Components).Returns(mockCompDbSet.Object);
 
-            var dbEntry = new Project { IsActive = true };
+            var dbEntry = new Project { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.Projects.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
 
             mockPersonService.Setup(x => x.EditPersonProjectsAsync(new string[] { dbEntry1.Id }, projectIds, false))
@@ -532,7 +532,7 @@ namespace SDDB.UnitTests
             mockDbSet.As<IQueryable<Person>>().Setup(m => m.GetEnumerator()).Returns(dbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.Persons).Returns(mockDbSet.Object);
 
-            var docDbEntry1 = new Document { Id = "docDummyId1", DocName = "Name1", DocAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var docDbEntry1 = new Document { Id = "docDummyId1", DocName = "Name1", DocAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
             var docDbEntries = (new List<Document> { docDbEntry1 }).AsQueryable();
             var mockDocDbSet = new Mock<DbSet<Document>>();
             mockDocDbSet.As<IDbAsyncEnumerable<Document>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Document>(docDbEntries.GetEnumerator()));
@@ -542,7 +542,7 @@ namespace SDDB.UnitTests
             mockDocDbSet.As<IQueryable<Document>>().Setup(m => m.GetEnumerator()).Returns(docDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.Documents).Returns(mockDocDbSet.Object);
 
-            var locDbEntry1 = new Location { Id = "locDummyId1", LocName = "Name1", LocAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var locDbEntry1 = new Location { Id = "locDummyId1", LocName = "Name1", LocAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
             var locDbEntries = (new List<Location> { locDbEntry1 }).AsQueryable();
             var mockLocDbSet = new Mock<DbSet<Location>>();
             mockLocDbSet.As<IDbAsyncEnumerable<Location>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Location>(locDbEntries.GetEnumerator()));
@@ -552,7 +552,7 @@ namespace SDDB.UnitTests
             mockLocDbSet.As<IQueryable<Location>>().Setup(m => m.GetEnumerator()).Returns(locDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.Locations).Returns(mockLocDbSet.Object);
 
-            var assyDbEntry1 = new AssemblyDb { Id = "assyDummyId1", AssyName = "Name1", AssyAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var assyDbEntry1 = new AssemblyDb { Id = "assyDummyId1", AssyName = "Name1", AssyAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
             var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
             var mockAssyDbSet = new Mock<DbSet<AssemblyDb>>();
             mockAssyDbSet.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
@@ -562,7 +562,7 @@ namespace SDDB.UnitTests
             mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockAssyDbSet.Object);
 
-            var compDbEntry1 = new Component { Id = "compDummyId1", CompName = "Name1", CompAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var compDbEntry1 = new Component { Id = "compDummyId1", CompName = "Name1", CompAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
             var compDbEntries = (new List<Component> { compDbEntry1 }).AsQueryable();
             var mockCompDbSet = new Mock<DbSet<Component>>();
             mockCompDbSet.As<IDbAsyncEnumerable<Component>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Component>(compDbEntries.GetEnumerator()));
@@ -572,7 +572,7 @@ namespace SDDB.UnitTests
             mockCompDbSet.As<IQueryable<Component>>().Setup(m => m.GetEnumerator()).Returns(compDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.Components).Returns(mockCompDbSet.Object);
 
-            var dbEntry = new Project { IsActive = true };
+            var dbEntry = new Project { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.Projects.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
             mockEfDbContext.Setup(x => x.Projects.FindAsync("dummyId2")).Returns(Task.FromResult<Project>(null));
 
@@ -590,7 +590,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Record with Id=DummyId2 not found\n"));
-            Assert.IsTrue(dbEntry.IsActive == false);
+            Assert.IsTrue(dbEntry.IsActive_bl == false);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.Projects.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -614,7 +614,7 @@ namespace SDDB.UnitTests
 
             var projectIds = new string[] { "dummyId1", "dummyId2" };
 
-            var docDbEntry1 = new Document { Id = "docDummyId1", DocName = "Name1", DocAltName = "AltName1", IsActive = true, AssignedToProject_Id = "dummyId2" };
+            var docDbEntry1 = new Document { Id = "docDummyId1", DocName = "Name1", DocAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "dummyId2" };
             var docDbEntries = (new List<Document> { docDbEntry1 }).AsQueryable();
             var mockDocDbSet = new Mock<DbSet<Document>>();
             mockDocDbSet.As<IDbAsyncEnumerable<Document>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Document>(docDbEntries.GetEnumerator()));
@@ -634,7 +634,7 @@ namespace SDDB.UnitTests
             mockDbSet.As<IQueryable<Person>>().Setup(m => m.GetEnumerator()).Returns(personDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.Persons).Returns(mockDbSet.Object);
 
-            var locDbEntry1 = new Location { Id = "locDummyId1", LocName = "Name1", LocAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var locDbEntry1 = new Location { Id = "locDummyId1", LocName = "Name1", LocAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
             var locDbEntries = (new List<Location> { locDbEntry1 }).AsQueryable();
             var mockLocDbSet = new Mock<DbSet<Location>>();
             mockLocDbSet.As<IDbAsyncEnumerable<Location>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Location>(locDbEntries.GetEnumerator()));
@@ -644,7 +644,7 @@ namespace SDDB.UnitTests
             mockLocDbSet.As<IQueryable<Location>>().Setup(m => m.GetEnumerator()).Returns(locDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.Locations).Returns(mockLocDbSet.Object);
 
-            var assyDbEntry1 = new AssemblyDb { Id = "assyDummyId1", AssyName = "Name1", AssyAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var assyDbEntry1 = new AssemblyDb { Id = "assyDummyId1", AssyName = "Name1", AssyAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
             var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
             var mockAssyDbSet = new Mock<DbSet<AssemblyDb>>();
             mockAssyDbSet.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
@@ -654,7 +654,7 @@ namespace SDDB.UnitTests
             mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockAssyDbSet.Object);
 
-            var compDbEntry1 = new Component { Id = "compDummyId1", CompName = "Name1", CompAltName = "AltName1", IsActive = true, AssignedToProject_Id = "assignedProjId" };
+            var compDbEntry1 = new Component { Id = "compDummyId1", CompName = "Name1", CompAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
             var compDbEntries = (new List<Component> { compDbEntry1 }).AsQueryable();
             var mockCompDbSet = new Mock<DbSet<Component>>();
             mockCompDbSet.As<IDbAsyncEnumerable<Component>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Component>(compDbEntries.GetEnumerator()));
@@ -664,8 +664,8 @@ namespace SDDB.UnitTests
             mockCompDbSet.As<IQueryable<Component>>().Setup(m => m.GetEnumerator()).Returns(compDbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.Components).Returns(mockCompDbSet.Object);
 
-            var dbEntry1 = new Project { IsActive = true };
-            var dbEntry2 = new Project { IsActive = true };
+            var dbEntry1 = new Project { IsActive_bl = true };
+            var dbEntry2 = new Project { IsActive_bl = true };
             mockEfDbContext.Setup(x => x.Projects.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry1));
             mockEfDbContext.Setup(x => x.Projects.FindAsync("dummyId2")).Returns(Task.FromResult(dbEntry2));
 
@@ -683,8 +683,8 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("not deleted, it has documents assigned to it"));
-            Assert.IsTrue(dbEntry1.IsActive == false);
-            Assert.IsTrue(dbEntry2.IsActive == true);
+            Assert.IsTrue(dbEntry1.IsActive_bl == false);
+            Assert.IsTrue(dbEntry2.IsActive_bl == true);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.Projects.FindAsync(It.IsAny<string>()), Times.Exactly(2));
@@ -711,15 +711,15 @@ namespace SDDB.UnitTests
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
             var projectPerson2 = new Person { Id = "dummyUserId2", FirstName = "Firs2", LastName = "Last2" };
 
-            var dbEntry1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var dbEntry1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
-            var dbEntry2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive = false, ProjectCode = "CODE2", 
+            var dbEntry2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive_bl = false, ProjectCode = "CODE2", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
-            var dbEntry3 = new Project { Id = "dummyId3", ProjectName = "Project3", ProjectAltName = "ProjectAlt3", IsActive = true, ProjectCode = "CODE3", 
+            var dbEntry3 = new Project { Id = "dummyId3", ProjectName = "Project3", ProjectAltName = "ProjectAlt3", IsActive_bl = true, ProjectCode = "CODE3", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
-            var dbEntry4 = new Project { Id = "dummyId4", ProjectName = "Project4", ProjectAltName = "ProjectAlt4", IsActive = true, ProjectCode = "CODE4", 
+            var dbEntry4 = new Project { Id = "dummyId4", ProjectName = "Project4", ProjectAltName = "ProjectAlt4", IsActive_bl = true, ProjectCode = "CODE4", 
                 ProjectPersons = new List<Person> { } };
-            var dbEntry5 = new Project { Id = "dummyId5", ProjectName = "Project5", ProjectAltName = "ProjectAlt5", IsActive = true, ProjectCode = "CODE5", 
+            var dbEntry5 = new Project { Id = "dummyId5", ProjectName = "Project5", ProjectAltName = "ProjectAlt5", IsActive_bl = true, ProjectCode = "CODE5", 
                 ProjectPersons = new List<Person> { projectPerson2 } };
 
             var dbEntries = (new List<Project> { dbEntry1, dbEntry2, dbEntry3, dbEntry4, dbEntry5 }).AsQueryable();
@@ -758,11 +758,11 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var dbEntry1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var dbEntry1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
-            var dbEntry2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive = false, ProjectCode = "CODE2", 
+            var dbEntry2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive_bl = false, ProjectCode = "CODE2", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
-            var dbEntry3 = new Project { Id = "dummyId3", ProjectName = "Project3", ProjectAltName = "ProjectAlt3", IsActive = true, ProjectCode = "CODE3", 
+            var dbEntry3 = new Project { Id = "dummyId3", ProjectName = "Project3", ProjectAltName = "ProjectAlt3", IsActive_bl = true, ProjectCode = "CODE3", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
             var dbEntries = (new List<Project> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
@@ -801,11 +801,11 @@ namespace SDDB.UnitTests
 
             var projectPerson1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
 
-            var dbEntry1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive = true, ProjectCode = "CODE1", 
+            var dbEntry1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
-            var dbEntry2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive = false, ProjectCode = "CODE2", 
+            var dbEntry2 = new Project { Id = "dummyId2", ProjectName = "Project2", ProjectAltName = "ProjectAlt2", IsActive_bl = false, ProjectCode = "CODE2", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
-            var dbEntry3 = new Project { Id = "dummyId3", ProjectName = "Project3", ProjectAltName = "ProjectAlt3", IsActive = true, ProjectCode = "CODE3", 
+            var dbEntry3 = new Project { Id = "dummyId3", ProjectName = "Project3", ProjectAltName = "ProjectAlt3", IsActive_bl = true, ProjectCode = "CODE3", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
             var dbEntries = (new List<Project> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();

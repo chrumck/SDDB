@@ -25,9 +25,6 @@ namespace SDDB.WebUI
             AutofacConfig.ConfigureContainer();
 
             InitialDBSetup.RunAtStartup();
-
-            ModelBinders.Binders.Add(typeof(SessionSettings), new SessionSettingsModelBinder());
-        
         }
 
         private void Application_Error(object sender, EventArgs e)

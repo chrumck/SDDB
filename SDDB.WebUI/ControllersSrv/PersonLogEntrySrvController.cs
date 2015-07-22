@@ -20,125 +20,45 @@ namespace SDDB.WebUI.ControllersSrv
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
         private PersonLogEntryService prsLogEntryService;
-        private IFileRepoService fileRepoService;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
-        public PersonLogEntrySrvController(PersonLogEntryService prsLogEntryService, IFileRepoService fileRepoService)
+        public PersonLogEntrySrvController(PersonLogEntryService prsLogEntryService)
         {
             this.prsLogEntryService = prsLogEntryService;
-            this.fileRepoService = fileRepoService;
         }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
-
-        // GET: /PersonLogEntrySrv/Get
-        [DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
-        public async Task<ActionResult> Get(bool getActive = true)
-        {
-            var data = (await prsLogEntryService.GetAsync(UserId, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.LogEntryDateTime,
-                EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
-                PersonActivityType_ = new { x.PersonActivityType.ActivityTypeName },
-                x.ManHours, 
-                AssignedToProject_ = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                AssignedToLocation_ = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName },
-                AssignedToProjectEvent_ = new { x.AssignedToProjectEvent.EventName },  
-                x.Comments, x.IsActive_bl,
-                x.EnteredByPerson_Id ,x.PersonActivityType_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id, x.AssignedToProjectEvent_Id
-            }).ToList();
-
-            if (!User.IsInRole("PersonLogEntry_View")) { data = data.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
-
-            ViewBag.ServiceName = "PersonLogEntryService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
-        }
         
         // POST: /PersonLogEntrySrv/GetByIds
         [HttpPost]
         [DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
-            var data = (await prsLogEntryService.GetAsync(UserId, ids, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.LogEntryDateTime,
-                EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
-                PersonActivityType_ = new { x.PersonActivityType.ActivityTypeName },
-                x.ManHours, 
-                AssignedToProject_ = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                AssignedToLocation_ = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName },
-                AssignedToProjectEvent_ = new { x.AssignedToProjectEvent.EventName },  
-                x.Comments, x.IsActive_bl,
-                x.EnteredByPerson_Id ,x.PersonActivityType_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id, x.AssignedToProjectEvent_Id
-            }).ToList();
+            var records = await prsLogEntryService.GetAsync(ids, getActive).ConfigureAwait(false);
 
-            if (!User.IsInRole("PersonLogEntry_View")) { data = data.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
-
+            if (!User.IsInRole("PersonLogEntry_View")) { records = records.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
+            
             ViewBag.ServiceName = "PersonLogEntryService.GetAsync";
             ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // POST: /PersonLogEntrySrv/GetByAltIds
         [HttpPost]
         [DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
-        public async Task<ActionResult> GetByAltIds( string[] personIds = null, string[] typeIds = null, 
-            string[] projectIds = null, string[] assyIds = null, DateTime? startDate = null, DateTime? endDate = null, bool getActive = true)
+        public async Task<ActionResult> GetByAltIds(string[] personIds, string[] projectIds, string[] assyIds, string[] typeIds,
+            DateTime? startDate, DateTime? endDate, bool getActive = true)
         {
-            var data = (await prsLogEntryService.GetByAltIdsAsync(UserId, personIds, projectIds, assyIds, typeIds, startDate, endDate, getActive)
-                .ConfigureAwait(false)).Select(x => new {
-                x.Id, x.LogEntryDateTime,
-                EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
-                PersonActivityType_ = new { x.PersonActivityType.ActivityTypeName },
-                x.ManHours, 
-                AssignedToProject_ = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                AssignedToLocation_ = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName },
-                AssignedToProjectEvent_ = new { x.AssignedToProjectEvent.EventName },  
-                x.Comments, x.IsActive_bl,
-                x.EnteredByPerson_Id ,x.PersonActivityType_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id, x.AssignedToProjectEvent_Id
-            }).ToList();
+            var records = await prsLogEntryService.GetByAltIdsAsync(personIds, projectIds, assyIds, typeIds, startDate, endDate, getActive)
+                .ConfigureAwait(false);
 
-
-            if (!User.IsInRole("PersonLogEntry_View")) { data = data.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
+            if (!User.IsInRole("PersonLogEntry_View")) { records = records.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
 
             ViewBag.ServiceName = "PersonLogEntryService.GetByAltIdsAsync";
             ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
-
-
-        // GET: /PersonLogEntrySrv/Lookup
-        public async Task<ActionResult> Lookup(string query = "", bool getActive = true)
-        {
-            var records = await prsLogEntryService.LookupAsync(UserId, query, getActive).ConfigureAwait(false);
-
-            if (!User.IsInRole("PersonLogEntry_View")) { records = records.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
-
-            var data = records.OrderBy(x => x.LogEntryDateTime)
-                .Select(x => new { id = x.Id, name = x.LogEntryDateTime + " " + x.EnteredByPerson.LastName + " " + x.EnteredByPerson.Initials });
-
-            ViewBag.ServiceName = "PersonLogEntryService.LookupAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
-        }
-
-        // GET: /PersonLogEntrySrv/LookupByProj
-        public async Task<ActionResult> LookupByProj(string projectIds = null, string query = "", bool getActive = true)
-        {
-            string[] projectIdsArray = null;
-            if (projectIds != null && projectIds != "") projectIdsArray = projectIds.Split(',');
-
-            var records = await prsLogEntryService.LookupByProjAsync(UserId, projectIdsArray, query, getActive).ConfigureAwait(false);
-
-            if (!User.IsInRole("PersonLogEntry_View")) { records = records.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
-
-            var data = records.OrderBy(x => x.LogEntryDateTime)
-                .Select(x => new { id = x.Id, name = x.LogEntryDateTime + " " + x.EnteredByPerson.LastName + " " + x.EnteredByPerson.Initials });
-
-            ViewBag.ServiceName = "PersonLogEntryService.LookupByProjAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
-        }
-
+        
         //-----------------------------------------------------------------------------------------------------------------------
 
         // POST: /PersonLogEntrySrv/Edit
@@ -149,23 +69,12 @@ namespace SDDB.WebUI.ControllersSrv
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(records).ConfigureAwait(false)))
             { return JsonResponseForNoRights(); }
 
-            var serviceResult = await prsLogEntryService.EditAsync(UserId,records).ConfigureAwait(false);
+            var newEntryIds = await prsLogEntryService.EditAsync(records).ConfigureAwait(false);
 
-            ViewBag.ServiceName = "PersonLogEntryService.EditAsync"; 
-            ViewBag.StatusCode = serviceResult.StatusCode; 
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True", ReturnIds = serviceResult.ReturnIds }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription,
-                    ReturnIds = serviceResult.ReturnIds }, JsonRequestBehavior.AllowGet);
-            }
+            ViewBag.ServiceName = "PersonLogEntryService.EditAsync";
+            ViewBag.StatusCode = HttpStatusCode.OK; 
+            
+            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /PersonLogEntrySrv/Delete
@@ -176,22 +85,12 @@ namespace SDDB.WebUI.ControllersSrv
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(ids).ConfigureAwait(false)))
             { return JsonResponseForNoRights(); }
 
-            var serviceResult = await prsLogEntryService.DeleteAsync(ids).ConfigureAwait(false);
+            await prsLogEntryService.DeleteAsync(ids).ConfigureAwait(false);
 
             ViewBag.ServiceName = "PersonLogEntryService.DeleteAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            ViewBag.StatusCode = HttpStatusCode.OK;
+            
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -326,19 +225,19 @@ namespace SDDB.WebUI.ControllersSrv
         //    return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         //}
 
-        // GET: /PersonLogEntrySrv/ListFiles
-        [DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
-        public async Task<ActionResult> ListFiles(string id)
-        {
-            if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { id }).ConfigureAwait(false)))
-            { return JsonResponseForNoRights(); }
+        //// GET: /PersonLogEntrySrv/ListFiles
+        //[DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
+        //public async Task<ActionResult> ListFiles(string id)
+        //{
+        //    if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { id }).ConfigureAwait(false)))
+        //    { return JsonResponseForNoRights(); }
 
-            var data = (await fileRepoService.GetAsync(id).ConfigureAwait(false));
+        //    var data = (await fileRepoService.GetAsync(id).ConfigureAwait(false));
 
-            ViewBag.ServiceName = "IFileRepoService.Get";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
-        }
+        //    ViewBag.ServiceName = "IFileRepoService.Get";
+        //    ViewBag.StatusCode = HttpStatusCode.OK;
+        //    return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+        //}
 
         //// POST: /PersonLogEntrySrv/DownloadFiles
         //[HttpPost]
@@ -409,6 +308,29 @@ namespace SDDB.WebUI.ControllersSrv
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
+
+        //take data and select fields for JSON - full data set
+        private object filterForJsonFull(List<PersonLogEntry> records) 
+        {
+            return records.Select(x => new
+            {
+                x.Id,
+                x.LogEntryDateTime,
+                EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
+                PersonActivityType_ = new { x.PersonActivityType.ActivityTypeName },
+                x.ManHours,
+                AssignedToProject_ = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
+                AssignedToLocation_ = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName },
+                AssignedToProjectEvent_ = new { x.AssignedToProjectEvent.EventName },
+                x.Comments,
+                x.IsActive_bl,
+                x.EnteredByPerson_Id,
+                x.PersonActivityType_Id,
+                x.AssignedToProject_Id,
+                x.AssignedToLocation_Id,
+                x.AssignedToProjectEvent_Id
+            }).ToList();
+        }
 
         //check if person log entry belongs to user - overload for single id
         private async Task<bool> isUserActivity(string id)

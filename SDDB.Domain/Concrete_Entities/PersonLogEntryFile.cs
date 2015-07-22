@@ -79,6 +79,9 @@ namespace SDDB.Domain.Entities
         [NotMapped]
         public byte[] FileData { get; set; }
 
+        [NotMapped]
+        public bool IsActive_bl { get; set; }
+
     }
   
 

@@ -40,7 +40,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 
                 var records = await dbContext.Documents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive)
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive)
                     .Include(x => x.DocumentType).Include(x => x.AuthorPerson).Include(x => x.ReviewerPerson).Include(x => x.AssignedToProject)
                     .Include(x => x.RelatesToAssyType).Include(x => x.RelatesToCompType)
                     .ToListAsync().ConfigureAwait(false);
@@ -62,7 +62,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 
                 var records = await dbContext.Documents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive && ids.Contains(x.Id))
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive && ids.Contains(x.Id))
                     .Include(x => x.DocumentType).Include(x => x.AuthorPerson).Include(x => x.ReviewerPerson).Include(x => x.AssignedToProject)
                     .Include(x => x.RelatesToAssyType).Include(x => x.RelatesToCompType)
                     .ToListAsync().ConfigureAwait(false);
@@ -85,7 +85,7 @@ namespace SDDB.Domain.Services
                 projectIds = projectIds ?? new string[] { }; typeIds = typeIds ?? new string[] { };
 
                 var records = await dbContext.Documents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         (typeIds.Count() == 0 || typeIds.Contains(x.DocumentType_Id)))
                     .Include(x => x.DocumentType).Include(x => x.AuthorPerson).Include(x => x.ReviewerPerson).Include(x => x.AssignedToProject)
@@ -107,7 +107,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.Documents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive == getActive &&
+                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                         (x.DocName.Contains(query) || x.DocAltName.Contains(query) || x.DocFilePath.Contains(query)))
                     .ToListAsync();
             }
@@ -138,7 +138,7 @@ namespace SDDB.Domain.Services
                             dbEntry.CopyModifiedProps(record);
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }
@@ -168,14 +168,14 @@ namespace SDDB.Domain.Services
                         var dbEntry = await dbContext.Documents.FindAsync(id).ConfigureAwait(false);
                         if (dbEntry != null)
                         {
-                            dbEntry.IsActive = false;
+                            dbEntry.IsActive_bl = false;
                         }
                         else
                         {
                             errorMessage += string.Format("Record with Id={0} not found\n", id);
                         }
                     }
-                    errorMessage += await DbHelpers.SaveChangesAsync(dbContext).ConfigureAwait(false);
+                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }
