@@ -43,7 +43,11 @@ namespace SDDB.Domain.Services
         {
             if (records == null || records.Length == 0) { throw new ArgumentNullException("records"); }
 
-            var newEntryIds = await dbScopeHelperAsync(dbContext => editHelperAsync(dbContext, records))
+            var newEntryIds = await dbScopeHelperAsync(async dbContext =>
+            {
+                await checkBeforeEditHelperAsync(dbContext, records).ConfigureAwait(false);
+                return await editHelperAsync(dbContext, records).ConfigureAwait(false);
+            })
                 .ConfigureAwait(false);
 
             return newEntryIds;
@@ -54,7 +58,11 @@ namespace SDDB.Domain.Services
         {
             if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
 
-            await dbScopeHelperAsync(dbContext => deleteHelperAsync(dbContext, ids))
+            await dbScopeHelperAsync(async dbContext =>
+                {
+                    await checkBeforeDeleteHelperAsync(dbContext, ids).ConfigureAwait(false);
+                    return await deleteHelperAsync(dbContext, ids).ConfigureAwait(false);
+                })
                 .ConfigureAwait(false);
         }
 
@@ -90,8 +98,8 @@ namespace SDDB.Domain.Services
 
         //Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T
         //overload taking lamdba expression
-        public virtual async Task AddRemoveRelated<TAddRem, TOut>(string[] ids, string[] idsAddRem,
-            Expression<Func<TAddRem, TOut>> lambda, bool isAdd = true) where TAddRem : IDbEntity
+        public virtual async Task AddRemoveRelated<TAddRem>(string[] ids, string[] idsAddRem,
+            Expression<Func<T, ICollection<TAddRem>>> lambda, bool isAdd = true) where TAddRem : IDbEntity
         {
             var body = (MemberExpression)lambda.Body;
             if (body == null)
@@ -126,7 +134,23 @@ namespace SDDB.Domain.Services
 
         //-----------------------------------------------------------------------------------------------------------------------
 
-        //helper - editing single Db Entry
+        //helper - check before editing records, takes single T record
+        //stub method for derived classes to implement
+        protected virtual Task checkBeforeEditHelperAsync(EFDbContext dbContext, T record)
+        {
+            return Task.FromResult(default(int));
+        }
+
+        //helper - check before editing records, overload - takes array of T record
+        protected virtual async Task checkBeforeEditHelperAsync(EFDbContext dbContext, T[] records)
+        {
+            for (int i = 0; i < records.Length; i++)
+            {
+                await checkBeforeEditHelperAsync(dbContext, records[i]).ConfigureAwait(false);
+            }
+        }
+
+        //helper - editing records, takes single T record
         protected virtual async Task<string> editHelperAsync(EFDbContext dbContext, T record)
         {
             var dbEntry = (T)(await dbContext.Set(typeof(T)).FindAsync(record.Id).ConfigureAwait(false));
@@ -140,8 +164,8 @@ namespace SDDB.Domain.Services
             return null;
         }
 
-        //helper - editing Db Entries in array
-        protected async Task<List<string>> editHelperAsync(EFDbContext dbContext, T[] records)
+        //helper - editing records, overload - takes array of T record
+        protected virtual async Task<List<string>> editHelperAsync(EFDbContext dbContext, T[] records)
         {
             var newEntryIds = new List<string>();
 
@@ -153,8 +177,17 @@ namespace SDDB.Domain.Services
             return newEntryIds;
         }
 
-        //helper deleting db entries (setting isActive_bl to false) 
-        protected async Task<int> deleteHelperAsync(EFDbContext dbContext, string[] ids)
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        //helper - check before deleting records, takes single T record
+        //stub method for derived classes to implement
+        protected virtual Task checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
+        {
+            return Task.FromResult(default(int));
+        }
+                
+        //helper -  deleting db entries (setting isActive_bl to false) 
+        protected virtual async Task<int> deleteHelperAsync(EFDbContext dbContext, string[] ids)
         {
             var dbEntries = await ((IQueryable<T>)dbContext.Set(typeof(T)).AsQueryable())
                 .Where(x => ids.Contains(x.Id))
@@ -166,8 +199,8 @@ namespace SDDB.Domain.Services
 
         //-----------------------------------------------------------------------------------------------------------------------
 
-        //Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T 
-        //helper taking lists of T and TAddRem
+        //helper - Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T 
+        //taking taking single T and TAddRem
         protected async Task<int> AddRemoveRelatedHelper<TAddRem>(T dbEntry, TAddRem dbEntryAddRem,
             string relatedCollectionName, bool isAdd) where TAddRem : IDbEntity
         {
@@ -183,7 +216,7 @@ namespace SDDB.Domain.Services
         }
 
         //Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T 
-        //helper taking single T and TAddRem
+        //overload taking lists of T and TAddRem
         protected async Task<int> AddRemoveRelatedHelper<TAddRem>(List<T> dbEntries, List<TAddRem> dbEntriesAddRem,
             string relatedCollectionName, bool isAdd) where TAddRem : IDbEntity
         {

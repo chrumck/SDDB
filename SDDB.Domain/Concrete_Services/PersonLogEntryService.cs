@@ -166,22 +166,9 @@ namespace SDDB.Domain.Services
         
         //-----------------------------------------------------------------------------------------------------------------------
 
-        // Create and Update records given in [] 
-        // Overriden from base : check before edit and update EnteredByPerson_Id 
-        // Also see overriden editHelperAsync(EFDbContext dbContext, PersonLogEntry record)
-        public override async Task<List<string>> EditAsync(PersonLogEntry[] records)
-        {
-            if (records == null || records.Length == 0) { throw new ArgumentNullException("records"); }
-
-            var newEntryIds = await dbScopeHelperAsync(async dbContext => 
-            {
-                await checkPersonLogEntrysBeforeEditAsync(dbContext, records).ConfigureAwait(false);
-                return await editHelperAsync(dbContext, records).ConfigureAwait(false);
-            })
-            .ConfigureAwait(false);
-
-            return newEntryIds;
-        }
+        // Create and Update records given in [] - same as BaseDbService
+        // See overriden checkBeforeEditHelperAsync(EFDbContext dbContext, PersonLogEntry record)
+        // See overriden editHelperAsync(EFDbContext dbContext, PersonLogEntry record)
 
 
         // Delete records by their Ids - same as BaseDbService
@@ -266,11 +253,9 @@ namespace SDDB.Domain.Services
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
 
-        //checking if log entry, event and location belong to the same project
-        private async Task checkPersonLogEntrysBeforeEditAsync(EFDbContext dbContext, PersonLogEntry[] records)
+        //checking if log entry, event and location belong to the same project - overriden from BaseDbService
+        protected override async Task checkBeforeEditHelperAsync(EFDbContext dbContext, PersonLogEntry record)
         {
-            foreach (var record in records)
-            {
                 var projEvent = await dbContext.ProjectEvents.FindAsync(record.AssignedToProjectEvent_Id).ConfigureAwait(false);
                 var location = await dbContext.Locations.FindAsync(record.AssignedToLocation_Id).ConfigureAwait(false);
 
@@ -279,10 +264,9 @@ namespace SDDB.Domain.Services
                 
                 if (record.AssignedToLocation_Id != null && location.AssignedToProject_Id != record.AssignedToProject_Id)
                 { throw new ArgumentException("Log Entry and Location do not belong to the same project. Entry(ies) not saved."); }
-            }
         }
 
-        //helper - editing single Db Entry - overriden
+        //helper - editing single Db Entry - overriden from BaseDbService
         protected override async Task<string> editHelperAsync(EFDbContext dbContext, PersonLogEntry record)
         {
             var dbEntry = await dbContext.PersonLogEntrys.FindAsync(record.Id).ConfigureAwait(false);
@@ -296,7 +280,6 @@ namespace SDDB.Domain.Services
             dbEntry.CopyProperties(record);
             return null;
         }
-
         
         #endregion
     }

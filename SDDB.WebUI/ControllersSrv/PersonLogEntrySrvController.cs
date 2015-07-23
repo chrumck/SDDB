@@ -131,8 +131,7 @@ namespace SDDB.WebUI.ControllersSrv
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(ids).ConfigureAwait(false)))
             { return JsonResponseForNoRights(); }
 
-            await prsLogEntryService.AddRemoveRelated(ids, idsAddRem, (PersonLogEntry x) => x.PrsLogEntryAssemblyDbs ,isAdd)
-                .ConfigureAwait(false);
+            await prsLogEntryService.AddRemoveRelated(ids, idsAddRem, x => x.PrsLogEntryAssemblyDbs, isAdd).ConfigureAwait(false);
 
             ViewBag.ServiceName = "PersonLogEntryService.AddRemoveRelated";
             ViewBag.StatusCode = HttpStatusCode.OK;
@@ -179,8 +178,7 @@ namespace SDDB.WebUI.ControllersSrv
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(ids).ConfigureAwait(false)))
             { return JsonResponseForNoRights(); }
 
-            await prsLogEntryService.AddRemoveRelated(ids, idsAddRem, (PersonLogEntry x) => x.PrsLogEntryPersons, isAdd)
-                .ConfigureAwait(false);
+            await prsLogEntryService.AddRemoveRelated(ids, idsAddRem, x => x.PrsLogEntryPersons, isAdd).ConfigureAwait(false);
 
             ViewBag.ServiceName = "PersonLogEntryService.AddRemoveRelated";
             ViewBag.StatusCode = HttpStatusCode.OK;
