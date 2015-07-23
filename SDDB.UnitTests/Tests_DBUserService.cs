@@ -51,7 +51,7 @@ namespace SDDB.UnitTests
         public void UserService_EditAsync_CreatesUserIfNotInDbWithGUID()
         {
             // Arrange
-            var dbUser = new DBUser { Id = "dummyId", UserName = "UserName2",  Email = "Email2",  LDAPAuthenticated = true, Password = "NewPassword" };
+            var dbUser = new DBUser { Id = "dummyId", UserName = "UserName2",  Email = "Email2",  LDAPAuthenticated_bl = true, Password = "NewPassword" };
             
             var dbUsers = new DBUser[] { dbUser };
 
@@ -81,7 +81,7 @@ namespace SDDB.UnitTests
         public void UserService_EditAsync_CreatesUserIfNotInDbWithPassword()
         {
             // Arrange
-            var dbUser = new DBUser { Id = "dummyId", UserName = "UserName2", Email = "Email2", LDAPAuthenticated = false, Password = "NewPassword" };
+            var dbUser = new DBUser { Id = "dummyId", UserName = "UserName2", Email = "Email2", LDAPAuthenticated_bl = false, Password = "NewPassword" };
             
             var dbUsers = new DBUser[] { dbUser };
 
@@ -109,8 +109,8 @@ namespace SDDB.UnitTests
         public void UserService_EditAsync_UpdateSingleUserwithGUID()
         {
             // Arrange
-            var dbEntry = new DBUser { Id = "dummyId1", UserName = "UserName", Email = "Email", LDAPAuthenticated = false };
-            var dbUser = new DBUser { Id = "dummyId2", UserName = "UserName2", Email = "Email2", LDAPAuthenticated = true, 
+            var dbEntry = new DBUser { Id = "dummyId1", UserName = "UserName", Email = "Email", LDAPAuthenticated_bl = false };
+            var dbUser = new DBUser { Id = "dummyId2", UserName = "UserName2", Email = "Email2", LDAPAuthenticated_bl = true, 
                 Password = "NewPassword", ModifiedProperties = new[] { "Email", "Password" } };
             
             var dbUsers = new DBUser[] { dbUser };
@@ -132,7 +132,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(dbEntry.Id != dbUser.Id);
             Assert.IsTrue(dbEntry.UserName != dbUser.UserName);
             Assert.IsTrue(dbEntry.Email == dbUser.Email);
-            Assert.IsTrue(dbEntry.LDAPAuthenticated != dbUser.LDAPAuthenticated);
+            Assert.IsTrue(dbEntry.LDAPAuthenticated_bl != dbUser.LDAPAuthenticated_bl);
             var regex = new Regex(@"\w*-\w*-\w*-\w*-\w*out\b"); Assert.IsTrue(regex.IsMatch(dbEntry.PasswordHash));
             mockAppUserManager.Verify(x => x.CreateAsync(It.IsAny<DBUser>(), It.IsAny<string>()), Times.Never);
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
@@ -142,8 +142,8 @@ namespace SDDB.UnitTests
         public void UserService_EditAsync_UpdateSingleUserwithPassword()
         {
             // Arrange
-            var dbEntry = new DBUser { Id = "dummyId1", UserName = "UserName", Email = "Email", LDAPAuthenticated = true };
-            var dbUser = new DBUser { Id = "dummyId2", UserName = "UserName2", Email = "Email2", LDAPAuthenticated = false,
+            var dbEntry = new DBUser { Id = "dummyId1", UserName = "UserName", Email = "Email", LDAPAuthenticated_bl = true };
+            var dbUser = new DBUser { Id = "dummyId2", UserName = "UserName2", Email = "Email2", LDAPAuthenticated_bl = false,
                 Password = "NewPassword", ModifiedProperties = new[] { "Password" } };
             
             var dbUsers = new DBUser[] { dbUser };
@@ -165,7 +165,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(dbEntry.Id != dbUser.Id);
             Assert.IsTrue(dbEntry.UserName != dbUser.UserName);
             Assert.IsTrue(dbEntry.Email != dbUser.Email);
-            Assert.IsTrue(dbEntry.LDAPAuthenticated != dbUser.LDAPAuthenticated);
+            Assert.IsTrue(dbEntry.LDAPAuthenticated_bl != dbUser.LDAPAuthenticated_bl);
             Assert.IsTrue(dbEntry.PasswordHash == dbUser.Password + "out");
             mockAppUserManager.Verify(x => x.CreateAsync(It.IsAny<DBUser>(), It.IsAny<string>()), Times.Never);
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
@@ -175,8 +175,8 @@ namespace SDDB.UnitTests
         public void UserService_EditAsync_UpdateSingleUserLeavePasswordIfPropNotModified()
         {
             // Arrange
-            var dbEntry = new DBUser { Id = "dummyId1", UserName = "UserName", Email = "Email", LDAPAuthenticated = true };
-            var dbUser = new DBUser { Id = "dummyId2", UserName = "UserName2", Email = "Email2", LDAPAuthenticated = false, Password = "D$mmyPasww0rd",
+            var dbEntry = new DBUser { Id = "dummyId1", UserName = "UserName", Email = "Email", LDAPAuthenticated_bl = true };
+            var dbUser = new DBUser { Id = "dummyId2", UserName = "UserName2", Email = "Email2", LDAPAuthenticated_bl = false, Password = "D$mmyPasww0rd",
                 ModifiedProperties = new[] { "UserName", "Email" } };
             
             var dbUsers = new DBUser[] { dbUser };
@@ -198,7 +198,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(dbEntry.Id != dbUser.Id);
             Assert.IsTrue(dbEntry.UserName == dbUser.UserName);
             Assert.IsTrue(dbEntry.Email == dbUser.Email);
-            Assert.IsTrue(dbEntry.LDAPAuthenticated != dbUser.LDAPAuthenticated);
+            Assert.IsTrue(dbEntry.LDAPAuthenticated_bl != dbUser.LDAPAuthenticated_bl);
             Assert.IsTrue(dbEntry.PasswordHash == null);
             mockAppUserManager.Verify(x => x.CreateAsync(It.IsAny<DBUser>(), It.IsAny<string>()), Times.Never);
             mockAppUserManager.Verify(x => x.UpdateAsync(dbEntry), Times.Once);
@@ -209,10 +209,10 @@ namespace SDDB.UnitTests
         public void UserService_EditAsync_UpdateManyUsersDoNotUpdateNotModified()
         {
             // Arrange
-            var dbEntry1 = new DBUser { Id = "dummyId1", UserName = "EntryName1", Email = "EntryEmail1", LDAPAuthenticated = true };
-            var dbEntry2 = new DBUser { Id = "dummyId2", UserName = "EntryName2", Email = "EntryEmail2", LDAPAuthenticated = false };
-            var dbUser1 = new DBUser { Id = "dummyUserId1", UserName = "UserName1", Email = "UserEmail1", LDAPAuthenticated = false, Password = "NewPassword1" };
-            var dbUser2 = new DBUser { Id = "dummyUserId2", UserName = "UserName2", Email = "UserEmail2", LDAPAuthenticated = true, Password = "NewPassword2" };
+            var dbEntry1 = new DBUser { Id = "dummyId1", UserName = "EntryName1", Email = "EntryEmail1", LDAPAuthenticated_bl = true };
+            var dbEntry2 = new DBUser { Id = "dummyId2", UserName = "EntryName2", Email = "EntryEmail2", LDAPAuthenticated_bl = false };
+            var dbUser1 = new DBUser { Id = "dummyUserId1", UserName = "UserName1", Email = "UserEmail1", LDAPAuthenticated_bl = false, Password = "NewPassword1" };
+            var dbUser2 = new DBUser { Id = "dummyUserId2", UserName = "UserName2", Email = "UserEmail2", LDAPAuthenticated_bl = true, Password = "NewPassword2" };
 
             var dbUsers = new DBUser[] { dbUser1, dbUser2 };
 
@@ -235,12 +235,12 @@ namespace SDDB.UnitTests
             Assert.IsTrue(dbEntry1.Id != dbUser1.Id);
             Assert.IsTrue(dbEntry1.UserName != dbUser1.UserName);
             Assert.IsTrue(dbEntry1.Email != dbUser1.Email);
-            Assert.IsTrue(dbEntry1.LDAPAuthenticated != dbUser1.LDAPAuthenticated);
+            Assert.IsTrue(dbEntry1.LDAPAuthenticated_bl != dbUser1.LDAPAuthenticated_bl);
             Assert.IsTrue(dbEntry1.PasswordHash == null);
             Assert.IsTrue(dbEntry2.Id != dbUser2.Id);
             Assert.IsTrue(dbEntry2.UserName != dbUser2.UserName);
             Assert.IsTrue(dbEntry2.Email != dbUser2.Email);
-            Assert.IsTrue(dbEntry2.LDAPAuthenticated != dbUser2.LDAPAuthenticated);
+            Assert.IsTrue(dbEntry2.LDAPAuthenticated_bl != dbUser2.LDAPAuthenticated_bl);
             Assert.IsTrue(dbEntry2.PasswordHash == null);
             mockAppUserManager.Verify(x => x.CreateAsync(It.IsAny<DBUser>(), It.IsAny<string>()), Times.Never);
             mockAppUserManager.Verify(x => x.UpdateAsync(It.IsAny<DBUser>()), Times.Exactly(2));
@@ -251,11 +251,11 @@ namespace SDDB.UnitTests
         public void UserService_EditAsync_UpdateManyUsersDoUpdateModified()
         {
             // Arrange
-            var dbEntry1 = new DBUser { Id = "dummyEntryId1", UserName = "EntryName1", Email = "EntryEmail1", LDAPAuthenticated = true };
-            var dbEntry2 = new DBUser { Id = "dummyEntryId2", UserName = "EntryName2", Email = "EntryEmail2", LDAPAuthenticated = false };
-            var dbUser1 = new DBUser { Id = "dummyUserId1", UserName = "UserName1", Email = "UserEmail1", LDAPAuthenticated = false, Password = "NewPassword1", 
+            var dbEntry1 = new DBUser { Id = "dummyEntryId1", UserName = "EntryName1", Email = "EntryEmail1", LDAPAuthenticated_bl = true };
+            var dbEntry2 = new DBUser { Id = "dummyEntryId2", UserName = "EntryName2", Email = "EntryEmail2", LDAPAuthenticated_bl = false };
+            var dbUser1 = new DBUser { Id = "dummyUserId1", UserName = "UserName1", Email = "UserEmail1", LDAPAuthenticated_bl = false, Password = "NewPassword1", 
                 ModifiedProperties = new[] { "UserName", "Email", "LDAPAuthenticated", } };
-            var dbUser2 = new DBUser { Id = "dummyUserId2", UserName = "UserName2", Email = "UserEmail2", LDAPAuthenticated = true, Password = "NewPassword2" };
+            var dbUser2 = new DBUser { Id = "dummyUserId2", UserName = "UserName2", Email = "UserEmail2", LDAPAuthenticated_bl = true, Password = "NewPassword2" };
 
             var dbUsers = new DBUser[] { dbUser1, dbUser2 };
 
@@ -278,12 +278,12 @@ namespace SDDB.UnitTests
             Assert.IsTrue(dbEntry1.Id != dbUser1.Id);
             Assert.IsTrue(dbEntry1.UserName == dbUser1.UserName);
             Assert.IsTrue(dbEntry1.Email == dbUser1.Email);
-            Assert.IsTrue(dbEntry1.LDAPAuthenticated == dbUser1.LDAPAuthenticated);
+            Assert.IsTrue(dbEntry1.LDAPAuthenticated_bl == dbUser1.LDAPAuthenticated_bl);
             Assert.IsTrue(dbEntry1.PasswordHash == null);
             Assert.IsTrue(dbEntry2.Id != dbUser2.Id);
             Assert.IsTrue(dbEntry2.UserName != dbUser2.UserName);
             Assert.IsTrue(dbEntry2.Email != dbUser2.Email);
-            Assert.IsTrue(dbEntry2.LDAPAuthenticated != dbUser2.LDAPAuthenticated);
+            Assert.IsTrue(dbEntry2.LDAPAuthenticated_bl != dbUser2.LDAPAuthenticated_bl);
             Assert.IsTrue(dbEntry2.PasswordHash == null);
             mockAppUserManager.Verify(x => x.CreateAsync(It.IsAny<DBUser>(), It.IsAny<string>()), Times.Never);
             mockAppUserManager.Verify(x => x.UpdateAsync(It.IsAny<DBUser>()), Times.Exactly(2));
@@ -294,14 +294,14 @@ namespace SDDB.UnitTests
         public void UserService_EditAsync_UpdateManyUsersReportErrorsFromIdentityResult()
         {
             // Arrange
-            var dbEntry1 = new DBUser { Id = "dummyEntryId1", UserName = "EntryName1", Email = "EntryEmail1", LDAPAuthenticated = true };
-            var dbEntry2 = new DBUser { Id = "dummyEntryId2", UserName = "EntryName2", Email = "EntryEmail2", LDAPAuthenticated = false };
+            var dbEntry1 = new DBUser { Id = "dummyEntryId1", UserName = "EntryName1", Email = "EntryEmail1", LDAPAuthenticated_bl = true };
+            var dbEntry2 = new DBUser { Id = "dummyEntryId2", UserName = "EntryName2", Email = "EntryEmail2", LDAPAuthenticated_bl = false };
             var dbUser1 = new DBUser
             {
                 Id = "dummyUserId1",
                 UserName = "UserName1",
                 Email = "UserEmail1",
-                LDAPAuthenticated = false,
+                LDAPAuthenticated_bl = false,
                 Password = "NewPassword1",
                 ModifiedProperties = new[] { "UserName", "Email", "LDAPAuthenticated" }
             };
@@ -310,7 +310,7 @@ namespace SDDB.UnitTests
                 Id = "dummyUserId2",
                 UserName = "UserName2",
                 Email = "UserEmail2",
-                LDAPAuthenticated = true,
+                LDAPAuthenticated_bl = true,
                 Password = "NewPassword2",
                 ModifiedProperties = new[] { "Password" }
             };
@@ -336,12 +336,12 @@ namespace SDDB.UnitTests
             Assert.IsTrue(dbEntry1.Id != dbUser1.Id);
             Assert.IsTrue(dbEntry1.UserName == dbUser1.UserName);
             Assert.IsTrue(dbEntry1.Email == dbUser1.Email);
-            Assert.IsTrue(dbEntry1.LDAPAuthenticated == dbUser1.LDAPAuthenticated);
+            Assert.IsTrue(dbEntry1.LDAPAuthenticated_bl == dbUser1.LDAPAuthenticated_bl);
             Assert.IsTrue(dbEntry1.PasswordHash == null);
             Assert.IsTrue(dbEntry2.Id != dbUser2.Id);
             Assert.IsTrue(dbEntry2.UserName != dbUser2.UserName);
             Assert.IsTrue(dbEntry2.Email != dbUser2.Email);
-            Assert.IsTrue(dbEntry2.LDAPAuthenticated != dbUser2.LDAPAuthenticated);
+            Assert.IsTrue(dbEntry2.LDAPAuthenticated_bl != dbUser2.LDAPAuthenticated_bl);
             var regex = new Regex(@"\w*-\w*-\w*-\w*-\w*out\b"); Assert.IsTrue(regex.IsMatch(dbEntry2.PasswordHash));
             mockAppUserManager.Verify(x => x.CreateAsync(It.IsAny<DBUser>(), It.IsAny<string>()), Times.Never);
             mockAppUserManager.Verify(x => x.UpdateAsync(It.IsAny<DBUser>()), Times.Exactly(2));
@@ -354,13 +354,13 @@ namespace SDDB.UnitTests
         public void UserService_EditAsync_UpdateSingleUserReportErrorsFromIdentityResult()
         {
             // Arrange
-            var dbEntry1 = new DBUser { Id = "dummyEntryId1", UserName = "EntryName1", Email = "EntryEmail1", LDAPAuthenticated = true };
+            var dbEntry1 = new DBUser { Id = "dummyEntryId1", UserName = "EntryName1", Email = "EntryEmail1", LDAPAuthenticated_bl = true };
             var dbUser1 = new DBUser
             {
                 Id = "dummyUserId1",
                 UserName = "UserName1",
                 Email = "UserEmail1",
-                LDAPAuthenticated = false,
+                LDAPAuthenticated_bl = false,
                 Password = "NewPassword1",
                 ModifiedProperties = new[] { "UserName", "Email", "LDAPAuthenticated", "Password" }
             };
@@ -384,7 +384,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(dbEntry1.Id != dbUser1.Id);
             Assert.IsTrue(dbEntry1.UserName == dbUser1.UserName);
             Assert.IsTrue(dbEntry1.Email == dbUser1.Email);
-            Assert.IsTrue(dbEntry1.LDAPAuthenticated == dbUser1.LDAPAuthenticated);
+            Assert.IsTrue(dbEntry1.LDAPAuthenticated_bl == dbUser1.LDAPAuthenticated_bl);
             Assert.IsTrue(dbEntry1.PasswordHash == dbUser1.Password + "out");
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Error1"));
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Error2"));
@@ -402,7 +402,7 @@ namespace SDDB.UnitTests
                 Id = "dummyUserId1",
                 UserName = "UserName1",
                 Email = "UserEmail1",
-                LDAPAuthenticated = false,
+                LDAPAuthenticated_bl = false,
                 ModifiedProperties = new[] { "UserName", "Email", "LDAPAuthenticated" }
             };
 
@@ -433,13 +433,13 @@ namespace SDDB.UnitTests
         public void UserService_EditAsync_DoesNotUpdateUserifLDAPModifiedToFalseAndNoPassword()
         {
             // Arrange
-            var dbEntry = new DBUser { Id = "dummyEntryId1", UserName = "UserName", Email = "Email", LDAPAuthenticated = true };
+            var dbEntry = new DBUser { Id = "dummyEntryId1", UserName = "UserName", Email = "Email", LDAPAuthenticated_bl = true };
             var dbUser = new DBUser
             {
                 Id = "dummyUserId1",
                 UserName = "UserName2",
                 Email = "Email2",
-                LDAPAuthenticated = false,
+                LDAPAuthenticated_bl = false,
                 Password = "",
                 ModifiedProperties = new[] { "UserName", "Email", "LDAPAuthenticated" }
             };
@@ -462,7 +462,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(dbEntry.Id != dbUser.Id);
             Assert.IsTrue(dbEntry.UserName != dbUser.UserName);
             Assert.IsTrue(dbEntry.Email != dbUser.Email);
-            Assert.IsTrue(dbEntry.LDAPAuthenticated != dbUser.LDAPAuthenticated);
+            Assert.IsTrue(dbEntry.LDAPAuthenticated_bl != dbUser.LDAPAuthenticated_bl);
             Assert.IsTrue(dbEntry.PasswordHash == null);
             Assert.IsTrue(serviceResult.StatusDescription.Contains("Password is required if not LDAP authenticated\n"));
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
@@ -475,8 +475,8 @@ namespace SDDB.UnitTests
         public void UserService_GetAsync_ReturnsResultWithUsers()
         {
             // Arrange
-            var dbEntry1 = new DBUser { Id = "dummyEntryId1", UserName = "UserName1", Email = "UserEmail1", LDAPAuthenticated = false, };
-            var dbEntry2 = new DBUser { Id = "dummyEntryId2", UserName = "UserName2", Email = "UserEmail2", LDAPAuthenticated = true, };
+            var dbEntry1 = new DBUser { Id = "dummyEntryId1", UserName = "UserName1", Email = "UserEmail1", LDAPAuthenticated_bl = false, };
+            var dbEntry2 = new DBUser { Id = "dummyEntryId2", UserName = "UserName2", Email = "UserEmail2", LDAPAuthenticated_bl = true, };
             var users = (new List<DBUser> { dbEntry1, dbEntry2 }).AsQueryable();
 
             var mockAppUserManager = new Mock<IAppUserManager>();
@@ -523,7 +523,7 @@ namespace SDDB.UnitTests
             // Arrange
             var ids = new string[] { "dummyEntryId1", "dummyEntryId11" };
 
-            var dbEntry = new DBUser { Id = "dummyEntryId1", UserName = "UserName2", Email = "Email2", LDAPAuthenticated = true, Password = "NewPassword" };
+            var dbEntry = new DBUser { Id = "dummyEntryId1", UserName = "UserName2", Email = "Email2", LDAPAuthenticated_bl = true, Password = "NewPassword" };
 
 
             var mockAppUserManager = new Mock<IAppUserManager>();
@@ -551,7 +551,7 @@ namespace SDDB.UnitTests
             // Arrange
             var ids = new string[] { "dummyEntryId1" };
 
-            var dbEntry = new DBUser { Id = "dummyEntryId1", UserName = "UserName2", Email = "Email2", LDAPAuthenticated = true, Password = "NewPassword" };
+            var dbEntry = new DBUser { Id = "dummyEntryId1", UserName = "UserName2", Email = "Email2", LDAPAuthenticated_bl = true, Password = "NewPassword" };
 
             var mockAppUserManager = new Mock<IAppUserManager>();
             mockAppUserManager.Setup(x => x.FindByIdAsync("dummyEntryId1")).Returns(Task.FromResult<DBUser>(dbEntry));

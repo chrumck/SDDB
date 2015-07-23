@@ -14,6 +14,8 @@ using SDDB.Domain.Entities;
 using SDDB.Domain.DbContexts;
 using SDDB.Domain.Infrastructure;
 using SDDB.Domain.Abstract;
+using System.Collections;
+using System.Linq.Expressions;
 
 namespace SDDB.Domain.Services
 {
@@ -39,11 +41,10 @@ namespace SDDB.Domain.Services
         // Create and Update records given in []
         public virtual async Task<List<string>> EditAsync(T[] records)
         {
-            var newEntryIds = await executeOnDbScope(async (dbContext) =>
-            {
-                return await editHelperAsync(dbContext, records).ConfigureAwait(false);
-            })
-            .ConfigureAwait(false);
+            if (records == null || records.Length == 0) { throw new ArgumentNullException("records"); }
+
+            var newEntryIds = await dbScopeHelperAsync(dbContext => editHelperAsync(dbContext, records))
+                .ConfigureAwait(false);
 
             return newEntryIds;
         }
@@ -51,35 +52,83 @@ namespace SDDB.Domain.Services
         // Delete records by their Ids
         public virtual async Task DeleteAsync(string[] ids)
         {
-            await executeOnDbScope<Task>((dbContext) =>
+            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
+
+            await dbScopeHelperAsync(dbContext => deleteHelperAsync(dbContext, ids))
+                .ConfigureAwait(false);
+        }
+
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        //Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T 
+        public virtual async Task AddRemoveRelated<TAddRem> (string[] ids, string[] idsAddRem, 
+            string relatedCollectionName, bool isAdd = true) where TAddRem: IDbEntity
+        {
+            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
+            if (idsAddRem == null || idsAddRem.Length == 0) { throw new ArgumentNullException("idsAddRem"); }
+            if (String.IsNullOrEmpty(relatedCollectionName)) { throw new ArgumentNullException("relatedCollectionName"); }
+
+            await dbScopeHelperAsync(async dbContext => 
             {
-                return Task.FromResult(deleteHelperAsync(dbContext, ids));
+                var dbEntries = await ((IQueryable<T>)dbContext.Set(typeof(T)).AsQueryable())
+                    .Where(x => ids.Contains(x.Id))
+                    .Include(relatedCollectionName)
+                    .ToListAsync().ConfigureAwait(false);
+                if (dbEntries.Count != ids.Length){ throw new ArgumentException("Entry(ies) not found"); }
+
+                var dbEntriesAddRem = await ((IQueryable<TAddRem>)dbContext.Set(typeof(TAddRem)).AsQueryable())
+                    .Where(x => idsAddRem.Contains(x.Id))
+                    .ToListAsync().ConfigureAwait(false);
+                if (dbEntriesAddRem.Count != idsAddRem.Length) { throw new ArgumentException("Related Entry(ies) not found"); }
+
+                await AddRemoveRelatedHelper(dbEntries, dbEntriesAddRem, relatedCollectionName, isAdd).ConfigureAwait(false);
+
+                return default(int);
             })
             .ConfigureAwait(false);
+        }
 
+        //Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T
+        //overload taking lamdba expression
+        public virtual async Task AddRemoveRelated<TAddRem, TOut>(string[] ids, string[] idsAddRem,
+            Expression<Func<TAddRem, TOut>> lambda, bool isAdd = true) where TAddRem : IDbEntity
+        {
+            var body = (MemberExpression)lambda.Body;
+            if (body == null)
+            {
+                throw new ArgumentException(
+                    string.Format("Expression '{0}' refers to a method, not a property.", lambda.ToString()));
+            }
+            await AddRemoveRelated<TAddRem>(ids, idsAddRem, body.Member.Name, isAdd).ConfigureAwait(false);
+        }
+
+
+        //Helpers--------------------------------------------------------------------------------------------------------------//
+        #region Helpers
+
+        //wrapper for dbcontext scope factory - version for Write
+        protected async Task<TResult> dbScopeHelperAsync<TResult>(Func<EFDbContext, Task<TResult>> innerDelegate)
+        {
+            TResult result = default(TResult);
             using (var dbContextScope = contextScopeFac.Create())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    var dbEntries = await dbContext.PersonLogEntrys.Where(x => ids.Contains(x.Id))
-                        .ToListAsync().ConfigureAwait(false);
-                    if (dbEntries.Count() == 0) throw new ArgumentException("Entry(ies) not found");
-                    dbEntries.ForEach(x => x.IsActive_bl = false);
+                    result = await innerDelegate(dbContext).ConfigureAwait(false);
+
                     await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
                     trans.Complete();
                 }
             }
+            return result;
         }
 
-        //Helpers--------------------------------------------------------------------------------------------------------------//
-        #region Helpers
+        //-----------------------------------------------------------------------------------------------------------------------
 
         //helper - editing single Db Entry
-        protected async Task<string> editHelperAsync(EFDbContext dbContext, T record)
+        protected virtual async Task<string> editHelperAsync(EFDbContext dbContext, T record)
         {
-            if (record == null) { throw new ArgumentNullException("record"); }
-
             var dbEntry = (T)(await dbContext.Set(typeof(T)).FindAsync(record.Id).ConfigureAwait(false));
             if (dbEntry == null)
             {
@@ -94,8 +143,6 @@ namespace SDDB.Domain.Services
         //helper - editing Db Entries in array
         protected async Task<List<string>> editHelperAsync(EFDbContext dbContext, T[] records)
         {
-            if (records == null || records.Length == 0) { throw new ArgumentNullException("records"); }
-
             var newEntryIds = new List<string>();
 
             for (int i = 0; i < records.Length; i++)
@@ -107,34 +154,48 @@ namespace SDDB.Domain.Services
         }
 
         //helper deleting db entries (setting isActive_bl to false) 
-        protected async Task deleteHelperAsync(EFDbContext dbContext, string[] ids)
+        protected async Task<int> deleteHelperAsync(EFDbContext dbContext, string[] ids)
         {
-            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
-
-            var dbEntries = await ((IQueryable<T>)dbContext.Set(typeof(T)).AsQueryable()).Where(x => ids.Contains(x.Id))
+            var dbEntries = await ((IQueryable<T>)dbContext.Set(typeof(T)).AsQueryable())
+                .Where(x => ids.Contains(x.Id))
                 .ToListAsync().ConfigureAwait(false);
-            if (dbEntries.Count() == 0) throw new ArgumentException("Entry(ies) not found");
+            if (dbEntries.Count() != ids.Length) { throw new ArgumentException("Entry(ies) not found"); }
             dbEntries.ForEach(x => x.IsActive_bl = false);
+            return default(int);
         }
-        
-        //wrapper for dbcontext scope factory - version for Write
-        protected async Task<TResult> executeOnDbScope<TResult>(Func<EFDbContext,Task<TResult>> innerFunction)
-        {
-            TResult result = default(TResult);
-            using (var dbContextScope = contextScopeFac.Create())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    result = await innerFunction(dbContext).ConfigureAwait(false);
 
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-                    trans.Complete();
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        //Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T 
+        //helper taking lists of T and TAddRem
+        protected async Task<int> AddRemoveRelatedHelper<TAddRem>(T dbEntry, TAddRem dbEntryAddRem,
+            string relatedCollectionName, bool isAdd) where TAddRem : IDbEntity
+        {
+            await Task.Run(() =>
+            {
+                var relatedCollection = (List<TAddRem>)typeof(T).GetProperty(relatedCollectionName).GetValue(dbEntry);
+
+                if (isAdd && !relatedCollection.Contains(dbEntryAddRem)) { relatedCollection.Add(dbEntryAddRem); }
+                if (!isAdd && relatedCollection.Contains(dbEntryAddRem)) { relatedCollection.Remove(dbEntryAddRem); }    
+            }).ConfigureAwait(false);
+
+            return default(int);
+        }
+
+        //Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T 
+        //helper taking single T and TAddRem
+        protected async Task<int> AddRemoveRelatedHelper<TAddRem>(List<T> dbEntries, List<TAddRem> dbEntriesAddRem,
+            string relatedCollectionName, bool isAdd) where TAddRem : IDbEntity
+        {
+            foreach (var dbEntry in dbEntries)
+            {
+                foreach (var dbEntryAddRem in dbEntriesAddRem)
+                {
+                    await AddRemoveRelatedHelper(dbEntry, dbEntryAddRem, relatedCollectionName, isAdd).ConfigureAwait(false);
                 }
             }
-            return result;
+            return default(int);
         }
-
 
         #endregion
     }

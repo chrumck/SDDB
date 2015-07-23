@@ -33,7 +33,7 @@ namespace SDDB.WebUI.ControllersSrv
                 AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
                 ContactPerson = new { x.ContactPerson.FirstName, x.ContactPerson.LastName, x.ContactPerson.Initials },
                 x.Address, x.City, x.ZIP, x.State, x.Country, x.LocX, x.LocY, x.LocZ, x.LocStationing,
-                x.CertOfApprReqd, x.RightOfEntryReqd, x.AccessInfo ,x.Comments, IsActive = x.IsActive_bl,
+                CertOfApprReqd = x.CertOfApprReqd_bl, RightOfEntryReqd = x.RightOfEntryReqd_bl, x.AccessInfo ,x.Comments, IsActive = x.IsActive_bl,
                 x.LocationType_Id,x.AssignedToProject_Id, x.ContactPerson_Id 
             });
 
@@ -52,7 +52,7 @@ namespace SDDB.WebUI.ControllersSrv
                 AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
                 ContactPerson = new { x.ContactPerson.FirstName, x.ContactPerson.LastName, x.ContactPerson.Initials },
                 x.Address, x.City, x.ZIP, x.State, x.Country, x.LocX, x.LocY, x.LocZ, x.LocStationing,
-                x.CertOfApprReqd, x.RightOfEntryReqd, x.AccessInfo ,x.Comments, IsActive = x.IsActive_bl,
+                CertOfApprReqd = x.CertOfApprReqd_bl, RightOfEntryReqd = x.RightOfEntryReqd_bl, x.AccessInfo ,x.Comments, IsActive = x.IsActive_bl,
                 x.LocationType_Id,x.AssignedToProject_Id, x.ContactPerson_Id
             });
 
@@ -72,7 +72,7 @@ namespace SDDB.WebUI.ControllersSrv
                 AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
                 ContactPerson = new { x.ContactPerson.FirstName, x.ContactPerson.LastName, x.ContactPerson.Initials },
                 x.Address, x.City, x.ZIP, x.State, x.Country, x.LocX, x.LocY, x.LocZ, x.LocStationing,
-                x.CertOfApprReqd, x.RightOfEntryReqd, x.AccessInfo ,x.Comments, IsActive = x.IsActive_bl,
+                CertOfApprReqd = x.CertOfApprReqd_bl, RightOfEntryReqd = x.RightOfEntryReqd_bl, x.AccessInfo ,x.Comments, IsActive = x.IsActive_bl,
                 x.LocationType_Id,x.AssignedToProject_Id, x.ContactPerson_Id
             });
 

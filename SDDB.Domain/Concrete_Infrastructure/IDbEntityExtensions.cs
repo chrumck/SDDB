@@ -26,7 +26,8 @@ namespace SDDB.Domain.Infrastructure
             var body = (MemberExpression)lambda.Body;
             if (body == null) 
             {
-                throw new ArgumentException(string.Format("Expression '{0}' refers to a method, not a property.", lambda.ToString()));
+                throw new ArgumentException(
+                    string.Format("Expression '{0}' refers to a method, not a property.", lambda.ToString()));
             }
             return instance.PropIsModified(body.Member.Name);
         }

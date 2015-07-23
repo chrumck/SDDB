@@ -64,12 +64,12 @@ namespace SDDB.Domain.Services
             var errorMessage = "";
             foreach (var record in records)
             {
-                if (!record.LDAPAuthenticated && record.PropIsModified(x => x.LDAPAuthenticated) && String.IsNullOrEmpty(record.Password))
+                if (!record.LDAPAuthenticated_bl && record.PropIsModified(x => x.LDAPAuthenticated_bl) && String.IsNullOrEmpty(record.Password))
                 {
                     errorMessage += String.Format("User {0}: Password is required if not LDAP authenticated\n", record.UserName); continue;
                 }
 
-                if (record.LDAPAuthenticated) { record.Password = Guid.NewGuid().ToString(); record.PasswordConf = record.Password; }
+                if (record.LDAPAuthenticated_bl) { record.Password = Guid.NewGuid().ToString(); record.PasswordConf = record.Password; }
 
                 var dbEntry = await appUserManager.FindByIdAsync(record.Id).ConfigureAwait(false);
                 if (dbEntry == null)
@@ -81,7 +81,7 @@ namespace SDDB.Domain.Services
                 {
                     if (record.PropIsModified(x => x.UserName)) dbEntry.UserName = record.UserName;
                     if (record.PropIsModified(x => x.Email)) dbEntry.Email = record.Email;
-                    if (record.PropIsModified(x => x.LDAPAuthenticated)) dbEntry.LDAPAuthenticated = record.LDAPAuthenticated;
+                    if (record.PropIsModified(x => x.LDAPAuthenticated_bl)) dbEntry.LDAPAuthenticated_bl = record.LDAPAuthenticated_bl;
                     if (record.PropIsModified(x => x.Password)) dbEntry.PasswordHash = appUserManager.HashPassword(record.Password);
 
                     var identityResult = await appUserManager.UpdateAsync(dbEntry).ConfigureAwait(false);

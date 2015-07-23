@@ -32,7 +32,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             var users = await dbUserService.GetAsync().ConfigureAwait(false);
             var data = users.OrderBy(x => x.Person.LastName).Select(x => new {
-                x.Id, x.Person.LastName, x.Person.FirstName, x.UserName, x.Email, x.LDAPAuthenticated });
+                x.Id, x.Person.LastName, x.Person.FirstName, x.UserName, x.Email, LDAPAuthenticated = x.LDAPAuthenticated_bl });
 
             ViewBag.ServiceName = "DBUserService.GetAsync";
             ViewBag.StatusCode = HttpStatusCode.OK;
@@ -47,7 +47,7 @@ namespace SDDB.WebUI.ControllersSrv
             var users = await dbUserService.GetAsync().ConfigureAwait(false);
 
             var data = users.Where(x => ids.Contains((x.Id))).OrderBy(x => x.Person.LastName).Select(x => new {
-                x.Id, x.Person.LastName, x.Person.FirstName, x.UserName, x.Email, x.LDAPAuthenticated });
+                x.Id, x.Person.LastName, x.Person.FirstName, x.UserName, x.Email, LDAPAuthenticated = x.LDAPAuthenticated_bl });
 
             ViewBag.ServiceName = "DBUserService.GetAsync";
             ViewBag.StatusCode = HttpStatusCode.OK;

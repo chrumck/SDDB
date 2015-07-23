@@ -51,7 +51,6 @@ namespace SDDB.Domain.Services
                     .ToListAsync().ConfigureAwait(false);
                 
                 records.FillRelatedIfNull();
-
                 return records;
             }
         }
@@ -167,36 +166,25 @@ namespace SDDB.Domain.Services
         
         //-----------------------------------------------------------------------------------------------------------------------
 
-        // Create and Update records given in []
-        public virtual async Task<List<string>> EditAsync(PersonLogEntry[] records)
+        // Create and Update records given in [] 
+        // Overriden from base : check before edit and update EnteredByPerson_Id 
+        // Also see overriden editHelperAsync(EFDbContext dbContext, PersonLogEntry record)
+        public override async Task<List<string>> EditAsync(PersonLogEntry[] records)
         {
-            var newEntryIds = await executeOnScopeFactory(contextScopeFac, async (dbContext) => 
+            if (records == null || records.Length == 0) { throw new ArgumentNullException("records"); }
+
+            var newEntryIds = await dbScopeHelperAsync(async dbContext => 
             {
                 await checkPersonLogEntrysBeforeEditAsync(dbContext, records).ConfigureAwait(false);
-                return await editPersonLogEntrysAsync(dbContext, records).ConfigureAwait(false);
-            },
-            new List<string>()).ConfigureAwait(false);
+                return await editHelperAsync(dbContext, records).ConfigureAwait(false);
+            })
+            .ConfigureAwait(false);
 
             return newEntryIds;
         }
 
-        // Delete records by their Ids
-        public virtual async Task DeleteAsync(string[] ids)
-        {
-            using (var dbContextScope = contextScopeFac.Create())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    var dbEntries = await dbContext.PersonLogEntrys.Where(x => ids.Contains(x.Id))
-                        .ToListAsync().ConfigureAwait(false);
-                    if (dbEntries.Count() == 0) throw new ArgumentException("Entry(ies) not found");
-                    dbEntries.ForEach(x => x.IsActive_bl = false);
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-                    trans.Complete();
-                }
-            }
-        }
+
+        // Delete records by their Ids - same as BaseDbService
 
         //-----------------------------------------------------------------------------------------------------------------------
 
@@ -208,73 +196,37 @@ namespace SDDB.Domain.Services
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+                
                 return dbContext.AssemblyDbs
-                    .Where(x => x.AssemblyDbPrsLogEntrys.Any(y => y.Id == logEntryId) && x.IsActive_bl == true).ToListAsync();
+                    .Where(x => x.AssemblyDbPrsLogEntrys.Any(y => y.Id == logEntryId) && x.IsActive_bl)
+                    .ToListAsync();
             }
         }
 
         //get all active assemblies from the location not assigned to log entry
-        public virtual Task<List<AssemblyDb>> GetPrsLogEntryAssysNotAsync(string logEntryId, string locId = null)
+        public virtual Task<List<AssemblyDb>> GetPrsLogEntryAssysNotAsync(string logEntryId, string locId)
         {
             if (String.IsNullOrEmpty(logEntryId)) throw new ArgumentNullException("logEntryId");
+            locId = locId ?? String.Empty;
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
-                locId = locId ?? String.Empty;
-
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+                
                 return dbContext.AssemblyDbs
-                    .Where(x => !x.AssemblyDbPrsLogEntrys.Any(y => y.Id == logEntryId) && x.IsActive_bl == true && 
+                    .Where(x =>
+                        !x.AssemblyDbPrsLogEntrys.Any(y => y.Id == logEntryId) &&
+                        x.IsActive_bl && 
                         (locId == String.Empty || x.AssignedToLocation_Id == locId))
                     .ToListAsync();
             }
         }
 
-        //Add (or Remove  when set isAdd to false) Assemblies to Person Log Entry
-        public virtual async Task<DBResult> EditPrsLogEntryAssysAsync(string[] ids, string[] idsAddRem, bool isAdd)
-        {
-            if (ids == null || ids.Length == 0 || idsAddRem == null || idsAddRem.Length == 0)
-                return new DBResult { StatusCode = HttpStatusCode.BadRequest, StatusDescription = "arguments missing" };
-
-            var errorMessage = String.Empty; 
-
-            using (var dbContextScope = contextScopeFac.Create())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    var logEntrys = await dbContext.PersonLogEntrys.Include(x => x.PrsLogEntryAssemblyDbs).Where(x => ids.Contains(x.Id))
-                       .ToListAsync().ConfigureAwait(false);
-
-                    var assys = await dbContext.AssemblyDbs.Where(x => idsAddRem.Contains(x.Id)).ToListAsync().ConfigureAwait(false);
-
-                    foreach (var logEntry in logEntrys)
-                    {
-                        foreach (var assy in assys)
-                        {
-                            if (isAdd) { if (!logEntry.PrsLogEntryAssemblyDbs.Contains(assy)) logEntry.PrsLogEntryAssemblyDbs.Add(assy); }
-                            else {
-                                if (logEntry.PrsLogEntryAssemblyDbs.Contains(assy)) logEntry.PrsLogEntryAssemblyDbs.Remove(assy); 
-                            }
-                        }
-                    }
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-                    trans.Complete();
-                }
-            }
-            if (errorMessage == String.Empty) { return new DBResult(); }
-            else
-            {
-                return new DBResult
-                {
-                    StatusCode = HttpStatusCode.Conflict,
-                    StatusDescription = "Errors editing records:\n" + errorMessage
-                };
-            }
-        }
+        //Add (or Remove  when set isAdd to false) Assemblies to Person Log Entry 
+        //use generic version AddRemoveRelated from BaseDbService to replace EditPrsLogEntryAssysAsync
 
         //-----------------------------------------------------------------------------------------------------------------------
-
+        
         //get all person log entry persons
         public virtual Task<List<Person>> GetPrsLogEntryPersonsAsync(string logEntryId)
         {
@@ -283,8 +235,10 @@ namespace SDDB.Domain.Services
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
                 return dbContext.Persons
-                    .Where(x => x.PersonPrsLogEntrys.Any(y => y.Id == logEntryId) && x.IsActive_bl == true).ToListAsync();
+                    .Where(x => x.PersonPrsLogEntrys.Any(y => y.Id == logEntryId) && x.IsActive_bl)
+                    .ToListAsync();
             }
         }
 
@@ -297,55 +251,17 @@ namespace SDDB.Domain.Services
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.PersonGroups.Where(x => x.GroupManagers.Any(y => y.Id == userId)).SelectMany(x => x.GroupPersons)
-                    .Distinct().Where(x => x.IsActive_bl == true && !x.PersonPrsLogEntrys.Any(y => y.Id == logEntryId))
+                return dbContext.PersonGroups
+                    .Where(x => x.GroupManagers.Any(y => y.Id == userId))
+                    .SelectMany(x => x.GroupPersons)
+                    .Distinct()
+                    .Where(x => x.IsActive_bl && !x.PersonPrsLogEntrys.Any(y => y.Id == logEntryId))
                     .ToListAsync();
             }
         }
 
         //Add (or Remove  when set isAdd to false) Persons to Person Log Entry
-        public virtual async Task<DBResult> EditPrsLogEntryPersonsAsync(string[] ids, string[] idsAddRem, bool isAdd)
-        {
-            if (ids == null || ids.Length == 0 || idsAddRem == null || idsAddRem.Length == 0)
-                return new DBResult { StatusCode = HttpStatusCode.BadRequest, StatusDescription = "arguments missing" };
-
-            var errorMessage = String.Empty;
-            using (var dbContextScope = contextScopeFac.Create())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    var logEntrys = await dbContext.PersonLogEntrys.Include(x => x.PrsLogEntryPersons).Where(x => ids.Contains(x.Id))
-                       .ToListAsync().ConfigureAwait(false);
-
-                    var persons = await dbContext.Persons.Where(x => idsAddRem.Contains(x.Id)).ToListAsync().ConfigureAwait(false);
-
-                    foreach (var logEntry in logEntrys)
-                    {
-                        foreach (var person in persons)
-                        {
-                            if (isAdd) { if (!logEntry.PrsLogEntryPersons.Contains(person)) logEntry.PrsLogEntryPersons.Add(person); }
-                            else
-                            {
-                                if (logEntry.PrsLogEntryPersons.Contains(person)) logEntry.PrsLogEntryPersons.Remove(person);
-                            }
-                        }
-                    }
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-                    trans.Complete();
-                }
-            }
-            if (errorMessage == String.Empty) { return new DBResult(); }
-            else
-            {
-                return new DBResult
-                {
-                    StatusCode = HttpStatusCode.Conflict,
-                    StatusDescription = "Errors editing records:\n" + errorMessage
-                };
-            }
-        }
-
+        //use generic version AddRemoveRelated from BaseDbService to replace EditPrsLogEntryPersonsAsync
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
@@ -366,47 +282,22 @@ namespace SDDB.Domain.Services
             }
         }
 
-        //editing log entries
-        private async Task<List<string>> editPersonLogEntrysAsync(EFDbContext dbContext, PersonLogEntry[] records)
+        //helper - editing single Db Entry - overriden
+        protected override async Task<string> editHelperAsync(EFDbContext dbContext, PersonLogEntry record)
         {
-            var newEntryIds = new List<string>();
-
-            foreach (var record in records)
+            var dbEntry = await dbContext.PersonLogEntrys.FindAsync(record.Id).ConfigureAwait(false);
+            if (dbEntry == null)
             {
-                var dbEntry = await dbContext.PersonLogEntrys.FindAsync(record.Id).ConfigureAwait(false);
-                if (dbEntry == null)
-                {
-                    record.Id = Guid.NewGuid().ToString();
-                    record.EnteredByPerson_Id = record.EnteredByPerson_Id ?? userId;
-                    dbContext.PersonLogEntrys.Add(record);
-                    newEntryIds.Add(record.Id);
-                }
-                else
-                {
-                    dbEntry.CopyProperties(record);
-                }
+                record.Id = Guid.NewGuid().ToString();
+                record.EnteredByPerson_Id = record.EnteredByPerson_Id ?? userId;
+                dbContext.PersonLogEntrys.Add(record);
+                return record.Id;
             }
-            return newEntryIds;
+            dbEntry.CopyProperties(record);
+            return null;
         }
 
-        //wrapper for dbcontext scope - version for create
-        private async Task<TResult> executeOnScopeFactory<TResult>(IDbContextScopeFactory contextScopeFac, Func<EFDbContext,Task<TResult>> innerFunction, TResult result)
-        {
-            using (var dbContextScope = contextScopeFac.Create())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    result = await innerFunction(dbContext);
-
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-                    trans.Complete();
-                }
-            }
-            return result;
-        }
-
-
+        
         #endregion
     }
 }

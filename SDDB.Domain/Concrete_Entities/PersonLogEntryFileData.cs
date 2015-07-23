@@ -61,6 +61,7 @@ namespace SDDB.Domain.Entities
         public const int DataLength = 65535;
 
         [NotMapped]
+        [DefaultValue(true)]
         public bool IsActive_bl { get; set; }
 
     }

@@ -66,11 +66,11 @@ namespace SDDB.Domain.Entities
 
         [Required]
         [DefaultValue(false)]
-        public bool CertOfApprReqd { get; set; }
+        public bool CertOfApprReqd_bl { get; set; }
 
         [Required]
         [DefaultValue(false)]
-        public bool RightOfEntryReqd { get; set; }
+        public bool RightOfEntryReqd_bl { get; set; }
         
         [Column(TypeName = "text")] [StringLength(65535)]
         public string AccessInfo { get; set; }

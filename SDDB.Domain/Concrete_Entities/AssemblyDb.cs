@@ -83,7 +83,7 @@ namespace SDDB.Domain.Entities
 
         [Required]
         [DefaultValue(false)]
-        public bool IsReference { get; set; }
+        public bool IsReference_bl { get; set; }
                
         [Column(TypeName = "text")] [StringLength(65535)]
         public string TechnicalDetails { get; set; }

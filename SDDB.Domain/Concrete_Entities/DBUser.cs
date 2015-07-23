@@ -1,10 +1,8 @@
 ﻿using System;
 using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.AspNet.Identity;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.Web.Mvc;
 
 using SDDB.Domain.Infrastructure;
 using SDDB.Domain.Abstract;
@@ -32,7 +30,7 @@ namespace SDDB.Domain.Entities
         { get { return base.Email; } set { base.Email = value; } }
 
         [Required]
-        public bool LDAPAuthenticated { get; set; }
+        public bool LDAPAuthenticated_bl { get; set; }
 
         //TSP Column Wireup ---------------------------------------------------------------------------------------------------//
 
@@ -72,6 +70,7 @@ namespace SDDB.Domain.Entities
         public string[] ModifiedProperties { get; set; }
 
         [NotMapped]
+        [DefaultValue(true)]
         public bool IsActive_bl { get; set; }
 
 

@@ -61,7 +61,7 @@ namespace SDDB.Domain.Entities
                 
         [Required]
         [DefaultValue(false)]
-        public bool CalibrationReqd { get; set; }
+        public bool CalibrationReqd_bl { get; set; }
 
         [DBIsDateISO]
         public DateTime? LastCalibrationDate { get; set; }

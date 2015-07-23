@@ -426,6 +426,10 @@
     <Compile Include="Migrations\201507201836301_PersonLogEntryFile2.Designer.cs">
       <DependentUpon>201507201836301_PersonLogEntryFile2.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201507221812429_changeToBl.cs" />
+    <Compile Include="Migrations\201507221812429_changeToBl.Designer.cs">
+      <DependentUpon>201507221812429_changeToBl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -618,6 +622,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201507201836301_PersonLogEntryFile2.resx">
       <DependentUpon>201507201836301_PersonLogEntryFile2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201507221812429_changeToBl.resx">
+      <DependentUpon>201507221812429_changeToBl.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

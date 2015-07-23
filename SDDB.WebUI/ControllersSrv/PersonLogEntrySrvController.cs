@@ -73,7 +73,6 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonLogEntryService.EditAsync";
             ViewBag.StatusCode = HttpStatusCode.OK; 
-            
             return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
         }
 
@@ -89,7 +88,6 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "PersonLogEntryService.DeleteAsync";
             ViewBag.StatusCode = HttpStatusCode.OK;
-            
             return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
@@ -133,22 +131,12 @@ namespace SDDB.WebUI.ControllersSrv
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(ids).ConfigureAwait(false)))
             { return JsonResponseForNoRights(); }
 
-            var serviceResult = await prsLogEntryService.EditPrsLogEntryAssysAsync(ids, idsAddRem, isAdd).ConfigureAwait(false);
+            await prsLogEntryService.AddRemoveRelated(ids, idsAddRem, (PersonLogEntry x) => x.PrsLogEntryAssemblyDbs ,isAdd)
+                .ConfigureAwait(false);
 
-            ViewBag.ServiceName = "PersonLogEntryService.EditPrsLogEntryAssysAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            ViewBag.ServiceName = "PersonLogEntryService.AddRemoveRelated";
+            ViewBag.StatusCode = HttpStatusCode.OK;
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -191,22 +179,12 @@ namespace SDDB.WebUI.ControllersSrv
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(ids).ConfigureAwait(false)))
             { return JsonResponseForNoRights(); }
 
-            var serviceResult = await prsLogEntryService.EditPrsLogEntryPersonsAsync(ids, idsAddRem, isAdd).ConfigureAwait(false);
+            await prsLogEntryService.AddRemoveRelated(ids, idsAddRem, (PersonLogEntry x) => x.PrsLogEntryPersons, isAdd)
+                .ConfigureAwait(false);
 
-            ViewBag.ServiceName = "PersonLogEntryService.EditPrsLogEntryPersonsAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            ViewBag.ServiceName = "PersonLogEntryService.AddRemoveRelated";
+            ViewBag.StatusCode = HttpStatusCode.OK;
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
