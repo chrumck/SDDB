@@ -505,38 +505,7 @@ namespace SDDB.UnitTests
             mockEfDbContext.Verify(x => x.ComponentLogEntrys.Add(It.IsAny<ComponentLogEntry>()), Times.Once);
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
-
-        [TestMethod]
-        public void ComponentService_EditAsync_ReturnsExceptionFromSaveChanges()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var initialId = "dummyEntryId1";
-            var component1 = new Component { Id = initialId, CompName = "Comp1", CompAltName = "CompAlt1", IsActive_bl = false, ProgramAddress = "DummyInfo1" };
-            var components = new Component[] { component1 };
-
-            mockEfDbContext.Setup(x => x.Components.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<Component>(null));
-            mockEfDbContext.Setup(x => x.Components.Add(component1)).Returns(component1);
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
-
-            var componentService = new ComponentService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = componentService.EditAsync("DummyUserId", components).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            var regex = new Regex(@"\w*-\w*-\w*-\w*-\w*"); Assert.IsTrue(regex.IsMatch(component1.Id));
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-
-        }
-
+        
         //-----------------------------------------------------------------------------------------------------------------------
 
         [TestMethod]
@@ -572,40 +541,6 @@ namespace SDDB.UnitTests
             mockEfDbContext.Verify(x => x.Components.FindAsync(It.IsAny<string>()), Times.Exactly(2));
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
-
-        [TestMethod]
-        public void ComponentService_DeleteAsync_DeletesAndReturnsErrorifSaveException()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var componentIds = new string[] { "dummyId1" };
-
-            var dbEntry = new Component { IsActive_bl = true };
-            mockEfDbContext.Setup(x => x.Components.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
-
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
-
-            var componentService = new ComponentService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = componentService.DeleteAsync(componentIds).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            Assert.IsTrue(dbEntry.IsActive_bl == false);
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.Components.FindAsync(It.IsAny<string>()), Times.Once);
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-        }
-
 
         //-----------------------------------------------------------------------------------------------------------------------
 
@@ -747,55 +682,6 @@ namespace SDDB.UnitTests
 
             //Assert
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
-            Assert.IsTrue(componentExt1.Attr01 == dbEntry1.Attr01); Assert.IsTrue(componentExt1.Attr02 == dbEntry1.Attr02);
-            Assert.IsTrue(componentExt1.Attr03 != dbEntry1.Attr03); Assert.IsTrue(componentExt1.Attr04 != dbEntry1.Attr04);
-            Assert.IsTrue(componentExt2.Attr01 != dbEntry2.Attr01); Assert.IsTrue(componentExt2.Attr02 != dbEntry2.Attr02);
-            Assert.IsTrue(componentExt2.Attr03 != dbEntry2.Attr03); Assert.IsTrue(componentExt2.Attr04 != dbEntry2.Attr04);
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.ComponentExts.FindAsync(It.IsAny<string>()), Times.Exactly(2));
-            mockEfDbContext.Verify(x => x.Components.FindAsync(It.IsAny<string>()), Times.Never);
-            mockEfDbContext.Verify(x => x.ComponentExts.Add(It.IsAny<ComponentExt>()), Times.Never);
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-        }
-
-        [TestMethod]
-        public void ComponentService_EditExtAsync_ReturnsErrorFromSaveChanges()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var componentExt1 = new ComponentExt { Id = "dummyEntryId1", Attr01 = "Attr01", Attr02 = "Attr02", Attr03 = "Attr03", Attr04 = "Attr04",
-                ModifiedProperties = new string[] { "Attr01", "Attr02" } };
-            var componentExt2 = new ComponentExt { Id = "dummyEntryId2", Attr01 = "Attr05", Attr02 = "Attr06", Attr03 = "Attr07", Attr04 = "Attr08" };
-            var componentExts = new ComponentExt[] { componentExt1, componentExt2 };
-
-            var component1 = new Component { Id = "dummyEntryId1" };
-            var component2 = new Component { Id = "dummyEntryId2" };
-            var components = new Component[] { component1, component2 };
-
-            var dbEntry1 = new ComponentExt { Id = "dummyEntryId1", Attr01 = "Attr09", Attr02 = "Attr10", Attr03 = "Attr11", Attr04 = "Attr12" };
-            var dbEntry2 = new ComponentExt { Id = "dummyEntryId2", Attr01 = "Attr13", Attr02 = "Attr14", Attr03 = "Attr15", Attr04 = "Attr16" };
-            
-            mockEfDbContext.Setup(x => x.ComponentExts.FindAsync(componentExt1.Id)).Returns(Task.FromResult(dbEntry1));
-            mockEfDbContext.Setup(x => x.ComponentExts.FindAsync(componentExt2.Id)).Returns(Task.FromResult(dbEntry2));
-            mockEfDbContext.Setup(x => x.Components.FindAsync(component1.Id)).Returns(Task.FromResult(component1));
-            mockEfDbContext.Setup(x => x.Components.FindAsync(component2.Id)).Returns(Task.FromResult(component2));
-            mockEfDbContext.Setup(x => x.ComponentExts.Add(It.IsAny<ComponentExt>())).Verifiable();
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
-
-            var componentService = new ComponentService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = componentService.EditExtAsync(componentExts).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
             Assert.IsTrue(componentExt1.Attr01 == dbEntry1.Attr01); Assert.IsTrue(componentExt1.Attr02 == dbEntry1.Attr02);
             Assert.IsTrue(componentExt1.Attr03 != dbEntry1.Attr03); Assert.IsTrue(componentExt1.Attr04 != dbEntry1.Attr04);
             Assert.IsTrue(componentExt2.Attr01 != dbEntry2.Attr01); Assert.IsTrue(componentExt2.Attr02 != dbEntry2.Attr02);

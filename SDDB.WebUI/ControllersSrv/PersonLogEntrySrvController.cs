@@ -318,7 +318,7 @@ namespace SDDB.WebUI.ControllersSrv
         //check if person log entry belongs to user
         private async Task<bool> isUserActivity(string[] ids)
         {
-            var dbEntries = await prsLogEntryService.GetAsync(ids).ConfigureAwait(false);
+            var dbEntries = await prsLogEntryService.GetAllAsync(ids).ConfigureAwait(false);
             if (dbEntries.Count() == 0) { return true; }
             return dbEntries.All(x => x.EnteredByPerson_Id == UserId);
         }

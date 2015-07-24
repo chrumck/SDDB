@@ -455,37 +455,7 @@ namespace SDDB.UnitTests
             mockEfDbContext.Verify(x => x.Locations.Add(It.IsAny<Location>()), Times.Never);
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
-
-        [TestMethod]
-        public void LocationService_EditAsync_ReturnsExceptionFromSaveChanges()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var initialId = "dummyEntryId1";
-            var location1 = new Location { Id = initialId, LocName = "Loc1", LocAltName = "LocAlt1", IsActive_bl = false, AccessInfo = "DummyInfo1" };
-            var locations = new Location[] { location1 };
-
-            mockEfDbContext.Setup(x => x.Locations.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<Location>(null));
-            mockEfDbContext.Setup(x => x.Locations.Add(location1)).Returns(location1);
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
-
-            var locationService = new LocationService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = locationService.EditAsync(locations).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            var regex = new Regex(@"\w*-\w*-\w*-\w*-\w*"); Assert.IsTrue(regex.IsMatch(location1.Id));
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-
-        }
+               
 
         //-----------------------------------------------------------------------------------------------------------------------
 
@@ -532,51 +502,6 @@ namespace SDDB.UnitTests
             mockEfDbContext.Verify(x => x.Locations.FindAsync(It.IsAny<string>()), Times.Exactly(2));
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
-
-        [TestMethod]
-        public void LocationService_DeleteAsync_DeletesAndReturnsErrorifSaveException()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var locationIds = new string[] { "dummyId1" };
-
-            var assyDbEntry1 = new AssemblyDb { Id = "assyDummyId1", AssyName = "Name1", AssyAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
-            var assyDbEntries = (new List<AssemblyDb> { assyDbEntry1 }).AsQueryable();
-            var mockAssyDbSet = new Mock<DbSet<AssemblyDb>>();
-            mockAssyDbSet.As<IDbAsyncEnumerable<AssemblyDb>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<AssemblyDb>(assyDbEntries.GetEnumerator()));
-            mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<AssemblyDb>(assyDbEntries.Provider));
-            mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.Expression).Returns(assyDbEntries.Expression);
-            mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.ElementType).Returns(assyDbEntries.ElementType);
-            mockAssyDbSet.As<IQueryable<AssemblyDb>>().Setup(m => m.GetEnumerator()).Returns(assyDbEntries.GetEnumerator());
-            mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockAssyDbSet.Object);
-
-            var dbEntry = new Location { IsActive_bl = true };
-            mockEfDbContext.Setup(x => x.Locations.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
-
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
-
-            var locationService = new LocationService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = locationService.DeleteAsync(locationIds).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            Assert.IsTrue(dbEntry.IsActive_bl == false);
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.Locations.FindAsync(It.IsAny<string>()), Times.Once);
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-        }
-
-
 
     }
 }

@@ -44,7 +44,8 @@ namespace SDDB.Domain.Services
         {
             var dbEntry = await appUserManager.FindAsync(userName, password).ConfigureAwait(false);
             if (dbEntry == null) return null;
-            else return await appUserManager.CreateIdentityAsync(dbEntry, DefaultAuthenticationTypes.ApplicationCookie).ConfigureAwait(false);
+            else return await appUserManager.CreateIdentityAsync(dbEntry, DefaultAuthenticationTypes.ApplicationCookie)
+                .ConfigureAwait(false);
         }
 
 
@@ -64,7 +65,9 @@ namespace SDDB.Domain.Services
             var errorMessage = "";
             foreach (var record in records)
             {
-                if (!record.LDAPAuthenticated_bl && record.PropIsModified(x => x.LDAPAuthenticated_bl) && String.IsNullOrEmpty(record.Password))
+                if (!record.LDAPAuthenticated_bl &&
+                    record.PropIsModified(x => x.LDAPAuthenticated_bl) &&
+                    String.IsNullOrEmpty(record.Password))
                 {
                     errorMessage += String.Format("User {0}: Password is required if not LDAP authenticated\n", record.UserName); continue;
                 }
@@ -75,7 +78,8 @@ namespace SDDB.Domain.Services
                 if (dbEntry == null)
                 {
                     var identityResult = await appUserManager.CreateAsync(record, record.Password).ConfigureAwait(false);
-                    errorMessage += (identityResult.Succeeded) ? "" : String.Format("User {0}:{1}\n", record.UserName, getErrorsFromIdResult(identityResult));
+                    errorMessage += (identityResult.Succeeded) ? "" : 
+                        String.Format("User {0}:{1}\n", record.UserName, getErrorsFromIdResult(identityResult));
                 }
                 else
                 {
@@ -85,7 +89,8 @@ namespace SDDB.Domain.Services
                     if (record.PropIsModified(x => x.Password)) dbEntry.PasswordHash = appUserManager.HashPassword(record.Password);
 
                     var identityResult = await appUserManager.UpdateAsync(dbEntry).ConfigureAwait(false);
-                    errorMessage += (identityResult.Succeeded) ? "" : String.Format("User {0}:{1}\n", record.UserName, getErrorsFromIdResult(identityResult));
+                    errorMessage += (identityResult.Succeeded) ? "" : 
+                        String.Format("User {0}:{1}\n", record.UserName, getErrorsFromIdResult(identityResult));
                 }
             }
             if (errorMessage == "") { return new DBResult(); }
@@ -188,7 +193,8 @@ namespace SDDB.Domain.Services
                                 identityResult = await appUserManager.RemoveFromRoleAsync(userId, dbRole).ConfigureAwait(false);
                             }
                         }
-                        errorMessage += (identityResult.Succeeded) ? "" : String.Format("User Id={0}:{1}\n", userId, getErrorsFromIdResult(identityResult));
+                        errorMessage += (identityResult.Succeeded) ? "" : 
+                            String.Format("User Id={0}:{1}\n", userId, getErrorsFromIdResult(identityResult));
                     }
                 }
             }

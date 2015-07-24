@@ -282,40 +282,7 @@ namespace SDDB.UnitTests
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
 
-        [TestMethod]
-        public void PersonService_EditAsync_ReturnsExceptionFromSaveChanges()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var mockAppUserManager = new Mock<IAppUserManager>();
-            var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
-
-            var initialId = "dummyEntryId1";
-            var debEntry1 = new Person { Id = initialId, FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
-            var persons = new Person[] { debEntry1 };
-
-            mockEfDbContext.Setup(x => x.Persons.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<Person>(null));
-            mockEfDbContext.Setup(x => x.Persons.Add(debEntry1)).Returns(debEntry1);
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
-
-            var personService = new PersonService(mockDbContextScopeFac.Object, mockDbUserService.Object);
-
-            //Act
-            var serviceResult = personService.EditAsync(persons).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            var regex = new Regex(@"\w*-\w*-\w*-\w*-\w*"); Assert.IsTrue(regex.IsMatch(debEntry1.Id));
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-
-        }
-
+        
         //-----------------------------------------------------------------------------------------------------------------------
 
         [TestMethod]
@@ -989,65 +956,6 @@ namespace SDDB.UnitTests
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
         }
-
-        [TestMethod]
-        public void PersonService_EditPrsProjectsAsync_ReturnsExceptionMessageFromSaveChanges()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var mockAppUserManager = new Mock<IAppUserManager>();
-            var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
-
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
-            var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
-            var mockDbSet = new Mock<DbSet<Person>>();
-            mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
-            mockDbSet.As<IQueryable<Person>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<Person>(personDbEntries.Provider));
-            mockDbSet.As<IQueryable<Person>>().Setup(m => m.Expression).Returns(personDbEntries.Expression);
-            mockDbSet.As<IQueryable<Person>>().Setup(m => m.ElementType).Returns(personDbEntries.ElementType);
-            mockDbSet.As<IQueryable<Person>>().Setup(m => m.GetEnumerator()).Returns(personDbEntries.GetEnumerator());
-            mockDbSet.Setup(x => x.Include(It.IsAny<string>())).Returns(mockDbSet.Object);
-
-            mockEfDbContext.Setup(x => x.Persons).Returns(mockDbSet.Object);
-
-            var dbEntry1 = new Project { Id = "ProjectId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1" };
-            var dbEntries = (new List<Project> { dbEntry1 }).AsQueryable();
-            var mockDbSet2 = new Mock<DbSet<Project>>();
-            mockDbSet2.As<IDbAsyncEnumerable<Project>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Project>(dbEntries.GetEnumerator()));
-            mockDbSet2.As<IQueryable<Project>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<Project>(dbEntries.Provider));
-            mockDbSet2.As<IQueryable<Project>>().Setup(m => m.Expression).Returns(dbEntries.Expression);
-            mockDbSet2.As<IQueryable<Project>>().Setup(m => m.ElementType).Returns(dbEntries.ElementType);
-            mockDbSet2.As<IQueryable<Project>>().Setup(m => m.GetEnumerator()).Returns(dbEntries.GetEnumerator());
-
-            mockEfDbContext.Setup(x => x.Projects).Returns(mockDbSet2.Object);
-
-            var projectIds = new string[] { "" };
-            var personIds = new string[] { "" };
-
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyExceptionMessage"));
-            //Returns(Task.FromResult<int>(throw new ArgumentException("DummyExceptionMessage"); ));
-
-            var personService = new PersonService(mockDbContextScopeFac.Object, mockDbUserService.Object);
-
-            //Act
-            var serviceResult = personService.EditPersonProjectsAsync(personIds, projectIds, false).Result;
-
-            //Assert
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.Persons, Times.Once);
-            mockEfDbContext.Verify(x => x.Projects, Times.Once);
-            Assert.IsTrue(!personDbEntry1.PersonProjects.Contains(dbEntry1));
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyExceptionMessage"));
-        }
-        
         
         //-----------------------------------------------------------------------------------------------------------------------
         
@@ -1750,64 +1658,6 @@ namespace SDDB.UnitTests
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
         }
 
-        [TestMethod]
-        public void PersonService_EditPersonGroupsAsync_ReturnsExceptionMessageFromSaveChanges()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var mockAppUserManager = new Mock<IAppUserManager>();
-            var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
-
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
-            var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
-            var mockDbSet = new Mock<DbSet<Person>>();
-            mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
-            mockDbSet.As<IQueryable<Person>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<Person>(personDbEntries.Provider));
-            mockDbSet.As<IQueryable<Person>>().Setup(m => m.Expression).Returns(personDbEntries.Expression);
-            mockDbSet.As<IQueryable<Person>>().Setup(m => m.ElementType).Returns(personDbEntries.ElementType);
-            mockDbSet.As<IQueryable<Person>>().Setup(m => m.GetEnumerator()).Returns(personDbEntries.GetEnumerator());
-            mockDbSet.Setup(x => x.Include(It.IsAny<string>())).Returns(mockDbSet.Object);
-
-            mockEfDbContext.Setup(x => x.Persons).Returns(mockDbSet.Object);
-
-            var dbEntry1 = new PersonGroup { Id = "DummyId1", PrsGroupName = "Dummy1", PrsGroupAltName = "DummyAlt1", IsActive_bl = true };
-            var dbEntries = (new List<PersonGroup> { dbEntry1 }).AsQueryable();
-            var mockDbSet2 = new Mock<DbSet<PersonGroup>>();
-            mockDbSet2.As<IDbAsyncEnumerable<PersonGroup>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonGroup>(dbEntries.GetEnumerator()));
-            mockDbSet2.As<IQueryable<PersonGroup>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<PersonGroup>(dbEntries.Provider));
-            mockDbSet2.As<IQueryable<PersonGroup>>().Setup(m => m.Expression).Returns(dbEntries.Expression);
-            mockDbSet2.As<IQueryable<PersonGroup>>().Setup(m => m.ElementType).Returns(dbEntries.ElementType);
-            mockDbSet2.As<IQueryable<PersonGroup>>().Setup(m => m.GetEnumerator()).Returns(dbEntries.GetEnumerator());
-
-            mockEfDbContext.Setup(x => x.PersonGroups).Returns(mockDbSet2.Object);
-
-            var personGroupIds = new string[] { "" };
-            var personIds = new string[] { "" };
-
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyExceptionMessage"));
-            //Returns(Task.FromResult<int>(throw new ArgumentException("DummyExceptionMessage"); ));
-
-            var personService = new PersonService(mockDbContextScopeFac.Object, mockDbUserService.Object);
-
-            //Act
-            var serviceResult = personService.EditPersonGroupsAsync(personIds, personGroupIds, false).Result;
-
-            //Assert
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.Persons, Times.Once);
-            mockEfDbContext.Verify(x => x.PersonGroups, Times.Once);
-            Assert.IsTrue(!personDbEntry1.PersonGroups.Contains(dbEntry1));
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyExceptionMessage"));
-        }
-
         //-----------------------------------------------------------------------------------------------------------------------
 
         [TestMethod]
@@ -2260,64 +2110,6 @@ namespace SDDB.UnitTests
             Assert.IsTrue(!personDbEntry1.ManagedGroups.Contains(dbEntry1));
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
             Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
-        }
-
-        [TestMethod]
-        public void PersonService_EditManagedGroupsAsync_ReturnsExceptionMessageFromSaveChanges()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var mockAppUserManager = new Mock<IAppUserManager>();
-            var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
-
-            var personDbEntry1 = new Person { Id = "EntryId1", FirstName = "First1", LastName = "Last1", IsActive_bl = false, Initials = "FLA1" };
-            var personDbEntries = (new List<Person> { personDbEntry1 }).AsQueryable();
-            var mockDbSet = new Mock<DbSet<Person>>();
-            mockDbSet.As<IDbAsyncEnumerable<Person>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Person>(personDbEntries.GetEnumerator()));
-            mockDbSet.As<IQueryable<Person>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<Person>(personDbEntries.Provider));
-            mockDbSet.As<IQueryable<Person>>().Setup(m => m.Expression).Returns(personDbEntries.Expression);
-            mockDbSet.As<IQueryable<Person>>().Setup(m => m.ElementType).Returns(personDbEntries.ElementType);
-            mockDbSet.As<IQueryable<Person>>().Setup(m => m.GetEnumerator()).Returns(personDbEntries.GetEnumerator());
-            mockDbSet.Setup(x => x.Include(It.IsAny<string>())).Returns(mockDbSet.Object);
-
-            mockEfDbContext.Setup(x => x.Persons).Returns(mockDbSet.Object);
-
-            var dbEntry1 = new PersonGroup { Id = "DummyId1", PrsGroupName = "Dummy1", PrsGroupAltName = "DummyAlt1", IsActive_bl = true };
-            var dbEntries = (new List<PersonGroup> { dbEntry1 }).AsQueryable();
-            var mockDbSet2 = new Mock<DbSet<PersonGroup>>();
-            mockDbSet2.As<IDbAsyncEnumerable<PersonGroup>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonGroup>(dbEntries.GetEnumerator()));
-            mockDbSet2.As<IQueryable<PersonGroup>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<PersonGroup>(dbEntries.Provider));
-            mockDbSet2.As<IQueryable<PersonGroup>>().Setup(m => m.Expression).Returns(dbEntries.Expression);
-            mockDbSet2.As<IQueryable<PersonGroup>>().Setup(m => m.ElementType).Returns(dbEntries.ElementType);
-            mockDbSet2.As<IQueryable<PersonGroup>>().Setup(m => m.GetEnumerator()).Returns(dbEntries.GetEnumerator());
-
-            mockEfDbContext.Setup(x => x.PersonGroups).Returns(mockDbSet2.Object);
-
-            var personGroupIds = new string[] { "" };
-            var personIds = new string[] { "" };
-
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyExceptionMessage"));
-            //Returns(Task.FromResult<int>(throw new ArgumentException("DummyExceptionMessage"); ));
-
-            var personService = new PersonService(mockDbContextScopeFac.Object, mockDbUserService.Object);
-
-            //Act
-            var serviceResult = personService.EditManagedGroupsAsync(personIds, personGroupIds, false).Result;
-
-            //Assert
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.Persons, Times.Once);
-            mockEfDbContext.Verify(x => x.PersonGroups, Times.Once);
-            Assert.IsTrue(!personDbEntry1.ManagedGroups.Contains(dbEntry1));
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyExceptionMessage"));
         }
 
     }

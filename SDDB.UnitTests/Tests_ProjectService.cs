@@ -250,40 +250,6 @@ namespace SDDB.UnitTests
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
 
-        [TestMethod]
-        public void ProjectService_EditAsync_ReturnsExceptionFromSaveChanges()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var mockAppUserManager = new Mock<IAppUserManager>();
-            var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppUserManager.Object, mockDbContextScopeFac.Object, true });
-            var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
-
-            var initialId = "dummyEntryId1";
-            var dbEntry1 = new Project { Id = initialId, ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = false, ProjectCode = "CODE1" };
-            var projects = new Project[] { dbEntry1 };
-
-            mockEfDbContext.Setup(x => x.Projects.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<Project>(null));
-            mockEfDbContext.Setup(x => x.Projects.Add(dbEntry1)).Returns(dbEntry1);
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
-
-            var projectService = new ProjectService(mockDbContextScopeFac.Object, mockPersonService.Object);
-
-            //Act
-            var serviceResult = projectService.EditAsync(projects).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            var regex = new Regex(@"\w*-\w*-\w*-\w*-\w*"); Assert.IsTrue(regex.IsMatch(dbEntry1.Id));
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-
-        }
 
         //-----------------------------------------------------------------------------------------------------------------------
 

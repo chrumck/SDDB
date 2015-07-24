@@ -31,6 +31,8 @@ namespace SDDB.WebUI
             var dbLoggingLevel = int.Parse(ConfigurationManager.AppSettings["dbLoggingLevel"] ?? "1");
             var procTooLongmSec = int.Parse(ConfigurationManager.AppSettings["procTooLongmSec"] ?? "0");
             
+            var userId = ((ClaimsIdentity)HttpContext.Current.User.Identity).FindFirst(ClaimTypes.Sid).Value;
+
             //following Krystian's advice - file storage on FTP is discontinued
             //var ftpAddress = ConfigurationManager.AppSettings["ftpAddress"] ?? "";
             //var ftpUserName = ConfigurationManager.AppSettings["ftpUserName"] ?? "";
@@ -68,11 +70,7 @@ namespace SDDB.WebUI
             builder.RegisterType<PersonGroupService>().AsSelf().InstancePerDependency();
             builder.RegisterType<PersonActivityTypeService>().AsSelf().InstancePerDependency();
             builder.RegisterType<PersonLogEntryService>().AsSelf().InstancePerDependency();
-            builder.RegisterType<PersonLogEntryFileService>().AsSelf()
-                .WithParameter(new ResolvedParameter(
-                    (pi, ctx) => pi.Name == "userId",
-                    (pi, ctx) => ((ClaimsIdentity)HttpContext.Current.User.Identity).FindFirst(ClaimTypes.Sid).Value))
-                .InstancePerDependency();
+            builder.RegisterType<PersonLogEntryFileService>().AsSelf().WithParameter("userId", userId).InstancePerDependency();
             
             builder.RegisterType<ProjectService>().AsSelf().InstancePerDependency();
             builder.RegisterType<ProjectEventService>().AsSelf().InstancePerDependency();

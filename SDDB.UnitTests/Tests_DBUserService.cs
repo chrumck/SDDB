@@ -254,7 +254,7 @@ namespace SDDB.UnitTests
             var dbEntry1 = new DBUser { Id = "dummyEntryId1", UserName = "EntryName1", Email = "EntryEmail1", LDAPAuthenticated_bl = true };
             var dbEntry2 = new DBUser { Id = "dummyEntryId2", UserName = "EntryName2", Email = "EntryEmail2", LDAPAuthenticated_bl = false };
             var dbUser1 = new DBUser { Id = "dummyUserId1", UserName = "UserName1", Email = "UserEmail1", LDAPAuthenticated_bl = false, Password = "NewPassword1", 
-                ModifiedProperties = new[] { "UserName", "Email", "LDAPAuthenticated", } };
+                ModifiedProperties = new[] { "UserName", "Email", "LDAPAuthenticated_bl", } };
             var dbUser2 = new DBUser { Id = "dummyUserId2", UserName = "UserName2", Email = "UserEmail2", LDAPAuthenticated_bl = true, Password = "NewPassword2" };
 
             var dbUsers = new DBUser[] { dbUser1, dbUser2 };
@@ -303,7 +303,7 @@ namespace SDDB.UnitTests
                 Email = "UserEmail1",
                 LDAPAuthenticated_bl = false,
                 Password = "NewPassword1",
-                ModifiedProperties = new[] { "UserName", "Email", "LDAPAuthenticated" }
+                ModifiedProperties = new[] { "UserName", "Email", "LDAPAuthenticated_bl" }
             };
             var dbUser2 = new DBUser
             {
@@ -362,7 +362,7 @@ namespace SDDB.UnitTests
                 Email = "UserEmail1",
                 LDAPAuthenticated_bl = false,
                 Password = "NewPassword1",
-                ModifiedProperties = new[] { "UserName", "Email", "LDAPAuthenticated", "Password" }
+                ModifiedProperties = new[] { "UserName", "Email", "LDAPAuthenticated_bl", "Password" }
             };
 
             var dbUsers = new DBUser[] { dbUser1 };
@@ -403,7 +403,7 @@ namespace SDDB.UnitTests
                 UserName = "UserName1",
                 Email = "UserEmail1",
                 LDAPAuthenticated_bl = false,
-                ModifiedProperties = new[] { "UserName", "Email", "LDAPAuthenticated" }
+                ModifiedProperties = new[] { "UserName", "Email", "LDAPAuthenticated_bl" }
             };
 
             var dbUsers = new DBUser[] { dbUser1 };
@@ -441,7 +441,7 @@ namespace SDDB.UnitTests
                 Email = "Email2",
                 LDAPAuthenticated_bl = false,
                 Password = "",
-                ModifiedProperties = new[] { "UserName", "Email", "LDAPAuthenticated" }
+                ModifiedProperties = new[] { "UserName", "Email", "LDAPAuthenticated_bl" }
             };
 
             var dbUsers = new DBUser[] { dbUser };

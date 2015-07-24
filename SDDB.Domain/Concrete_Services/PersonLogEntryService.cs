@@ -42,7 +42,7 @@ namespace SDDB.Domain.Services
                         x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
                         ids.Contains(x.Id) &&
                         x.IsActive_bl == getActive
-                    )
+                        )
                     .Include(x => x.EnteredByPerson)
                     .Include(x => x.PersonActivityType)
                     .Include(x => x.AssignedToProject)
@@ -56,7 +56,8 @@ namespace SDDB.Domain.Services
         }
 
         //get by PersonLogEntry ids - no filters on person Id and getActive
-        public virtual async Task<List<PersonLogEntry>> GetAsync(string[] ids)
+        //used by PersonLogEntrySrvController.isUserActivity(string[] ids)
+        public virtual async Task<List<PersonLogEntry>> GetAllAsync(string[] ids)
         {
             if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
 
@@ -102,7 +103,7 @@ namespace SDDB.Domain.Services
                            (startDate == null || x.LogEntryDateTime >= startDate) &&
                            (endDate == null || x.LogEntryDateTime <= endDate) &&
                            x.IsActive_bl == getActive
-                        ) 
+                           ) 
                        .Include(x => x.EnteredByPerson)
                        .Include(x => x.PersonActivityType)
                        .Include(x => x.AssignedToProject)
@@ -130,7 +131,7 @@ namespace SDDB.Domain.Services
                         x.IsActive_bl == getActive &&
                         (x.EnteredByPerson.Initials.Contains(query) || x.EnteredByPerson.LastName.Contains(query) ||
                             x.Comments.Contains(query) )
-                    )
+                        )
                     .Include(x => x.EnteredByPerson)
                     .ToListAsync().ConfigureAwait(false);
                 

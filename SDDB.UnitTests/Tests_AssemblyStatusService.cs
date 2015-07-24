@@ -326,38 +326,7 @@ namespace SDDB.UnitTests
             mockEfDbContext.Verify(x => x.AssemblyStatuss.Add(It.IsAny<AssemblyStatus>()), Times.Never);
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
-
-        [TestMethod]
-        public void AssemblyStatusService_EditAsync_ReturnsExceptionFromSaveChanges()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var initialId = "dummyEntryId1";
-            var assyStatus1 = new AssemblyStatus { Id = initialId, AssyStatusName = "Name1", AssyStatusAltName = "NameAlt1", IsActive_bl = false };
-            var assyStatuss = new AssemblyStatus[] { assyStatus1 };
-
-            mockEfDbContext.Setup(x => x.AssemblyStatuss.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<AssemblyStatus>(null));
-            mockEfDbContext.Setup(x => x.AssemblyStatuss.Add(assyStatus1)).Returns(assyStatus1);
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
-
-            var assyStatusService = new AssemblyStatusService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = assyStatusService.EditAsync(assyStatuss).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            var regex = new Regex(@"\w*-\w*-\w*-\w*-\w*"); Assert.IsTrue(regex.IsMatch(assyStatus1.Id));
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-
-        }
-
+                
         //-----------------------------------------------------------------------------------------------------------------------
 
         [TestMethod]
@@ -393,41 +362,6 @@ namespace SDDB.UnitTests
             mockEfDbContext.Verify(x => x.AssemblyStatuss.FindAsync(It.IsAny<string>()), Times.Exactly(2));
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
-
-        [TestMethod]
-        public void AssemblyStatusService_DeleteAsync_DeletesAndReturnsErrorifSaveException()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var ids = new string[] { "dummyId1" };
-
-            var dbEntry = new AssemblyStatus { IsActive_bl = true };
-            mockEfDbContext.Setup(x => x.AssemblyStatuss.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
-
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
-
-            var assyStatusService = new AssemblyStatusService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = assyStatusService.DeleteAsync(ids).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            Assert.IsTrue(dbEntry.IsActive_bl == false);
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.AssemblyStatuss.FindAsync(It.IsAny<string>()), Times.Once);
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-        }
-
-
-
+        
     }
 }

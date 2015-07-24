@@ -120,6 +120,7 @@
     <Compile Include="Abstract_Infrastructure\ILogger.cs" />
     <Compile Include="Abstract_Services\IAppRoleManager.cs" />
     <Compile Include="Abstract_Services\IAppUserManager.cs" />
+    <Compile Include="Concrete_Infrastructure\EFDbContextExtensions.cs" />
     <Compile Include="Concrete_DbContexts\EFDbContext.cs" />
     <Compile Include="Concrete_Entities\PersonLogEntryFileData.cs" />
     <Compile Include="Concrete_Entities\PersonLogEntryFile.cs" />

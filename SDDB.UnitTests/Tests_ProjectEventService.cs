@@ -418,37 +418,6 @@ namespace SDDB.UnitTests
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
 
-        [TestMethod]
-        public void ProjectEventService_EditAsync_ReturnsExceptionFromSaveChanges()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var initialId = "dummyEntryId1";
-            var event1 = new ProjectEvent { Id = initialId, EventName = "Event1", EventAltName = "EventAlt1", IsActive_bl = false,  };
-            var events = new ProjectEvent[] { event1 };
-
-            mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<ProjectEvent>(null));
-            mockEfDbContext.Setup(x => x.ProjectEvents.Add(event1)).Returns(event1);
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
-
-            var eventService = new ProjectEventService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = eventService.EditAsync(events).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            var regex = new Regex(@"\w*-\w*-\w*-\w*-\w*"); Assert.IsTrue(regex.IsMatch(event1.Id));
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-
-        }
-
         //-----------------------------------------------------------------------------------------------------------------------
 
         [TestMethod]
@@ -482,39 +451,6 @@ namespace SDDB.UnitTests
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.ProjectEvents.FindAsync(It.IsAny<string>()), Times.Exactly(2));
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-        }
-
-        [TestMethod]
-        public void ProjectEventService_DeleteAsync_DeletesAndReturnsErrorifSaveException()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var eventIds = new string[] { "dummyId1" };
-
-            var dbEntry = new ProjectEvent { IsActive_bl = true, EventClosed = new DateTime(2015, 10, 10), ClosedByPerson_Id = "DummyId" };
-            mockEfDbContext.Setup(x => x.ProjectEvents.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
-
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
-
-            var eventService = new ProjectEventService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = eventService.DeleteAsync(eventIds).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            Assert.IsTrue(dbEntry.IsActive_bl == false);
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.ProjectEvents.FindAsync(It.IsAny<string>()), Times.Once);
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
 

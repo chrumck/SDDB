@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Data.Entity;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using System.Reflection;
 
 using SDDB.Domain.Abstract;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SDDB.Domain.Infrastructure
 {
@@ -74,7 +72,7 @@ namespace SDDB.Domain.Infrastructure
             }
         }
 
-        //check is properites got modified and belong to logged properties
+        //check is properties got modified and belong to logged properties
         public static bool LoggedPropsModified<T>(this T instance, string[] loggedProperties) where T : IDbEntity
         {
             return instance.ModifiedProperties == null ? false : instance.ModifiedProperties.Any(x => loggedProperties.Contains(x));
@@ -88,7 +86,7 @@ namespace SDDB.Domain.Infrastructure
         private static void copyProperty<T>(T instance, T record, PropertyInfo property) where T: IDbEntity
         {
             var excludedProperties = new string[] { "Id", "TSP" };
-            if (property.GetMethod.IsVirtual) return;
+            if (property.GetMethod.IsVirtual && typeof(IDbEntity).GetProperty(property.Name) == null) return;
             if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) return;
             if (excludedProperties.Contains(property.Name)) return;
             property.SetValue(instance, property.GetValue(record));

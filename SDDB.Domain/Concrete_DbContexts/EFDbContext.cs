@@ -66,30 +66,5 @@ namespace SDDB.Domain.DbContexts
 
             base.OnModelCreating(modelBuilder);
         }
-
-        //Wire up Reload
-        public virtual void Reload(IDbEntity entity)
-        {
-            this.Entry(entity).Reload();
-        }
-
-        //attempt to save changes to DBContext, retry if exception on deadlock thrown
-        public async Task SaveChangesWithRetryAsync()
-        {
-            for (int i = 1; i <= 10; i++)
-            {
-                try
-                {
-                    await SaveChangesAsync().ConfigureAwait(false);
-                    break;
-                }
-                catch (Exception e)
-                {
-                    if (i == 10 || !e.GetBaseException().Message.Contains("Deadlock found when trying to get lock")) { throw; }
-                }
-                await Task.Delay(200).ConfigureAwait(false);
-            }
-        }
-
     }
 }

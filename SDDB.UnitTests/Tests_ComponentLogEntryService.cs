@@ -293,37 +293,6 @@ namespace SDDB.UnitTests
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
 
-        [TestMethod]
-        public void ComponentLogEntryService_EditAsync_ReturnsExceptionFromSaveChanges()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var initialId = "dummyEntryId1";
-            var compLogEntry1 = new ComponentLogEntry { Id = initialId, Component_Id = "CLCompId1", AssignedToProject_Id = "CLProjId1", IsActive_bl = false, Comments = "CLComments1" };
-            var compLogEntrys = new ComponentLogEntry[] { compLogEntry1 };
-
-            mockEfDbContext.Setup(x => x.ComponentLogEntrys.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<ComponentLogEntry>(null));
-            mockEfDbContext.Setup(x => x.ComponentLogEntrys.Add(compLogEntry1)).Returns(compLogEntry1);
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
-
-            var compLogEntryService = new ComponentLogEntryService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = compLogEntryService.EditAsync(compLogEntrys).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            var regex = new Regex(@"\w*-\w*-\w*-\w*-\w*"); Assert.IsTrue(regex.IsMatch(compLogEntry1.Id));
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-
-        }
-
         //-----------------------------------------------------------------------------------------------------------------------
 
         [TestMethod]
@@ -359,41 +328,6 @@ namespace SDDB.UnitTests
             mockEfDbContext.Verify(x => x.ComponentLogEntrys.FindAsync(It.IsAny<string>()), Times.Exactly(2));
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
-
-        [TestMethod]
-        public void ComponentLogEntryService_DeleteAsync_DeletesAndReturnsErrorifSaveException()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var ids = new string[] { "dummyId1" };
-
-            var dbEntry = new ComponentLogEntry { IsActive_bl = true };
-            mockEfDbContext.Setup(x => x.ComponentLogEntrys.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
-
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
-
-            var compLogEntryService = new ComponentLogEntryService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = compLogEntryService.DeleteAsync(ids).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            Assert.IsTrue(dbEntry.IsActive_bl == false);
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.ComponentLogEntrys.FindAsync(It.IsAny<string>()), Times.Once);
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-        }
-
-
-
+        
     }
 }

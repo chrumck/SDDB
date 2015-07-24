@@ -505,39 +505,7 @@ namespace SDDB.UnitTests
             mockEfDbContext.Verify(x => x.AssemblyLogEntrys.Add(It.IsAny<AssemblyLogEntry>()), Times.Once);
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
-
-        
-        [TestMethod]
-        public void AssemblyDbService_EditAsync_ReturnsExceptionFromSaveChanges()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var initialId = "dummyEntryId1";
-            var assembly1 = new AssemblyDb { Id = initialId, AssyName = "Assy1", AssyAltName = "AssyAlt1", IsActive_bl = false, TechnicalDetails = "DummyInfo1" };
-            var assemblys = new AssemblyDb[] { assembly1 };
-
-            mockEfDbContext.Setup(x => x.AssemblyDbs.FindAsync(It.IsAny<string>())).Returns(Task.FromResult<AssemblyDb>(null));
-            mockEfDbContext.Setup(x => x.AssemblyDbs.Add(assembly1)).Returns(assembly1);
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
-
-            var assemblyService = new AssemblyDbService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = assemblyService.EditAsync("DummyUserId", assemblys).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            var regex = new Regex(@"\w*-\w*-\w*-\w*-\w*"); Assert.IsTrue(regex.IsMatch(assembly1.Id));
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-
-        }
-
+                       
         //-----------------------------------------------------------------------------------------------------------------------
 
         [TestMethod]
@@ -583,50 +551,6 @@ namespace SDDB.UnitTests
             mockEfDbContext.Verify(x => x.AssemblyDbs.FindAsync(It.IsAny<string>()), Times.Exactly(2));
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
-
-        [TestMethod]
-        public void AssemblyDbService_DeleteAsync_DeletesAndReturnsErrorifSaveException()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var assemblyIds = new string[] { "dummyId1" };
-
-            var compDbEntry1 = new Component { Id = "compDummyId1", CompName = "Name1", CompAltName = "AltName1", IsActive_bl = true, AssignedToProject_Id = "assignedProjId" };
-            var compDbEntries = (new List<Component> { compDbEntry1 }).AsQueryable();
-            var mockCompDbSet = new Mock<DbSet<Component>>();
-            mockCompDbSet.As<IDbAsyncEnumerable<Component>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<Component>(compDbEntries.GetEnumerator()));
-            mockCompDbSet.As<IQueryable<Component>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<Component>(compDbEntries.Provider));
-            mockCompDbSet.As<IQueryable<Component>>().Setup(m => m.Expression).Returns(compDbEntries.Expression);
-            mockCompDbSet.As<IQueryable<Component>>().Setup(m => m.ElementType).Returns(compDbEntries.ElementType);
-            mockCompDbSet.As<IQueryable<Component>>().Setup(m => m.GetEnumerator()).Returns(compDbEntries.GetEnumerator());
-            mockEfDbContext.Setup(x => x.Components).Returns(mockCompDbSet.Object);
-
-            var dbEntry = new AssemblyDb { IsActive_bl = true };
-            mockEfDbContext.Setup(x => x.AssemblyDbs.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
-
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
-
-            var assemblyService = new AssemblyDbService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = assemblyService.DeleteAsync(assemblyIds).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            Assert.IsTrue(dbEntry.IsActive_bl == false);
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.AssemblyDbs.FindAsync(It.IsAny<string>()), Times.Once);
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-        }
-
 
         //-----------------------------------------------------------------------------------------------------------------------
 
@@ -780,54 +704,7 @@ namespace SDDB.UnitTests
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
 
-        [TestMethod]
-        public void AssemblyDbService_EditExtAsync_ReturnsErrorFromSaveChanges()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var assemblyExt1 = new AssemblyExt { Id = "dummyEntryId1", Attr01 = "Attr01", Attr02 = "Attr02", Attr03 = "Attr03", Attr04 = "Attr04",
-                ModifiedProperties = new string[] { "Attr01", "Attr02" } };
-            var assemblyExt2 = new AssemblyExt { Id = "dummyEntryId2", Attr01 = "Attr05", Attr02 = "Attr06", Attr03 = "Attr07", Attr04 = "Attr08" };
-            var assemblyExts = new AssemblyExt[] { assemblyExt1, assemblyExt2 };
-
-            var assembly1 = new AssemblyDb { Id = "dummyEntryId1" };
-            var assembly2 = new AssemblyDb { Id = "dummyEntryId2" };
-            var assemblys = new AssemblyDb[] { assembly1, assembly2 };
-
-            var dbEntry1 = new AssemblyExt { Id = "dummyEntryId1", Attr01 = "Attr09", Attr02 = "Attr10", Attr03 = "Attr11", Attr04 = "Attr12" };
-            var dbEntry2 = new AssemblyExt { Id = "dummyEntryId2", Attr01 = "Attr13", Attr02 = "Attr14", Attr03 = "Attr15", Attr04 = "Attr16" };
-            
-            mockEfDbContext.Setup(x => x.AssemblyExts.FindAsync(assemblyExt1.Id)).Returns(Task.FromResult(dbEntry1));
-            mockEfDbContext.Setup(x => x.AssemblyExts.FindAsync(assemblyExt2.Id)).Returns(Task.FromResult(dbEntry2));
-            mockEfDbContext.Setup(x => x.AssemblyDbs.FindAsync(assembly1.Id)).Returns(Task.FromResult(assembly1));
-            mockEfDbContext.Setup(x => x.AssemblyDbs.FindAsync(assembly2.Id)).Returns(Task.FromResult(assembly2));
-            mockEfDbContext.Setup(x => x.AssemblyExts.Add(It.IsAny<AssemblyExt>())).Verifiable();
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Throws(new ArgumentException("DummyMessage"));
-
-            var assemblyService = new AssemblyDbService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = assemblyService.EditExtAsync(assemblyExts).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("DummyMessage"));
-            Assert.IsTrue(assemblyExt1.Attr01 == dbEntry1.Attr01); Assert.IsTrue(assemblyExt1.Attr02 == dbEntry1.Attr02);
-            Assert.IsTrue(assemblyExt1.Attr03 != dbEntry1.Attr03); Assert.IsTrue(assemblyExt1.Attr04 != dbEntry1.Attr04);
-            Assert.IsTrue(assemblyExt2.Attr01 != dbEntry2.Attr01); Assert.IsTrue(assemblyExt2.Attr02 != dbEntry2.Attr02);
-            Assert.IsTrue(assemblyExt2.Attr03 != dbEntry2.Attr03); Assert.IsTrue(assemblyExt2.Attr04 != dbEntry2.Attr04);
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.AssemblyExts.FindAsync(It.IsAny<string>()), Times.Exactly(2));
-            mockEfDbContext.Verify(x => x.AssemblyDbs.FindAsync(It.IsAny<string>()), Times.Never);
-            mockEfDbContext.Verify(x => x.AssemblyExts.Add(It.IsAny<AssemblyExt>()), Times.Never);
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-        }
+        
 
     }
 }
