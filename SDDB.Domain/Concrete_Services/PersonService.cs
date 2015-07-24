@@ -161,11 +161,10 @@ namespace SDDB.Domain.Services
 
                 //tasks prior to desactivating:
                 //running dbUserService and deleting the SDDB accounts
-                var serviceResult = await dbUserService.DeleteAsync(ids).ConfigureAwait(false);
+                await dbUserService.DeleteAsync(ids).ConfigureAwait(false);
                 //removing persons from PersonGroups
                 var groupIds = await dbContext.PersonGroups.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
-                if (serviceResult.StatusCode == HttpStatusCode.OK)
-                    serviceResult = await EditPersonGroupsAsync(ids, groupIds, false).ConfigureAwait(false);
+                var serviceResult = await EditPersonGroupsAsync(ids, groupIds, false).ConfigureAwait(false);
                 if (serviceResult.StatusCode == HttpStatusCode.OK)
                     serviceResult = await EditManagedGroupsAsync(ids, groupIds, false).ConfigureAwait(false);
                 //removing persons from PersonProjects

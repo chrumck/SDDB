@@ -19,114 +19,73 @@ namespace SDDB.Domain.Services
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
-        private bool ldapAuthenticationEnabled;
+        IDbContextScopeFactory contextScopeFac;
         private IAppUserManager appUserManager;
-        private IDbContextScopeFactory contextScopeFac;
+        private bool ldapAuthenticationEnabled;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
-        public DBUserService(IAppUserManager appUserManager, IDbContextScopeFactory contextScopeFac, bool ldapAuthenticationEnabled)
+        public DBUserService(IDbContextScopeFactory contextScopeFac, IAppUserManager appUserManager, bool ldapAuthenticationEnabled)
         {
-            this.ldapAuthenticationEnabled = ldapAuthenticationEnabled;
-            this.appUserManager = appUserManager;
             this.contextScopeFac = contextScopeFac;
+            this.appUserManager = appUserManager;
+            this.ldapAuthenticationEnabled = ldapAuthenticationEnabled;
         }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
+
+        //get all users
+        public virtual Task<List<DBUser>> GetAsync()
+        {
+            return appUserManager.Users
+                .Include( x => x.Person)
+                .ToListAsync();
+        }
+
+        //get users by ids
+        public virtual Task<List<DBUser>> GetAsync(string[] ids)
+        {
+            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
+
+            return appUserManager.Users
+                .Where(x => ids.Contains((x.Id)))
+                .Include(x => x.Person)
+                .ToListAsync();
+        }
 
         //Wiring up IAppUserManager.FindByNameAsync
         public virtual Task<DBUser> FindByNameAsync(string userName)
         {
             return appUserManager.FindByNameAsync(userName);
         }
+        
+        //-----------------------------------------------------------------------------------------------------------------------
 
+        // Create and Update records given in []
+        public virtual async Task EditAsync(DBUser[] records)
+        {
+            if (records == null || records.Length == 0) { throw new ArgumentNullException("records"); }
+
+            checkDbUserBeforeEditHelperAsync(records);
+            await editDbUserHelperAsync(records);
+        }
+
+        // Delete records by their Ids
+        public virtual async Task DeleteAsync(string[] ids)
+        {
+            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
+
+            await deleteDbUserHelperAsync(ids).ConfigureAwait(false);
+        }
+        
         // Logging in user and returning identity result
         public virtual async Task<ClaimsIdentity> LoginAsync(string userName, string password)
         {
             var dbEntry = await appUserManager.FindAsync(userName, password).ConfigureAwait(false);
-            if (dbEntry == null) return null;
-            else return await appUserManager.CreateIdentityAsync(dbEntry, DefaultAuthenticationTypes.ApplicationCookie)
+            if (dbEntry == null) { return null; }
+            return await appUserManager.CreateIdentityAsync(dbEntry, DefaultAuthenticationTypes.ApplicationCookie)
                 .ConfigureAwait(false);
         }
 
-
-        //-----------------------------------------------------------------------------------------------------------------------
-
-        //get all users
-        public virtual Task<List<DBUser>> GetAsync()
-        {
-            return Task.FromResult(appUserManager.Users.Include( x => x.Person).ToList());
-        }
-
-        //-----------------------------------------------------------------------------------------------------------------------
-
-        // Create and Update DBUsers given in DBUser[]
-        public virtual async Task<DBResult> EditAsync(DBUser[] records)
-        {
-            var errorMessage = "";
-            foreach (var record in records)
-            {
-                if (!record.LDAPAuthenticated_bl &&
-                    record.PropIsModified(x => x.LDAPAuthenticated_bl) &&
-                    String.IsNullOrEmpty(record.Password))
-                {
-                    errorMessage += String.Format("User {0}: Password is required if not LDAP authenticated\n", record.UserName); continue;
-                }
-
-                if (record.LDAPAuthenticated_bl) { record.Password = Guid.NewGuid().ToString(); record.PasswordConf = record.Password; }
-
-                var dbEntry = await appUserManager.FindByIdAsync(record.Id).ConfigureAwait(false);
-                if (dbEntry == null)
-                {
-                    var identityResult = await appUserManager.CreateAsync(record, record.Password).ConfigureAwait(false);
-                    errorMessage += (identityResult.Succeeded) ? "" : 
-                        String.Format("User {0}:{1}\n", record.UserName, getErrorsFromIdResult(identityResult));
-                }
-                else
-                {
-                    if (record.PropIsModified(x => x.UserName)) dbEntry.UserName = record.UserName;
-                    if (record.PropIsModified(x => x.Email)) dbEntry.Email = record.Email;
-                    if (record.PropIsModified(x => x.LDAPAuthenticated_bl)) dbEntry.LDAPAuthenticated_bl = record.LDAPAuthenticated_bl;
-                    if (record.PropIsModified(x => x.Password)) dbEntry.PasswordHash = appUserManager.HashPassword(record.Password);
-
-                    var identityResult = await appUserManager.UpdateAsync(dbEntry).ConfigureAwait(false);
-                    errorMessage += (identityResult.Succeeded) ? "" : 
-                        String.Format("User {0}:{1}\n", record.UserName, getErrorsFromIdResult(identityResult));
-                }
-            }
-            if (errorMessage == "") { return new DBResult(); }
-            else
-            {
-                return new DBResult
-                {
-                    StatusCode = HttpStatusCode.Conflict,
-                    StatusDescription = "Errors editing records:\n" + errorMessage
-                };
-            }
-        }
-
-        // Delete DBUsers by their IDs
-        public virtual async Task<DBResult> DeleteAsync(string[] ids)
-        {
-            var errorMessage = "";
-            foreach (var id in ids)
-            {
-                DBUser user = await appUserManager.FindByIdAsync(id).ConfigureAwait(false);
-                if (user != null)
-                {
-                    IdentityResult result = await appUserManager.DeleteAsync(user).ConfigureAwait(false);
-                    if (!result.Succeeded) { errorMessage += string.Format("Id={0}: {1}\n", id, getErrorsFromIdResult(result)); }
-                }
-            }
-            if (errorMessage == "") { return new DBResult(); }
-            else
-            {
-                return new DBResult
-                {
-                    StatusCode = HttpStatusCode.Conflict,
-                    StatusDescription = "Errors deleting records:\n" + errorMessage
-                };
-            }
-        }
 
         //-----------------------------------------------------------------------------------------------------------------------
 
@@ -162,57 +121,147 @@ namespace SDDB.Domain.Services
         }
 
         //Add (or Remove  when set isAdd to false) roles to DBUSer
-        public virtual async Task<DBResult> EditRolesAsync(string[] ids, string[] idsAddRem, bool isAdd)
+        public virtual async Task AddRemoveRolesAsync(string[] ids, string[] roleNames, bool isAdd)
         {
-            if (ids == null || ids.Length == 0 || idsAddRem == null || idsAddRem.Length == 0)
-                return new DBResult { StatusCode = HttpStatusCode.BadRequest, StatusDescription = "arguments missing" };
+            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
+            if (roleNames == null || roleNames.Length == 0) { throw new ArgumentNullException("roleNames"); }
 
-            var errorMessage = "";
-            var identityResult = IdentityResult.Success;
-            
-            foreach (var userId in ids)
+            var users = await GetAsync(ids).ConfigureAwait(false);
+            if (users.Count != ids.Length) { throw new DbBadRequestException("Error adding/removing roles. User(s) not found."); }
+
+            foreach (var user in users)
             {
-                var dbEntry = await appUserManager.FindByIdAsync(userId).ConfigureAwait(false);
-                if (dbEntry == null) errorMessage += String.Format("User with Id={0} not found.\n", userId);
-                else
-                {
-                    var userRoles = await appUserManager.GetRolesAsync(userId).ConfigureAwait(false);
-                    foreach (var dbRole in idsAddRem)
-                    {
-                        if (isAdd)
-                        {
-                            if (!userRoles.Contains(dbRole))
-                            {
-                                identityResult = await appUserManager.AddToRoleAsync(userId, dbRole).ConfigureAwait(false);
-                            }
-                        }
-                        else
-                        {
-                            if (userRoles.Contains(dbRole))
-                            {
-                                identityResult = await appUserManager.RemoveFromRoleAsync(userId, dbRole).ConfigureAwait(false);
-                            }
-                        }
-                        errorMessage += (identityResult.Succeeded) ? "" : 
-                            String.Format("User Id={0}:{1}\n", userId, getErrorsFromIdResult(identityResult));
-                    }
-                }
-            }
-            if (errorMessage == "") { return new DBResult(); }
-            else
-            {
-                return new DBResult
-                {
-                    StatusCode = HttpStatusCode.Conflict,
-                    StatusDescription = "Errors editing records:\n" + errorMessage
-                };
+                await addRemoveRolesHelper(user, roleNames, isAdd).ConfigureAwait(false);
             }
         }
-
-
+        
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
 
+        //checkDbUserBeforeEditHelperAsync - single record
+        private void checkDbUserBeforeEditHelperAsync(DBUser record)
+        {
+            if (!record.LDAPAuthenticated_bl && record.PasswordChanged_bl && String.IsNullOrEmpty(record.Password))
+            {
+                throw new DbBadRequestException(
+                    String.Format("User {0}: Password is required if not LDAP authenticated\n", record.UserName));
+            }
+        }
+
+        //checkDbUserBeforeEditHelperAsync - override for array of records
+        private void checkDbUserBeforeEditHelperAsync(DBUser[] records)
+        {
+            for (int i = 0; i < records.Length; i++)
+            {
+                checkDbUserBeforeEditHelperAsync(records[i]);
+            }
+        }
+
+        //editDbUserHelperAsync - single record
+        private async Task editDbUserHelperAsync(DBUser record)
+        {
+            if (record.LDAPAuthenticated_bl)
+            { record.Password = Guid.NewGuid().ToString(); record.PasswordConf = record.Password; }
+
+            var dbEntry = await appUserManager.FindByIdAsync(record.Id).ConfigureAwait(false);
+            if (dbEntry == null)
+            {
+                var createResult = await appUserManager.CreateAsync(record, record.Password).ConfigureAwait(false);
+                if (!createResult.Succeeded)
+                {
+                    throw new DbBadRequestException(
+                        String.Format("Error creating user {0}:{1}\n", record.UserName, getErrorsFromIdResult(createResult)));
+                }
+            }
+            else
+            {
+                dbEntry.UserName = record.UserName;
+                dbEntry.Email = record.Email;
+                dbEntry.LDAPAuthenticated_bl = record.LDAPAuthenticated_bl;
+                if (record.PasswordChanged_bl) { dbEntry.PasswordHash = appUserManager.HashPassword(record.Password); }
+                var updateResult = await appUserManager.UpdateAsync(dbEntry).ConfigureAwait(false);
+                if (!updateResult.Succeeded)
+                {
+                    throw new DbBadRequestException(
+                        String.Format("Error editing user {0}:{1}\n", record.UserName, getErrorsFromIdResult(updateResult)));
+                }
+            }
+        }
+
+        //editDbUserHelperAsync - override for array of records
+        private async Task editDbUserHelperAsync(DBUser[] records)
+        {
+            for (int i = 0; i < records.Length; i++)
+            {
+                await editDbUserHelperAsync(records[i]);
+            }
+        }
+
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        //deleteDbUserHelperAsync - single record
+        private async Task deleteDbUserHelperAsync(string id)
+        {
+            var user = await appUserManager.FindByIdAsync(id).ConfigureAwait(false);
+            if (user == null) { throw new DbBadRequestException(string.Format("DB User with Id={0} not found", id)); }
+
+            var deleteResult = await appUserManager.DeleteAsync(user).ConfigureAwait(false);
+            if (!deleteResult.Succeeded)
+            {
+                throw new DbBadRequestException(
+                    string.Format("Error Deleting User {0}: {1}\n", user.UserName, getErrorsFromIdResult(deleteResult)));
+            }
+        }
+
+        //deleteDbUserHelperAsync - override for array of records
+        private async Task deleteDbUserHelperAsync(string[] ids)
+        {
+            for (int i = 0; i < ids.Length; i++)
+            {
+                await deleteDbUserHelperAsync(ids[i]).ConfigureAwait(false);
+            }
+        }
+
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        //helper - Add (or Remove  when set isAdd to false) roles to dbUser 
+        //taking taking single DBUser + rolenames and isAdd
+        private async Task addRemoveRolesHelper(DBUser user, string[] roleNames, bool isAdd)
+        {
+            var userRoles = await appUserManager.GetRolesAsync(user.Id).ConfigureAwait(false);
+            foreach (var dbRoleName in roleNames)
+            {
+                await addRemoveRoleHelper(user, userRoles, dbRoleName, isAdd).ConfigureAwait(false);
+            }
+        }
+
+        //helper - Add (or Remove  when set isAdd to false) role to dbUser 
+        //taking taking single roleName and dbUser + userRoles and isAdd
+        private async Task addRemoveRoleHelper(DBUser user, IList<string> userRoles, string roleName, bool isAdd)
+        {
+            if (isAdd && !userRoles.Contains(roleName))
+            {
+                var addResult = await appUserManager.AddToRoleAsync(user.Id, roleName).ConfigureAwait(false);
+                if (!addResult.Succeeded)
+                {
+                    throw new DbBadRequestException(string.Format("Error adding role {0} to user {1}: {2}",
+                        roleName, user.UserName, getErrorsFromIdResult(addResult)));
+                }
+            }
+            if (!isAdd && userRoles.Contains(roleName))
+            {
+                var removeResult = await appUserManager.RemoveFromRoleAsync(user.Id, roleName).ConfigureAwait(false);
+                if (!removeResult.Succeeded)
+                {
+                    throw new DbBadRequestException(string.Format("Error removing role {0} from user {1}: {2}",
+                        roleName, user.UserName, getErrorsFromIdResult(removeResult)));
+                }
+            }
+        }
+
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        //getErrorsFromIdResult
         private string getErrorsFromIdResult(IdentityResult identityResult)
         {
             string errorsFromResult = null;

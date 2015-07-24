@@ -73,11 +73,18 @@ namespace SDDB.Domain.Services
             {
                 var dbEntries = await getEntriesFromContextHelperAsync<T>(dbContext, ids, relatedCollectionName)
                     .ConfigureAwait(false);
-                if (dbEntries.Count != ids.Length){ throw new ArgumentException("Entry(ies) not found"); }
+                if (dbEntries.Count != ids.Length)
+                { 
+                    throw new DbBadRequestException(
+                        String.Format("Add/Remove to {0} failed, entry(ies) not found",relatedCollectionName));
+                }
 
                 var dbEntriesAddRem = await getEntriesFromContextHelperAsync<TAddRem>(dbContext, idsAddRem)
                     .ConfigureAwait(false);
-                if (dbEntriesAddRem.Count != idsAddRem.Length) { throw new ArgumentException("Related Entry(ies) not found"); }
+                if (dbEntriesAddRem.Count != idsAddRem.Length) {
+                    throw new DbBadRequestException(
+                        String.Format("Add/Remove to {0} failed, related entry(ies) not found", relatedCollectionName)); 
+                }
 
                 await addRemoveRelatedHelper(dbEntries, dbEntriesAddRem, relatedCollectionName, isAdd).ConfigureAwait(false);
 
@@ -180,7 +187,7 @@ namespace SDDB.Domain.Services
         protected virtual async Task<int> deleteHelperAsync(EFDbContext dbContext, string[] ids)
         {
             var dbEntries = await getEntriesFromContextHelperAsync<T>(dbContext, ids).ConfigureAwait(false);
-            if (dbEntries.Count() != ids.Length) { throw new ArgumentException("Entry(ies) not found"); }
+            if (dbEntries.Count() != ids.Length) { throw new DbBadRequestException("Delete failed, entry(ies) not found"); }
 
             dbEntries.ForEach(x => x.IsActive_bl = false);
             
@@ -191,7 +198,7 @@ namespace SDDB.Domain.Services
 
         //helper - Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T 
         //taking taking single T and TAddRem
-        protected async Task<int> addRemoveRelatedHelper<TAddRem>(T dbEntry, TAddRem dbEntryAddRem,
+        protected virtual async Task<int> addRemoveRelatedHelper<TAddRem>(T dbEntry, TAddRem dbEntryAddRem,
             string relatedCollectionName, bool isAdd) where TAddRem : IDbEntity
         {
             await Task.Run(() =>
@@ -207,7 +214,7 @@ namespace SDDB.Domain.Services
 
         //Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T 
         //overload taking lists of T and TAddRem
-        protected async Task<int> addRemoveRelatedHelper<TAddRem>(List<T> dbEntries, List<TAddRem> dbEntriesAddRem,
+        protected virtual async Task<int> addRemoveRelatedHelper<TAddRem>(List<T> dbEntries, List<TAddRem> dbEntriesAddRem,
             string relatedCollectionName, bool isAdd) where TAddRem : IDbEntity
         {
             foreach (var dbEntry in dbEntries)

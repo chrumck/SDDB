@@ -30,13 +30,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("DBUser_View")]
         public async Task<ActionResult> Get()
         {
-            var users = await dbUserService.GetAsync().ConfigureAwait(false);
-            var data = users.OrderBy(x => x.Person.LastName).Select(x => new {
-                x.Id, x.Person.LastName, x.Person.FirstName, x.UserName, x.Email, LDAPAuthenticated = x.LDAPAuthenticated_bl });
-
             ViewBag.ServiceName = "DBUserService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            var records = await dbUserService.GetAsync().ConfigureAwait(false);
+            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
         }
 
         //POST: /DBUserSrv/Get By Ids
@@ -44,14 +40,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("DBUser_View")]
         public async Task<ActionResult> GetByIds(string[] ids)
         {
-            var users = await dbUserService.GetAsync().ConfigureAwait(false);
-
-            var data = users.Where(x => ids.Contains((x.Id))).OrderBy(x => x.Person.LastName).Select(x => new {
-                x.Id, x.Person.LastName, x.Person.FirstName, x.UserName, x.Email, LDAPAuthenticated = x.LDAPAuthenticated_bl });
-
             ViewBag.ServiceName = "DBUserService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            var records = await dbUserService.GetAsync(ids).ConfigureAwait(false);
+            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -61,22 +52,10 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("DBUser_Edit")]
         public async Task<ActionResult> Edit(DBUser[] records)
         {
-            var serviceResult = await dbUserService.EditAsync(records).ConfigureAwait(false);
-
             ViewBag.ServiceName = "DBUserService.EditAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
 
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode; 
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            await dbUserService.EditAsync(records).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /DBUserSrv/Delete
@@ -84,22 +63,10 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("DBUser_Edit")]
         public async Task<ActionResult> Delete(string[] ids)
         {
-            var serviceResult = await dbUserService.DeleteAsync(ids).ConfigureAwait(false);
-
             ViewBag.ServiceName = "DBUserService.DeleteAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            
+            await dbUserService.DeleteAsync(ids).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
 
@@ -109,61 +76,54 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("DBUser_View")]
         public async Task<ActionResult> GetAllRoles()
         {
-            var data = (await dbUserService.GetAllRolesAsync().ConfigureAwait(false)).Select(x => new { Name = x });
-
             ViewBag.ServiceName = "DBUserService.GetAllRolesAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            var records = (await dbUserService.GetAllRolesAsync().ConfigureAwait(false)).Select(x => new { Name = x });
+            return Json(records, JsonRequestBehavior.AllowGet);
         }
 
         // GET: /DBUserSrv/GetUserRoles
         [DBSrvAuth("DBUser_View")]
         public async Task<ActionResult> GetUserRoles(string id)
         {
-            var data = (await dbUserService.GetUserRolesAsync(id).ConfigureAwait(false)).Select(x => new { Name = x });
-
             ViewBag.ServiceName = "DBUserService.GetUserRolesAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            var records = (await dbUserService.GetUserRolesAsync(id).ConfigureAwait(false)).Select(x => new { Name = x });
+            return Json(records, JsonRequestBehavior.AllowGet);
         }
 
         // GET: /DBUserSrv/GetUserRolesNot
         [DBSrvAuth("DBUser_View")]
         public async Task<ActionResult> GetUserRolesNot(string id)
         {
-            var data = (await dbUserService.GetUserRolesNotAsync(id).ConfigureAwait(false)).Select(x => new { Name = x });
-
             ViewBag.ServiceName = "DBUserService.GetUserRolesNotAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            var records = (await dbUserService.GetUserRolesNotAsync(id).ConfigureAwait(false)).Select(x => new { Name = x });
+            return Json(records, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /DBUserSrv/EditRoles
         [HttpPost]
         [DBSrvAuth("DBUser_Edit")]
-        public async Task<ActionResult> EditRoles(string[] ids, string[] idsAddRem, bool isAdd)
+        public async Task<ActionResult> EditRoles(string[] ids, string[] roleNames, bool isAdd)
         {
-            var serviceResult = await dbUserService.EditRolesAsync(ids, idsAddRem, isAdd).ConfigureAwait(false);
-
             ViewBag.ServiceName = "DBUserService.EditRolesAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            await dbUserService.AddRemoveRolesAsync(ids, roleNames, isAdd).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
 
+        //take data and select fields for JSON - full data set
+        private object filterForJsonFull(List<DBUser> records)
+        {
+            return records.Select(x => new 
+            {
+                x.Id,
+                x.Person.LastName,
+                x.Person.FirstName,
+                x.UserName, x.Email,
+                x.LDAPAuthenticated_bl 
+            }).ToList();
+        }
 
         #endregion
     }

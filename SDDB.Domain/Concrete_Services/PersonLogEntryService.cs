@@ -261,10 +261,10 @@ namespace SDDB.Domain.Services
                 var location = await dbContext.Locations.FindAsync(record.AssignedToLocation_Id).ConfigureAwait(false);
 
                 if (record.AssignedToProjectEvent_Id != null && projEvent.AssignedToProject_Id != record.AssignedToProject_Id)
-                { throw new ArgumentException("Log Entry and Project Event do not belong to the same project. Entry(ies) not saved."); }
+                { throw new DbBadRequestException("Log Entry and Project Event do not belong to the same project. Entry(ies) not saved."); }
                 
                 if (record.AssignedToLocation_Id != null && location.AssignedToProject_Id != record.AssignedToProject_Id)
-                { throw new ArgumentException("Log Entry and Location do not belong to the same project. Entry(ies) not saved."); }
+                { throw new DbBadRequestException("Log Entry and Location do not belong to the same project. Entry(ies) not saved."); }
         }
 
         //helper - editing single Db Entry - overriden from BaseDbService

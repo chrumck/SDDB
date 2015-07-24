@@ -28,11 +28,11 @@ namespace SDDB.WebUI.Infrastructure
                 {
                     ActionName = filterContext.RouteData.Values["action"].ToString(),
                     ControllerName = filterContext.RouteData.Values["controller"].ToString(),
-                    ServiceName = "DBExceptionAttribute",
+                    ServiceName = filterContext.Controller.ViewBag.ServiceName,
                     UserName = filterContext.HttpContext.User.Identity.Name,
                     UserHostAddress = filterContext.HttpContext.Request.UserHostAddress,
                     StatusCode = HttpStatusCode.InternalServerError,
-                    StatusDescription = "Exception thrown: " + filterContext.Exception.ToString()
+                    StatusDescription = "DBException thrown: " + filterContext.Exception.ToString()
                 };
                 Logger.LogResult(filterResult);
 

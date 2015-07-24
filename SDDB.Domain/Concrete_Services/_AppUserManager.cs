@@ -36,9 +36,6 @@ namespace SDDB.Domain.Services
     public class AppUserStore : UserStore<DBUser>
     {
         //Constructors---------------------------------------------------------------------------------------------------------//
-        public AppUserStore(EFDbContext context)
-            : base(context)
-        {
-        }
+        public AppUserStore(EFDbContext context) : base(context) { }
     }
 }

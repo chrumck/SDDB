@@ -34,12 +34,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
-            var records = await prsLogEntryService.GetAsync(ids, getActive).ConfigureAwait(false);
-
-            if (!User.IsInRole("PersonLogEntry_View")) { records = records.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
-            
             ViewBag.ServiceName = "PersonLogEntryService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
+            var records = await prsLogEntryService.GetAsync(ids, getActive).ConfigureAwait(false);
+            if (!User.IsInRole("PersonLogEntry_View")) { records = records.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
             return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
@@ -49,13 +46,10 @@ namespace SDDB.WebUI.ControllersSrv
         public async Task<ActionResult> GetByAltIds(string[] personIds, string[] projectIds, string[] assyIds, string[] typeIds,
             DateTime? startDate, DateTime? endDate, bool getActive = true)
         {
+            ViewBag.ServiceName = "PersonLogEntryService.GetByAltIdsAsync";
             var records = await prsLogEntryService.GetByAltIdsAsync(personIds, projectIds, assyIds, typeIds, startDate, endDate, getActive)
                 .ConfigureAwait(false);
-
             if (!User.IsInRole("PersonLogEntry_View")) { records = records.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
-
-            ViewBag.ServiceName = "PersonLogEntryService.GetByAltIdsAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
             return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
         
@@ -66,13 +60,10 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("PersonLogEntry_Edit,YourActivity_Edit")]
         public async Task<ActionResult> Edit(PersonLogEntry[] records)
         {
-            if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(records).ConfigureAwait(false)))
-            { return JsonResponseForNoRights(); }
-
-            var newEntryIds = await prsLogEntryService.EditAsync(records).ConfigureAwait(false);
-
             ViewBag.ServiceName = "PersonLogEntryService.EditAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK; 
+            if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(records).ConfigureAwait(false)))
+                { return JsonResponseForNoRights(); }
+            var newEntryIds = await prsLogEntryService.EditAsync(records).ConfigureAwait(false);
             return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
         }
 
@@ -81,13 +72,10 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("PersonLogEntry_Edit,YourActivity_Edit")]
         public async Task<ActionResult> Delete(string[] ids)
         {
+            ViewBag.ServiceName = "PersonLogEntryService.DeleteAsync";
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(ids).ConfigureAwait(false)))
             { return JsonResponseForNoRights(); }
-
             await prsLogEntryService.DeleteAsync(ids).ConfigureAwait(false);
-
-            ViewBag.ServiceName = "PersonLogEntryService.DeleteAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
@@ -97,14 +85,11 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("PersonLogEntry_View,YourActivity_View,Assembly_View")]
         public async Task<ActionResult> GetPrsLogEntryAssys(string logEntryId)
         {
+            ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryAssysAsync";
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
-            { return JsonResponseForNoRights(); }
-
+                { return JsonResponseForNoRights(); }
             var data = (await prsLogEntryService.GetPrsLogEntryAssysAsync(logEntryId).ConfigureAwait(false))
                 .Select(x => new { x.Id, x.AssyName, x.AssyAltName });
-
-            ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryAssysAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -112,14 +97,11 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("PersonLogEntry_View,YourActivity_View,Assembly_View")]
         public async Task<ActionResult> GetPrsLogEntryAssysNot(string logEntryId, string locId = null)
         {
+            ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryAssysNotAsync";
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
-            { return JsonResponseForNoRights(); }
-
+                { return JsonResponseForNoRights(); }
             var data = (await prsLogEntryService.GetPrsLogEntryAssysNotAsync(logEntryId, locId).ConfigureAwait(false))
                 .Select(x => new { x.Id, x.AssyName, x.AssyAltName });
-
-            ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryAssysNotAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -128,13 +110,10 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("PersonLogEntry_Edit,YourActivity_Edit,Assembly_Edit")]
         public async Task<ActionResult> EditPrsLogEntryAssys(string[] ids, string[] idsAddRem, bool isAdd)
         {
-            if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(ids).ConfigureAwait(false)))
-            { return JsonResponseForNoRights(); }
-
-            await prsLogEntryService.AddRemoveRelated(ids, idsAddRem, x => x.PrsLogEntryAssemblyDbs, isAdd).ConfigureAwait(false);
-
             ViewBag.ServiceName = "PersonLogEntryService.AddRemoveRelated";
-            ViewBag.StatusCode = HttpStatusCode.OK;
+            if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(ids).ConfigureAwait(false)))
+                { return JsonResponseForNoRights(); }
+            await prsLogEntryService.AddRemoveRelated(ids, idsAddRem, x => x.PrsLogEntryAssemblyDbs, isAdd).ConfigureAwait(false);
             return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
@@ -144,14 +123,11 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("PersonLogEntry_View,YourActivity_View,Person_View")]
         public async Task<ActionResult> GetPrsLogEntryPersons(string logEntryId)
         {
+            ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryPersonsAsync";
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
-            { return JsonResponseForNoRights(); }
-
+                { return JsonResponseForNoRights(); }
             var data = (await prsLogEntryService.GetPrsLogEntryPersonsAsync(logEntryId).ConfigureAwait(false))
                 .Select(x => new { x.Id, x.FirstName, x.LastName, x.Initials });
-
-            ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryPersonsAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -159,14 +135,11 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("PersonLogEntry_View,YourActivity_View,Person_View")]
         public async Task<ActionResult> GetPrsLogEntryPersonsNot(string logEntryId)
         {
+            ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryPersonsNotAsync";
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
-            { return JsonResponseForNoRights(); }
-
+                { return JsonResponseForNoRights(); }
             var data = (await prsLogEntryService.GetPrsLogEntryPersonsNotAsync(UserId, logEntryId).ConfigureAwait(false))
                 .Select(x => new { x.Id, x.FirstName, x.LastName, x.Initials });
-
-            ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryPersonsNotAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
@@ -175,13 +148,10 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("PersonLogEntry_Edit,YourActivity_Edit,Person_Edit")]
         public async Task<ActionResult> EditPrsLogEntryPersons(string[] ids, string[] idsAddRem, bool isAdd)
         {
-            if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(ids).ConfigureAwait(false)))
-            { return JsonResponseForNoRights(); }
-
-            await prsLogEntryService.AddRemoveRelated(ids, idsAddRem, x => x.PrsLogEntryPersons, isAdd).ConfigureAwait(false);
-
             ViewBag.ServiceName = "PersonLogEntryService.AddRemoveRelated";
-            ViewBag.StatusCode = HttpStatusCode.OK;
+            if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(ids).ConfigureAwait(false)))
+                { return JsonResponseForNoRights(); }
+            await prsLogEntryService.AddRemoveRelated(ids, idsAddRem, x => x.PrsLogEntryPersons, isAdd).ConfigureAwait(false);
             return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
@@ -333,7 +303,7 @@ namespace SDDB.WebUI.ControllersSrv
         //set viewbag, response http code and return JSON if user does not have PersonLogEntry_ rights
         private JsonResult JsonResponseForNoRights()
         {
-            ViewBag.StatusCode = HttpStatusCode.Conflict;
+            ViewBag.StatusCode = HttpStatusCode.BadRequest;
             ViewBag.StatusDescription = "You have insufficient privileges to edit or view other person's entries.";
             Response.StatusCode = (int)ViewBag.StatusCode;
             return Json(new { Success = "False", responseText = ViewBag.StatusDescription }, JsonRequestBehavior.AllowGet); 

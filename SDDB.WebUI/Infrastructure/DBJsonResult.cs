@@ -14,10 +14,7 @@ namespace SDDB.WebUI.Infrastructure
 
         public override void ExecuteResult(ControllerContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException("context");
-            }
+            if (context == null) { throw new ArgumentNullException("context"); }
 
             HttpResponseBase response = context.HttpContext.Response;
 
@@ -51,10 +48,7 @@ namespace SDDB.WebUI.Infrastructure
 
         public override void ExecuteResult(ControllerContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException("context");
-            }
+            if (context == null) { throw new ArgumentNullException("context"); }
 
             HttpResponseBase response = context.HttpContext.Response;
 
