@@ -274,48 +274,50 @@ function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
         .done(function (dbEntries) {
             var formInput = $.extend(true, {}, dbEntries[0]);
             $.each(dbEntries, function (i, dbEntry) {
-                for (var property in dbEntry) {
-                    if (dbEntry.hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
-                        if (property.slice(-3) == "_Id") {
-                            if (formInput[property] != dbEntry[property]) {
-                                formInput[property] = "_VARIES_"; formInput[property.slice(0, -2)] = "_VARIES_";
-                            }
-                            else {
-                                formInput[property.slice(0, -2)] = "";
-                                for (var subProp in dbEntry[property.slice(0, -2)]) {
-                                    if (dbEntry[property.slice(0, -2)][subProp] != null) {
-                                        if (formInput[property.slice(0, -2)] != "") formInput[property.slice(0, -2)] += " ";
-                                        formInput[property.slice(0, -2)] += dbEntry[property.slice(0, -2)][subProp];
-                                    }
+                $.each(dbEntry, function (i, property) {
+                    if (!dbEntry.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") {
+                        return true;
+                    }
+                    if (property.slice(-3) == "_Id") {
+                        if (formInput[property] != dbEntry[property]) {
+                            formInput[property] = "_VARIES_";
+                            formInput[property.slice(0, -2)] = "_VARIES_";
+                        }
+                        else {
+                            formInput[property.slice(0, -2)] = "";
+                            for (var subProp in dbEntry[property.slice(0, -2)]) {
+                                if (dbEntry[property.slice(0, -2)][subProp] != null) {
+                                    if (formInput[property.slice(0, -2)] != "") { formInput[property.slice(0, -2)] += " "; }
+                                    formInput[property.slice(0, -2)] += dbEntry[property.slice(0, -2)][subProp];
                                 }
                             }
                         }
-                        else {
-                            if (formInput[property] != dbEntry[property]) formInput[property] = "_VARIES_";
-                        }
+                        return true;
                     }
-                }
+                    if (formInput[property] != dbEntry[property]) { formInput[property] = "_VARIES_"; }
+                });
             });
-
-            for (var property in formInput) {
-                if (formInput.hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
-                    if (property.slice(-3) == "_Id") {
-                        $.each(msArray, function (i, ms) {
-                            if (ms.id == property) {
-                                if (formInput[property] != null) ms.addToSelection([{ id: formInput[property], name: formInput[property.slice(0, -2)] }], true);
-                                return false;
-                            }
-                        });
-                    }
-                    else if (property.slice(-3) == "_bl") {
-                        if (formInput[property] == true) $("#" + property).prop("checked", true);
-                    }
-                    else {
-                        $("#" + property).val(formInput[property]);
-                    }
+            $.each(formInput, function (i,property) {
+                if (!formInput.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") {
+                    return true;
                 }
-            }
-
+                if (property.slice(-3) == "_Id") {
+                    $.each(msArray, function (i, ms) {
+                        if (ms.id == property) {
+                            if (formInput[property] != null) {
+                                ms.addToSelection([{ id: formInput[property], name: formInput[property.slice(0, -2)] }], true);
+                            }
+                            return false;
+                        }
+                    });
+                    return true;
+                }
+                if (property.slice(-3) == "_bl") {
+                    if (formInput[property] == true) { $("#" + property).prop("checked", true); }
+                    return true;
+                }
+                $("#" + property).val(formInput[property]);
+            })
             if (dbEntries.length == 1) {
                 $("[data-val-dbisunique]").prop("disabled", false);
                 disableUniqueMs(msArray, false);
@@ -346,7 +348,7 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url) {
     });
 
     $.each(currRecords, function (i, currRecord) {
-        for (var property in currRecord) {
+        $.each(currRecord, function (i, property) {
             if (!currRecord.hasOwnProperty(property) || property.slice(-1) == "Id") {
                 return true;
             }
@@ -371,7 +373,7 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url) {
                 currRecord[property] = $("#" + property).val();
                 return true;
             }
-        }
+        });
         currRecord.ModifiedProperties = modifiedProperties;
     });
 
