@@ -94,6 +94,7 @@ namespace SDDB.UnitTests
                 IsActive_bl = false,
                 AssignedToProject_Id = "DummyProjectId",
                 AssignedToProjectEvent_Id = "DummyProjEntryID",
+                ModifiedProperties = new[] { "LogEntryDateTime", "IsActive_bl" }
             };
             var record2 = new PersonLogEntry
             {
@@ -121,8 +122,8 @@ namespace SDDB.UnitTests
             //Assert
             Assert.IsTrue(record1.LogEntryDateTime == dbEntry1.LogEntryDateTime);
             Assert.IsTrue(record1.IsActive_bl == dbEntry1.IsActive_bl);
-            Assert.IsTrue(record2.LogEntryDateTime == dbEntry2.LogEntryDateTime);
-            Assert.IsTrue(record2.IsActive_bl == dbEntry2.IsActive_bl);
+            Assert.IsTrue(record2.LogEntryDateTime != dbEntry2.LogEntryDateTime);
+            Assert.IsTrue(record2.IsActive_bl != dbEntry2.IsActive_bl);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.Set(typeof(PersonLogEntry)).FindAsync(It.IsAny<string>()), Times.Exactly(2));

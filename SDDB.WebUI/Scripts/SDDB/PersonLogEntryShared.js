@@ -8,7 +8,27 @@
 /// <reference path="Shared.js" />
 
 //--------------------------------------Global Properties------------------------------------//
-
+var TableMain;
+var TableLogEntryAssysAdd;
+var TableLogEntryAssysRemove;
+var TableLogEntryPersonsAdd;
+var TableLogEntryPersonsRemove;
+var MagicSuggests = [];
+var RecordTemplate = {
+    Id: "RecordTemplateId",
+    LogEntryDateTime: null,
+    EnteredByPerson_Id: null,
+    PersonActivityType_Id: null,
+    ManHours: null,
+    AssignedToProject_Id: null,
+    AssignedToLocation_Id: null,
+    AssignedToProjectEvent_Id: null,
+    Comments: null,
+    IsActive_bl: null
+};
+var CurrRecords = {}
+var CurrIds = [];
+var GetActive = true;
 
 var FileCurrNames = [];
 var DlToken;
@@ -358,7 +378,7 @@ function submitEdits() {
 
     showModalWait();
 
-    submitEditsGeneric(CurrIds, "EditForm", MagicSuggests, CurrRecord, "POST", "/PersonLogEntrySrv/Edit")
+    submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonLogEntrySrv/Edit")
         .then(function (data) {
 
             var deferred1 = $.Deferred();

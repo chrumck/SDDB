@@ -197,8 +197,8 @@ function refreshTableGeneric(table, url, data, httpType) {
     table.clear().search("").draw();
 
     $.ajax({ type: httpType, url: url, timeout: 20000, data: data, dataType: "json", })
-        .done(function (data) {
-            table.rows.add(data).order([1, "asc"]).draw();
+        .done(function (dbEntries) {
+            table.rows.add(dbEntries).order([1, "asc"]).draw();
             deferred0.resolve();
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
@@ -250,7 +250,6 @@ function clearFormInputs(formId, msArray) {
 
 //Prepare Form For Create
 function fillFormForCreateGeneric(formId, msArray, labelText, mainViewId) {
-
     clearFormInputs(formId, msArray);
     $("#" + formId + "Label").text(labelText);
     $("#" + formId + " [data-val-dbisunique]").prop("disabled", false); disableUniqueMs(msArray, false);
@@ -272,13 +271,9 @@ function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
     $("#" + formId + "Label").text(labelText);
 
     $.ajax({ type: httpType, url: url, timeout: 20000, data: { ids: ids, getActive: getActive }, dataType: "json" })
-        .done(function (data) {
-            var currRecord = {};
-            copyFromDataToCurrRecord(currRecord, data);
-
-            var formInput = $.extend(true, {}, currRecord);
-
-            $.each(data, function (i, dbEntry) {
+        .done(function (dbEntries) {
+            var formInput = $.extend(true, {}, dbEntries[0]);
+            $.each(dbEntries, function (i, dbEntry) {
                 for (var property in dbEntry) {
                     if (dbEntry.hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
                         if (property.slice(-3) == "_Id") {
@@ -321,7 +316,7 @@ function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
                 }
             }
 
-            if (data.length == 1) {
+            if (dbEntries.length == 1) {
                 $("[data-val-dbisunique]").prop("disabled", false);
                 disableUniqueMs(msArray, false);
             }
@@ -330,26 +325,15 @@ function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
                 disableUniqueMs(msArray, true);
             }
 
-            deferred0.resolve(currRecord);
+            deferred0.resolve(dbEntries);
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 
     return deferred0.promise();
 }
 
-//helper for FillFormForEdit Generic version
-function copyFromDataToCurrRecord(currRecord, data) {
-    for (var property in data[0]) {
-        if (data[0].hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
-            currRecord[property] = data[0][property];
-        }
-    }
-}
-
-
-
 //SubmitEdits to DB - generic version
-function submitEditsGeneric(ids, formId, msArray, currRecord, httpType, url) {
+function submitEditsGeneric(formId, msArray, currRecords, httpType, url) {
 
     var deferred0 = $.Deferred();
 
@@ -357,47 +341,42 @@ function submitEditsGeneric(ids, formId, msArray, currRecord, httpType, url) {
     $("#" + formId + " .modifiable").each(function (index) {
         if ($(this).data("ismodified")) modifiedProperties.push($(this).prop("id"));
     });
-
     $.each(msArray, function (i, ms) {
         if (ms.isModified == true) modifiedProperties.push(ms.id);
     });
 
-    var editRecords = [];
-
-    if (ids.length == 0) ids = ["newEntryId"];
-    $.each(ids, function (i, id) {
-        var editRecord = {};
-        editRecord.Id = id;
-
+    $.each(currRecords, function (i, currRecord) {
         for (var property in currRecord) {
-            if (currRecord.hasOwnProperty(property) && property != "Id" && property.slice(-1) != "_") {
-                if (property.slice(-3) == "_Id") {
-                    $.each(msArray, function (i, ms) {
-                        if (ms.id == property) {
-                            editRecord[property] = (ms.isModified && ms.getSelection().length != 0) ?
-                                (ms.getSelection())[0].id : currRecord[property];
-                            return false;
-                        }
-                    });
-                }
-                else if (property.slice(-3) == "_bl") {
-                    editRecord[property] = ($.inArray(property, modifiedProperties) != -1) ?
-                        $("#" + property).prop("checked") : currRecord[property];
-                }
-                else {
-                    editRecord[property] = ($.inArray(property, modifiedProperties) != -1) ?
-                        $("#" + property).val() : currRecord[property];
-                }
+            if (!currRecord.hasOwnProperty(property) || property.slice(-1) == "Id") {
+                return true;
+            }
+            if (property.slice(-1) == "_") {
+                currRecord[property] = (function () { return; })();
+                return true;
+            }
+            if (property.slice(-3) == "_Id") {
+                $.each(msArray, function (i, ms) {
+                    if (ms.id == property && ms.isModified && ms.getSelection().length != 0) {
+                        currRecord[property] = (ms.getSelection())[0].id;
+                        return false;
+                    }
+                });
+                return true;
+            }
+            if (property.slice(-3) == "_bl" && $.inArray(property, modifiedProperties) != -1) {
+                currRecord[property] = $("#" + property).prop("checked");
+                return true;
+            }
+            if ($.inArray(property, modifiedProperties) != -1) {
+                currRecord[property] = $("#" + property).val();
+                return true;
             }
         }
-
-        editRecord.ModifiedProperties = modifiedProperties;
-
-        editRecords.push(editRecord);
+        currRecord.ModifiedProperties = modifiedProperties;
     });
 
     $.ajax({ type: httpType, url: url, timeout: 20000, data: { records: editRecords }, dataType: "json" })
-        .done(function (data) { deferred0.resolve(data); })
+        .done(function (newEntryIds) { deferred0.resolve(newEntryIds); })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 
     return deferred0.promise();

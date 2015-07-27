@@ -67,10 +67,6 @@ namespace SDDB.Domain.Entities
         public string PasswordConf { get; set; }
 
         [NotMapped]
-        [DefaultValue(false)]
-        public bool PasswordChanged_bl { get; set; }
-
-        [NotMapped]
         public string[] ModifiedProperties { get; set; }
 
         [NotMapped]

@@ -9,30 +9,10 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var TableMain;
-var TableLogEntryAssysAdd;
-var TableLogEntryAssysRemove;
-var TableLogEntryPersonsAdd;
-var TableLogEntryPersonsRemove;
 var MsFilterByPerson;
 var MsFilterByType;
 var MsFilterByProject;
 var MsFilterByAssy;
-var MagicSuggests = [];
-var CurrRecord = {
-    Id: null,
-    LogEntryDateTime: null,
-    EnteredByPerson_Id: null,
-    PersonActivityType_Id: null,
-    ManHours: null,
-    AssignedToProject_Id: null,
-    AssignedToLocation_Id: null,
-    AssignedToProjectEvent_Id: null,
-    Comments: null,
-    IsActive_bl: null
-};
-var CurrIds = [];
-var GetActive = true;
 
 $(document).ready(function () {
 
@@ -41,6 +21,8 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         CurrIds = [];
+        CurrRecords = {};
+        CurrRecords[0] = RecordTemplate;
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Log Entry", "MainView");
         MagicSuggests[3].disable();
         MagicSuggests[4].disable();
@@ -79,8 +61,8 @@ $(document).ready(function () {
                     "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { logEntryId: CurrIds[0] },
                     "GET", "/PersonSrv/Get", { getActive: true })
                 )
-                .then(function (currRecord) {
-                    CurrRecord = currRecord;
+                .then(function (currRecords) {
+                    currRecords = CurrRecords;
                     return fillFormForRelatedGeneric(TableLogEntryAssysAdd, TableLogEntryAssysRemove, CurrIds,
                         "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys", { logEntryId: CurrIds[0] },
                         "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot", { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] },

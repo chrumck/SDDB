@@ -141,7 +141,7 @@ namespace SDDB.Domain.Services
         //checkDbUserBeforeEditHelperAsync - single record
         private void checkDbUserBeforeEditHelperAsync(DBUser record)
         {
-            if (!record.LDAPAuthenticated_bl && record.PasswordChanged_bl && String.IsNullOrEmpty(record.Password))
+            if (record.PropIsModified(x => x.LDAPAuthenticated_bl) && !record.LDAPAuthenticated_bl && String.IsNullOrEmpty(record.Password))
             {
                 throw new DbBadRequestException(
                     String.Format("User {0}: Password is required if not LDAP authenticated\n", record.UserName));
@@ -175,10 +175,10 @@ namespace SDDB.Domain.Services
             }
             else
             {
-                dbEntry.UserName = record.UserName;
-                dbEntry.Email = record.Email;
-                dbEntry.LDAPAuthenticated_bl = record.LDAPAuthenticated_bl;
-                if (record.PasswordChanged_bl) { dbEntry.PasswordHash = appUserManager.HashPassword(record.Password); }
+                if (record.PropIsModified(x => x.UserName)) dbEntry.UserName = record.UserName;
+                if (record.PropIsModified(x => x.Email)) dbEntry.Email = record.Email;
+                if (record.PropIsModified(x => x.LDAPAuthenticated_bl)) dbEntry.LDAPAuthenticated_bl = record.LDAPAuthenticated_bl;
+                if (record.PropIsModified(x => x.Password)) dbEntry.PasswordHash = appUserManager.HashPassword(record.Password);
                 var updateResult = await appUserManager.UpdateAsync(dbEntry).ConfigureAwait(false);
                 if (!updateResult.Succeeded)
                 {

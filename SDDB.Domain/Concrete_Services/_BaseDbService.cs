@@ -157,7 +157,7 @@ namespace SDDB.Domain.Services
                 dbContext.Set(typeof(T)).Add(record);
                 return record.Id;
             }
-            dbEntry.CopyProperties(record);
+            dbEntry.CopyModifiedProps(record);
             return null;
         }
 

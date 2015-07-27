@@ -278,7 +278,7 @@ namespace SDDB.Domain.Services
                 dbContext.PersonLogEntrys.Add(record);
                 return record.Id;
             }
-            dbEntry.CopyProperties(record);
+            dbEntry.CopyModifiedProps(record);
             return null;
         }
         
