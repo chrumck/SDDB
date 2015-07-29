@@ -33,7 +33,7 @@ namespace SDDB.WebUI.Infrastructure
                 UserName = exceptionContext.HttpContext.User.Identity.Name,
                 UserHostAddress = exceptionContext.HttpContext.Request.UserHostAddress,
                 StatusCode = getStatusCodeHelper(exceptionContext),
-                StatusDescription = "DBException thrown: " + exceptionContext.Exception.ToString()
+                StatusDescription = "Exception thrown: " + exceptionContext.Exception.ToString()
             };
             Logger.LogResult(filterResult);
 

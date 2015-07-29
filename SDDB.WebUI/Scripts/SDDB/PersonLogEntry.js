@@ -62,7 +62,7 @@ $(document).ready(function () {
                     "GET", "/PersonSrv/Get", { getActive: true })
                 )
                 .then(function (currRecords) {
-                    currRecords = CurrRecords;
+                    CurrRecords = currRecords;
                     return fillFormForRelatedGeneric(TableLogEntryAssysAdd, TableLogEntryAssysRemove, CurrIds,
                         "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys", { logEntryId: CurrIds[0] },
                         "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot", { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] },
@@ -191,10 +191,8 @@ $(document).ready(function () {
     
     //Initialize MagicSuggest Array Event - AssignedToProject_Id
     $(MagicSuggests[2]).on("selectionchange", function (e, m) {
-        MagicSuggests[3].clear(true);
-        MagicSuggests[3].isModified = false;
-        MagicSuggests[4].clear(true);
-        MagicSuggests[4].isModified = false;
+        MagicSuggests[3].clear();
+        MagicSuggests[4].clear();
         TableLogEntryAssysAdd.clear().search("").draw();
         if (this.getValue().length == 0) {
             MagicSuggests[3].disable(); 
@@ -210,19 +208,17 @@ $(document).ready(function () {
     $(MagicSuggests[3]).on("selectionchange", function (e, m) {
         if (this.getValue().length == 0) {
             TableLogEntryAssysAdd.clear().search("").draw();
+            return;
+        }
+        if (CurrIds.length == 1) {
+            refreshTblGenWrp(TableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
+                { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] }, "GET")
+                .done(function () { $("#AssignedToLocation_Id input").focus(); });
         }
         else {
-            
-            if (CurrIds.length == 1) {
-                refreshTblGenWrp(TableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
-                    { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] }, "GET")
-                    .done(function () { $("#AssignedToLocation_Id input").focus(); });
-            }
-            else {
-                refreshTblGenWrp(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
-                { getActive: true, locId: MagicSuggests[3].getValue()[0] }, "GET")
-                .done(function () { $("#AssignedToLocation_Id input").focus(); });
-            }
+            refreshTblGenWrp(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
+            { getActive: true, locId: MagicSuggests[3].getValue()[0] }, "GET")
+            .done(function () { $("#AssignedToLocation_Id input").focus(); });
         }
     });
     

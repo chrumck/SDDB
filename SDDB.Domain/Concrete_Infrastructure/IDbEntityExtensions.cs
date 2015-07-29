@@ -54,21 +54,12 @@ namespace SDDB.Domain.Infrastructure
             }
         }
 
-        //copy properties from record to dbEntry
-        public static void CopyProperties<T> (this T instance, T record) where T: IDbEntity
-        {
-            foreach (var property in instance.getEntityProps())
-            {
-                copyProperty(instance, record, property);
-            }
-        }
-
         //copy modified properties from record to dbEntry (props listed in record's 'ModifiedProperties')
         public static void CopyModifiedProps<T> (this T instance, T record) where T: IDbEntity
         {
             foreach (var property in instance.getEntityProps())
             {
-                if (record.PropIsModified(property.Name)) { copyProperty(instance, record, property); }
+                if (record.PropIsModified(property.Name)) { copyPropertyHelper(instance, record, property); }
             }
         }
 
@@ -83,9 +74,9 @@ namespace SDDB.Domain.Infrastructure
         #region Helpers
 
         //copy property from instance to record, exclude virtual, not mapped and excluded properties
-        private static void copyProperty<T>(T instance, T record, PropertyInfo property) where T: IDbEntity
+        private static void copyPropertyHelper<T>(T instance, T record, PropertyInfo property) where T: IDbEntity
         {
-            var excludedProperties = new string[] { "Id", "TSP" };
+            var excludedProperties = new string[] { "Id" };
             if (property.GetMethod.IsVirtual && typeof(IDbEntity).GetProperty(property.Name) == null) return;
             if (property.GetCustomAttributes(typeof(NotMappedAttribute), false).FirstOrDefault() != null) return;
             if (excludedProperties.Contains(property.Name)) return;

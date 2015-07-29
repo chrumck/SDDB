@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -10,11 +11,11 @@ using Mehdime.Entity;
 using SDDB.Domain.DbContexts;
 using SDDB.Domain.Infrastructure;
 using SDDB.Domain.Abstract;
-using System.Diagnostics;
+using SDDB.Domain.Entities;
 
 namespace SDDB.Domain.Services
 {
-    public abstract class BaseDbService<T> where T: IDbEntity
+    public abstract class BaseDbService<T> where T: class, IDbEntity
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
@@ -63,7 +64,7 @@ namespace SDDB.Domain.Services
                 
         //Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T 
         public virtual async Task AddRemoveRelated<TAddRem> (string[] ids, string[] idsAddRem, 
-            string relatedCollectionName, bool isAdd = true) where TAddRem: IDbEntity
+            string relatedCollectionName, bool isAdd = true) where TAddRem: class, IDbEntity
         {
             if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
             if (idsAddRem == null || idsAddRem.Length == 0) { throw new ArgumentNullException("idsAddRem"); }
@@ -96,7 +97,7 @@ namespace SDDB.Domain.Services
         //Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T
         //overload taking lamdba expression
         public virtual async Task AddRemoveRelated<TAddRem>(string[] ids, string[] idsAddRem,
-            Expression<Func<T, ICollection<TAddRem>>> lambda, bool isAdd = true) where TAddRem : IDbEntity
+            Expression<Func<T, ICollection<TAddRem>>> lambda, bool isAdd = true) where TAddRem : class, IDbEntity
         {
             var body = (MemberExpression)lambda.Body;
             if (body == null)
@@ -199,11 +200,11 @@ namespace SDDB.Domain.Services
         //helper - Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T 
         //taking taking single T and TAddRem
         protected virtual async Task<int> addRemoveRelatedHelper<TAddRem>(T dbEntry, TAddRem dbEntryAddRem,
-            string relatedCollectionName, bool isAdd) where TAddRem : IDbEntity
+            string relatedCollectionName, bool isAdd) where TAddRem : class, IDbEntity
         {
             await Task.Run(() =>
             {
-                var relatedCollection = (List<TAddRem>)typeof(T).GetProperty(relatedCollectionName).GetValue(dbEntry);
+                var relatedCollection = (ICollection<TAddRem>)typeof(T).GetProperty(relatedCollectionName).GetValue(dbEntry);
 
                 if (isAdd && !relatedCollection.Contains(dbEntryAddRem)) { relatedCollection.Add(dbEntryAddRem); }
                 if (!isAdd && relatedCollection.Contains(dbEntryAddRem)) { relatedCollection.Remove(dbEntryAddRem); }    
@@ -215,7 +216,7 @@ namespace SDDB.Domain.Services
         //Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T 
         //overload taking lists of T and TAddRem
         protected virtual async Task<int> addRemoveRelatedHelper<TAddRem>(List<T> dbEntries, List<TAddRem> dbEntriesAddRem,
-            string relatedCollectionName, bool isAdd) where TAddRem : IDbEntity
+            string relatedCollectionName, bool isAdd) where TAddRem : class, IDbEntity
         {
             foreach (var dbEntry in dbEntries)
             {
@@ -231,22 +232,23 @@ namespace SDDB.Domain.Services
 
         //helper -  getEntriesFromContextAsync
         protected virtual async Task<List<TOut>> getEntriesFromContextHelperAsync<TOut>(EFDbContext dbContext, string[] ids) 
-            where TOut: IDbEntity
+            where TOut: class, IDbEntity
         {
-            return await ((IQueryable<TOut>)dbContext.Set(typeof(TOut)).AsQueryable())
+            return await dbContext.Set<TOut>()
                 .Where(x => ids.Contains(x.Id))
-                .ToListAsync().ConfigureAwait(false);
+                .ToListAsync<TOut>().ConfigureAwait(false);
         }
 
         //helper -  getEntriesFromContextAsync - overload with relatedCollectionName
         protected virtual async Task<List<TOut>> getEntriesFromContextHelperAsync<TOut>(EFDbContext dbContext, string[] ids,
-            string relatedCollectionName) where TOut: IDbEntity
+            string relatedCollectionName) where TOut : class, IDbEntity
         {
-            return await ((IQueryable<TOut>)dbContext.Set(typeof(TOut)).AsQueryable())
-                .Where(x => ids.Contains(x.Id))
+            return await dbContext.Set<TOut>().Where(x => ids.Contains(x.Id))
                 .Include(relatedCollectionName)
-                .ToListAsync().ConfigureAwait(false);
+                .ToListAsync<TOut>().ConfigureAwait(false);
         }
+
+
 
         #endregion
     }

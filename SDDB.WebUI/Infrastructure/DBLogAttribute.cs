@@ -44,7 +44,7 @@ namespace SDDB.WebUI.Infrastructure
             {
                 filterResult.DtEnd = filterResult.DtStart + timer.Elapsed;
                 filterResult.ServiceName = filterContext.Controller.ViewBag.ServiceName;
-                filterResult.StatusCode = filterContext.Controller.ViewBag.StatusCode ?? default(HttpStatusCode) ;
+                filterResult.StatusCode = filterContext.Controller.ViewBag.StatusCode ?? HttpStatusCode.OK ;
                 filterResult.StatusDescription = filterContext.Controller.ViewBag.StatusDescription;
 
                 Logger.LogResult(filterResult);

@@ -19,7 +19,7 @@ $(document).ready(function () {
         CurrIds = [];
         CurrRecords = {};
         CurrRecords[0] = RecordTemplate;
-        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Activity", "MainView");
+        fillFormForCreateGeneric("EditForm", MagicSuggests, "New Activity for " + $("#FilterDateStart").val(), "MainView");
         MagicSuggests[3].disable();
         MagicSuggests[4].disable();
         TableLogEntryAssysAdd.clear().search("").draw();
@@ -28,7 +28,7 @@ $(document).ready(function () {
         TableLogEntryPersonsRemove.clear().search("").draw();
         $("#LogEntryPersonsView").addClass("hide");
         MagicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
-        $("#LogEntryDateTime").val(moment().minute(0).format("YYYY-MM-DD HH:mm"));
+        $("#LogEntryDateTime").val(moment($("#FilterDateStart").val()).hour(moment().hour()).format("YYYY-MM-DD HH:mm"));
         $("#LogEntryTime").data('DateTimePicker').date(moment($("#LogEntryDateTime").val()));
         $("#ManHours").val(0);
         $("#HoursWorkedPicker").data("DateTimePicker").date("00:00");
@@ -54,7 +54,7 @@ $(document).ready(function () {
                 GetActive, "EditForm", "Edit Activity", MagicSuggests)
             )
             .then(function (currRecords) {
-                currRecords = CurrRecords;
+                CurrRecords = currRecords;
                 return fillFormForRelatedGeneric(
                     TableLogEntryAssysAdd, TableLogEntryAssysRemove, CurrIds,
                     "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys",
@@ -69,7 +69,9 @@ $(document).ready(function () {
             .always(hideModalWait)
             .done(function () {
                 $("#LogEntryTime").data('DateTimePicker').date(moment($("#LogEntryDateTime").val()));
+                $("#LogEntryDateTime").data("ismodified", false);
                 $("#HoursWorkedPicker").data('DateTimePicker').date(moment($("#ManHours").val(), "HH"));
+                $("#ManHours").data("ismodified", false);
                 $("#MainView").addClass("hide");
                 $("#EditFormView").removeClass("hide");
             })
@@ -166,10 +168,8 @@ $(document).ready(function () {
     
     //Initialize MagicSuggest Array Event - AssignedToProject_Id
     $(MagicSuggests[2]).on("selectionchange", function (e, m) {
-        MagicSuggests[3].clear(true);
-        MagicSuggests[3].isModified = false;
-        MagicSuggests[4].clear(true);
-        MagicSuggests[4].isModified = false;
+        MagicSuggests[3].clear();
+        MagicSuggests[4].clear();
         TableLogEntryAssysAdd.clear().search("").draw();
         if (this.getValue().length == 0) {
             MagicSuggests[3].disable(); 
@@ -189,8 +189,7 @@ $(document).ready(function () {
         }
         if (CurrIds.length == 1) {
             refreshTblGenWrp(TableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
-                { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] }, "GET"
-                )
+                { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] }, "GET")
                 .done(function () { $("#AssignedToLocation_Id input").focus(); });
         }
         else {

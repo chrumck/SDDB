@@ -31,7 +31,6 @@ namespace SDDB.Domain.Entities
         public string PersonLogEntryFile_Id { get; set; }
 
         //TSP Column Wireup ---------------------------------------------------------------------------------------------------//
-        [ConcurrencyCheck]
         [Column(TypeName = "timestamp")]
         public DateTime TSP
         {

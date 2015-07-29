@@ -69,7 +69,6 @@ namespace SDDB.Domain.Entities
         public string EmployeeDetails { get; set; }
 
         //TSP Column Wireup ---------------------------------------------------------------------------------------------------//
-        [ConcurrencyCheck]
         [Column(TypeName = "timestamp")]
         public DateTime TSP
         {

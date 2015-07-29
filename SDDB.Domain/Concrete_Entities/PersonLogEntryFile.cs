@@ -42,7 +42,6 @@ namespace SDDB.Domain.Entities
         public string Comments { get; set; }
     
         //TSP Column Wireup ---------------------------------------------------------------------------------------------------//
-        [ConcurrencyCheck]
         [Column(TypeName = "timestamp")]
         public DateTime TSP
         {

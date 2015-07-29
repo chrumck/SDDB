@@ -33,8 +33,6 @@ namespace SDDB.Domain.Entities
         public bool LDAPAuthenticated_bl { get; set; }
 
         //TSP Column Wireup ---------------------------------------------------------------------------------------------------//
-
-        [ConcurrencyCheck]
         [Column(TypeName = "timestamp")]
         public DateTime TSP
         {

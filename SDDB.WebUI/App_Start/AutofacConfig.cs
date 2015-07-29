@@ -30,8 +30,11 @@ namespace SDDB.WebUI
             var LDAPAuthenticationEnabled = bool.Parse(ConfigurationManager.AppSettings["LDAPAuthenticationEnabled"] ?? "false");
             var dbLoggingLevel = int.Parse(ConfigurationManager.AppSettings["dbLoggingLevel"] ?? "1");
             var procTooLongmSec = int.Parse(ConfigurationManager.AppSettings["procTooLongmSec"] ?? "0");
-            
-            var userId = ((ClaimsIdentity)HttpContext.Current.User.Identity).FindFirst(ClaimTypes.Sid).Value;
+
+            var userIdParameter = new ResolvedParameter(
+                (pi, ctx) => pi.ParameterType == typeof(string) && pi.Name == "userId",
+                (pi, ctx) => ((ClaimsIdentity)HttpContext.Current.User.Identity).FindFirst(ClaimTypes.Sid).Value
+                );
 
             //following Krystian's advice - file storage on FTP is discontinued
             //var ftpAddress = ConfigurationManager.AppSettings["ftpAddress"] ?? "";
@@ -47,7 +50,7 @@ namespace SDDB.WebUI
             //register Mehdime DBContextScope
             builder.RegisterType<DbContextScopeFactory>().As<IDbContextScopeFactory>().SingleInstance();
             builder.RegisterType<AmbientDbContextLocator>().As<IAmbientDbContextLocator>().SingleInstance();
-
+            
             //register repositories
 
             //register infrastructure
@@ -69,9 +72,9 @@ namespace SDDB.WebUI
             builder.RegisterType<PersonService>().AsSelf().InstancePerDependency();
             builder.RegisterType<PersonGroupService>().AsSelf().InstancePerDependency();
             builder.RegisterType<PersonActivityTypeService>().AsSelf().InstancePerDependency();
-            builder.RegisterType<PersonLogEntryService>().AsSelf().InstancePerDependency();
-            builder.RegisterType<PersonLogEntryFileService>().AsSelf().WithParameter("userId", userId).InstancePerDependency();
-            
+            builder.RegisterType<PersonLogEntryService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
+            builder.RegisterType<PersonLogEntryFileService>().AsSelf().InstancePerDependency();
+
             builder.RegisterType<ProjectService>().AsSelf().InstancePerDependency();
             builder.RegisterType<ProjectEventService>().AsSelf().InstancePerDependency();
             

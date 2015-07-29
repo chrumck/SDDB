@@ -274,9 +274,9 @@ function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
         .done(function (dbEntries) {
             var formInput = $.extend(true, {}, dbEntries[0]);
             $.each(dbEntries, function (i, dbEntry) {
-                $.each(dbEntry, function (i, property) {
+                for (var property in dbEntry) {
                     if (!dbEntry.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") {
-                        return true;
+                        continue;
                     }
                     if (property.slice(-3) == "_Id") {
                         if (formInput[property] != dbEntry[property]) {
@@ -292,14 +292,15 @@ function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
                                 }
                             }
                         }
-                        return true;
+                        continue;
                     }
                     if (formInput[property] != dbEntry[property]) { formInput[property] = "_VARIES_"; }
-                });
+                }
             });
-            $.each(formInput, function (i,property) {
+
+            for (var property in formInput) {
                 if (!formInput.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") {
-                    return true;
+                    continue;
                 }
                 if (property.slice(-3) == "_Id") {
                     $.each(msArray, function (i, ms) {
@@ -310,14 +311,15 @@ function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
                             return false;
                         }
                     });
-                    return true;
+                    continue;
                 }
                 if (property.slice(-3) == "_bl") {
                     if (formInput[property] == true) { $("#" + property).prop("checked", true); }
-                    return true;
+                    continue;
                 }
                 $("#" + property).val(formInput[property]);
-            })
+            }
+
             if (dbEntries.length == 1) {
                 $("[data-val-dbisunique]").prop("disabled", false);
                 disableUniqueMs(msArray, false);
@@ -348,36 +350,36 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url) {
     });
 
     $.each(currRecords, function (i, currRecord) {
-        $.each(currRecord, function (i, property) {
+        for (var property in currRecord) {
             if (!currRecord.hasOwnProperty(property) || property.slice(-1) == "Id") {
-                return true;
+                continue;
             }
             if (property.slice(-1) == "_") {
                 currRecord[property] = (function () { return; })();
-                return true;
+                continue;
             }
             if (property.slice(-3) == "_Id") {
                 $.each(msArray, function (i, ms) {
-                    if (ms.id == property && ms.isModified && ms.getSelection().length != 0) {
-                        currRecord[property] = (ms.getSelection())[0].id;
+                    if (ms.id == property && ms.isModified) {
+                        currRecord[property] = ms.getSelection().length != 0 ? (ms.getSelection())[0].id : "";
                         return false;
                     }
                 });
-                return true;
+                continue;
             }
             if (property.slice(-3) == "_bl" && $.inArray(property, modifiedProperties) != -1) {
                 currRecord[property] = $("#" + property).prop("checked");
-                return true;
+                continue;
             }
             if ($.inArray(property, modifiedProperties) != -1) {
                 currRecord[property] = $("#" + property).val();
-                return true;
+                continue;
             }
-        });
+        }
         currRecord.ModifiedProperties = modifiedProperties;
     });
 
-    $.ajax({ type: httpType, url: url, timeout: 20000, data: { records: editRecords }, dataType: "json" })
+    $.ajax({ type: httpType, url: url, timeout: 20000, data: { records: currRecords }, dataType: "json" })
         .done(function (newEntryIds) { deferred0.resolve(newEntryIds); })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 
