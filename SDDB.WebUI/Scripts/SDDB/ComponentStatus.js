@@ -113,7 +113,7 @@ function FillFormForEdit() {
     $.ajax({
         type: "POST", url: "/ComponentStatusSrv/GetByIds", timeout: 20000,
         data: { ids: ids, getActive: (($("#ChBoxShowDeleted").prop("checked")) ? false : true) }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+        beforeSend: function () { showModalWait(); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
@@ -192,7 +192,7 @@ function SubmitEdits() {
 
     $.ajax({
         type: "POST", url: "/ComponentStatusSrv/Edit", timeout: 20000, data: { records: editRecords }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+        beforeSend: function () { showModalWait(); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
@@ -211,7 +211,7 @@ function DeleteRecords() {
     var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
     $.ajax({
         type: "POST", url: "/ComponentStatusSrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+        beforeSend: function () { showModalWait(); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () { refreshTable(TableMain, "/ComponentStatusSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true)); })

@@ -21,7 +21,7 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         CurrIds = [];
-        CurrRecords = {};
+        CurrRecords = [];
         CurrRecords[0] = RecordTemplate;
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Log Entry", "MainView");
         MagicSuggests[3].disable();
@@ -134,6 +134,13 @@ $(document).ready(function () {
         
     //---------------------------------------DataTables------------
     
+    //Wire up ChBoxShowDeleted
+    $("#ChBoxShowDeleted").change(function (event) {
+        if (!$(this).prop("checked")) { GetActive = true; $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary"); }
+        else { GetActive = false; $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger"); }
+        refreshMainView();
+    });
+
     //TableMain PersonLogEntrys
     TableMain = $("#TableMain").DataTable({
         columns: [

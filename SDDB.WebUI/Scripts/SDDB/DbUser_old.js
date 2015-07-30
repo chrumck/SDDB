@@ -166,7 +166,7 @@ function FillFormForEdit() {
     var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
     $.ajax({
         type: "POST", url: "/DBUserSrv/GetByIds", timeout: 20000, data: { ids: ids }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+        beforeSend: function () { showModalWait(); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
@@ -251,7 +251,7 @@ function SubmitEdits() {
 
     $.ajax({
         type: "POST", url: "/DBUserSrv/Edit", timeout: 20000, data: { records: editRecords }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+        beforeSend: function () { showModalWait(); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
@@ -270,7 +270,7 @@ function DeleteRecords() {
     var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
     $.ajax({
         type: "POST", url: "/DBUserSrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+        beforeSend: function () { showModalWait(); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () { refreshTblGenWrp(TableMain, "/DBUserSrv/Get", {}, "GET"); })
@@ -285,7 +285,7 @@ function FillDBRoleForEdit(noOfRows) {
         var selectedRecord = TableMain.row(".ui-selected").data()
         $("#DBRolesViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
 
-        $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+        showModalWait();
 
         $.when(
             $.ajax({ type: "GET", url: "/DBUserSrv/GetUserRolesNot", timeout: 20000, data: { id: selectedRecord.Id }, dataType: "json" }),
@@ -305,7 +305,7 @@ function FillDBRoleForEdit(noOfRows) {
 
         $.ajax({
             type: "GET", url: "/DBUserSrv/GetAllRoles", timeout: 20000, dataType: "json",
-            beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+            beforeSend: function () { showModalWait(); }
         })
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function (data) {
@@ -324,7 +324,7 @@ function SubmitRolesEdits() {
     var dbRecordsAdd = TableDBRolesAdd.cells(".ui-selected", "Name:name").data().toArray();
     var dbRecordsRemove = TableDBRolesRemove.cells(".ui-selected", "Name:name").data().toArray();
 
-    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+    showModalWait();
 
     var deferred1 = $.Deferred();
     if (dbRecordsAdd.length == 0) deferred1.resolve();

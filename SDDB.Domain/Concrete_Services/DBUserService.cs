@@ -121,17 +121,17 @@ namespace SDDB.Domain.Services
         }
 
         //Add (or Remove  when set isAdd to false) roles to DBUSer
-        public virtual async Task AddRemoveRolesAsync(string[] ids, string[] roleNames, bool isAdd)
+        public virtual async Task AddRemoveRolesAsync(string[] ids, string[] idsAddRem, bool isAdd)
         {
             if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
-            if (roleNames == null || roleNames.Length == 0) { throw new ArgumentNullException("roleNames"); }
+            if (idsAddRem == null || idsAddRem.Length == 0) { throw new ArgumentNullException("roleNames"); }
 
             var users = await GetAsync(ids).ConfigureAwait(false);
             if (users.Count != ids.Length) { throw new DbBadRequestException("Error adding/removing roles. User(s) not found."); }
 
             foreach (var user in users)
             {
-                await addRemoveRolesHelper(user, roleNames, isAdd).ConfigureAwait(false);
+                await addRemoveRolesHelper(user, idsAddRem, isAdd).ConfigureAwait(false);
             }
         }
         

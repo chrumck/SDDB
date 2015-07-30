@@ -17,7 +17,7 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         CurrIds = [];
-        CurrRecords = {};
+        CurrRecords = [];
         CurrRecords[0] = RecordTemplate;
         fillFormForCreateGeneric("EditForm", MagicSuggests, "New Activity for " + $("#FilterDateStart").val(), "MainView");
         MagicSuggests[3].disable();
@@ -49,6 +49,7 @@ $(document).ready(function () {
         $("#LogEntryPersonsView").addClass("hide");
 
         showModalWait();
+
         $.when(
             fillFormForEditGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
                 GetActive, "EditForm", "Edit Activity", MagicSuggests)
@@ -79,6 +80,13 @@ $(document).ready(function () {
     });
         
     //---------------------------------------DataTables------------
+
+    //Wire up ChBoxShowDeleted
+    $("#ChBoxShowDeleted").change(function (event) {
+        if (!$(this).prop("checked")) { GetActive = true; $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-tdo-success"); }
+        else { GetActive = false; $("#PanelTableMain").removeClass("panel-tdo-success").addClass("panel-tdo-danger"); }
+        refreshMainView();
+    });
 
     //TableMain PersonLogEntrys
     TableMain = $("#TableMain").DataTable({

@@ -13,10 +13,9 @@ var TableMain = {};
 var TableProjectsAdd = {}; var TableProjectsRemove = {};
 var TablePersonGroupsAdd = {}; var TablePersonGroupsRemove = {};
 var TableManagedGroupsAdd = {}; var TableManagedGroupsRemove = {};
-var IsCreate = false;
 var MagicSuggests = [];
-var CurrRecord = {
-    Id: null,
+var RecordTemplate = {
+    Id: "RecordTemplateId",
     FirstName: null,
     LastName: null,
     Initials: null,
@@ -32,9 +31,9 @@ var CurrRecord = {
     EmployeeDetails: null,
     IsActive_bl: null
 };
+var CurrRecords = [];
 var CurrIds = [];
 var GetActive = true;
-var SelectedRecord;
 
 
 $(document).ready(function () {
@@ -44,6 +43,8 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         CurrIds = [];
+        CurrRecords = [];
+        CurrRecords[0] = RecordTemplate;
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Person", "MainView");
     });
 
@@ -55,12 +56,12 @@ $(document).ready(function () {
             if (GetActive) $("#EditFormGroupIsActive").addClass("hide");
             else $("#EditFormGroupIsActive").removeClass("hide");
 
-            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+            showModalWait();
 
             fillFormForEditGeneric(CurrIds, "POST", "/PersonSrv/GetAllByIds", GetActive, "EditForm", "Edit Person", MagicSuggests)
                 .always(function () { $("#ModalWait").modal("hide"); })
-                .done(function (currRecord) {
-                    CurrRecord = currRecord;
+                .done(function (currRecords) {
+                    CurrRecords = currRecords;
                     $("#MainView").addClass("hide");
                     $("#EditFormView").removeClass("hide");
                 })
@@ -80,11 +81,11 @@ $(document).ready(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
         if (CurrIds.length == 0) showModalNothingSelected();
         else {
-            SelectedRecord = TableMain.row(".ui-selected").data()
-            if (CurrIds.length == 1) $("#PrsProjViewPanel").text(SelectedRecord.FirstName + " " + SelectedRecord.LastName);
+            var selectedRecord = TableMain.row(".ui-selected").data()
+            if (CurrIds.length == 1) $("#PrsProjViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
             else $("#PrsProjViewPanel").text("_MULTIPLE_");
 
-            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+            showModalWait();
 
             fillFormForRelatedGeneric(TableProjectsAdd, TableProjectsRemove, CurrIds, "GET", "/PersonSrv/GetPersonProjects", { id: CurrIds[0] },
             "GET", "/PersonSrv/GetPersonProjectsNot", { id: CurrIds[0] }, "GET", "/ProjectSrv/Get", { getActive: true })
@@ -102,11 +103,11 @@ $(document).ready(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
         if (CurrIds.length == 0) showModalNothingSelected();
         else {
-            SelectedRecord = TableMain.row(".ui-selected").data()
-            if (CurrIds.length == 1) $("#PersonGroupsViewPanel").text(SelectedRecord.FirstName + " " + SelectedRecord.LastName);
+            var selectedRecord = TableMain.row(".ui-selected").data()
+            if (CurrIds.length == 1) $("#PersonGroupsViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
             else $("#PersonGroupsViewPanel").text("_MULTIPLE_");
 
-            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+            showModalWait();
 
             fillFormForRelatedGeneric(TablePersonGroupsAdd, TablePersonGroupsRemove, CurrIds, "GET", "/PersonSrv/GetPersonGroups", { id: CurrIds[0] },
             "GET", "/PersonSrv/GetPersonGroupsNot", { id: CurrIds[0] }, "GET", "/PersonGroupSrv/Get", { getActive: true })
@@ -124,11 +125,11 @@ $(document).ready(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
         if (CurrIds.length == 0) showModalNothingSelected();
         else {
-            SelectedRecord = TableMain.row(".ui-selected").data()
-            if (CurrIds.length == 1) $("#ManagedGroupsViewPanel").text(SelectedRecord.FirstName + " " + SelectedRecord.LastName);
+            var selectedRecord = TableMain.row(".ui-selected").data()
+            if (CurrIds.length == 1) $("#ManagedGroupsViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
             else $("#ManagedGroupsViewPanel").text("_MULTIPLE_");
 
-            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+            showModalWait();
 
             fillFormForRelatedGeneric(TableManagedGroupsAdd, TableManagedGroupsRemove, CurrIds, "GET", "/PersonSrv/GetManagedGroups", { id: CurrIds[0] },
             "GET", "/PersonSrv/GetManagedGroupsNot", { id: CurrIds[0] }, "GET", "/PersonGroupSrv/Get", { getActive: true })
@@ -233,9 +234,9 @@ $(document).ready(function () {
         msValidate(MagicSuggests);
         if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
 
-            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+            showModalWait();
 
-            submitEditsGeneric(CurrIds, "EditForm", MagicSuggests, CurrRecord, "POST", "/PersonSrv/Edit")
+            submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonSrv/Edit")
                 .always(function () { $("#ModalWait").modal("hide"); })
                 .done(function () {
                     refreshTableGeneric(TableMain, "/PersonSrv/GetAll", { getActive: GetActive });
@@ -259,7 +260,7 @@ $(document).ready(function () {
         if (TableProjectsAdd.rows(".ui-selected").data().length +
             TableProjectsRemove.rows(".ui-selected").data().length == 0) showModalNothingSelected();
         else {
-            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+            showModalWait();
 
             submitEditsForRelatedGeneric(CurrIds, TableProjectsAdd.cells(".ui-selected", "Id:name").data().toArray(),
                     TableProjectsRemove.cells(".ui-selected", "Id:name").data().toArray(), "/PersonSrv/EditPersonProjects")
@@ -336,7 +337,7 @@ $(document).ready(function () {
         if (TablePersonGroupsAdd.rows(".ui-selected").data().length +
             TablePersonGroupsRemove.rows(".ui-selected").data().length == 0) showModalNothingSelected();
         else {
-            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+            showModalWait();
 
             submitEditsForRelatedGeneric(CurrIds, TablePersonGroupsAdd.cells(".ui-selected", "Id:name").data().toArray(),
                     TablePersonGroupsRemove.cells(".ui-selected", "Id:name").data().toArray(), "/PersonSrv/EditPersonGroups")
@@ -413,7 +414,7 @@ $(document).ready(function () {
         if (TableManagedGroupsAdd.rows(".ui-selected").data().length +
             TableManagedGroupsRemove.rows(".ui-selected").data().length == 0) showModalNothingSelected();
         else {
-            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+            showModalWait();
 
             submitEditsForRelatedGeneric(CurrIds, TableManagedGroupsAdd.cells(".ui-selected", "Id:name").data().toArray(),
                     TableManagedGroupsRemove.cells(".ui-selected", "Id:name").data().toArray(), "/PersonSrv/EditManagedGroups")
@@ -494,7 +495,7 @@ $(document).ready(function () {
 //Delete Records from DB
 function DeleteRecords() {
     CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+    showModalWait();
     $.ajax({ type: "POST", url: "/PersonSrv/Delete", timeout: 20000, data: { ids: CurrIds }, dataType: "json" })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () { refreshTableGeneric(TableMain, "/PersonSrv/GetAll", { getActive: GetActive }); })

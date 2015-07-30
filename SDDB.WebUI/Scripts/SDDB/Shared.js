@@ -168,7 +168,7 @@ function refreshTable(table, url, getActive, httpType, projectIds, modelIds, typ
     endDate = (typeof endDate !== "undefined") ? endDate : {};
 
     table.clear().search("").draw();
-    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+    showModalWait();
 
     $.ajax({
         type: httpType, url: url, timeout: 20000,
@@ -351,7 +351,7 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url) {
 
     $.each(currRecords, function (i, currRecord) {
         for (var property in currRecord) {
-            if (!currRecord.hasOwnProperty(property) || property.slice(-1) == "Id") {
+            if (!currRecord.hasOwnProperty(property) || property == "Id") {
                 continue;
             }
             if (property.slice(-1) == "_") {
@@ -390,11 +390,14 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url) {
 
 //Fill Form for Edit from n:n related table - generic version
 function fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
-    httpType, url, data, httpTypeNot, urlNot, dataNot, httpTypeMany, urlMany, dataMany) {
+    httpType, url, data, httpTypeNot, urlNot, dataNot, httpTypeMany, urlMany, dataMany, sortColumn) {
+
+    sortColumn = (typeof sortColumn !== "undefined") ? sortColumn : 1;
 
     var deferred0 = $.Deferred();
 
-    tableAdd.clear().search("").draw(); tableRemove.clear().search("").draw();
+    tableAdd.clear().search("").draw();
+    tableRemove.clear().search("").draw();
 
     if (ids.length == 1) {
         $.when(
@@ -402,8 +405,8 @@ function fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
             $.ajax({type: httpType, url: url, timeout: 20000, data: data, dataType: "json" })
         )
         .done(function (done1, done2) {
-            tableAdd.rows.add(done1[0]).order([1, "asc"]).draw();
-            tableRemove.rows.add(done2[0]).order([1, "asc"]).draw();
+            tableAdd.rows.add(done1[0]).order([sortColumn, "asc"]).draw();
+            tableRemove.rows.add(done2[0]).order([sortColumn, "asc"]).draw();
             deferred0.resolve();
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
@@ -411,8 +414,8 @@ function fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
     else {
         $.ajax({ type: httpTypeMany, url: urlMany, timeout: 20000, data: dataMany, dataType: "json" })
             .done(function (data) {
-                tableAdd.rows.add(data).order([1, "asc"]).draw();
-                if (ids.length != 0) tableRemove.rows.add(data).order([1, "asc"]).draw();
+                tableAdd.rows.add(data).order([sortColumn, "asc"]).draw();
+                if (ids.length != 0) tableRemove.rows.add(data).order([sortColumn, "asc"]).draw();
                 deferred0.resolve();
             })
             .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
@@ -425,7 +428,8 @@ function fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
 function submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
 
     var deferred0 = $.Deferred();
-    var deferred1 = $.Deferred(); var deferred2 = $.Deferred();
+    var deferred1 = $.Deferred();
+    var deferred2 = $.Deferred();
 
     if (idsAdd.length == 0) deferred1.resolve();
     else {

@@ -14,8 +14,8 @@ var MsFilterByProject;
 var MsFilterByAssembly;
 var MsFilterByPerson;
 var MagicSuggests = [];
-var CurrRecord = {
-    Id: null,
+var RecordTemplate = {
+    Id: "RecordTemplateId",
     LogEntryDateTime: null,
     AssemblyDb_Id: null,
     EnteredByPerson_Id: null,
@@ -36,9 +36,9 @@ var CurrRecord = {
     Comments: null,
     IsActive_bl: null
 };
+var CurrRecords = [];
 var CurrIds = [];
 var GetActive = true;
-var SelectedRecord;
 
 $(document).ready(function () {
 
@@ -47,6 +47,8 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         CurrIds = [];
+        CurrRecords = [];
+        CurrRecords[0] = RecordTemplate;
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Log Entry", "MainView");
     });
 
@@ -62,8 +64,8 @@ $(document).ready(function () {
 
             fillFormForEditGeneric(CurrIds, "POST", "/AssemblyLogEntrySrv/GetByIds", GetActive, "EditForm", "Edit Log Entry", MagicSuggests)
                 .always(hideModalWait)
-                .done(function (currRecord) {
-                    CurrRecord = currRecord;
+                .done(function (currRecords) {
+                    CurrRecords = currRecords;
                     $("#MainView").addClass("hide");
                     $("#EditFormView").removeClass("hide");
                 })
@@ -250,7 +252,7 @@ $(document).ready(function () {
         msValidate(MagicSuggests);
         if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
             showModalWait();
-            submitEditsGeneric(CurrIds, "EditForm", MagicSuggests, CurrRecord, "POST", "/AssemblyLogEntrySrv/Edit")
+            submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/AssemblyLogEntrySrv/Edit")
                 .always(hideModalWait)
                 .done(function () {
                     refreshMainView();

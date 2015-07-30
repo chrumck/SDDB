@@ -12,14 +12,14 @@ using SDDB.WebUI.Infrastructure;
 
 namespace SDDB.WebUI.ControllersSrv
 {
-    public class DBUserSrvController : BaseSrvCtrl
+    public class DbUserSrvController : BaseSrvCtrl
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
         private DBUserService dbUserService;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
-        public DBUserSrvController(DBUserService dbUserService)
+        public DbUserSrvController(DBUserService dbUserService)
         {
             this.dbUserService = dbUserService;
         }
@@ -53,7 +53,6 @@ namespace SDDB.WebUI.ControllersSrv
         public async Task<ActionResult> Edit(DBUser[] records)
         {
             ViewBag.ServiceName = "DBUserService.EditAsync";
-
             await dbUserService.EditAsync(records).ConfigureAwait(false);
             return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
@@ -64,7 +63,6 @@ namespace SDDB.WebUI.ControllersSrv
         public async Task<ActionResult> Delete(string[] ids)
         {
             ViewBag.ServiceName = "DBUserService.DeleteAsync";
-            
             await dbUserService.DeleteAsync(ids).ConfigureAwait(false);
             return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
@@ -102,10 +100,10 @@ namespace SDDB.WebUI.ControllersSrv
         // POST: /DBUserSrv/EditRoles
         [HttpPost]
         [DBSrvAuth("DBUser_Edit")]
-        public async Task<ActionResult> EditRoles(string[] ids, string[] roleNames, bool isAdd)
+        public async Task<ActionResult> EditRoles(string[] ids, string[] idsAddRem, bool isAdd)
         {
             ViewBag.ServiceName = "DBUserService.EditRolesAsync";
-            await dbUserService.AddRemoveRolesAsync(ids, roleNames, isAdd).ConfigureAwait(false);
+            await dbUserService.AddRemoveRolesAsync(ids, idsAddRem, isAdd).ConfigureAwait(false);
             return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
@@ -120,7 +118,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.Id,
                 x.Person.LastName,
                 x.Person.FirstName,
-                x.UserName, x.Email,
+                x.UserName,
+                x.Email,
                 x.LDAPAuthenticated_bl 
             }).ToList();
         }

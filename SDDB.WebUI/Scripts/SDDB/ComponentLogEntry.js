@@ -10,10 +10,12 @@
 //--------------------------------------Global Properties------------------------------------//
 
 var TableMain;
-var MsFilterByProject; var MsFilterByComponent; var MsFilterByPerson;
+var MsFilterByProject;
+var MsFilterByComponent;
+var MsFilterByPerson;
 var MagicSuggests = [];
-var CurrRecord = {
-    Id: null,
+var RecordTemplate = {
+    Id: "RecordTemplateId",
     LogEntryDateTime: null,
     Component_Id: null,
     EnteredByPerson_Id: null,
@@ -24,9 +26,9 @@ var CurrRecord = {
     Comments: null,
     IsActive_bl: null
 };
+var CurrRecords = [];
 var CurrIds = [];
 var GetActive = true;
-var SelectedRecord;
 
 $(document).ready(function () {
 
@@ -35,6 +37,8 @@ $(document).ready(function () {
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
         CurrIds = [];
+        CurrRecords = [];
+        CurrRecords[0] = RecordTemplate;
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Log Entry", "MainView");
     });
 
@@ -46,12 +50,12 @@ $(document).ready(function () {
             if (GetActive) $("#EditFormGroupIsActive").addClass("hide");
             else $("#EditFormGroupIsActive").removeClass("hide");
 
-            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+            showModalWait();
 
             fillFormForEditGeneric(CurrIds, "POST", "/ComponentLogEntrySrv/GetByIds", GetActive, "EditForm", "Edit Log Entry", MagicSuggests)
                 .always(function () { $("#ModalWait").modal("hide"); })
-                .done(function (currRecord) {
-                    CurrRecord = currRecord;
+                .done(function (currRecords) {
+                    CurrRecords = currRecords;
                     $("#MainView").addClass("hide");
                     $("#EditFormView").removeClass("hide");
                 })
@@ -184,8 +188,8 @@ $(document).ready(function () {
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
         if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
-            $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
-            submitEditsGeneric(CurrIds, "EditForm", MagicSuggests, CurrRecord, "POST", "/ComponentLogEntrySrv/Edit")
+            showModalWait();
+            submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/ComponentLogEntrySrv/Edit")
                 .always(function () { $("#ModalWait").modal("hide"); })
                 .done(function () {
                     refreshMainView();
@@ -199,7 +203,7 @@ $(document).ready(function () {
     //--------------------------------------View Initialization------------------------------------//
 
     if (typeof compId !== "undefined" && compId != "") {
-        $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+        showModalWait();
         $.ajax({
             type: "POST", url: "/ComponentSrv/GetByIds", timeout: 20000, data: { ids: [compId], getActive: true }, dataType: "json"})
             .always(function () { $("#ModalWait").modal("hide"); })
@@ -220,7 +224,7 @@ $(document).ready(function () {
 //Delete Records from DB
 function DeleteRecords() {
     CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+    showModalWait();
     $.ajax({ type: "POST", url: "/ComponentLogEntrySrv/Delete", timeout: 20000, data: { ids: CurrIds }, dataType: "json" })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () { refreshMainView(); })

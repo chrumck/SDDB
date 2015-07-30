@@ -409,6 +409,8 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\SDDB\AssemblyLogEntry.js" />
     <Content Include="Scripts\SDDB\ComponentLogEntry.js" />
+    <Content Include="Scripts\SDDB\DbUser.js" />
+    <Content Include="Scripts\SDDB\PersonLogEntryFiles.js" />
     <Content Include="Scripts\SDDB\PersonLogEntryShared.js" />
     <Content Include="Scripts\SDDB\YourActivity.js" />
     <Content Include="Scripts\SDDB\PersonLogEntry.js" />
@@ -431,7 +433,7 @@
     <Content Include="Scripts\SDDB\Person.js" />
     <Content Include="Scripts\SDDB\Project.js" />
     <Content Include="Scripts\SDDB\PersonGroup.js" />
-    <Content Include="Scripts\SDDB\SDDBUser.js" />
+    <Content Include="Scripts\SDDB\DbUser_old.js" />
     <Content Include="Scripts\SDDB\Shared.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -458,7 +460,7 @@
     <Compile Include="ControllersSrv\ComponentStatusSrvController.cs" />
     <Compile Include="ControllersSrv\AssemblyStatusSrvController.cs" />
     <Compile Include="ControllersSrv\ComponentTypeSrvController.cs" />
-    <Compile Include="ControllersSrv\DBUserSrvController.cs" />
+    <Compile Include="ControllersSrv\DbUserSrvController.cs" />
     <Compile Include="ControllersSrv\AssemblyTypeSrvController.cs" />
     <Compile Include="ControllersSrv\DocumentTypeSrvController.cs" />
     <Compile Include="ControllersSrv\PersonSrvController.cs">

@@ -186,7 +186,7 @@ $(document).ready(function () {
         $.ajax({
             type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 20000,
             data: { ids: [assyId], getActive: true }, dataType: "json",
-            beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+            beforeSend: function () { showModalWait(); }
         })
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function (data) {
@@ -214,7 +214,7 @@ function FillFormForEdit() {
     $.ajax({
         type: "POST", url: "/ComponentSrv/GetByIds", timeout: 20000,
         data: { ids: ids, getActive: (($("#ChBoxShowDeleted").prop("checked")) ? false : true) }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+        beforeSend: function () { showModalWait(); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
@@ -346,7 +346,7 @@ function SubmitEdits() {
 
     $.ajax({
         type: "POST", url: "/ComponentSrv/Edit", timeout: 20000, data: { records: editRecords }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+        beforeSend: function () { showModalWait(); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
@@ -364,7 +364,7 @@ function DeleteRecords() {
     var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
     $.ajax({
         type: "POST", url: "/ComponentSrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+        beforeSend: function () { showModalWait(); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () { RefreshMainView(); })

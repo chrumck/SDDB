@@ -73,6 +73,26 @@
   border-bottom-color: #d1d5e4;
 }
 
+/*custom panels: panel-tdo-success*/
+.panel-tdo-success {
+  border-color: #11a400;
+}
+.panel-tdo-success > .panel-heading {
+  color: #fff;
+  background-color: #13b600;
+  border-color: #11a400;
+}
+.panel-tdo-success > .panel-heading + .panel-collapse > .panel-body {
+  border-top-color: #11a400;
+}
+.panel-tdo-success > .panel-heading .badge {
+  color: #13b600;
+  background-color: #fff;
+}
+.panel-tdo-success > .panel-footer + .panel-collapse > .panel-body {
+  border-bottom-color: #11a400;
+}
+
 /*custom buttons btn-tdo-info*/
 .btn-tdo-info {
   color: #fff;

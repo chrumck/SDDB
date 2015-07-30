@@ -190,7 +190,7 @@ function FillFormForEdit() {
     $.ajax({
         type: "POST", url: "/PersonGroupSrv/GetByIds", timeout: 20000,
         data: { ids: ids, getActive: (($("#ChBoxShowDeleted").prop("checked")) ? false : true) }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+        beforeSend: function () { showModalWait(); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
@@ -269,7 +269,7 @@ function SubmitEdits() {
 
     $.ajax({
         type: "POST", url: "/PersonGroupSrv/Edit", timeout: 20000, data: { records: editRecords }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+        beforeSend: function () { showModalWait(); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function (data) {
@@ -288,7 +288,7 @@ function DeleteRecords() {
     var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
     $.ajax({
         type: "POST", url: "/PersonGroupSrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json",
-        beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+        beforeSend: function () { showModalWait(); }
     })
         .always(function () { $("#ModalWait").modal("hide"); })
         .done(function () { refreshTable(TableMain, "/PersonGroupSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true)); })
@@ -303,7 +303,7 @@ function FillGroupManagersForEdit(noOfRows) {
         var selectedRecord = TableMain.row(".ui-selected").data()
         $("#GroupManagersViewPanel").text(selectedRecord.PrsGroupName);
 
-        $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+        showModalWait();
 
         $.when(
             $.ajax({ type: "GET", url: "/PersonGroupSrv/GetGroupManagersNot", timeout: 20000, data: { id: selectedRecord.Id }, dataType: "json" }),
@@ -323,7 +323,7 @@ function FillGroupManagersForEdit(noOfRows) {
 
         $.ajax({
             type: "GET", url: "/PersonSrv/GetAll", timeout: 20000, data: { getActive: true }, dataType: "json",
-            beforeSend: function () { $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false }); }
+            beforeSend: function () { showModalWait(); }
         })
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function (data) {
@@ -342,7 +342,7 @@ function SubmitGroupManagersEdits() {
     var dbRecordsAdd = TableGroupManagersAdd.cells(".ui-selected", "Id:name").data().toArray();
     var dbRecordsRemove = TableGroupManagersRemove.cells(".ui-selected", "Id:name").data().toArray();
 
-    $("#ModalWait").modal({ show: true, backdrop: "static", keyboard: false });
+    showModalWait();
 
     var deferred1 = $.Deferred();
     if (dbRecordsAdd.length == 0) deferred1.resolve();
