@@ -44,10 +44,24 @@ namespace SDDB.Domain.Services
                 await checkBeforeEditHelperAsync(dbContext, records).ConfigureAwait(false);
                 return await editHelperAsync(dbContext, records).ConfigureAwait(false);
             })
-                .ConfigureAwait(false);
+            .ConfigureAwait(false);
 
             return newEntryIds;
         }
+
+        // Create and Update extended table records given in [] (meant at this point for AssemblyExt and ComponentExt)
+        public virtual async Task EditExtendedAsync<TExtended>(TExtended[] records) where TExtended: class, IDbEntity
+        {
+            if (records == null || records.Length == 0) { throw new ArgumentNullException("records"); }
+
+            await dbScopeHelperAsync(async dbContext =>
+            {
+                await editExtendedHelperAsync(dbContext, records).ConfigureAwait(false);
+                return default(int);
+            })
+            .ConfigureAwait(false);
+        }
+
 
         // Delete records by their Ids
         public virtual async Task DeleteAsync(string[] ids)
@@ -55,12 +69,15 @@ namespace SDDB.Domain.Services
             if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
 
             await dbScopeHelperAsync(async dbContext =>
-                {
-                    await checkBeforeDeleteHelperAsync(dbContext, ids).ConfigureAwait(false);
-                    return await deleteHelperAsync(dbContext, ids).ConfigureAwait(false);
-                })
-                .ConfigureAwait(false);
+            {
+                await checkBeforeDeleteHelperAsync(dbContext, ids).ConfigureAwait(false);
+                await deleteHelperAsync(dbContext, ids).ConfigureAwait(false);
+                return default(int);
+            })
+            .ConfigureAwait(false);
         }
+
+        //-----------------------------------------------------------------------------------------------------------------------
                 
         //Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T 
         public virtual async Task AddRemoveRelated<TAddRem> (string[] ids, string[] idsAddRem, 
@@ -82,7 +99,8 @@ namespace SDDB.Domain.Services
 
                 var dbEntriesAddRem = await getEntriesFromContextHelperAsync<TAddRem>(dbContext, idsAddRem)
                     .ConfigureAwait(false);
-                if (dbEntriesAddRem.Count != idsAddRem.Length) {
+                if (dbEntriesAddRem.Count != idsAddRem.Length)
+                {
                     throw new DbBadRequestException(
                         String.Format("Add/Remove to {0} failed, related entry(ies) not found", relatedCollectionName)); 
                 }
@@ -108,6 +126,7 @@ namespace SDDB.Domain.Services
             await AddRemoveRelated<TAddRem>(ids, idsAddRem, body.Member.Name, isAdd).ConfigureAwait(false);
         }
 
+        
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
@@ -177,7 +196,7 @@ namespace SDDB.Domain.Services
 
         //-----------------------------------------------------------------------------------------------------------------------
 
-        //helper - check before deleting records, takes single T record
+        //helper - check before deleting records, takes T ids array
         //stub method for derived classes to implement
         protected virtual Task checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
         {
@@ -185,14 +204,12 @@ namespace SDDB.Domain.Services
         }
                 
         //helper -  deleting db entries (setting isActive_bl to false) 
-        protected virtual async Task<int> deleteHelperAsync(EFDbContext dbContext, string[] ids)
+        protected virtual async Task deleteHelperAsync(EFDbContext dbContext, string[] ids)
         {
             var dbEntries = await getEntriesFromContextHelperAsync<T>(dbContext, ids).ConfigureAwait(false);
-            if (dbEntries.Count() != ids.Length) { throw new DbBadRequestException("Delete failed, entry(ies) not found"); }
+            if (dbEntries.Count != ids.Length) { throw new DbBadRequestException("Delete failed, entry(ies) not found"); }
 
             dbEntries.ForEach(x => x.IsActive_bl = false);
-            
-            return default(int);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -226,6 +243,38 @@ namespace SDDB.Domain.Services
                 }
             }
             return default(int);
+        }
+
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        //editExtHelper - takes single record and adds or updates the dbEntry
+        protected virtual async Task editExtendedHelperAsync<TExtended>(EFDbContext dbContext, TExtended record) 
+            where TExtended : class, IDbEntity
+        {
+            var dbEntry = await dbContext.Set<TExtended>().FindAsync(record.Id).ConfigureAwait(false);
+            if (dbEntry == null)
+            {
+                if (await dbContext.Set<T>().FindAsync(record.Id).ConfigureAwait(false) == null)
+                {
+                    throw new DbBadRequestException(
+                        String.Format("Entity {0} with id={1} not found.\n", typeof(TExtended).Name ,record.Id));
+                }
+                dbContext.Set<TExtended>().Add(record);
+            }
+            else
+            {
+                dbEntry.CopyModifiedProps(record);
+            }
+        }
+
+        //editExtHelper - overload for array of T records
+        protected virtual async Task editExtendedHelperAsync<TExtended>(EFDbContext dbContext, TExtended[] records) 
+            where TExtended : class, IDbEntity
+        {
+            for (int i = 0; i < records.Length; i++)
+            {
+                await editExtendedHelperAsync<TExtended>(dbContext, records[i]).ConfigureAwait(false);
+            }
         }
 
         //-----------------------------------------------------------------------------------------------------------------------

@@ -262,12 +262,27 @@ namespace SDDB.WebUI.ControllersSrv
             {
                 x.Id,
                 x.LogEntryDateTime,
-                EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
-                PersonActivityType_ = new { x.PersonActivityType.ActivityTypeName },
+                EnteredByPerson_ = new {
+                    x.EnteredByPerson.FirstName,
+                    x.EnteredByPerson.LastName,
+                    x.EnteredByPerson.Initials 
+                },
+                PersonActivityType_ = new { 
+                    x.PersonActivityType.ActivityTypeName 
+                },
                 x.ManHours,
-                AssignedToProject_ = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                AssignedToLocation_ = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName },
-                AssignedToProjectEvent_ = new { x.AssignedToProjectEvent.EventName },
+                AssignedToProject_ = new { 
+                    x.AssignedToProject.ProjectName,
+                    x.AssignedToProject.ProjectAltName,
+                    x.AssignedToProject.ProjectCode 
+                },
+                AssignedToLocation_ = new { 
+                    x.AssignedToLocation.LocName,
+                    x.AssignedToLocation.LocAltName 
+                },
+                AssignedToProjectEvent_ = new {
+                    x.AssignedToProjectEvent.EventName
+                },
                 x.Comments,
                 x.IsActive_bl,
                 x.EnteredByPerson_Id,

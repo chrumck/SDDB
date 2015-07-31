@@ -15,166 +15,173 @@ using SDDB.Domain.Infrastructure;
 
 namespace SDDB.Domain.Services
 {
-    public class AssemblyDbService
+    public class AssemblyDbService : BaseDbService<AssemblyDb>
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
-        private IDbContextScopeFactory contextScopeFac;
+        private IReadOnlyList<string> loggedProperties = new List<string> {"AssemblyStatus_Id", "AssignedToProject_Id",
+            "AssignedToLocation_Id", "AssyGlobalX", "AssyGlobalY", "AssyGlobalZ", "AssyLocalXDesign", "AssyLocalYDesign",
+            "AssyLocalZDesign","AssyLocalXAsBuilt", "AssyLocalYAsBuilt", "AssyLocalZAsBuilt", "AssyStationing", "AssyLength"};
+        private IReadOnlyList<string> modifiedPropsForStatusChange = new List<string> { "AssemblyStatus_Id" };
 
         //Constructors---------------------------------------------------------------------------------------------------------//
 
-        public AssemblyDbService(IDbContextScopeFactory contextScopeFac)
-        {
-            this.contextScopeFac = contextScopeFac;
-        }
+        public AssemblyDbService(IDbContextScopeFactory contextScopeFac, string userId) : base(contextScopeFac, userId) { }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
-        //get all 
-        public virtual async Task<List<AssemblyDb>> GetAsync(string userId, bool getActive = true)
-        {
-            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
-
-            using (var dbContextScope = contextScopeFac.CreateReadOnly())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                var records = await dbContext.AssemblyDbs
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive)
-                    .Include(x => x.AssemblyType).Include(x => x.AssemblyStatus).Include(x => x.AssemblyModel).Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToLocation).Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssemblyExt)
-                    .ToListAsync().ConfigureAwait(false);
-
-                foreach (var record in records) { record.FillRelatedIfNull(); }
-                
-                return records;
-            }
-        }
-
         //get by ids
-        public virtual async Task<List<AssemblyDb>> GetAsync(string userId, string[] ids, bool getActive = true)
+        public virtual async Task<List<AssemblyDb>> GetAsync(string[] ids, bool getActive = true)
         {
-            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
-            if (ids == null || ids.Length == 0) throw new ArgumentNullException("ids");
+            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+                
                 var records = await dbContext.AssemblyDbs
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive && ids.Contains(x.Id))
-                    .Include(x => x.AssemblyType).Include(x => x.AssemblyStatus).Include(x => x.AssemblyModel).Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToLocation).Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssemblyExt)
+                    .Where(x => 
+                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
+                        ids.Contains(x.Id) &&
+                        x.IsActive_bl == getActive
+                        )
+                    .Include(x => x.AssemblyType)
+                    .Include(x => x.AssemblyStatus)
+                    .Include(x => x.AssemblyModel)
+                    .Include(x => x.AssignedToProject)
+                    .Include(x => x.AssignedToLocation)
+                    .Include(x => x.AssignedToLocation.LocationType)
+                    .Include(x => x.AssemblyExt)
                     .ToListAsync().ConfigureAwait(false);
 
-                foreach (var record in records) { record.FillRelatedIfNull(); }
-                
+                records.FillRelatedIfNull();
                 return records;
             }
         }
 
         //get by projectIds and modelIds
-        public virtual async Task<List<AssemblyDb>> GetByAltIdsAsync(string userId, string[] projectIds = null, string[] modelIds = null, bool getActive = true)
+        public virtual async Task<List<AssemblyDb>> GetByAltIdsAsync(string[] projectIds, string[] modelIds, bool getActive = true)
         {
-            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+            projectIds = projectIds ?? new string[] { };
+            modelIds = modelIds ?? new string[] { };
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
-                projectIds = projectIds ?? new string[] { }; modelIds = modelIds ?? new string[] { };
-
                 var records = await dbContext.AssemblyDbs
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
+                    .Where(x => 
+                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && 
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
-                        (modelIds.Count() == 0 || modelIds.Contains(x.AssemblyModel_Id)))
-                    .Include(x => x.AssemblyType).Include(x => x.AssemblyStatus).Include(x => x.AssemblyModel).Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToLocation).Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssemblyExt)
+                        (modelIds.Count() == 0 || modelIds.Contains(x.AssemblyModel_Id)) &&
+                        x.IsActive_bl == getActive
+                        )
+                    .Include(x => x.AssemblyType)
+                    .Include(x => x.AssemblyStatus)
+                    .Include(x => x.AssemblyModel)
+                    .Include(x => x.AssignedToProject)
+                    .Include(x => x.AssignedToLocation)
+                    .Include(x => x.AssignedToLocation.LocationType)
+                    .Include(x => x.AssemblyExt)
                     .ToListAsync().ConfigureAwait(false);
 
-                foreach (var record in records) { record.FillRelatedIfNull(); }
-                
+                records.FillRelatedIfNull();
                 return records;
             }
         }
 
         //get by projectIds, typeIds and locIds
-        public virtual async Task<List<AssemblyDb>> GetByAltIdsAsync(string userId,
-            string[] projectIds = null, string[] typeIds = null, string[] locIds = null, bool getActive = true)
+        public virtual async Task<List<AssemblyDb>> GetByAltIdsAsync(string[] projectIds, string[] typeIds, string[] locIds,
+            bool getActive = true)
         {
-            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+            projectIds = projectIds ?? new string[] { };
+            typeIds = typeIds ?? new string[] { };
+            locIds = locIds ?? new string[] { };
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
-                projectIds = projectIds ?? new string[] { }; typeIds = typeIds ?? new string[] { }; locIds = locIds ?? new string[] { };
-
                 var records = await dbContext.AssemblyDbs
-                        .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
+                        .Where(x =>
+                            x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
                             (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                             (typeIds.Count() == 0 || typeIds.Contains(x.AssemblyType_Id)) &&
-                            (locIds.Count() == 0 || locIds.Contains(x.AssignedToLocation_Id)))
-                        .Include(x => x.AssemblyType).Include(x => x.AssemblyStatus).Include(x => x.AssemblyModel).Include(x => x.AssignedToProject)
-                        .Include(x => x.AssignedToLocation).Include(x => x.AssignedToLocation.LocationType).Include(x => x.AssemblyExt)
+                            (locIds.Count() == 0 || locIds.Contains(x.AssignedToLocation_Id)) &&
+                            x.IsActive_bl == getActive
+                            )
+                        .Include(x => x.AssemblyType)
+                        .Include(x => x.AssemblyStatus)
+                        .Include(x => x.AssemblyModel)
+                        .Include(x => x.AssignedToProject)
+                        .Include(x => x.AssignedToLocation)
+                        .Include(x => x.AssignedToLocation.LocationType)
+                        .Include(x => x.AssemblyExt)
                         .ToListAsync().ConfigureAwait(false);
 
-                foreach (var record in records) { record.FillRelatedIfNull(); }
-
+                records.FillRelatedIfNull();
                 return records;
             }
         }
 
         //lookup by query
-        public virtual Task<List<AssemblyDb>> LookupAsync(string userId, string query = "", bool getActive = true)
+        public virtual async Task<List<AssemblyDb>> LookupAsync(string query = "", bool getActive = true)
         {
-            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
-
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.AssemblyDbs
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
-                        (x.AssyName.Contains(query) || x.AssyAltName.Contains(query) || x.AssyAltName2.Contains(query) ||
-                        x.AssignedToProject.ProjectCode.Contains(query)))
-                    .Include(x => x.AssignedToProject).ToListAsync();
+                
+                var records = await dbContext.AssemblyDbs
+                    .Where(x =>
+                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && 
+                        (x.AssyName.Contains(query) || x.AssignedToProject.ProjectCode.Contains(query)) &&
+                        x.IsActive_bl == getActive
+                        )
+                    .Include(x => x.AssignedToProject)
+                    .ToListAsync().ConfigureAwait(false);
+                return records;
             }
         }
 
         //lookup by query and project
-        public virtual async Task<List<AssemblyDb>> LookupByProjAsync(string userId, string[] projectIds = null, string query = "", bool getActive = true)
+        public virtual async Task<List<AssemblyDb>> LookupByProjAsync(string[] projectIds, string query = "",
+            bool getActive = true)
         {
-            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+            projectIds = projectIds ?? new string[] { };
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
-                projectIds = projectIds ?? new string[] { };
-
                 var records = await dbContext.AssemblyDbs
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
+                    .Where(x =>
+                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
-                        (x.AssyName.Contains(query) || x.AssyAltName.Contains(query) || x.AssyAltName2.Contains(query)))
-                    .Include(x => x.AssignedToProject).ToListAsync();
+                        (x.AssyName.Contains(query) || x.AssignedToProject.ProjectCode.Contains(query)) &&
+                        x.IsActive_bl == getActive
+                        )
+                    .Include(x => x.AssignedToProject)
+                    .ToListAsync().ConfigureAwait(false);
 
                 return records;
             }
         }
 
         //lookup by location
-        public virtual async Task<List<AssemblyDb>> LookupByLocAsync(string userId, string locId = null, bool getActive = true)
+        public virtual async Task<List<AssemblyDb>> LookupByLocAsync(string locId = "", bool getActive = true)
         {
-            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
-
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
-                locId = locId ?? "";
-
                 var records = await dbContext.AssemblyDbs
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
-                        (locId == "" || x.AssignedToLocation_Id == locId))
-                    .Include(x => x.AssignedToProject).ToListAsync();
+                    .Where(x => 
+                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
+                        (locId == "" || x.AssignedToLocation_Id == locId) &&
+                        x.IsActive_bl == getActive
+                        )
+                    .Include(x => x.AssignedToProject)
+                    .ToListAsync().ConfigureAwait(false);
 
                 return records;
             }
@@ -182,184 +189,75 @@ namespace SDDB.Domain.Services
 
         //-----------------------------------------------------------------------------------------------------------------------
 
-        // Create and Update records given in []
-        public virtual async Task<DBResult> EditAsync(string userId, AssemblyDb[] records)
-        {
-            if (string.IsNullOrEmpty(userId))
-                return new DBResult { StatusCode = HttpStatusCode.BadRequest, StatusDescription = "arguments missing" };
+        // Create and Update records given in [] - same as BaseDbService
+        // See overriden editHelperAsync(EFDbContext dbContext, AssemblyDb record)
 
-            var errorMessage = "";
-            var newEntries = 1;
-            var loggedProperties = new string[] { "AssemblyStatus_Id", "AssignedToProject_Id", "AssignedToLocation_Id",
-                                "AssyGlobalX", "AssyGlobalY", "AssyGlobalZ", "AssyLocalXDesign", "AssyLocalYDesign", "AssyLocalZDesign",
-                                "AssyLocalXAsBuilt", "AssyLocalYAsBuilt", "AssyLocalZAsBuilt", "AssyStationing", "AssyLength"};
 
-            using (var dbContextScope = contextScopeFac.Create())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    foreach (var record in records)
-                    {
-                        var dbEntry = await dbContext.AssemblyDbs.FindAsync(record.Id).ConfigureAwait(false);
-                        if (dbEntry == null)
-                        {
-                            record.Id = Guid.NewGuid().ToString();
+        // Create and Update AssemblyExt records given in [] - same as BaseDbService
 
-                            if (newEntries > 1)
-                            {
-                                var excludedProperties = new string[] { "Id", "TSP" };
-                                var properties = typeof(AssemblyDb).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
-                                foreach (var property in properties)
-                                {
-                                    if (property.GetCustomAttributes(typeof(DBIsUniqueAttribute), false).FirstOrDefault() == null) continue;
-                                    property.SetValue(record, property.GetValue(record) + String.Format("_{0:D3}", newEntries));
-                                }
-                            }
-                            dbContext.AssemblyDbs.Add(record); newEntries++;
-                        }
-                        else
-                        {
-                            dbEntry.CopyModifiedProps(record);
-                            if (record.LoggedPropsModified(loggedProperties)) addLogEntry(dbContext, dbEntry, userId);
-                        }
-                    }
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
 
-                    trans.Complete();
-                }
-            }
-            if (errorMessage == "") return new DBResult();
-            else return new DBResult
-            {
-                StatusCode = HttpStatusCode.Conflict,
-                StatusDescription = "Errors editing records:\n" + errorMessage
-            };
-        }
+        // Delete records by their Ids - same as BaseDbService
+        // See overriden checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
+
 
         // change status given as statusId of records given as recordIds[]
-        public virtual async Task<DBResult> EditStatusAsync(string userId, string[] ids, string statusId)
+        public virtual async Task EditStatusAsync(string[] ids, string statusId)
         {
-            if (ids == null || ids.Length == 0 || string.IsNullOrEmpty(statusId) || string.IsNullOrEmpty(userId))
-                return new DBResult { StatusCode = HttpStatusCode.BadRequest, StatusDescription = "arguments missing" };
+            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
+            if (String.IsNullOrEmpty(statusId)) { throw new ArgumentNullException("statusId"); }
 
-            var errorMessage = "";
-            using (var dbContextScope = contextScopeFac.Create())
+            var dbEntries = await GetAsync(ids).ConfigureAwait(false);
+            if (ids.Length != dbEntries.Count) { throw new DbBadRequestException("Edit status failed, entry(ies) not found."); }
+
+            foreach (var dbEntry in dbEntries)
             {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                if (dbEntry.AssemblyStatus_Id != statusId)
                 {
-                    foreach (var recordId in ids)
-                    {
-                        var dbEntry = await dbContext.AssemblyDbs.FindAsync(recordId).ConfigureAwait(false);
-                        if (dbEntry != null)
-                        {
-                            if (dbEntry.AssemblyStatus_Id != statusId)
-                            {
-                                dbEntry.AssemblyStatus_Id = statusId;
-                                addLogEntry(dbContext, dbEntry, userId);
-                            }
-                        }
-                        else errorMessage += string.Format("Record with id:{0} not found\n", recordId);
-                    }
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-
-                    trans.Complete();
+                    dbEntry.AssemblyStatus_Id = statusId;
+                    dbEntry.ModifiedProperties = modifiedPropsForStatusChange.ToArray();
                 }
             }
-            if (errorMessage == "") return new DBResult();
-            else return new DBResult
-            {
-                StatusCode = HttpStatusCode.Conflict,
-                StatusDescription = "Errors editing records:\n" + errorMessage
-            };
+            await EditAsync(dbEntries.ToArray()).ConfigureAwait(false);
         }
 
-        // Delete records by their Ids
-        public virtual async Task<DBResult> DeleteAsync(string[] ids)
-        {
-            var errorMessage = "";
-            using (var dbContextScope = contextScopeFac.Create())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    foreach (var id in ids)
-                    {
-                        var dbEntry = await dbContext.AssemblyDbs.FindAsync(id).ConfigureAwait(false);
-                        if (dbEntry != null)
-                        {
-                            //tasks prior to desactivating: check if components assigned to assembly
-                            if ((await dbContext.Components.Where(x => x.IsActive_bl == true && x.AssignedToAssemblyDb_Id == id).CountAsync().ConfigureAwait(false)) > 0)
-                                errorMessage += string.Format("Assembly {0} not deleted, it has components assigned to it\n", dbEntry.AssyName);
-                            else
-                            {
-                                dbEntry.IsActive_bl = false;
-                            }
-                        }
-                        else
-                        {
-                            errorMessage += string.Format("Record with Id={0} not found\n", id);
-                        }
-                    }
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-
-                    trans.Complete();
-                }
-            }
-            if (errorMessage == "") return new DBResult();
-            else return new DBResult
-            {
-                StatusCode = HttpStatusCode.Conflict,
-                StatusDescription = "Errors deleting records:\n" + errorMessage
-            };
-        }
-
-        //-----------------------------------------------------------------------------------------------------------------------
-
-        // Create and Update records given in [] - AssemblyExt
-        public virtual async Task<DBResult> EditExtAsync(AssemblyExt[] records)
-        {
-            var errorMessage = "";
-            using (var dbContextScope = contextScopeFac.Create())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    foreach (var record in records)
-                    {
-                        var dbEntry = await dbContext.AssemblyExts.FindAsync(record.Id).ConfigureAwait(false);
-                        if (dbEntry == null)
-                        {
-                            if (await dbContext.AssemblyDbs.FindAsync(record.Id).ConfigureAwait(false) == null)
-                                errorMessage += String.Format("Assembly with id={0} not found.\n", record.Id);
-                            else
-                                dbContext.AssemblyExts.Add(record);
-                        }
-                        else
-                        {
-                            dbEntry.CopyModifiedProps(record);
-                        }
-                    }
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-
-                    trans.Complete();
-                }
-            }
-            if (errorMessage == "") return new DBResult();
-            else return new DBResult
-            {
-                StatusCode = HttpStatusCode.Conflict,
-                StatusDescription = "Errors deleting records:\n" + errorMessage
-            };
-        }
-
-
+               
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
 
+        //helper - editing records, takes single AssemblyDb record - override 
+        protected override async Task<string> editHelperAsync(EFDbContext dbContext, AssemblyDb record)
+        {
+            var dbEntry = await dbContext.AssemblyDbs.FindAsync(record.Id).ConfigureAwait(false);
+            if (dbEntry == null)
+            {
+                record.Id = Guid.NewGuid().ToString();
+                dbContext.AssemblyDbs.Add(record);
+                addLogEntryHelper(dbContext, record);
+                return record.Id;
+            }
+            dbEntry.CopyModifiedProps(record);
+            if (record.LoggedPropsModified(loggedProperties.ToArray())) { addLogEntryHelper(dbContext, dbEntry); }
+            return null;
+        }
+
+        //helper - check before deleting records, takes AssemblyDb ids array
+        protected override async Task checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
+        {
+            for (int i = 0; i < ids.Length; i++)
+            {
+                var assignedCompsCount = await dbContext.Components
+                    .CountAsync(x => x.IsActive_bl && x.AssignedToAssemblyDb_Id == ids[i]).ConfigureAwait(false);
+                if (assignedCompsCount > 0)
+                {
+                    var dbEntry = await dbContext.AssemblyDbs.FindAsync(ids[i]).ConfigureAwait(false);
+                    throw new DbBadRequestException(
+                        string.Format("Delete failed\n Assembly {0} has components assigned to it.", dbEntry.AssyName));
+                }
+            }
+        }
+        
         //adds log entry to the dbContext based on assembly data and user Id
-        private void addLogEntry(EFDbContext dbContext, AssemblyDb dbEntry, string userId)
+        private void addLogEntryHelper(EFDbContext dbContext, AssemblyDb dbEntry)
         {
             dbContext.AssemblyLogEntrys.Add(
                 new AssemblyLogEntry
@@ -387,6 +285,7 @@ namespace SDDB.Domain.Services
                 }
             );
         }
+
 
         #endregion
     }

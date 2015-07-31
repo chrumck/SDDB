@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -23,150 +25,71 @@ namespace SDDB.WebUI.ControllersSrv
         }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
-
-        // GET: /AssemblyDbSrv/Get
-        [DBSrvAuth("Assembly_View")]
-        public async Task<ActionResult> Get(bool getActive = true)
-        {
-            var data = (await assemblyService.GetAsync(UserId, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.AssyName, x.AssyAltName, x.AssyAltName2, 
-                x.AssemblyType.AssyTypeName, x.AssemblyStatus.AssyStatusName, x.AssemblyModel.AssyModelName,
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                AssignedToLocation = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName, x.AssignedToLocation.LocationType.LocTypeName },
-                x.AssyGlobalX, x.AssyGlobalY, x.AssyGlobalZ, x.AssyLocalXDesign, x.AssyLocalYDesign, x.AssyLocalZDesign,
-                x.AssyLocalXAsBuilt, x.AssyLocalYAsBuilt, x.AssyLocalZAsBuilt, x.AssyStationing, x.AssyLength, x.AssyReadingIntervalSecs,
-                IsReference = x.IsReference_bl , x.TechnicalDetails, x.PowerSupplyDetails, x.HSEDetails, x.Comments, IsActive = x.IsActive_bl,
-                x.AssemblyExt.Attr01,x.AssemblyExt.Attr02,x.AssemblyExt.Attr03,x.AssemblyExt.Attr04,x.AssemblyExt.Attr05,
-                x.AssemblyExt.Attr06,x.AssemblyExt.Attr07,x.AssemblyExt.Attr08,x.AssemblyExt.Attr09,x.AssemblyExt.Attr10,
-                x.AssemblyExt.Attr11,x.AssemblyExt.Attr12,x.AssemblyExt.Attr13,x.AssemblyExt.Attr14,x.AssemblyExt.Attr15,
-                x.AssemblyType_Id, x.AssemblyStatus_Id, x.AssemblyModel_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id
-            });
-
-            ViewBag.ServiceName = "AssemblyDbService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
-        }
-        
+                
         // POST: /AssemblyDbSrv/GetByIds
         [HttpPost]
         [DBSrvAuth("Assembly_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
-            var data = (await assemblyService.GetAsync(UserId, ids, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.AssyName, x.AssyAltName, x.AssyAltName2, 
-                x.AssemblyType.AssyTypeName, x.AssemblyStatus.AssyStatusName, x.AssemblyModel.AssyModelName,
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                AssignedToLocation = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName, x.AssignedToLocation.LocationType.LocTypeName },
-                x.AssyGlobalX, x.AssyGlobalY, x.AssyGlobalZ, x.AssyLocalXDesign, x.AssyLocalYDesign, x.AssyLocalZDesign,
-                x.AssyLocalXAsBuilt, x.AssyLocalYAsBuilt, x.AssyLocalZAsBuilt, x.AssyStationing, x.AssyLength, x.AssyReadingIntervalSecs,
-                IsReference = x.IsReference_bl , x.TechnicalDetails, x.PowerSupplyDetails, x.HSEDetails, x.Comments, IsActive = x.IsActive_bl,
-                x.AssemblyExt.Attr01,x.AssemblyExt.Attr02,x.AssemblyExt.Attr03,x.AssemblyExt.Attr04,x.AssemblyExt.Attr05,
-                x.AssemblyExt.Attr06,x.AssemblyExt.Attr07,x.AssemblyExt.Attr08,x.AssemblyExt.Attr09,x.AssemblyExt.Attr10,
-                x.AssemblyExt.Attr11,x.AssemblyExt.Attr12,x.AssemblyExt.Attr13,x.AssemblyExt.Attr14,x.AssemblyExt.Attr15,
-                x.AssemblyType_Id, x.AssemblyStatus_Id, x.AssemblyModel_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id
-            });
-
             ViewBag.ServiceName = "AssemblyDbService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json( data , JsonRequestBehavior.AllowGet);
+            var records = (await assemblyService.GetAsync(ids, getActive).ConfigureAwait(false));
+            return Json( filterForJsonFull(records) , JsonRequestBehavior.AllowGet);
         }
 
         // POST: /AssemblyDbSrv/GetByAltIds
         [HttpPost]
         [DBSrvAuth("Assembly_View")]
-        public async Task<ActionResult> GetByAltIds(string[] projectIds = null, string[] modelIds = null, bool getActive = true)
+        public async Task<ActionResult> GetByAltIds(string[] projectIds, string[] modelIds, bool getActive = true)
         {
-            var data = (await assemblyService.GetByAltIdsAsync(UserId, projectIds, modelIds, getActive).ConfigureAwait(false)).Select(x => new
-            {
-                x.Id, x.AssyName, x.AssyAltName, x.AssyAltName2, 
-                x.AssemblyType.AssyTypeName, x.AssemblyStatus.AssyStatusName, x.AssemblyModel.AssyModelName,
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                AssignedToLocation = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName, x.AssignedToLocation.LocationType.LocTypeName },
-                x.AssyGlobalX, x.AssyGlobalY, x.AssyGlobalZ, x.AssyLocalXDesign, x.AssyLocalYDesign, x.AssyLocalZDesign,
-                x.AssyLocalXAsBuilt, x.AssyLocalYAsBuilt, x.AssyLocalZAsBuilt, x.AssyStationing, x.AssyLength, x.AssyReadingIntervalSecs,
-                IsReference = x.IsReference_bl , x.TechnicalDetails, x.PowerSupplyDetails, x.HSEDetails, x.Comments, IsActive = x.IsActive_bl,
-                x.AssemblyExt.Attr01,x.AssemblyExt.Attr02,x.AssemblyExt.Attr03,x.AssemblyExt.Attr04,x.AssemblyExt.Attr05,
-                x.AssemblyExt.Attr06,x.AssemblyExt.Attr07,x.AssemblyExt.Attr08,x.AssemblyExt.Attr09,x.AssemblyExt.Attr10,
-                x.AssemblyExt.Attr11,x.AssemblyExt.Attr12,x.AssemblyExt.Attr13,x.AssemblyExt.Attr14,x.AssemblyExt.Attr15,
-                x.AssemblyType_Id, x.AssemblyStatus_Id, x.AssemblyModel_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id
-            });
-
             ViewBag.ServiceName = "AssemblyDbService.GetByAltIdsAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            var records = (await assemblyService.GetByAltIdsAsync(projectIds, modelIds, getActive).ConfigureAwait(false));
+            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
         }
 
         // POST: /AssemblyDbSrv/GetByAltIds
         [HttpPost]
         [DBSrvAuth("Assembly_View")]
-        public async Task<ActionResult> GetByAltIds2(string[] projectIds = null, string[] typeIds = null, string[] locIds = null, bool getActive = true)
+        public async Task<ActionResult> GetByAltIds2(string[] projectIds, string[] typeIds, string[] locIds, bool getActive = true)
         {
-            var data = (await assemblyService.GetByAltIdsAsync(UserId, projectIds, typeIds, locIds, getActive).ConfigureAwait(false)).Select(x => new
-            {
-                x.Id, x.AssyName, x.AssyAltName, x.AssyAltName2, 
-                x.AssemblyType.AssyTypeName, x.AssemblyStatus.AssyStatusName, x.AssemblyModel.AssyModelName,
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                AssignedToLocation = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName, x.AssignedToLocation.LocationType.LocTypeName },
-                x.AssyGlobalX, x.AssyGlobalY, x.AssyGlobalZ, x.AssyLocalXDesign, x.AssyLocalYDesign, x.AssyLocalZDesign,
-                x.AssyLocalXAsBuilt, x.AssyLocalYAsBuilt, x.AssyLocalZAsBuilt, x.AssyStationing, x.AssyLength, x.AssyReadingIntervalSecs,
-                IsReference = x.IsReference_bl , x.TechnicalDetails, x.PowerSupplyDetails, x.HSEDetails, x.Comments, IsActive = x.IsActive_bl,
-                x.AssemblyExt.Attr01,x.AssemblyExt.Attr02,x.AssemblyExt.Attr03,x.AssemblyExt.Attr04,x.AssemblyExt.Attr05,
-                x.AssemblyExt.Attr06,x.AssemblyExt.Attr07,x.AssemblyExt.Attr08,x.AssemblyExt.Attr09,x.AssemblyExt.Attr10,
-                x.AssemblyExt.Attr11,x.AssemblyExt.Attr12,x.AssemblyExt.Attr13,x.AssemblyExt.Attr14,x.AssemblyExt.Attr15,
-                x.AssemblyType_Id, x.AssemblyStatus_Id, x.AssemblyModel_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id
-            });
-
             ViewBag.ServiceName = "AssemblyDbService.GetByAltIdsAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            var records = (await assemblyService.GetByAltIdsAsync(projectIds, typeIds, locIds, getActive).ConfigureAwait(false));
+            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
         }
 
 
         // GET: /AssemblyDbSrv/Lookup
         public async Task<ActionResult> Lookup(string query = "", bool getActive = true)
         {
-            var records = await assemblyService.LookupAsync(UserId, query, getActive).ConfigureAwait(false);
-
             ViewBag.ServiceName = "AssemblyDbService.LookupAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(records.OrderBy(x => x.AssyName)
-                .Select(x => new { id = x.Id, name = x.AssyName + " - " + x.AssignedToProject.ProjectName }), JsonRequestBehavior.AllowGet);
+            var records = await assemblyService.LookupAsync(query, getActive).ConfigureAwait(false);
+            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /AssemblyDbSrv/LookupByProj
-        public async Task<ActionResult> LookupByProj(string projectIds = null, string query = "", bool getActive = true)
+        public async Task<ActionResult> LookupByProj(string projectIds, string query = "", bool getActive = true)
         {
             string[] projectIdsArray = null;
-            if (projectIds != null && projectIds != "") projectIdsArray = projectIds.Split(',');
-
-            var records = await assemblyService.LookupByProjAsync(UserId, projectIdsArray, query, getActive).ConfigureAwait(false);
+            if (!String.IsNullOrEmpty(projectIds)) { projectIdsArray = projectIds.Split(','); }
 
             ViewBag.ServiceName = "AssemblyDbService.LookupByProjAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(records.OrderBy(x => x.AssyName)
-                .Select(x => new { id = x.Id, name = x.AssyName + " - " + x.AssignedToProject.ProjectName }), JsonRequestBehavior.AllowGet);
+            var records = await assemblyService.LookupByProjAsync(projectIdsArray, query, getActive).ConfigureAwait(false);
+            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /AssemblyDbSrv/LookupByLoc
         public async Task<ActionResult> LookupByLoc(string locId = null, bool getActive = true)
         {
-            var records = await assemblyService.LookupByLocAsync(UserId, locId, getActive).ConfigureAwait(false);
-
             ViewBag.ServiceName = "AssemblyDbService.LookupByLocAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(records.OrderBy(x => x.AssyName)
-                .Select(x => new { id = x.Id, name = x.AssyName + " - " + x.AssignedToProject.ProjectName }), JsonRequestBehavior.AllowGet);
+            var records = await assemblyService.LookupByLocAsync(locId, getActive).ConfigureAwait(false);
+            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /AssemblyDbSrv/LookupByLocDTables
         public async Task<ActionResult> LookupByLocDTables(string locId = null, bool getActive = true)
         {
-            var records = await assemblyService.LookupByLocAsync(UserId, locId, getActive).ConfigureAwait(false);
-
             ViewBag.ServiceName = "AssemblyDbService.LookupByLocAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(records.OrderBy(x => x.AssyName)
-                .Select(x => new { Id = x.Id, AssyName = x.AssyName }), JsonRequestBehavior.AllowGet);
+            var records = await assemblyService.LookupByLocAsync(locId, getActive).ConfigureAwait(false);
+            return Json(filterForJsonDTables(records), JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -176,22 +99,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Assembly_Edit")]
         public async Task<ActionResult> Edit(AssemblyDb[] records)
         {
-            var serviceResult = await assemblyService.EditAsync(UserId, records).ConfigureAwait(false);
-
             ViewBag.ServiceName = "AssemblyDbService.EditAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode; 
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK; 
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            var newEntryIds = await assemblyService.EditAsync(records).ConfigureAwait(false);
+            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /AssemblyDbSrv/EditStatus
@@ -199,22 +109,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Assembly_EditStatus")]
         public async Task<ActionResult> EditStatus(string[] ids, string statusId)
         {
-            var serviceResult = await assemblyService.EditStatusAsync(UserId, ids, statusId).ConfigureAwait(false);
-
             ViewBag.ServiceName = "AssemblyDbService.EditStatusAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK; 
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            await assemblyService.EditStatusAsync(ids, statusId).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /AssemblyDbSrv/Delete
@@ -222,22 +119,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Assembly_Edit")]
         public async Task<ActionResult> Delete(string[] ids)
         {
-            var serviceResult = await assemblyService.DeleteAsync(ids).ConfigureAwait(false);
-
             ViewBag.ServiceName = "AssemblyDbService.DeleteAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            await assemblyService.DeleteAsync(ids).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -247,26 +131,103 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Assembly_Edit")]
         public async Task<ActionResult> EditExt(AssemblyExt[] records)
         {
-            var serviceResult = await assemblyService.EditExtAsync(records).ConfigureAwait(false);
-
-            ViewBag.ServiceName = "AssemblyDbService.EditExtAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            ViewBag.ServiceName = "AssemblyDbService.EditExtendedAsync";
+            await assemblyService.EditExtendedAsync(records).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
+
+        //filterForJsonFull - filter data from service to be passed as response
+        private object filterForJsonFull(List<AssemblyDb> records)
+        {
+            return records.Select(x => new
+            {
+                x.Id,
+                x.AssyName,
+                x.AssyAltName,
+                x.AssyAltName2,
+                x.AssemblyType.AssyTypeName,
+                x.AssemblyStatus.AssyStatusName,
+                x.AssemblyModel.AssyModelName,
+                AssignedToProject_ = new {
+                    x.AssignedToProject.ProjectName,
+                    x.AssignedToProject.ProjectAltName,
+                    x.AssignedToProject.ProjectCode
+                },
+                AssignedToLocation_ = new {
+                    x.AssignedToLocation.LocName,
+                    x.AssignedToLocation.LocAltName,
+                    x.AssignedToLocation.LocationType.LocTypeName
+                },
+                x.AssyGlobalX,
+                x.AssyGlobalY,
+                x.AssyGlobalZ,
+                x.AssyLocalXDesign,
+                x.AssyLocalYDesign,
+                x.AssyLocalZDesign,
+                x.AssyLocalXAsBuilt,
+                x.AssyLocalYAsBuilt,
+                x.AssyLocalZAsBuilt,
+                x.AssyStationing,
+                x.AssyLength,
+                x.AssyReadingIntervalSecs,
+                IsReference = x.IsReference_bl,
+                x.TechnicalDetails,
+                x.PowerSupplyDetails,
+                x.HSEDetails,
+                x.Comments,
+                IsActive = x.IsActive_bl,
+                x.AssemblyExt.Attr01,
+                x.AssemblyExt.Attr02,
+                x.AssemblyExt.Attr03,
+                x.AssemblyExt.Attr04,
+                x.AssemblyExt.Attr05,
+                x.AssemblyExt.Attr06,
+                x.AssemblyExt.Attr07,
+                x.AssemblyExt.Attr08,
+                x.AssemblyExt.Attr09,
+                x.AssemblyExt.Attr10,
+                x.AssemblyExt.Attr11,
+                x.AssemblyExt.Attr12,
+                x.AssemblyExt.Attr13,
+                x.AssemblyExt.Attr14,
+                x.AssemblyExt.Attr15,
+                x.AssemblyType_Id,
+                x.AssemblyStatus_Id,
+                x.AssemblyModel_Id,
+                x.AssignedToProject_Id,
+                x.AssignedToLocation_Id
+            })
+            .ToList();
+        }
+
+
+        //filterForJsonLookup - filter data from service to be passed as response
+        private object filterForJsonLookup(List<AssemblyDb> records)
+        {
+            return records.OrderBy(x => x.AssyName)
+                .Select(x => new
+                {
+                    id = x.Id,
+                    name = x.AssyName + " - " + x.AssignedToProject.ProjectName
+                }).ToList();
+        }
+
+        //filterForJsonFull - filter data from service to be passed as response
+        private object filterForJsonDTables(List<AssemblyDb> records)
+        {
+            return records
+                .OrderBy(x => x.AssyName)
+                .Select(x => new
+                {
+                    Id = x.Id,
+                    AssyName = x.AssyName
+                })
+                .ToList();
+        }
+
 
 
         #endregion

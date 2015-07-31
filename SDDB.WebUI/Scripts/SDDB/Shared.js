@@ -386,6 +386,16 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url) {
     return deferred0.promise();
 }
 
+//look up if the input field has dbisunique class and modify record prop to be unique
+function modifyUniqueProps(formId, currRecords) {
+    $.each(currRecords, function (i, currRecord) {
+        for (var property in currRecord) {
+            //var element = $("#" + formId + " .modifiable")
+            //NotFinished
+        }
+    });
+}
+
 //-----------------------------------------------------------------------------
 
 //Fill Form for Edit from n:n related table - generic version

@@ -179,7 +179,7 @@ namespace SDDB.Domain.Services
         //get all person log entry assemblies
         public virtual Task<List<AssemblyDb>> GetPrsLogEntryAssysAsync(string logEntryId)
         {
-            if (String.IsNullOrEmpty(logEntryId)) throw new ArgumentNullException("logEntryId");
+            if (String.IsNullOrEmpty(logEntryId)) { throw new ArgumentNullException("logEntryId"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
@@ -194,7 +194,7 @@ namespace SDDB.Domain.Services
         //get all active assemblies from the location not assigned to log entry
         public virtual Task<List<AssemblyDb>> GetPrsLogEntryAssysNotAsync(string logEntryId, string locId)
         {
-            if (String.IsNullOrEmpty(logEntryId)) throw new ArgumentNullException("logEntryId");
+            if (String.IsNullOrEmpty(logEntryId)) { throw new ArgumentNullException("logEntryId"); }
             locId = locId ?? String.Empty;
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
@@ -218,7 +218,7 @@ namespace SDDB.Domain.Services
         //get all person log entry persons
         public virtual Task<List<Person>> GetPrsLogEntryPersonsAsync(string logEntryId)
         {
-            if (String.IsNullOrEmpty(logEntryId)) throw new ArgumentNullException("logEntryId");
+            if (String.IsNullOrEmpty(logEntryId)) { throw new ArgumentNullException("logEntryId"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
@@ -233,8 +233,8 @@ namespace SDDB.Domain.Services
         //get all active persons managed by user and not assigned to log entry
         public virtual Task<List<Person>> GetPrsLogEntryPersonsNotAsync(string userId, string logEntryId)
         {
-            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
-            if (String.IsNullOrEmpty(logEntryId)) throw new ArgumentNullException("logEntryId");
+            if (String.IsNullOrEmpty(userId)) { throw new ArgumentNullException("userId"); }
+            if (String.IsNullOrEmpty(logEntryId)) { throw new ArgumentNullException("logEntryId"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
