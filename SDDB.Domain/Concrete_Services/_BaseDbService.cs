@@ -170,7 +170,7 @@ namespace SDDB.Domain.Services
         //helper - editing records, takes single T record
         protected virtual async Task<string> editHelperAsync(EFDbContext dbContext, T record)
         {
-            var dbEntry = (T)(await dbContext.Set(typeof(T)).FindAsync(record.Id).ConfigureAwait(false));
+            var dbEntry = (T)(await dbContext.Set<T>().FindAsync(record.Id).ConfigureAwait(false));
             if (dbEntry == null)
             {
                 record.Id = Guid.NewGuid().ToString();
