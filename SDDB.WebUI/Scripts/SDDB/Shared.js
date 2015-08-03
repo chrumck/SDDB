@@ -314,10 +314,10 @@ function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
                     continue;
                 }
                 if (property.slice(-3) == "_bl") {
-                    if (formInput[property] == true) { $("#" + property).prop("checked", true); }
+                    if (formInput[property] == true) { $("#" + formId + " #" + property).prop("checked", true); }
                     continue;
                 }
-                $("#" + property).val(formInput[property]);
+                $("#" + formId + " #" + property).val(formInput[property]);
             }
 
             if (dbEntries.length == 1) {
@@ -337,7 +337,10 @@ function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
 }
 
 //SubmitEdits to DB - generic version
-function submitEditsGeneric(formId, msArray, currRecords, httpType, url) {
+function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNewRecords) {
+
+    noOfNewRecords = (typeof noOfNewRecords !== "undefined" && noOfNewRecords >= 1 && noOfNewRecords <= 100) ? noOfNewRecords : 1;
+    currRecords = $.extend(true, [], currRecords);
 
     var deferred0 = $.Deferred();
 
@@ -368,16 +371,20 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url) {
                 continue;
             }
             if (property.slice(-3) == "_bl" && $.inArray(property, modifiedProperties) != -1) {
-                currRecord[property] = $("#" + property).prop("checked");
+                currRecord[property] = $("#" + formId + " #" + property).prop("checked");
                 continue;
             }
             if ($.inArray(property, modifiedProperties) != -1) {
-                currRecord[property] = $("#" + property).val();
+                currRecord[property] = $("#" + formId +" #" + property).val();
                 continue;
             }
         }
         currRecord.ModifiedProperties = modifiedProperties;
     });
+
+    if (currRecords.length == 1 && noOfNewRecords > 1) {
+        multiplyRecordsAndModifyUniqueProps(formId, currRecords, noOfNewRecords);
+    }
 
     $.ajax({ type: httpType, url: url, timeout: 20000, data: { records: currRecords }, dataType: "json" })
         .done(function (newEntryIds) { deferred0.resolve(newEntryIds); })
@@ -387,11 +394,24 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url) {
 }
 
 //look up if the input field has dbisunique class and modify record prop to be unique
-function modifyUniqueProps(formId, currRecords) {
+function multiplyRecordsAndModifyUniqueProps(formId, currRecords, noOfNewRecords) {
+
+    for (var i = 1; i < noOfNewRecords; i++) {
+        currRecords[i] = $.extend(true, {}, currRecords[0]);
+    }
+
     $.each(currRecords, function (i, currRecord) {
         for (var property in currRecord) {
-            //var element = $("#" + formId + " .modifiable")
-            //NotFinished
+            if (!currRecord.hasOwnProperty(property) ||
+            property == "Id" ||
+            property.slice(-3) == "_Id" ||
+            property.slice(-1) == "_") {
+                continue;
+            }
+            if ($("#" + formId + " #" + property).data("valDbisunique") == true) {
+                var j = i + 1;
+                currRecord[property] = currRecord[property] + "_" + ("00" + j).slice(-3);
+            }
         }
     });
 }

@@ -36,7 +36,7 @@ $(document).ready(function () {
     $("#BtnCreate").click(function () {
         CurrIds = [];
         CurrRecords = [];
-        CurrRecords[0] = RecordTemplate;
+        CurrRecords[0] = $.extend(true, {}, RecordTemplate);
         MagicSuggests[0].enable();
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create SDDB User", "MainView");
     });

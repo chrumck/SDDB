@@ -13,9 +13,9 @@ namespace SDDB.WebUI.Controllers
 
         // GET: Document
         [Authorize(Roles = "Assembly_View")]
-        public ActionResult Index(string locId = null)
+        public ActionResult Index(string LocId = null)
         {
-            ViewBag.locId = locId;
+            ViewBag.LocId = LocId;
             return View();
         }
 

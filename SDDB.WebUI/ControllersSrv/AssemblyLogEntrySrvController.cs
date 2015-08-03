@@ -24,29 +24,6 @@ namespace SDDB.WebUI.ControllersSrv
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
-        // GET: /AssemblyLogEntrySrv/Get
-        [DBSrvAuth("Assembly_View")]
-        public async Task<ActionResult> Get(bool getActive = true)
-        {
-            var data = (await assyLogEntryService.GetAsync(UserId, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.LogEntryDateTime,
-                AssemblyDb_ = new { x.AssemblyDb.AssyName, x.AssemblyDb.AssyAltName },
-                EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
-                AssemblyStatus_ = new { x.AssemblyStatus.AssyStatusName },
-                AssignedToProject_ = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectCode },
-                AssignedToLocation_ = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName },
-                x.AssyGlobalX, x.AssyGlobalY, x.AssyGlobalZ,
-                x.AssyLocalXDesign, x.AssyLocalYDesign, x.AssyLocalZDesign,
-                x.AssyLocalXAsBuilt, x.AssyLocalYAsBuilt, x.AssyLocalZAsBuilt,
-                x.AssyStationing, x.AssyLength, x.Comments, x.IsActive_bl,
-                x.AssemblyDb_Id, x.EnteredByPerson_Id, x.AssemblyStatus_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id
-            });
-
-            ViewBag.ServiceName = "AssemblyLogEntryService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
-        }
-
         // POST: /AssemblyLogEntrySrv/GetByIds
         [HttpPost]
         [DBSrvAuth("Assembly_View")]

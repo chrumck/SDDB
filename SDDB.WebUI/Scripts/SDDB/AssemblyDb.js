@@ -2,19 +2,50 @@
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
-/// <reference path="../jquery-2.1.3.js" />
-/// <reference path="../jquery-2.1.3.intellisense.js" />
+/// <reference path="../jquery-2.1.4.js" />
+/// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
 //--------------------------------------Global Properties------------------------------------//
 
-var TableMain = {};
-var IsCreate = false;
-var MsFilterByProject = {}; var MsFilterByType = {}; var MsFilterByLoc = {};
+var TableMain;
+var MsFilterByProject = {};
+var MsFilterByType = {};
+var MsFilterByLoc = {};
 var MagicSuggests = [];
-var CurrRecord = {};
-
+var RecordTemplate = {
+    Id: "RecordTemplateId",
+    AssyName: null,
+    AssyAltName: null,
+    AssyAltName2: null,
+    AssyGlobalX: null,
+    AssyGlobalY: null,
+    AssyGlobalZ: null,
+    AssyLocalXDesign: null,
+    AssyLocalYDesign: null,
+    AssyLocalZDesign: null,
+    AssyLocalXAsBuilt: null,
+    AssyLocalYAsBuilt: null,
+    AssyLocalZAsBuilt: null,
+    AssyStationing: null,
+    AssyLength: null,
+    AssyReadingIntervalSecs: null,
+    IsReference_bl: null,
+    TechnicalDetails: null,
+    PowerSupplyDetails: null,
+    HSEDetails: null,
+    Comments: null,
+    IsActive_bl: null,
+    AssemblyType_Id: null,
+    AssemblyStatus_Id: null,
+    AssemblyModel_Id: null,
+    AssignedToProject_Id: null,
+    AssignedToLocation_Id: null
+};
+var CurrRecords = [];
+var CurrIds = [];
+var GetActive = true;
 
 $(document).ready(function () {
 
@@ -22,22 +53,41 @@ $(document).ready(function () {
 
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
-        IsCreate = true;
+        CurrIds = [];
+        CurrRecords = [];
+        CurrRecords[0] = $.extend(true, {}, RecordTemplate);
+        $("#EditFormCreateMultiple").removeClass("hide");
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Assembly", "MainView");
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-        var selectedRows = TableMain.rows(".ui-selected").data();
-        if (selectedRows.length == 0) showModalNothingSelected();
-        else { IsCreate = false; FillFormForEdit(); }
+        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        if (CurrIds.length == 0) { showModalNothingSelected(); }
+        else {
+            if (GetActive) { $("#EditFormGroupIsActive").addClass("hide"); }
+            else { $("#EditFormGroupIsActive").removeClass("hide"); }
+
+            $("#EditFormCreateMultiple").addClass("hide");
+
+            showModalWait();
+
+            fillFormForEditGeneric(CurrIds, "POST", "/AssemblyDbSrv/GetByIds", GetActive, "EditForm", "Edit Assembly", MagicSuggests)
+                .always(hideModalWait)
+                .done(function (currRecords) {
+                    CurrRecords = currRecords;
+                    $("#MainView").addClass("hide");
+                    $("#EditFormView").removeClass("hide");
+                })
+                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        }
     });
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
-        var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) showModalNothingSelected();
-        else showModalDelete(noOfRows);
+        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        if (CurrIds.length == 0) { showModalNothingSelected(); }
+        else showModalDelete(CurrIds.length);
     });
 
     //wire up dropdownId1
@@ -80,7 +130,7 @@ $(document).ready(function () {
     $("#dropdownId5").click(function (event) {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows != 1) showModalSelectOne();
+        if (noOfRows != 1) { showModalSelectOne(); }
         else window.open("/Component?assyId=" + TableMain.cell(".ui-selected", "Id:name").data())
     });
 
@@ -88,7 +138,7 @@ $(document).ready(function () {
     $("#dropdownId6").click(function (event) {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows != 1) showModalSelectOne();
+        if (noOfRows != 1) { showModalSelectOne(); }
         else window.open("/AssemblyLogEntry?assyId=" + TableMain.cell(".ui-selected", "Id:name").data())
     });
 
@@ -101,7 +151,8 @@ $(document).ready(function () {
         },
         style: "min-width: 240px;"
     });
-    $(MsFilterByType).on('selectionchange', function (e, m) { RefreshMainView(); });
+    //Wire up on change event for MsFilterByType
+    $(MsFilterByType).on('selectionchange', function (e, m) { refreshMainView(); });
 
     //Initialize MagicSuggest msFilterByProject
     MsFilterByProject = $("#MsFilterByProject").magicSuggest({
@@ -112,7 +163,8 @@ $(document).ready(function () {
         },
         style: "min-width: 240px;"
     });
-    $(MsFilterByProject).on('selectionchange', function (e, m) { RefreshMainView(); });
+    //Wire up on change event for MsFilterByProject
+    $(MsFilterByProject).on('selectionchange', function (e, m) { refreshMainView(); });
 
     //Initialize MagicSuggest MsFilterByLoc
     MsFilterByLoc = $("#MsFilterByLoc").magicSuggest({
@@ -124,17 +176,22 @@ $(document).ready(function () {
         },
         style: "min-width: 240px;"
     });
-    $(MsFilterByLoc).on('selectionchange', function (e, m) { RefreshMainView(); });
+    //Wire up on change event for MsFilterByLoc
+    $(MsFilterByLoc).on('selectionchange', function (e, m) { refreshMainView(); });
 
 
     //---------------------------------------DataTables------------
 
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
-        if (($(this).prop("checked")) ? false : true)
+        if (!$(this).prop("checked")) {
+            GetActive = true;
             $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
-        else $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
-        RefreshMainView();
+        } else {
+            GetActive = false;
+            $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
+        }
+        refreshMainView();
     });
 
     //TableMain AssemblyDbs
@@ -145,12 +202,12 @@ $(document).ready(function () {
             //------------------------------------------------first set of columns
             { data: "AssyAltName", name: "AssyAltName" },//2
             { data: "AssyAltName2", name: "AssyAltName2" },//3
-            { data: "AssyTypeName", name: "AssyTypeName" },//4  
-            { data: "AssyStatusName", name: "AssyStatusName" },//5
-            { data: "AssyModelName", name: "AssyModelName" },//6
-            { data: "AssignedToProject", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject" }, //7
+            { data: "AssemblyType_", render: function (data, type, full, meta) { return data.AssyTypeName }, name: "AssemblyType_" }, //4
+            { data: "AssemblyStatus_", render: function (data, type, full, meta) { return data.AssyStatusName }, name: "AssemblyStatus_" }, //5
+            { data: "AssemblyModel_", render: function (data, type, full, meta) { return data.AssyModelName }, name: "AssemblyModel_" }, //6
+            { data: "AssignedToProject_", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject" }, //7
             //------------------------------------------------second set of columns
-            { data: "AssignedToLocation", render: function (data, type, full, meta) { return data.LocName + " - " + data.LocTypeName }, name: "AssignedToLocation" }, //8
+            { data: "AssignedToLocation_", render: function (data, type, full, meta) { return data.LocName + " - " + data.LocTypeName }, name: "AssignedToLocation" }, //8
             { data: "AssyGlobalX", name: "AssyGlobalX" },//9
             { data: "AssyGlobalY", name: "AssyGlobalY" },//10
             { data: "AssyGlobalZ", name: "AssyGlobalZ" },//11
@@ -165,13 +222,13 @@ $(document).ready(function () {
             { data: "AssyLength", name: "AssyLength" },//19
             //------------------------------------------------Fourth set of columns
             { data: "AssyReadingIntervalSecs", name: "AssyReadingIntervalSecs" },//20
-            { data: "IsReference", name: "IsReference" },//21
+            { data: "IsReference_bl", name: "IsReference_bl" },//21
             { data: "TechnicalDetails", name: "TechnicalDetails" },//22
             { data: "PowerSupplyDetails", name: "PowerSupplyDetails" },//23
             { data: "HSEDetails", name: "HSEDetails" },//24
             { data: "Comments", name: "Comments" },//25
             //------------------------------------------------never visible
-            { data: "IsActive", name: "IsActive" },//26
+            { data: "IsActive_bl", name: "IsActive_bl" },//26
             { data: "AssemblyType_Id", name: "AssemblyType_Id" },//27
             { data: "AssemblyStatus_Id", name: "AssemblyStatus_Id" },//28
             { data: "AssemblyModel_Id", name: "AssemblyModel_Id" },//29
@@ -203,7 +260,7 @@ $(document).ready(function () {
             lengthMenu: "_MENU_",
             info: "_START_ - _END_ of _TOTAL_",
             infoEmpty: "",
-            infoFiltered:"(filtered)",
+            infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
     });
@@ -219,7 +276,6 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        IsCreate = false;
         $("#MainView").removeClass("hide");
         $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
     });
@@ -227,18 +283,31 @@ $(document).ready(function () {
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
-        if (formIsValid("EditForm", IsCreate) && msIsValid(MagicSuggests)) SubmitEdits();
+        if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
+            showModalWait();
+
+            var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
+            submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/AssemblyDbSrv/Edit", createMultiple)
+                .always(hideModalWait)
+                .done(function () {
+                    refreshMainView();
+                    $("#MainView").removeClass("hide");
+                    $("#EditFormView").addClass("hide");
+                    window.scrollTo(0, 0);
+                })
+                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+        }
     });
 
     //--------------------------------------View Initialization------------------------------------//
 
-    if (typeof locId !== "undefined" && locId != "") {
+    if (typeof LocId !== "undefined" && LocId != "") {
+        showModalWait();
         $.ajax({
             type: "POST", url: "/LocationSrv/GetByIds", timeout: 20000,
-            data: { ids: [locId], getActive: true }, dataType: "json",
-            beforeSend: function () { showModalWait(); }
+            data: { ids: [LocId], getActive: true }, dataType: "json",
         })
-            .always(function () { $("#ModalWait").modal("hide"); })
+            .always(hideModalWait)
             .done(function (data) {
                 MsFilterByLoc.setSelection([{ id: data[0].Id, name: data[0].LocName, }]);
             })
@@ -247,246 +316,45 @@ $(document).ready(function () {
     $("#InitialView").addClass("hide");
     $("#MainView").removeClass("hide");
 
-
     //--------------------------------End of execution at Start-----------
 });
 
 
 //--------------------------------------Main Methods---------------------------------------//
 
-//FillFormForEdit
-function FillFormForEdit() {
-    if ($("#ChBoxShowDeleted").prop("checked")) $("#EditFormGroupIsActive").removeClass("hide");
-    else $("#EditFormGroupIsActive").addClass("hide");
-
-    $("#EditFormCreateMultiple").addClass("hide");
-
-    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    $.ajax({
-        type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 20000,
-        data: { ids: ids, getActive: (($("#ChBoxShowDeleted").prop("checked")) ? false : true) }, dataType: "json",
-        beforeSend: function () { showModalWait(); }
-    })
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function (data) {
-         
-            CurrRecord.AssyName = data[0].AssyName;
-            CurrRecord.AssyAltName = data[0].AssyAltName;
-            CurrRecord.AssyAltName2 = data[0].AssyAltName2;
-            CurrRecord.AssyGlobalX = data[0].AssyGlobalX;
-            CurrRecord.AssyGlobalY = data[0].AssyGlobalY;
-            CurrRecord.AssyGlobalZ = data[0].AssyGlobalZ;
-            CurrRecord.AssyLocalXDesign = data[0].AssyLocalXDesign;
-            CurrRecord.AssyLocalYDesign = data[0].AssyLocalYDesign;
-            CurrRecord.AssyLocalZDesign = data[0].AssyLocalZDesign;
-            CurrRecord.AssyLocalXAsBuilt = data[0].AssyLocalXAsBuilt;
-            CurrRecord.AssyLocalYAsBuilt = data[0].AssyLocalYAsBuilt;
-            CurrRecord.AssyLocalZAsBuilt = data[0].AssyLocalZAsBuilt;
-            CurrRecord.AssyStationing = data[0].AssyStationing;
-            CurrRecord.AssyLength = data[0].AssyLength;
-            CurrRecord.AssyReadingIntervalSecs = data[0].AssyReadingIntervalSecs;
-            CurrRecord.IsReference = data[0].IsReference;
-            CurrRecord.TechnicalDetails = data[0].TechnicalDetails;
-            CurrRecord.PowerSupplyDetails = data[0].PowerSupplyDetails;
-            CurrRecord.HSEDetails = data[0].HSEDetails;
-            CurrRecord.Comments = data[0].Comments;
-            CurrRecord.IsActive = data[0].IsActive;
-            CurrRecord.AssemblyType_Id = data[0].AssemblyType_Id;
-            CurrRecord.AssemblyStatus_Id = data[0].AssemblyStatus_Id;
-            CurrRecord.AssemblyModel_Id = data[0].AssemblyModel_Id;
-            CurrRecord.AssignedToProject_Id = data[0].AssignedToProject_Id;
-            CurrRecord.AssignedToLocation_Id = data[0].AssignedToLocation_Id;
-            
-            var FormInput = $.extend(true, {}, CurrRecord);
-            $.each(data, function (i, dbEntry) {
-                if (FormInput.AssyName != dbEntry.AssyName) FormInput.AssyName = "_VARIES_";
-                if (FormInput.AssyAltName != dbEntry.AssyAltName) FormInput.AssyAltName = "_VARIES_";
-                if (FormInput.AssyAltName2 != dbEntry.AssyAltName2) FormInput.AssyAltName2 = "_VARIES_";
-                if (FormInput.AssyGlobalX != dbEntry.AssyGlobalX) FormInput.AssyGlobalX = "_VARIES_";
-                if (FormInput.AssyGlobalY != dbEntry.AssyGlobalY) FormInput.AssyGlobalY = "_VARIES_";
-                if (FormInput.AssyGlobalZ != dbEntry.AssyGlobalZ) FormInput.AssyGlobalZ = "_VARIES_";
-                if (FormInput.AssyLocalXDesign != dbEntry.AssyLocalXDesign) FormInput.AssyLocalXDesign = "_VARIES_";
-                if (FormInput.AssyLocalYDesign != dbEntry.AssyLocalYDesign) FormInput.AssyLocalYDesign = "_VARIES_";
-                if (FormInput.AssyLocalZDesign != dbEntry.AssyLocalZDesign) FormInput.AssyLocalZDesign = "_VARIES_";
-                if (FormInput.AssyLocalXAsBuilt != dbEntry.AssyLocalXAsBuilt) FormInput.AssyLocalXAsBuilt = "_VARIES_";
-                if (FormInput.AssyLocalYAsBuilt != dbEntry.AssyLocalYAsBuilt) FormInput.AssyLocalYAsBuilt = "_VARIES_";
-                if (FormInput.AssyLocalZAsBuilt != dbEntry.AssyLocalZAsBuilt) FormInput.AssyLocalZAsBuilt = "_VARIES_";
-                if (FormInput.AssyStationing != dbEntry.AssyStationing) FormInput.AssyStationing = "_VARIES_";
-                if (FormInput.AssyLength != dbEntry.AssyLength) FormInput.AssyLength = "_VARIES_";
-                if (FormInput.AssyReadingIntervalSecs != dbEntry.AssyReadingIntervalSecs) FormInput.AssyReadingIntervalSecs = "_VARIES_";
-                if (FormInput.IsReference != dbEntry.IsReference) FormInput.IsReference = "_VARIES_";
-                if (FormInput.TechnicalDetails != dbEntry.TechnicalDetails) FormInput.TechnicalDetails = "_VARIES_";
-                if (FormInput.PowerSupplyDetails != dbEntry.PowerSupplyDetails) FormInput.PowerSupplyDetails = "_VARIES_";
-                if (FormInput.HSEDetails != dbEntry.HSEDetails) FormInput.HSEDetails = "_VARIES_";
-                if (FormInput.Comments != dbEntry.Comments) FormInput.Comments = "_VARIES_";
-                if (FormInput.IsActive != dbEntry.IsActive) FormInput.IsActive = "_VARIES_";
-
-                if (FormInput.AssemblyType_Id != dbEntry.AssemblyType_Id) { FormInput.AssemblyType_Id = "_VARIES_"; FormInput.AssyTypeName = "_VARIES_"; }
-                else FormInput.AssyTypeName = dbEntry.AssyTypeName;
-                if (FormInput.AssemblyStatus_Id != dbEntry.AssemblyStatus_Id) { FormInput.AssemblyStatus_Id = "_VARIES_"; FormInput.AssyStatusName = "_VARIES_"; }
-                else FormInput.AssyStatusName = dbEntry.AssyStatusName;
-                if (FormInput.AssemblyModel_Id != dbEntry.AssemblyModel_Id) { FormInput.AssemblyModel_Id = "_VARIES_"; FormInput.AssyModelName = "_VARIES_"; }
-                else FormInput.AssyModelName = dbEntry.AssyModelName;
-                if (FormInput.AssignedToProject_Id != dbEntry.AssignedToProject_Id) { FormInput.AssignedToProject_Id = "_VARIES_"; FormInput.AssignedToProject = "_VARIES_"; }
-                else FormInput.AssignedToProject = dbEntry.AssignedToProject.ProjectName + " " + dbEntry.AssignedToProject.ProjectCode;
-                if (FormInput.AssignedToLocation_Id != dbEntry.AssignedToLocation_Id) { FormInput.AssignedToLocation_Id = "_VARIES_"; FormInput.AssignedToLocation = "_VARIES_"; }
-                else FormInput.AssignedToLocation = dbEntry.AssignedToLocation.LocName;
-            });
-
-            clearFormInputs("EditForm", MagicSuggests);
-            $("#EditFormLabel").text("Edit Assembly");
-
-            $("#AssyName").val(FormInput.AssyName);
-            $("#AssyAltName").val(FormInput.AssyAltName);
-            $("#AssyAltName2").val(FormInput.AssyAltName2);
-            $("#AssyGlobalX").val(FormInput.AssyGlobalX);
-            $("#AssyGlobalY").val(FormInput.AssyGlobalY);
-            $("#AssyGlobalZ").val(FormInput.AssyGlobalZ);
-            $("#AssyLocalXDesign").val(FormInput.AssyLocalXDesign);
-            $("#AssyLocalYDesign").val(FormInput.AssyLocalYDesign);
-            $("#AssyLocalZDesign").val(FormInput.AssyLocalZDesign);
-            $("#AssyLocalXAsBuilt").val(FormInput.AssyLocalXAsBuilt);
-            $("#AssyLocalYAsBuilt").val(FormInput.AssyLocalYAsBuilt);
-            $("#AssyLocalZAsBuilt").val(FormInput.AssyLocalZAsBuilt);
-            $("#AssyStationing").val(FormInput.AssyStationing);
-            $("#AssyLength").val(FormInput.AssyLength);
-            $("#AssyReadingIntervalSecs").val(FormInput.AssyReadingIntervalSecs);
-            if (FormInput.IsReference == true) $("#IsReference").prop("checked", true);
-            $("#TechnicalDetails").val(FormInput.TechnicalDetails);
-            $("#PowerSupplyDetails").val(FormInput.PowerSupplyDetails);
-            $("#HSEDetails").val(FormInput.HSEDetails);
-            $("#Comments").val(FormInput.Comments);
-            if (FormInput.IsActive == true) $("#IsActive").prop("checked", true);
-
-            if (FormInput.AssemblyType_Id != null) MagicSuggests[0].addToSelection([{ id: FormInput.AssemblyType_Id, name: FormInput.AssyTypeName }], true);
-            if (FormInput.AssemblyStatus_Id != null) MagicSuggests[1].addToSelection([{ id: FormInput.AssemblyStatus_Id, name: FormInput.AssyStatusName }], true);
-            if (FormInput.AssemblyModel_Id != null) MagicSuggests[2].addToSelection([{ id: FormInput.AssemblyModel_Id, name: FormInput.AssyModelName }], true);
-            if (FormInput.AssignedToProject_Id != null) MagicSuggests[3].addToSelection([{ id: FormInput.AssignedToProject_Id, name: FormInput.AssignedToProject }], true);
-            if (FormInput.AssignedToLocation_Id != null) MagicSuggests[4].addToSelection([{ id: FormInput.AssignedToLocation_Id, name: FormInput.AssignedToLocation }], true);
-
-
-            if (data.length == 1) {
-                $("[data-val-dbisunique]").prop("disabled", false);
-                disableUniqueMs(MagicSuggests, false);
-            }
-            else {
-                $("[data-val-dbisunique]").prop("disabled", true);
-                disableUniqueMs(MagicSuggests, true);
-            }
-
-            $("#MainView").addClass("hide");
-            $("#EditFormView").removeClass("hide");
-        })
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-}
-
-//SubmitEdits to DB
-function SubmitEdits() {
-
-    var modifiedProperties = [];
-    $(".modifiable").each(function (index) {
-        if ($(this).data("ismodified")) modifiedProperties.push($(this).prop("id"));
-    });
-
-    $.each(MagicSuggests, function (i, ms) {
-        if (ms.isModified == true) modifiedProperties.push(ms.id);
-    });
-
-    var editRecords = [];
-    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    if (IsCreate == true) {
-        var multipleCount = ($("#CreateMultiple").val() == "") ? 1 : $("#CreateMultiple").val();
-        ids = []; for (var i = 1; i <= multipleCount; i++) {
-            var id = "newEntryId"; ids.push(id);
-        }
-    }
-
-    var magicResults = [];
-    $.each(MagicSuggests, function (i, ms) {
-        var msValue = (ms.getSelection().length != 0) ? (ms.getSelection())[0].id : null;
-        magicResults.push(msValue);
-    });
-
-    $.each(ids, function (i, id) {
-        var editRecord = {};
-        editRecord.Id = id;
-               
-        editRecord.AssyName = ($("#AssyName").data("ismodified")) ? $("#AssyName").val() : CurrRecord.AssyName;
-        editRecord.AssyAltName = ($("#AssyAltName").data("ismodified")) ? $("#AssyAltName").val() : CurrRecord.AssyAltName;
-        editRecord.AssyAltName2 = ($("#AssyAltName2").data("ismodified")) ? $("#AssyAltName2").val() : CurrRecord.AssyAltName2;
-        editRecord.AssyGlobalX = ($("#AssyGlobalX").data("ismodified")) ? $("#AssyGlobalX").val() : CurrRecord.AssyGlobalX;
-        editRecord.AssyGlobalY = ($("#AssyGlobalY").data("ismodified")) ? $("#AssyGlobalY").val() : CurrRecord.AssyGlobalY;
-        editRecord.AssyGlobalZ = ($("#AssyGlobalZ").data("ismodified")) ? $("#AssyGlobalZ").val() : CurrRecord.AssyGlobalZ;
-        editRecord.AssyLocalXDesign = ($("#AssyLocalXDesign").data("ismodified")) ? $("#AssyLocalXDesign").val() : CurrRecord.AssyLocalXDesign;
-        editRecord.AssyLocalYDesign = ($("#AssyLocalYDesign").data("ismodified")) ? $("#AssyLocalYDesign").val() : CurrRecord.AssyLocalYDesign;
-        editRecord.AssyLocalZDesign = ($("#AssyLocalZDesign").data("ismodified")) ? $("#AssyLocalZDesign").val() : CurrRecord.AssyLocalZDesign;
-        editRecord.AssyLocalXAsBuilt = ($("#AssyLocalXAsBuilt").data("ismodified")) ? $("#AssyLocalXAsBuilt").val() : CurrRecord.AssyLocalXAsBuilt;
-        editRecord.AssyLocalYAsBuilt = ($("#AssyLocalYAsBuilt").data("ismodified")) ? $("#AssyLocalYAsBuilt").val() : CurrRecord.AssyLocalYAsBuilt;
-        editRecord.AssyLocalZAsBuilt = ($("#AssyLocalZAsBuilt").data("ismodified")) ? $("#AssyLocalZAsBuilt").val() : CurrRecord.AssyLocalZAsBuilt;
-        editRecord.AssyStationing = ($("#AssyStationing").data("ismodified")) ? $("#AssyStationing").val() : CurrRecord.AssyStationing;
-        editRecord.AssyLength = ($("#AssyLength").data("ismodified")) ? $("#AssyLength").val() : CurrRecord.AssyLength;
-        editRecord.AssyReadingIntervalSecs = ($("#AssyReadingIntervalSecs").data("ismodified")) ? $("#AssyReadingIntervalSecs").val() : CurrRecord.AssyReadingIntervalSecs;
-        editRecord.IsReference = ($("#IsReference").data("ismodified")) ? (($("#IsReference").prop("checked")) ? true : false) : CurrRecord.IsReference;
-        editRecord.TechnicalDetails = ($("#TechnicalDetails").data("ismodified")) ? $("#TechnicalDetails").val() : CurrRecord.TechnicalDetails;
-        editRecord.PowerSupplyDetails = ($("#PowerSupplyDetails").data("ismodified")) ? $("#PowerSupplyDetails").val() : CurrRecord.PowerSupplyDetails;
-        editRecord.HSEDetails = ($("#HSEDetails").data("ismodified")) ? $("#HSEDetails").val() : CurrRecord.HSEDetails;
-        editRecord.Comments = ($("#Comments").data("ismodified")) ? $("#Comments").val() : CurrRecord.Comments;
-        editRecord.IsActive = ($("#IsActive").data("ismodified")) ? (($("#IsActive").prop("checked")) ? true : false) : CurrRecord.IsActive;
-        editRecord.AssemblyType_Id = (MagicSuggests[0].isModified) ? magicResults[0] : CurrRecord.AssemblyType_Id;
-        editRecord.AssemblyStatus_Id = (MagicSuggests[1].isModified) ? magicResults[1] : CurrRecord.AssemblyStatus_Id;
-        editRecord.AssemblyModel_Id = (MagicSuggests[2].isModified) ? magicResults[2] : CurrRecord.AssemblyModel_Id;
-        editRecord.AssignedToProject_Id = (MagicSuggests[3].isModified) ? magicResults[3] : CurrRecord.AssignedToProject_Id;
-        editRecord.AssignedToLocation_Id = (MagicSuggests[4].isModified) ? magicResults[4] : CurrRecord.AssignedToLocation_Id;
-
-        editRecord.ModifiedProperties = modifiedProperties;
-
-        editRecords.push(editRecord);
-    });
-
-    $.ajax({
-        type: "POST", url: "/AssemblyDbSrv/Edit", timeout: 20000, data: { records: editRecords }, dataType: "json",
-        beforeSend: function () { showModalWait(); }
-    })
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function (data) {
-            RefreshMainView();
-            IsCreate = false;
-            $("#MainView").removeClass("hide");
-            $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
-        })
-        .fail(function (xhr, status, error) {
-            showModalAJAXFail(xhr, status, error);
-        });
-}
 
 //Delete Records from DB
 function DeleteRecords() {
-    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    $.ajax({
-        type: "POST", url: "/AssemblyDbSrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json",
-        beforeSend: function () { showModalWait(); }
-    })
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function () { RefreshMainView(); })
+    CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+    showModalWait();
+    $.ajax({ type: "POST", url: "/AssemblyDbSrv/Delete", timeout: 20000, data: { ids: CurrIds }, dataType: "json" })
+        .always(hideModalWait)
+        .done(refreshMainView)
         .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
-//refresh main view
-function RefreshMainView() {
-    if (MsFilterByType.getValue().length == 0 && MsFilterByProject.getValue().length == 0
-        && MsFilterByLoc.getValue().length == 0) {
-        $("#ChBoxShowDeleted").bootstrapToggle("disable")
+//refresh view after magicsuggest update
+function refreshMainView() {
+    if (MsFilterByType.getValue().length == 0 &&
+            MsFilterByProject.getValue().length == 0 &&
+            MsFilterByLoc.getValue().length == 0) {
+        $("#ChBoxShowDeleted").bootstrapToggle("disable");
         TableMain.clear().search("").draw();
     }
     else {
-        refreshTable(TableMain, "/AssemblyDbSrv/GetByAltIds2", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
-            "POST", MsFilterByProject.getValue(), [], MsFilterByType.getValue(), MsFilterByLoc.getValue());
-        $("#ChBoxShowDeleted").bootstrapToggle("enable")
+        refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByAltIds2",
+            {
+                projectIds: MsFilterByProject.getValue(),
+                typeIds: MsFilterByType.getValue(),
+                locIds: MsFilterByLoc.getValue(),
+                getActive: GetActive
+            },
+            "POST")
+            .done($("#ChBoxShowDeleted").bootstrapToggle("enable"))
     }
-
 }
 
 
-//---------------------------------------Helper Methods--------------------------------------//
 
+//---------------------------------------Helper Methods--------------------------------------//
 

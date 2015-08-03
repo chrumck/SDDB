@@ -83,8 +83,8 @@ namespace SDDB.WebUI
             
             builder.RegisterType<LocationService>().AsSelf().InstancePerDependency();
             builder.RegisterType<LocationTypeService>().AsSelf().InstancePerDependency();
-            
-            builder.RegisterType<AssemblyDbService>().AsSelf().InstancePerDependency();
+
+            builder.RegisterType<AssemblyDbService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
             builder.RegisterType<AssemblyTypeService>().AsSelf().InstancePerDependency();
             builder.RegisterType<AssemblyModelService>().AsSelf().InstancePerDependency();
             builder.RegisterType<AssemblyStatusService>().AsSelf().InstancePerDependency();

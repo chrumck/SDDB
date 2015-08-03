@@ -270,8 +270,8 @@
                     </div>
                     <div class="form-group">
                         <div class="col-sm-10 col-sm-offset-2">
-                            @Html.CheckBoxFor(x => x.IsReference, new { @class = "modifiable" }) &nbsp;&nbsp;
-                            @Html.LabelFor(x => x.IsReference, "Is Monitoring Reference")
+                            @Html.CheckBoxFor(x => x.IsReference_bl, new { @class = "modifiable" }) &nbsp;&nbsp;
+                            @Html.LabelFor(x => x.IsReference_bl, "Is Monitoring Reference")
                         </div>
                     </div>
                     <div class="form-group">
@@ -328,7 +328,7 @@
 
 <!------- ScriptVariables ------->
 
-<script>var locId = "@ViewBag.locId";</script>
+<script>var LocId = "@ViewBag.LocId";</script>
 
 @section Scripts {
     @Scripts.Render("~/bundles/DataTables")

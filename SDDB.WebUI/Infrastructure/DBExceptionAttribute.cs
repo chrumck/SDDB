@@ -7,6 +7,7 @@ using SDDB.Domain.Entities;
 using System.Web.Routing;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using MySql.Data.MySqlClient;
 
 
 namespace SDDB.WebUI.Infrastructure
@@ -61,17 +62,19 @@ namespace SDDB.WebUI.Infrastructure
             var exceptionType = exceptionContext.Exception.GetBaseException().GetType();
             var exceptionMessage = exceptionContext.Exception.GetBaseException().Message;
             var responseText = String.Empty;
+
             if (exceptionType == typeof(ArgumentNullException))
             {
                 responseText = "Error(s) in submitted parameters:\n" + exceptionMessage;
                 exceptionContext.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             }
-            if (exceptionType == typeof(DbBadRequestException))
+            if (exceptionType == typeof(DbBadRequestException) || exceptionType == typeof(MySqlException))
             {
                 responseText = "Error(s) in submited request:\n " + exceptionMessage;
                 exceptionContext.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             }
-            if (exceptionType != typeof(DbBadRequestException) && exceptionType != typeof(ArgumentNullException))
+
+            if (String.IsNullOrEmpty(responseText))
             {
                 responseText = "Oops, Something went wrong!\n" +
                       "This error has been recorded. Contact SDDB Admin to help resolve the issue.";

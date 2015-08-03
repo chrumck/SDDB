@@ -148,9 +148,15 @@ namespace SDDB.WebUI.ControllersSrv
                 x.AssyName,
                 x.AssyAltName,
                 x.AssyAltName2,
-                x.AssemblyType.AssyTypeName,
-                x.AssemblyStatus.AssyStatusName,
-                x.AssemblyModel.AssyModelName,
+                AssemblyType_ = new {
+                    x.AssemblyType.AssyTypeName
+                },
+                AssemblyStatus_ = new {
+                    x.AssemblyStatus.AssyStatusName
+                },
+                AssemblyModel_ = new {
+                    x.AssemblyModel.AssyModelName
+                },
                 AssignedToProject_ = new {
                     x.AssignedToProject.ProjectName,
                     x.AssignedToProject.ProjectAltName,
@@ -173,12 +179,12 @@ namespace SDDB.WebUI.ControllersSrv
                 x.AssyStationing,
                 x.AssyLength,
                 x.AssyReadingIntervalSecs,
-                IsReference = x.IsReference_bl,
+                x.IsReference_bl,
                 x.TechnicalDetails,
                 x.PowerSupplyDetails,
                 x.HSEDetails,
                 x.Comments,
-                IsActive = x.IsActive_bl,
+                x.IsActive_bl,
                 x.AssemblyExt.Attr01,
                 x.AssemblyExt.Attr02,
                 x.AssemblyExt.Attr03,

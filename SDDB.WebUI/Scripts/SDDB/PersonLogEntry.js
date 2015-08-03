@@ -22,7 +22,7 @@ $(document).ready(function () {
     $("#BtnCreate").click(function () {
         CurrIds = [];
         CurrRecords = [];
-        CurrRecords[0] = RecordTemplate;
+        CurrRecords[0] = $.extend(true, {}, RecordTemplate);
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Log Entry", "MainView");
         MagicSuggests[3].disable();
         MagicSuggests[4].disable();

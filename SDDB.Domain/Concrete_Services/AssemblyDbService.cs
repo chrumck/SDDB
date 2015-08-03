@@ -245,8 +245,9 @@ namespace SDDB.Domain.Services
         {
             for (int i = 0; i < ids.Length; i++)
             {
+                var currentId = ids[i];
                 var assignedCompsCount = await dbContext.Components
-                    .CountAsync(x => x.IsActive_bl && x.AssignedToAssemblyDb_Id == ids[i]).ConfigureAwait(false);
+                    .CountAsync(x => x.IsActive_bl && x.AssignedToAssemblyDb_Id == currentId).ConfigureAwait(false);
                 if (assignedCompsCount > 0)
                 {
                     var dbEntry = await dbContext.AssemblyDbs.FindAsync(ids[i]).ConfigureAwait(false);

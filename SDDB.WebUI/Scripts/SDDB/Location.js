@@ -70,7 +70,7 @@ $(document).ready(function () {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected").data().length;
         if (noOfRows != 1) showModalSelectOne();
-        else window.open("/AssemblyDb?locId=" + TableMain.cell(".ui-selected", "Id:name").data())
+        else window.open("/AssemblyDb?LocId=" + TableMain.cell(".ui-selected", "Id:name").data())
     });
 
     //Initialize MagicSuggest MsFilterByType
