@@ -22,6 +22,8 @@ namespace SDDB.Domain.Services
         protected IDbContextScopeFactory contextScopeFac;
         protected string userId;
 
+        protected IReadOnlyList<string> loggedProperties = new List<string> { };
+
         //Constructors---------------------------------------------------------------------------------------------------------//
 
         public BaseDbService(IDbContextScopeFactory contextScopeFac, string userId)
@@ -170,14 +172,18 @@ namespace SDDB.Domain.Services
         //helper - editing records, takes single T record
         protected virtual async Task<string> editHelperAsync(EFDbContext dbContext, T record)
         {
-            var dbEntry = (T)(await dbContext.Set<T>().FindAsync(record.Id).ConfigureAwait(false));
+            var dbEntry = await dbContext.Set<T>().FindAsync(record.Id).ConfigureAwait(false);
             if (dbEntry == null)
             {
                 record.Id = Guid.NewGuid().ToString();
-                dbContext.Set(typeof(T)).Add(record);
+                record.LastSavedByPerson_Id = userId;
+                dbContext.Set<T>().Add(record);
+                addLogEntryHelper(dbContext, record);
                 return record.Id;
             }
             dbEntry.CopyModifiedProps(record);
+            dbEntry.LastSavedByPerson_Id = userId;
+            if (record.LoggedPropsModified(loggedProperties.ToArray())) { addLogEntryHelper(dbContext, dbEntry); }
             return null;
         }
 
@@ -259,11 +265,13 @@ namespace SDDB.Domain.Services
                     throw new DbBadRequestException(
                         String.Format("Entity {0} with id={1} not found.\n", typeof(TExtended).Name ,record.Id));
                 }
+                record.LastSavedByPerson_Id = userId;
                 dbContext.Set<TExtended>().Add(record);
             }
             else
             {
                 dbEntry.CopyModifiedProps(record);
+                dbEntry.LastSavedByPerson_Id = userId;
             }
         }
 
@@ -295,6 +303,14 @@ namespace SDDB.Domain.Services
             return await dbContext.Set<TOut>().Where(x => ids.Contains(x.Id))
                 .Include(relatedCollectionName)
                 .ToListAsync<TOut>().ConfigureAwait(false);
+        }
+
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        //adds log entry to the dbContext based on record data and user Id
+        protected virtual void addLogEntryHelper(EFDbContext dbContext, T dbEntry)
+        {
+            //stub method for derived classes to implement
         }
 
 

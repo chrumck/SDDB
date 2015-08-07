@@ -221,7 +221,7 @@ namespace SDDB.WebUI.ControllersSrv
                 }).ToList();
         }
 
-        //filterForJsonFull - filter data from service to be passed as response
+        //filterForJsonDTables - filter data from service to be passed as response
         private object filterForJsonDTables(List<AssemblyDb> records)
         {
             return records

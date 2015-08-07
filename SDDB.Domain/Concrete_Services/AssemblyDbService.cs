@@ -19,14 +19,16 @@ namespace SDDB.Domain.Services
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
-        private IReadOnlyList<string> loggedProperties = new List<string> {"AssemblyStatus_Id", "AssignedToProject_Id",
-            "AssignedToLocation_Id", "AssyGlobalX", "AssyGlobalY", "AssyGlobalZ", "AssyLocalXDesign", "AssyLocalYDesign",
-            "AssyLocalZDesign","AssyLocalXAsBuilt", "AssyLocalYAsBuilt", "AssyLocalZAsBuilt", "AssyStationing", "AssyLength"};
         private IReadOnlyList<string> modifiedPropsForStatusChange = new List<string> { "AssemblyStatus_Id" };
 
         //Constructors---------------------------------------------------------------------------------------------------------//
 
-        public AssemblyDbService(IDbContextScopeFactory contextScopeFac, string userId) : base(contextScopeFac, userId) { }
+        public AssemblyDbService(IDbContextScopeFactory contextScopeFac, string userId) : base(contextScopeFac, userId) 
+        {
+            loggedProperties = new List<string> {"AssemblyStatus_Id", "AssignedToProject_Id",
+            "AssignedToLocation_Id", "AssyGlobalX", "AssyGlobalY", "AssyGlobalZ", "AssyLocalXDesign", "AssyLocalYDesign",
+            "AssyLocalZDesign","AssyLocalXAsBuilt", "AssyLocalYAsBuilt", "AssyLocalZAsBuilt", "AssyStationing", "AssyLength"};
+        }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
@@ -134,7 +136,7 @@ namespace SDDB.Domain.Services
                 var records = await dbContext.AssemblyDbs
                     .Where(x =>
                         x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && 
-                        (x.AssyName.Contains(query) || x.AssignedToProject.ProjectCode.Contains(query)) &&
+                        (x.AssyName.Contains(query) || x.AssignedToProject.ProjectName.Contains(query)) &&
                         x.IsActive_bl == getActive
                         )
                     .Include(x => x.AssignedToProject)
@@ -157,7 +159,7 @@ namespace SDDB.Domain.Services
                     .Where(x =>
                         x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
-                        (x.AssyName.Contains(query) || x.AssignedToProject.ProjectCode.Contains(query)) &&
+                        (x.AssyName.Contains(query) || x.AssignedToProject.ProjectName.Contains(query)) &&
                         x.IsActive_bl == getActive
                         )
                     .Include(x => x.AssignedToProject)
@@ -190,11 +192,9 @@ namespace SDDB.Domain.Services
         //-----------------------------------------------------------------------------------------------------------------------
 
         // Create and Update records given in [] - same as BaseDbService
-        // See overriden editHelperAsync(EFDbContext dbContext, AssemblyDb record)
-
+        // See overriden addLogEntryHelper(EFDbContext dbContext, AssemblyDb dbEntry)
 
         // Create and Update AssemblyExt records given in [] - same as BaseDbService
-
 
         // Delete records by their Ids - same as BaseDbService
         // See overriden checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
@@ -224,22 +224,6 @@ namespace SDDB.Domain.Services
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
 
-        //helper - editing records, takes single AssemblyDb record - override 
-        protected override async Task<string> editHelperAsync(EFDbContext dbContext, AssemblyDb record)
-        {
-            var dbEntry = await dbContext.AssemblyDbs.FindAsync(record.Id).ConfigureAwait(false);
-            if (dbEntry == null)
-            {
-                record.Id = Guid.NewGuid().ToString();
-                dbContext.AssemblyDbs.Add(record);
-                addLogEntryHelper(dbContext, record);
-                return record.Id;
-            }
-            dbEntry.CopyModifiedProps(record);
-            if (record.LoggedPropsModified(loggedProperties.ToArray())) { addLogEntryHelper(dbContext, dbEntry); }
-            return null;
-        }
-
         //helper - check before deleting records, takes AssemblyDb ids array
         protected override async Task checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
         {
@@ -257,8 +241,8 @@ namespace SDDB.Domain.Services
             }
         }
         
-        //adds log entry to the dbContext based on assembly data and user Id
-        private void addLogEntryHelper(EFDbContext dbContext, AssemblyDb dbEntry)
+        //adds log entry to the dbContext based on assembly data and user Id - override
+        protected override void addLogEntryHelper(EFDbContext dbContext, AssemblyDb dbEntry)
         {
             dbContext.AssemblyLogEntrys.Add(
                 new AssemblyLogEntry
@@ -266,7 +250,7 @@ namespace SDDB.Domain.Services
                     Id = Guid.NewGuid().ToString(),
                     LogEntryDateTime = DateTime.Now,
                     AssemblyDb_Id = dbEntry.Id,
-                    EnteredByPerson_Id = userId,
+                    LastSavedByPerson_Id = userId,
                     AssemblyStatus_Id = dbEntry.AssemblyStatus_Id,
                     AssignedToProject_Id = dbEntry.AssignedToProject_Id,
                     AssignedToLocation_Id = dbEntry.AssignedToLocation_Id,

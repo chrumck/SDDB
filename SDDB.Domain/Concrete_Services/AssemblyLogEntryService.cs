@@ -41,7 +41,7 @@ namespace SDDB.Domain.Services
                         x.IsActive_bl == getActive
                         )
                     .Include(x => x.AssemblyDb)
-                    .Include(x => x.EnteredByPerson)
+                    .Include(x => x.LastSavedByPerson)
                     .Include(x => x.AssemblyStatus)
                     .Include(x => x.AssignedToProject)
                     .Include(x => x.AssignedToLocation)
@@ -69,13 +69,13 @@ namespace SDDB.Domain.Services
                         x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         (assemblyIds.Count() == 0 || assemblyIds.Contains(x.AssemblyDb_Id)) &&
-                        (personIds.Count() == 0 || personIds.Contains(x.EnteredByPerson_Id)) &&
+                        (personIds.Count() == 0 || personIds.Contains(x.LastSavedByPerson_Id)) &&
                         (startDate == null || x.LogEntryDateTime >= startDate) &&
                         (endDate == null || x.LogEntryDateTime <= endDate) &&
                         x.IsActive_bl == getActive
                         )
                     .Include(x => x.AssemblyDb)
-                    .Include(x => x.EnteredByPerson)
+                    .Include(x => x.LastSavedByPerson)
                     .Include(x => x.AssemblyStatus)
                     .Include(x => x.AssignedToProject)
                     .Include(x => x.AssignedToLocation)
@@ -88,29 +88,13 @@ namespace SDDB.Domain.Services
 
         //-----------------------------------------------------------------------------------------------------------------------
 
-        // Create and Update records given in []
-        // See overriden editHelperAsync(EFDbContext dbContext, AssmeblyLogEntry record)
+        // Create and Update records given in []  - same as BaseDbService
 
         // Delete records by their Ids - same as BaseDbService
 
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
-
-        //helper - editing single Db Entry - overriden from BaseDbService
-        protected override async Task<string> editHelperAsync(EFDbContext dbContext, AssemblyLogEntry record)
-        {
-            var dbEntry = await dbContext.AssemblyLogEntrys.FindAsync(record.Id).ConfigureAwait(false);
-            if (dbEntry == null)
-            {
-                record.Id = Guid.NewGuid().ToString();
-                record.EnteredByPerson_Id = record.EnteredByPerson_Id ?? userId;
-                dbContext.AssemblyLogEntrys.Add(record);
-                return record.Id;
-            }
-            dbEntry.CopyModifiedProps(record);
-            return null;
-        }
 
         #endregion
     }

@@ -248,6 +248,9 @@ $(document).ready(function () {
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }
+    else {
+        refreshMainView();
+    }
 
     $("#InitialView").addClass("hide");
     $("#MainView").removeClass("hide");
@@ -261,9 +264,15 @@ $(document).ready(function () {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
-    if ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "" ||
-            (MsFilterByType.getValue().length == 0 && MsFilterByProject.getValue().length == 0
-                && MsFilterByPerson.getValue().length == 0 && MsFilterByAssy.getValue().length == 0)
+    if ( ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "") ||
+            (
+                $("#FilterDateStart").val() == "" ||
+                $("#FilterDateEnd").val() == "" &&
+                MsFilterByType.getValue().length == 0 &&
+                MsFilterByProject.getValue().length == 0 &&
+                MsFilterByPerson.getValue().length == 0 &&
+                MsFilterByAssy.getValue().length == 0
+            )
         ) {
         $("#ChBoxShowDeleted").bootstrapToggle("disable")
         TableMain.clear().search("").draw();

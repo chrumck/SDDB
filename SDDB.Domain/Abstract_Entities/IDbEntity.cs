@@ -7,6 +7,8 @@ namespace SDDB.Domain.Abstract
         
         string Id { get; set; }
 
+        string LastSavedByPerson_Id { get; set; }
+
         bool IsActive_bl { get; set; }
 
         DateTime TSP { get; set; }

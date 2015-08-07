@@ -304,7 +304,7 @@ namespace SDDB.Domain.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Component_Id = dbEntry.Id,
-                    EnteredByPerson_Id = userId,
+                    LastSavedByPerson_Id = userId,
                     LogEntryDateTime = DateTime.Now,
                     ComponentStatus_Id = dbEntry.ComponentStatus_Id,
                     AssignedToProject_Id = dbEntry.AssignedToProject_Id,

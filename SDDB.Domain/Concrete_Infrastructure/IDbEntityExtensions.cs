@@ -33,7 +33,7 @@ namespace SDDB.Domain.Infrastructure
         //fill dbEntry with empty related entities to avoid having null objects at 1st nesting level
         public static void FillRelatedIfNull<T>(this T instance) where T: IDbEntity
         {
-            var excludedProperties = new string[] { "Id", "TSP" };
+            var excludedProperties = new string[] { "Id", "TSP", "LastSavedByPerson_Id" };
             var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
             foreach (var property in properties)
             {

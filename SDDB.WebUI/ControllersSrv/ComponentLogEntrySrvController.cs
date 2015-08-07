@@ -32,12 +32,12 @@ namespace SDDB.WebUI.ControllersSrv
                 x.Id,
                 x.LogEntryDateTime,
                 Component_ = new { x.Component.CompName, x.Component.CompAltName },
-                EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
+                LastSavedByPerson_ = new { x.LastSavedByPerson.FirstName, x.LastSavedByPerson.LastName, x.LastSavedByPerson.Initials },
                 ComponentStatus_ = new { x.ComponentStatus.CompStatusName },
                 AssignedToProject_ = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectCode },
                 AssignedToAssemblyDb_ = new { x.AssignedToAssemblyDb.AssyName, x.AssignedToAssemblyDb.AssyAltName },
                 x.LastCalibrationDate, x.Comments, x.IsActive_bl,
-                x.Component_Id, x.EnteredByPerson_Id, x.ComponentStatus_Id, x.AssignedToProject_Id, x.AssignedToAssemblyDb_Id
+                x.Component_Id, x.LastSavedByPerson_Id, x.ComponentStatus_Id, x.AssignedToProject_Id, x.AssignedToAssemblyDb_Id
             });
 
             ViewBag.ServiceName = "ComponentLogEntryService.GetAsync";
@@ -54,12 +54,12 @@ namespace SDDB.WebUI.ControllersSrv
                 x.Id,
                 x.LogEntryDateTime,
                 Component_ = new { x.Component.CompName, x.Component.CompAltName },
-                EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
+                LastSavedByPerson_ = new { x.LastSavedByPerson.FirstName, x.LastSavedByPerson.LastName, x.LastSavedByPerson.Initials },
                 ComponentStatus_ = new { x.ComponentStatus.CompStatusName },
                 AssignedToProject_ = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectCode },
                 AssignedToAssemblyDb_ = new { x.AssignedToAssemblyDb.AssyName, x.AssignedToAssemblyDb.AssyAltName },
                 x.LastCalibrationDate, x.Comments, x.IsActive_bl,
-                x.Component_Id, x.EnteredByPerson_Id, x.ComponentStatus_Id, x.AssignedToProject_Id, x.AssignedToAssemblyDb_Id
+                x.Component_Id, x.LastSavedByPerson_Id, x.ComponentStatus_Id, x.AssignedToProject_Id, x.AssignedToAssemblyDb_Id
             });
 
             ViewBag.ServiceName = "ComponentLogEntryService.GetAsync";
@@ -79,12 +79,12 @@ namespace SDDB.WebUI.ControllersSrv
                 x.Id,
                 x.LogEntryDateTime,
                 Component_ = new { x.Component.CompName, x.Component.CompAltName },
-                EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
+                LastSavedByPerson_ = new { x.LastSavedByPerson.FirstName, x.LastSavedByPerson.LastName, x.LastSavedByPerson.Initials },
                 ComponentStatus_ = new { x.ComponentStatus.CompStatusName },
                 AssignedToProject_ = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectCode },
                 AssignedToAssemblyDb_ = new { x.AssignedToAssemblyDb.AssyName, x.AssignedToAssemblyDb.AssyAltName },
                 x.LastCalibrationDate, x.Comments, x.IsActive_bl,
-                x.Component_Id, x.EnteredByPerson_Id, x.ComponentStatus_Id, x.AssignedToProject_Id, x.AssignedToAssemblyDb_Id
+                x.Component_Id, x.LastSavedByPerson_Id, x.ComponentStatus_Id, x.AssignedToProject_Id, x.AssignedToAssemblyDb_Id
             });
 
             ViewBag.ServiceName = "ComponentLogEntryService.GetByAltIdsAsync"; 

@@ -61,7 +61,7 @@
                     <th>Comments</th>
                     <th>Is Active</th>
                     <th>Component_Id</th>
-                    <th>EnteredByPerson_Id</th>
+                    <th>LastSavedByPerson_Id</th>
                     <th>ComponentStatus_Id</th>
                     <th>AssignedToProject_Id</th>
                     <th>AssignedToAssemblyDb_Id</th>
@@ -99,13 +99,6 @@
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.Component_Id, new { @class = "form-control modifiable", placeholder = "Component" })
                             @Html.ValidationMessageFor(x => x.Component_Id)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.EnteredByPerson_Id, "Entered By", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.EnteredByPerson_Id, new { @class = "form-control modifiable", placeholder = "Entered By Person" })
-                            @Html.ValidationMessageFor(x => x.EnteredByPerson_Id)
                         </div>
                     </div>
                     <div class="form-group">

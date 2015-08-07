@@ -432,6 +432,14 @@
     <Compile Include="Migrations\201507221812429_changeToBl.Designer.cs">
       <DependentUpon>201507221812429_changeToBl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201508062048477_LastSavedByPerson_Id.cs" />
+    <Compile Include="Migrations\201508062048477_LastSavedByPerson_Id.Designer.cs">
+      <DependentUpon>201508062048477_LastSavedByPerson_Id.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201508062101365_LogEntryLastSavedNotRequired.cs" />
+    <Compile Include="Migrations\201508062101365_LogEntryLastSavedNotRequired.Designer.cs">
+      <DependentUpon>201508062101365_LogEntryLastSavedNotRequired.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -627,6 +635,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201507221812429_changeToBl.resx">
       <DependentUpon>201507221812429_changeToBl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508062048477_LastSavedByPerson_Id.resx">
+      <DependentUpon>201508062048477_LastSavedByPerson_Id.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508062101365_LogEntryLastSavedNotRequired.resx">
+      <DependentUpon>201508062101365_LogEntryLastSavedNotRequired.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

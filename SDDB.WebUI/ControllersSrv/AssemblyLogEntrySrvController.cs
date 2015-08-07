@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -29,49 +30,21 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Assembly_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
-            var data = (await assyLogEntryService.GetAsync(UserId,ids, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.LogEntryDateTime,
-                AssemblyDb_ = new { x.AssemblyDb.AssyName, x.AssemblyDb.AssyAltName },
-                EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
-                AssemblyStatus_ = new { x.AssemblyStatus.AssyStatusName },
-                AssignedToProject_ = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectCode },
-                AssignedToLocation_ = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName },
-                x.AssyGlobalX, x.AssyGlobalY, x.AssyGlobalZ,
-                x.AssyLocalXDesign, x.AssyLocalYDesign, x.AssyLocalZDesign,
-                x.AssyLocalXAsBuilt, x.AssyLocalYAsBuilt, x.AssyLocalZAsBuilt,
-                x.AssyStationing, x.AssyLength, x.Comments, x.IsActive_bl,
-                x.AssemblyDb_Id, x.EnteredByPerson_Id, x.AssemblyStatus_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id
-            });
-
             ViewBag.ServiceName = "AssemblyLogEntryService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            var records = (await assyLogEntryService.GetAsync(ids, getActive).ConfigureAwait(false));
+            return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // POST: /AssemblyLogEntrySrv/GetByAltIds
         [HttpPost]
         [DBSrvAuth("Assembly_View")]
-        public async Task<ActionResult> GetByAltIds(string[] projectIds = null, string[] assyIds = null, string[] personIds = null,
-            DateTime? startDate = null, DateTime? endDate = null, bool getActive = true)
+        public async Task<ActionResult> GetByAltIds(string[] projectIds, string[] assyIds, string[] personIds, 
+            DateTime? startDate, DateTime? endDate, bool getActive = true)
         {
-            var data = (await assyLogEntryService.GetByAltIdsAsync(UserId, projectIds, assyIds, personIds, startDate, endDate, getActive)
-                .ConfigureAwait(false)).Select(x => new {
-                x.Id, x.LogEntryDateTime,
-                AssemblyDb_ = new { x.AssemblyDb.AssyName, x.AssemblyDb.AssyAltName },
-                EnteredByPerson_ = new { x.EnteredByPerson.FirstName, x.EnteredByPerson.LastName, x.EnteredByPerson.Initials },
-                AssemblyStatus_ = new { x.AssemblyStatus.AssyStatusName },
-                AssignedToProject_ = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectCode },
-                AssignedToLocation_ = new { x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName },
-                x.AssyGlobalX, x.AssyGlobalY, x.AssyGlobalZ,
-                x.AssyLocalXDesign, x.AssyLocalYDesign, x.AssyLocalZDesign,
-                x.AssyLocalXAsBuilt, x.AssyLocalYAsBuilt, x.AssyLocalZAsBuilt,
-                x.AssyStationing, x.AssyLength, x.Comments, x.IsActive_bl,
-                x.AssemblyDb_Id, x.EnteredByPerson_Id, x.AssemblyStatus_Id, x.AssignedToProject_Id, x.AssignedToLocation_Id
-            });
-
             ViewBag.ServiceName = "AssemblyLogEntryService.GetByAltIdsAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            var records = (await assyLogEntryService.GetByAltIdsAsync(projectIds, assyIds, personIds, startDate, endDate, getActive)
+                .ConfigureAwait(false));
+            return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
                 
         
@@ -82,22 +55,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Assembly_Edit")]
         public async Task<ActionResult> Edit(AssemblyLogEntry[] records)
         {
-            var serviceResult = await assyLogEntryService.EditAsync(records).ConfigureAwait(false);
-
             ViewBag.ServiceName = "AssemblyLogEntryService.EditAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode; 
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            var newEntryIds = await assyLogEntryService.EditAsync(records).ConfigureAwait(false);
+            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /AssemblyLogEntrySrv/Delete
@@ -105,26 +65,57 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Assembly_Edit")]
         public async Task<ActionResult> Delete(string[] ids)
         {
-            var serviceResult = await assyLogEntryService.DeleteAsync(ids).ConfigureAwait(false);
-
             ViewBag.ServiceName = "AssemblyLogEntryService.DeleteAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            await assyLogEntryService.DeleteAsync(ids).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
+
+        //filterForJsonFull - filter data from service to be passed as response
+        private object filterForJsonFull(List<AssemblyLogEntry> records)
+        {
+            return records.Select(x => new
+            {
+                x.Id,
+                x.LogEntryDateTime,
+                AssemblyDb_ = new {
+                    x.AssemblyDb.AssyName, x.AssemblyDb.AssyAltName 
+                },
+                LastSavedByPerson_ = new {
+                    x.LastSavedByPerson.FirstName, x.LastSavedByPerson.LastName, x.LastSavedByPerson.Initials
+                },
+                AssemblyStatus_ = new {
+                    x.AssemblyStatus.AssyStatusName
+                },
+                AssignedToProject_ = new {
+                    x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectCode 
+                },
+                AssignedToLocation_ = new {
+                    x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName 
+                },
+                x.AssyGlobalX,
+                x.AssyGlobalY,
+                x.AssyGlobalZ,
+                x.AssyLocalXDesign,
+                x.AssyLocalYDesign,
+                x.AssyLocalZDesign,
+                x.AssyLocalXAsBuilt,
+                x.AssyLocalYAsBuilt,
+                x.AssyLocalZAsBuilt,
+                x.AssyStationing,
+                x.AssyLength,
+                x.Comments,
+                x.IsActive_bl,
+                x.AssemblyDb_Id,
+                x.LastSavedByPerson_Id,
+                x.AssemblyStatus_Id,
+                x.AssignedToProject_Id,
+                x.AssignedToLocation_Id
+            })
+            .ToList();
+        }
 
 
         #endregion

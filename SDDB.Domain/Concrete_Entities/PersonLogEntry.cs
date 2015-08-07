@@ -22,7 +22,7 @@ namespace SDDB.Domain.Entities
         [DBIsDateTimeISO] 
         public DateTime LogEntryDateTime { get; set; }
 
-        [Required(ErrorMessage = "Person field is required")]
+        [Required(ErrorMessage = "Entered By Person field is required")]
         [StringLength(40)]
         [ForeignKey("EnteredByPerson")]
         public string EnteredByPerson_Id { get; set; }
@@ -66,12 +66,19 @@ namespace SDDB.Domain.Entities
         [NotMapped]
         private DateTime? tsp;
 
+        //LastSavedByPerson_Id -------------------------------------------------------------------------------------------------//
+        //[Required(ErrorMessage = "LastSavedByPerson Id field is required")]
+        [StringLength(40)]
+        [ForeignKey("LastSavedByPerson")]
+        public string LastSavedByPerson_Id { get; set; }
+        //Navigation Property
+        public virtual Person LastSavedByPerson { get; set; }
+
         //EF Navigation Properties---------------------------------------------------------------------------------------------//
 
         //one to one
         
         //one to many
-
         public virtual Person EnteredByPerson { get; set; }
         public virtual PersonActivityType PersonActivityType { get; set; }
         public virtual Project AssignedToProject { get; set; }

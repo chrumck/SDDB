@@ -18,7 +18,6 @@ var RecordTemplate = {
     Id: "RecordTemplateId",
     LogEntryDateTime: null,
     AssemblyDb_Id: null,
-    EnteredByPerson_Id: null,
     AssemblyStatus_Id: null,
     AssignedToProject_Id: null,
     AssignedToLocation_Id: null,
@@ -168,7 +167,7 @@ $(document).ready(function () {
             { data: "LogEntryDateTime", name: "LogEntryDateTime" },//1
             //------------------------------------------------first set of columns
             { data: "AssemblyDb_", render: function (data, type, full, meta) { return data.AssyName }, name: "AssemblyDb_" }, //2
-            { data: "EnteredByPerson_", render: function (data, type, full, meta) { return data.LastName + " " + data.Initials }, name: "EnteredByPerson_" }, //3
+            { data: "LastSavedByPerson_", render: function (data, type, full, meta) { return data.LastName + " " + data.Initials }, name: "LastSavedByPerson_" }, //3
             { data: "AssemblyStatus_", render: function (data, type, full, meta) { return data.AssyStatusName }, name: "AssemblyStatus_" }, //4
             { data: "AssignedToProject_", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject_" }, //5
             { data: "AssignedToLocation_", render: function (data, type, full, meta) { return data.LocName }, name: "AssignedToAssemblyDb_" }, //6
@@ -189,7 +188,7 @@ $(document).ready(function () {
             //------------------------------------------------never visible
             { data: "IsActive_bl", name: "IsActive_bl" },//19
             { data: "AssemblyDb_Id", name: "AssemblyDb_Id" },//20
-            { data: "EnteredByPerson_Id", name: "EnteredByPerson_Id" },//21
+            { data: "LastSavedByPerson_Id", name: "LastSavedByPerson_Id" },//21
             { data: "AssemblyStatus_Id", name: "AssemblyStatus_Id" },//22
             { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//23
             { data: "AssignedToLocation_Id", name: "AssignedToLocation_Id" }//24
@@ -236,7 +235,6 @@ $(document).ready(function () {
 
     //Initialize MagicSuggest Array
     addToMSArray(MagicSuggests, "AssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
     addToMSArray(MagicSuggests, "AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup", 1);
     addToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
     addToMSArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/Lookup", 1);

@@ -78,6 +78,14 @@ namespace SDDB.Domain.Entities
         [NotMapped]
         private DateTime? tsp;
 
+        //LastSavedByPerson_Id -------------------------------------------------------------------------------------------------//
+        //[Required(ErrorMessage = "LastSavedByPerson Id field is required")]
+        [StringLength(40)]
+        [ForeignKey("LastSavedByPerson")]
+        public string LastSavedByPerson_Id { get; set; }
+        //Navigation Property
+        public virtual Person LastSavedByPerson { get; set; }
+
         //EF Navigation Properties---------------------------------------------------------------------------------------------//
 
         //one to one
@@ -101,14 +109,8 @@ namespace SDDB.Domain.Entities
         [InverseProperty("EnteredByPerson")]
         public virtual ICollection<PersonLogEntry> EnteredPrsLogEntrys { get; set; }
 
-        [InverseProperty("EnteredByPerson")]
-        public virtual ICollection<AssemblyLogEntry> EnteredAssyLogEntrys { get; set; }
-
-        [InverseProperty("EnteredByPerson")]
-        public virtual ICollection<ComponentLogEntry> EnteredCompLogEntrys { get; set; }
-
         //many to many
-        
+
         [InverseProperty("ProjectPersons")]
         public virtual ICollection<Project> PersonProjects { get; set; }
 
@@ -130,8 +132,6 @@ namespace SDDB.Domain.Entities
             this.DocumentsReviewer = new HashSet<Document>();
             this.LocationsContact = new HashSet<Location>();
             this.EnteredPrsLogEntrys = new HashSet<PersonLogEntry>();
-            this.EnteredAssyLogEntrys = new HashSet<AssemblyLogEntry>();
-            this.EnteredCompLogEntrys = new HashSet<ComponentLogEntry>();
 
             this.PersonProjects = new HashSet<Project>();
             this.PersonGroups = new HashSet<PersonGroup>();

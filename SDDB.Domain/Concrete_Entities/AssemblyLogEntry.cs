@@ -27,11 +27,6 @@ namespace SDDB.Domain.Entities
         [ForeignKey("AssemblyDb")]
         public string AssemblyDb_Id { get; set; }
         
-        [Required(ErrorMessage = "Person field is required")]
-        [StringLength(40)]
-        [ForeignKey("EnteredByPerson")]
-        public string EnteredByPerson_Id { get; set; }
-        
         [Required(ErrorMessage = "Assy. Status field is required")]
         [StringLength(40)]
         [ForeignKey("AssemblyStatus")]
@@ -89,13 +84,19 @@ namespace SDDB.Domain.Entities
         [NotMapped]
         private DateTime? tsp;
 
+        //LastSavedByPerson_Id-------------------------------------------------------------------------------------------------//
+        [StringLength(40)]
+        [ForeignKey("LastSavedByPerson")]
+        public string LastSavedByPerson_Id { get; set; }
+        //Navigation property ------------
+        public virtual Person LastSavedByPerson { get; set; }
+
         //EF Navigation Properties---------------------------------------------------------------------------------------------//
 
         //one to one
         
         //one to many
         public virtual AssemblyDb AssemblyDb { get; set; }
-        public virtual Person EnteredByPerson { get; set; }
         
         public virtual AssemblyStatus AssemblyStatus { get; set; }
         public virtual Project AssignedToProject { get; set; }

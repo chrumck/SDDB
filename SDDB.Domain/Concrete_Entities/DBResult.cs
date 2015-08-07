@@ -78,6 +78,8 @@ namespace SDDB.Domain.Entities
         [DefaultValue(true)]
         public bool IsActive_bl { get; set; }
 
+        [NotMapped]
+        public string LastSavedByPerson_Id { get; set; }
     }
 
 }

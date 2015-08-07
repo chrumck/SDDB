@@ -169,7 +169,6 @@ namespace SDDB.Domain.Services
 
         // Create and Update records given in [] - same as BaseDbService
         // See overriden checkBeforeEditHelperAsync(EFDbContext dbContext, PersonLogEntry record)
-        // See overriden editHelperAsync(EFDbContext dbContext, PersonLogEntry record)
 
 
         // Delete records by their Ids - same as BaseDbService
@@ -266,22 +265,6 @@ namespace SDDB.Domain.Services
                 if (record.AssignedToLocation_Id != null && location.AssignedToProject_Id != record.AssignedToProject_Id)
                 { throw new DbBadRequestException("Log Entry and Location do not belong to the same project.\n Entry(ies) not saved."); }
         }
-
-        //helper - editing single Db Entry - overriden from BaseDbService
-        protected override async Task<string> editHelperAsync(EFDbContext dbContext, PersonLogEntry record)
-        {
-            var dbEntry = await dbContext.PersonLogEntrys.FindAsync(record.Id).ConfigureAwait(false);
-            if (dbEntry == null)
-            {
-                record.Id = Guid.NewGuid().ToString();
-                record.EnteredByPerson_Id = record.EnteredByPerson_Id ?? userId;
-                dbContext.PersonLogEntrys.Add(record);
-                return record.Id;
-            }
-            dbEntry.CopyModifiedProps(record);
-            return null;
-        }
-
 
         
         #endregion

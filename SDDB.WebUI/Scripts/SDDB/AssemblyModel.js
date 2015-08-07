@@ -144,7 +144,7 @@ $(document).ready(function () {
             { data: "Attr15Desc", name: "Attr15Desc" },//32
             //------------------------------------------------never visible
             { data: "Comments", name: "Comments" },//33
-            { data: "IsActive", name: "IsActive" },//34
+            { data: "IsActive_bl", name: "IsActive_bl" },//34
         ],
         columnDefs: [
             { targets: [0, 34], visible: false }, // - never show
@@ -241,7 +241,7 @@ function FillFormForEdit() {
             CurrRecord.Attr14Type = data[0].Attr14Type;CurrRecord.Attr14Desc = data[0].Attr14Desc;
             CurrRecord.Attr15Type = data[0].Attr15Type;CurrRecord.Attr15Desc = data[0].Attr15Desc;
             CurrRecord.Comments = data[0].Comments;
-            CurrRecord.IsActive = data[0].IsActive;
+            CurrRecord.IsActive_bl = data[0].IsActive_bl;
 
             var FormInput = $.extend(true, {}, CurrRecord);
             $.each(data, function (i, dbEntry) {
@@ -280,7 +280,7 @@ function FillFormForEdit() {
                 if (FormInput.Attr15Desc != dbEntry.Attr15Desc) FormInput.Attr15Desc = "_VARIES_";
 
                 if (FormInput.Comments != dbEntry.Comments) FormInput.Comments = "_VARIES_";
-                if (FormInput.IsActive != dbEntry.IsActive) FormInput.IsActive = "_VARIES_";
+                if (FormInput.IsActive_bl != dbEntry.IsActive_bl) FormInput.IsActive_bl = "_VARIES_";
             });
 
             clearFormInputs("EditForm", MagicSuggests);
@@ -305,7 +305,7 @@ function FillFormForEdit() {
             $("#Attr14Type").val(FormInput.Attr14Type); $("#Attr14Desc").val(FormInput.Attr14Desc);
             $("#Attr15Type").val(FormInput.Attr15Type); $("#Attr15Desc").val(FormInput.Attr15Desc);
             $("#Comments").val(FormInput.Comments);
-            if (FormInput.IsActive == true) $("#IsActive").prop("checked", true);
+            if (FormInput.IsActive_bl == true) $("#IsActive_bl").prop("checked", true);
 
             if (data.length == 1) {
                 $("[data-val-dbisunique]").prop("disabled", false);
@@ -381,7 +381,7 @@ function SubmitEdits() {
         editRecord.Attr15Type = ($("#Attr15Type").data("ismodified")) ? $("#Attr15Type").val() : CurrRecord.Attr15Type;
         editRecord.Attr15Desc = ($("#Attr15Desc").data("ismodified")) ? $("#Attr15Desc").val() : CurrRecord.Attr15Desc;
         editRecord.Comments = ($("#Comments").data("ismodified")) ? $("#Comments").val() : CurrRecord.Comments;
-        editRecord.IsActive = ($("#IsActive").data("ismodified")) ? (($("#IsActive").prop("checked")) ? true : false) : CurrRecord.IsActive;
+        editRecord.IsActive_bl = ($("#IsActive_bl").data("ismodified")) ? (($("#IsActive_bl").prop("checked")) ? true : false) : CurrRecord.IsActive_bl;
 
         editRecord.ModifiedProperties = modifiedProperties;
 

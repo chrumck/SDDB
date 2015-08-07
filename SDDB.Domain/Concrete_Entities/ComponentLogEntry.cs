@@ -27,11 +27,6 @@ namespace SDDB.Domain.Entities
         [ForeignKey("Component")]
         public string Component_Id { get; set; }
 
-        [Required(ErrorMessage = "Person field is required")]
-        [StringLength(40)]
-        [ForeignKey("EnteredByPerson")]
-        public string EnteredByPerson_Id { get; set; }
-
         [Required(ErrorMessage = "Comp. Status field is required")]
         [StringLength(40)]
         [ForeignKey("ComponentStatus")]
@@ -66,13 +61,19 @@ namespace SDDB.Domain.Entities
         [NotMapped]
         private DateTime? tsp;
 
+        //LastSavedByPerson_Id-------------------------------------------------------------------------------------------------//
+        [StringLength(40)]
+        [ForeignKey("LastSavedByPerson")]
+        public string LastSavedByPerson_Id { get; set; }
+        //Navigation property ------------
+        public virtual Person LastSavedByPerson { get; set; }
+
         //EF Navigation Properties---------------------------------------------------------------------------------------------//
 
         //one to one
         
         //one to many
         public virtual Component Component { get; set; }
-        public virtual Person EnteredByPerson { get; set; }
         public virtual ComponentStatus ComponentStatus { get; set; }
         public virtual Project AssignedToProject { get; set; }
         public virtual AssemblyDb AssignedToAssemblyDb { get; set; }

@@ -256,9 +256,9 @@ namespace SDDB.UnitTests
             var dbEntry2 = new AssemblyDb { Id = "dummyEntryId2", AssyName = "DbEntry2", AssyAltName = "DbEntryAlt2", IsActive_bl = false, TechnicalDetails = "DbEntryInfo2",
                                         AssignedToLocation_Id = "dummyLocId4" };
 
-            mockEfDbContext.Setup(x => x.AssemblyDbs.FindAsync(assembly1.Id)).Returns(Task.FromResult(dbEntry1));
-            mockEfDbContext.Setup(x => x.AssemblyDbs.FindAsync(assembly2.Id)).Returns(Task.FromResult(dbEntry2));
-            mockEfDbContext.Setup(x => x.AssemblyDbs.Add(assembly1)).Verifiable();
+            mockEfDbContext.Setup(x => x.Set<AssemblyDb>().FindAsync(assembly1.Id)).Returns(Task.FromResult(dbEntry1));
+            mockEfDbContext.Setup(x => x.Set<AssemblyDb>().FindAsync(assembly2.Id)).Returns(Task.FromResult(dbEntry2));
+            mockEfDbContext.Setup(x => x.Set<AssemblyDb>().Add(assembly1)).Verifiable();
             var logEntry = new AssemblyLogEntry();
             mockEfDbContext.Setup(x => x.AssemblyLogEntrys.Add(It.IsAny<AssemblyLogEntry>())).Callback<AssemblyLogEntry>( x => logEntry = x);
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
@@ -278,8 +278,8 @@ namespace SDDB.UnitTests
             Assert.IsTrue(logEntry.AssemblyDb_Id == dbEntry1.Id); Assert.IsTrue(logEntry.AssignedToLocation_Id == dbEntry1.AssignedToLocation_Id);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.AssemblyDbs.FindAsync(It.IsAny<string>()), Times.Exactly(2));
-            mockEfDbContext.Verify(x => x.AssemblyDbs.Add(It.IsAny<AssemblyDb>()), Times.Never);
+            mockEfDbContext.Verify(x => x.Set<AssemblyDb>().FindAsync(It.IsAny<string>()), Times.Exactly(2));
+            mockEfDbContext.Verify(x => x.Set<AssemblyDb>().Add(It.IsAny<AssemblyDb>()), Times.Never);
             mockEfDbContext.Verify(x => x.AssemblyLogEntrys.Add(It.IsAny<AssemblyLogEntry>()), Times.Once);
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
@@ -305,9 +305,9 @@ namespace SDDB.UnitTests
             var dbEntry2 = new AssemblyDb { Id = "dummyEntryId2", AssyName = "DbEntry2", AssyAltName = "DbEntryAlt2", IsActive_bl = false, TechnicalDetails = "DbEntryInfo2",
                                         AssignedToLocation_Id = "dummyLocId4" };
 
-            mockEfDbContext.Setup(x => x.AssemblyDbs.FindAsync(assembly1.Id)).Returns(Task.FromResult(dbEntry1));
-            mockEfDbContext.Setup(x => x.AssemblyDbs.FindAsync(assembly2.Id)).Returns(Task.FromResult<AssemblyDb>(null));
-            mockEfDbContext.Setup(x => x.AssemblyDbs.Add(It.IsAny<AssemblyDb>())).Verifiable();
+            mockEfDbContext.Setup(x => x.Set<AssemblyDb>().FindAsync(assembly1.Id)).Returns(Task.FromResult(dbEntry1));
+            mockEfDbContext.Setup(x => x.Set<AssemblyDb>().FindAsync(assembly2.Id)).Returns(Task.FromResult<AssemblyDb>(null));
+            mockEfDbContext.Setup(x => x.Set<AssemblyDb>().Add(It.IsAny<AssemblyDb>())).Verifiable();
             var logEntry = new AssemblyLogEntry();
             mockEfDbContext.Setup(x => x.AssemblyLogEntrys.Add(It.IsAny<AssemblyLogEntry>())).Callback<AssemblyLogEntry>( x => logEntry = x);
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
@@ -331,8 +331,8 @@ namespace SDDB.UnitTests
             Assert.IsTrue(logEntry.AssignedToLocation_Id == assembly2.AssignedToLocation_Id);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.AssemblyDbs.FindAsync(It.IsAny<string>()), Times.Exactly(2));
-            mockEfDbContext.Verify(x => x.AssemblyDbs.Add(assembly2), Times.Once );
+            mockEfDbContext.Verify(x => x.Set<AssemblyDb>().FindAsync(It.IsAny<string>()), Times.Exactly(2));
+            mockEfDbContext.Verify(x => x.Set<AssemblyDb>().Add(assembly2), Times.Once);
             mockEfDbContext.Verify(x => x.AssemblyLogEntrys.Add(It.IsAny<AssemblyLogEntry>()), Times.Exactly(2));
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
@@ -421,6 +421,10 @@ namespace SDDB.UnitTests
             mockEfDbContext.Setup(x => x.AssemblyDbs).Returns(mockDbSet.Object);
 
             var logEntry = new AssemblyLogEntry();
+
+            mockEfDbContext.Setup(x => x.Set<AssemblyDb>().FindAsync(dbEntry1.Id)).Returns(Task.FromResult(dbEntry1));
+            mockEfDbContext.Setup(x => x.Set<AssemblyDb>().FindAsync(dbEntry2.Id)).Returns(Task.FromResult(dbEntry1));
+
             mockEfDbContext.Setup(x => x.AssemblyLogEntrys.Add(It.IsAny<AssemblyLogEntry>())).Callback<AssemblyLogEntry>( x => logEntry = x);
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
 

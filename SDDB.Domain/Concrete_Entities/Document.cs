@@ -75,6 +75,14 @@ namespace SDDB.Domain.Entities
         [NotMapped]
         private DateTime? tsp;
 
+        //LastSavedByPerson_Id -------------------------------------------------------------------------------------------------//
+        //[Required(ErrorMessage = "LastSavedByPerson Id field is required")]
+        [StringLength(40)]
+        [ForeignKey("LastSavedByPerson")]
+        public string LastSavedByPerson_Id { get; set; }
+        //Navigation Property
+        public virtual Person LastSavedByPerson { get; set; }
+
         //EF Navigation Properties---------------------------------------------------------------------------------------------//
 
         //one to one

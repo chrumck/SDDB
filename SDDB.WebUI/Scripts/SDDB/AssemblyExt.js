@@ -53,7 +53,7 @@ $(document).ready(function () {
         else {
             showModalWait();
             var editFormLabel = "Edit " + MsFilterByModel.getSelection()[0].name;
-            fillFormForEditGeneric(CurrIds, "POST", "/AssemblyDbSrv/GetByIds", GetActive, editFormLabel, "Edit Extended", MagicSuggests)
+            fillFormForEditGeneric(CurrIds, "POST", "/AssemblyDbSrv/GetByIds", GetActive, editFormLabel, "Edit Extended", [])
                 .always(hideModalWait)
                 .done(function (currRecords) {
                     CurrRecords = currRecords;
@@ -149,9 +149,9 @@ $(document).ready(function () {
             { data: "AssyName", name: "AssyName" },//1
             //------------------------------------------------first set of columns
             { data: "AssyAltName", name: "AssyAltName" },//2
-            { data: "AssyTypeName", name: "AssyTypeName" },//3  
-            { data: "AssyStatusName", name: "AssyStatusName" },//4
-            { data: "AssignedToProject", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject" }, //5
+            { data: "AssemblyType_", render: function (data, type, full, meta) { return data.AssyTypeName }, name: "AssemblyType_" }, //3
+            { data: "AssemblyStatus_", render: function (data, type, full, meta) { return data.AssyStatusName }, name: "AssemblyStatus_" }, //4
+            { data: "AssignedToProject_", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject_" }, //5
             //------------------------------------------------second set of columns
             { data: "Attr01", name: "Attr01" },//6
             { data: "Attr02", name: "Attr02" },//7
@@ -265,7 +265,7 @@ function refreshMainView() {
 }
 
 //Pulls Model Information and formats edit form and column names
-function UpdateViewsForModel() {
+function updateViewsForModel() {
     var modelId = MsFilterByModel.getValue();
     showModalWait();
     $.ajax({ type: "POST", url: "/AssemblyModelSrv/GetByIds", timeout: 20000, data: { ids: [modelId] }, dataType: "json"})

@@ -40,7 +40,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 var records = await dbContext.ComponentLogEntrys
                     .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive)
-                    .Include(x => x.Component).Include(x => x.EnteredByPerson).Include(x => x.ComponentStatus).Include(x => x.AssignedToProject)
+                    .Include(x => x.Component).Include(x => x.LastSavedByPerson).Include(x => x.ComponentStatus).Include(x => x.AssignedToProject)
                     .Include(x => x.AssignedToAssemblyDb)
                     .ToListAsync().ConfigureAwait(false);
 
@@ -61,7 +61,7 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 var records = await dbContext.ComponentLogEntrys
                     .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive && ids.Contains(x.Id))
-                    .Include(x => x.Component).Include(x => x.EnteredByPerson).Include(x => x.ComponentStatus).Include(x => x.AssignedToProject)
+                    .Include(x => x.Component).Include(x => x.LastSavedByPerson).Include(x => x.ComponentStatus).Include(x => x.AssignedToProject)
                     .Include(x => x.AssignedToAssemblyDb)
                     .ToListAsync().ConfigureAwait(false);
 
@@ -88,10 +88,10 @@ namespace SDDB.Domain.Services
                     .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         (componentIds.Count() == 0 || componentIds.Contains(x.Component_Id)) &&
-                        (personIds.Count() == 0 || personIds.Contains(x.EnteredByPerson_Id)) &&
+                        (personIds.Count() == 0 || personIds.Contains(x.LastSavedByPerson_Id)) &&
                         (startDate == null || x.LogEntryDateTime >= startDate) &&
                         (endDate == null || x.LogEntryDateTime <= endDate)  )
-                    .Include(x => x.Component).Include(x => x.EnteredByPerson).Include(x => x.ComponentStatus).Include(x => x.AssignedToProject)
+                    .Include(x => x.Component).Include(x => x.LastSavedByPerson).Include(x => x.ComponentStatus).Include(x => x.AssignedToProject)
                     .Include(x => x.AssignedToAssemblyDb)
                     .ToListAsync().ConfigureAwait(false);
 

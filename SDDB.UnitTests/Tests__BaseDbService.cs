@@ -56,8 +56,8 @@ namespace SDDB.UnitTests
             mockDbSet.Setup(x => x.FindAsync(dbEntry1.Id)).Returns(Task.FromResult<PersonLogEntry>(null));
             mockDbSet.Setup(x => x.Add(dbEntry1)).Returns(dbEntry1);
 
-            mockEfDbContext.Setup(x => x.Set(typeof(PersonLogEntry)).FindAsync(userId)).Returns(Task.FromResult<object>(null));
-            mockEfDbContext.Setup(x => x.Set(typeof(PersonLogEntry)).Add(dbEntry1)).Verifiable();
+            mockEfDbContext.Setup(x => x.Set<PersonLogEntry>().FindAsync(userId)).Returns(Task.FromResult<PersonLogEntry>(null));
+            mockEfDbContext.Setup(x => x.Set<PersonLogEntry>().Add(dbEntry1)).Verifiable();
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
 
             var derivedTestService = new TestBaseDbService(mockDbContextScopeFac.Object, userId);
@@ -70,8 +70,8 @@ namespace SDDB.UnitTests
             Assert.IsTrue(regex.IsMatch(dbEntry1.Id));
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.Set(typeof(PersonLogEntry)).FindAsync(userId), Times.Once);
-            mockEfDbContext.Verify(x => x.Set(typeof(PersonLogEntry)).Add(dbEntry1), Times.Once);
+            mockEfDbContext.Verify(x => x.Set<PersonLogEntry>().FindAsync(userId), Times.Once);
+            mockEfDbContext.Verify(x => x.Set<PersonLogEntry>().Add(dbEntry1), Times.Once);
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
 
@@ -108,10 +108,10 @@ namespace SDDB.UnitTests
 
             var dbEntry1 = new PersonLogEntry { Id = "dummyEntryId1", LogEntryDateTime = new DateTime(2001, 1, 1), IsActive_bl = true };
             var dbEntry2 = new PersonLogEntry { Id = "dummyEntryId2", LogEntryDateTime = new DateTime(2001, 1, 2), IsActive_bl = false };
-            
-            mockEfDbContext.Setup(x => x.Set(typeof(PersonLogEntry)).FindAsync(record1.Id)).Returns(Task.FromResult((object)dbEntry1));
-            mockEfDbContext.Setup(x => x.Set(typeof(PersonLogEntry)).FindAsync(record2.Id)).Returns(Task.FromResult((object)dbEntry2));
-            mockEfDbContext.Setup(x => x.Set(typeof(PersonLogEntry)).Add(It.IsAny<PersonLogEntry>())).Verifiable();
+
+            mockEfDbContext.Setup(x => x.Set<PersonLogEntry>().FindAsync(record1.Id)).Returns(Task.FromResult((PersonLogEntry)dbEntry1));
+            mockEfDbContext.Setup(x => x.Set<PersonLogEntry>().FindAsync(record2.Id)).Returns(Task.FromResult((PersonLogEntry)dbEntry2));
+            mockEfDbContext.Setup(x => x.Set<PersonLogEntry>().Add(It.IsAny<PersonLogEntry>())).Verifiable();
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
 
             var derivedTestService = new TestBaseDbService(mockDbContextScopeFac.Object, userId);
@@ -126,16 +126,15 @@ namespace SDDB.UnitTests
             Assert.IsTrue(record2.IsActive_bl != dbEntry2.IsActive_bl);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.Set(typeof(PersonLogEntry)).FindAsync(It.IsAny<string>()), Times.Exactly(2));
-            mockEfDbContext.Verify(x => x.Set(typeof(PersonLogEntry)).Add(It.IsAny<PersonLogEntry>()), Times.Never);
+            mockEfDbContext.Verify(x => x.Set<PersonLogEntry>().FindAsync(It.IsAny<string>()), Times.Exactly(2));
+            mockEfDbContext.Verify(x => x.Set<PersonLogEntry>().Add(It.IsAny<PersonLogEntry>()), Times.Never);
             mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
         
+
         ////-----------------------------------------------------------------------------------------------------------------------
 
-        //[TestMethod]
-        // the method doesn't work because of Moq limitation:
-        // NotSupportedException: Conversion between generic and non-generic DbSet objects is not supported for test doubles.
+        [TestMethod]
         public void BaseDbService_DeleteAsync_DeletesRecords()
         {
             // Arrange
@@ -161,7 +160,7 @@ namespace SDDB.UnitTests
             mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.GetEnumerator()).Returns(dbEntries.GetEnumerator());
             mockDbSet.Setup(x => x.Include(It.IsAny<string>())).Returns(mockDbSet.Object);
 
-            mockEfDbContext.Setup(x => x.Set(typeof(PersonLogEntry))).Returns(mockDbSet.Object);
+            mockEfDbContext.Setup(x => x.Set<PersonLogEntry>()).Returns(mockDbSet.Object);
             mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
 
             var derivedTestService = new TestBaseDbService(mockDbContextScopeFac.Object, userId);
@@ -181,6 +180,8 @@ namespace SDDB.UnitTests
 
         // not able to unit test BaseDbService_AddRemoveRelated because of Moq limitation:
         // NotSupportedException: Conversion between generic and non-generic DbSet objects is not supported for test doubles.
+
+
 
     }
 }
