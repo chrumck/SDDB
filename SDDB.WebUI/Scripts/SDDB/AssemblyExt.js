@@ -10,6 +10,7 @@
 //--------------------------------------Global Properties------------------------------------//
 
 var TableMain;
+var MagicSuggests = [];
 var MsFilterByProject = {};
 var MsFilterByModel = {};
 
@@ -53,10 +54,11 @@ $(document).ready(function () {
         else {
             showModalWait();
             var editFormLabel = "Edit " + MsFilterByModel.getSelection()[0].name;
-            fillFormForEditGeneric(CurrIds, "POST", "/AssemblyDbSrv/GetByIds", GetActive, editFormLabel, "Edit Extended", [])
+            fillFormForEditGeneric(CurrIds, "POST", "/AssemblyDbSrv/GetByIds", GetActive, "EditForm", editFormLabel, MagicSuggests)
                 .always(hideModalWait)
                 .done(function (currRecords) {
                     CurrRecords = currRecords;
+                    disableAllMs(MagicSuggests);
                     $("#MainView").addClass("hide");
                     $("#EditFormView").removeClass("hide");
                 })
@@ -206,7 +208,12 @@ $(document).ready(function () {
     });
 
     //---------------------------------------EditFormView----------------------------------------//
-        
+      
+    //Initialize MagicSuggest Array
+    addToMSArray(MagicSuggests, "AssemblyType_Id", "/AssemblyTypeSrv/Lookup", 1);
+    addToMSArray(MagicSuggests, "AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup");
+    addToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+  
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
         $("#MainView").removeClass("hide");
@@ -259,89 +266,9 @@ function refreshMainView() {
             .done(function myfunction() {
                 $("#ChBoxShowDeleted").bootstrapToggle("enable");
                 MsFilterByProject.enable();
-                updateViewsForModel();
+                updateViewsForModelGeneric(TableMain, "/AssemblyModelSrv/GetByIds", MsFilterByModel.getValue());
             });
     }
-}
-
-//Pulls Model Information and formats edit form and column names
-function updateViewsForModel() {
-    var modelId = MsFilterByModel.getValue();
-    showModalWait();
-    $.ajax({ type: "POST", url: "/AssemblyModelSrv/GetByIds", timeout: 20000, data: { ids: [modelId] }, dataType: "json"})
-        .always(hideModalWait)
-        .done(function (data) {
-            for (var prop in data[0]) {
-                if (prop.indexOf("Attr") != -1 && prop.indexOf("Desc") != -1) {
-
-                    var attrName = prop.slice(prop.indexOf("Attr"), 6);
-
-                    $(TableMain.column(attrName + ":name").header()).text(data[0][prop]);
-                    $("label[for=" + attrName + "]").text(data[0][prop]);
-                    $("#" + attrName).prop("placeholder", data[0][prop]);
-                }
-                if (prop.indexOf("Attr") != -1 && prop.indexOf("Type") != -1) {
-
-                    var attrName = prop.slice(prop.indexOf("Attr"), 6);
-                    var $targetEl = $("#" + attrName);
-                    var attrsToRemove = "";
-
-                    $.each($targetEl[0].attributes, function (i, attrib) {
-                        if (typeof attrib !== "undefined" && attrib.name.indexOf("data-val") == 0) {
-                            attrsToRemove += (attrsToRemove == "") ? attrib.name : " " + attrib.name;
-                        }
-                    });
-
-                    var picker = $targetEl.data("DateTimePicker");
-                    if (typeof picker !== "undefined") { picker.destroy(); }
-
-                    $("#FrmGrp" + attrName).removeClass("hide");
-
-                    switch (data[0][prop]) {
-                        case "NotUsed":
-                            $("#FrmGrp" + attrName).addClass("hide");
-                            break;
-                        case "String":
-                            $targetEl.removeAttr(attrsToRemove).attr({
-                                "data-val": "true",
-                                "data-val-length": "The field must be a string with a maximum length of 255.",
-                                "data-val-length-max": "255"
-                            });
-                            break;
-                        case "Int":
-                            $targetEl.removeAttr(attrsToRemove).attr({
-                                "data-val": "true",
-                                "data-val-dbisinteger": "The field must be an integer."
-                            });
-                            break;
-                        case "Decimal":
-                            $targetEl.removeAttr(attrsToRemove).attr({
-                                "data-val": "true",
-                                "data-val-number": "The field must be a number."
-                            });
-                            break;
-                        case "DateTime":
-                            $targetEl.removeAttr(attrsToRemove).attr({
-                                "data-val": "true",
-                                "data-val-dbisdatetimeiso": "The field must have YYYY-MM-DD HH:mm format."
-                            });
-                            $targetEl.datetimepicker({ format: "YYYY-MM-DD HH:mm" })
-                                .on("dp.change", function (e) { $(this).data("ismodified", true); });
-                            break;
-                        case "Bool":
-                            $targetEl.removeAttr(attrsToRemove).attr({
-                                "data-val": "true",
-                                "data-val-dbisbool": "The field must be 'true' or 'false'."
-                            });
-                            break;
-                    }
-                }
-            }
-            $("#EditForm").removeData("validator");
-            $("#EditForm").removeData('unobtrusiveValidation');
-            $.validator.unobtrusive.parse("#EditForm")
-        })
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
 

@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -23,121 +25,55 @@ namespace SDDB.WebUI.ControllersSrv
         }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
-
-        // GET: /ComponentSrv/Get
-        [DBSrvAuth("Component_View")]
-        public async Task<ActionResult> Get(bool getActive = true)
-        {
-            var data = (await componentService.GetAsync(UserId, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.CompName, x.CompAltName, x.CompAltName2, 
-                x.ComponentType.CompTypeName, x.ComponentStatus.CompStatusName, x.ComponentModel.CompModelName,
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                AssignedToAssemblyDb = new { x.AssignedToAssemblyDb.AssyName, x.AssignedToAssemblyDb.AssyAltName },
-                x.PositionInAssy, x.ProgramAddress, CalibrationReqd = x.CalibrationReqd_bl, x.LastCalibrationDate, x.Comments, IsActive = x.IsActive_bl,
-                x.ComponentExt.Attr01,x.ComponentExt.Attr02,x.ComponentExt.Attr03,x.ComponentExt.Attr04,x.ComponentExt.Attr05,
-                x.ComponentExt.Attr06,x.ComponentExt.Attr07,x.ComponentExt.Attr08,x.ComponentExt.Attr09,x.ComponentExt.Attr10,
-                x.ComponentExt.Attr11,x.ComponentExt.Attr12,x.ComponentExt.Attr13,x.ComponentExt.Attr14,x.ComponentExt.Attr15,
-                x.ComponentType_Id, x.ComponentStatus_Id, x.ComponentModel_Id, x.AssignedToProject_Id, x.AssignedToAssemblyDb_Id
-            });
-
-            ViewBag.ServiceName = "ComponentService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
-
-        }
-        
+       
         // POST: /ComponentSrv/GetByIds
         [HttpPost]
         [DBSrvAuth("Component_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
-            var data = (await componentService.GetAsync(UserId, ids, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.CompName, x.CompAltName, x.CompAltName2, 
-                x.ComponentType.CompTypeName, x.ComponentStatus.CompStatusName, x.ComponentModel.CompModelName,
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                AssignedToAssemblyDb = new { x.AssignedToAssemblyDb.AssyName, x.AssignedToAssemblyDb.AssyAltName },
-                x.PositionInAssy, x.ProgramAddress, CalibrationReqd = x.CalibrationReqd_bl, x.LastCalibrationDate, x.Comments, IsActive = x.IsActive_bl,
-                x.ComponentExt.Attr01,x.ComponentExt.Attr02,x.ComponentExt.Attr03,x.ComponentExt.Attr04,x.ComponentExt.Attr05,
-                x.ComponentExt.Attr06,x.ComponentExt.Attr07,x.ComponentExt.Attr08,x.ComponentExt.Attr09,x.ComponentExt.Attr10,
-                x.ComponentExt.Attr11,x.ComponentExt.Attr12,x.ComponentExt.Attr13,x.ComponentExt.Attr14,x.ComponentExt.Attr15,
-                x.ComponentType_Id, x.ComponentStatus_Id, x.ComponentModel_Id, x.AssignedToProject_Id, x.AssignedToAssemblyDb_Id
-            });
-
             ViewBag.ServiceName = "ComponentService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            var records = await componentService.GetAsync(ids, getActive).ConfigureAwait(false);
+            return new DBJsonDateISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // POST: /ComponentSrv/GetByAltIds
         [HttpPost]
         [DBSrvAuth("Component_View")]
-        public async Task<ActionResult> GetByAltIds(string[] projectIds = null, string[] modelIds = null, bool getActive = true)
+        public async Task<ActionResult> GetByAltIds(string[] projectIds, string[] modelIds, bool getActive = true)
         {
-            var data = (await componentService.GetByAltIdsAsync(UserId, projectIds, modelIds, getActive).ConfigureAwait(false)).Select(x => new
-            {
-                x.Id, x.CompName, x.CompAltName, x.CompAltName2, 
-                x.ComponentType.CompTypeName, x.ComponentStatus.CompStatusName, x.ComponentModel.CompModelName,
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                AssignedToAssemblyDb = new { x.AssignedToAssemblyDb.AssyName, x.AssignedToAssemblyDb.AssyAltName },
-                x.PositionInAssy, x.ProgramAddress, CalibrationReqd = x.CalibrationReqd_bl, x.LastCalibrationDate, x.Comments, IsActive = x.IsActive_bl,
-                x.ComponentExt.Attr01,x.ComponentExt.Attr02,x.ComponentExt.Attr03,x.ComponentExt.Attr04,x.ComponentExt.Attr05,
-                x.ComponentExt.Attr06,x.ComponentExt.Attr07,x.ComponentExt.Attr08,x.ComponentExt.Attr09,x.ComponentExt.Attr10,
-                x.ComponentExt.Attr11,x.ComponentExt.Attr12,x.ComponentExt.Attr13,x.ComponentExt.Attr14,x.ComponentExt.Attr15,
-                x.ComponentType_Id, x.ComponentStatus_Id, x.ComponentModel_Id, x.AssignedToProject_Id, x.AssignedToAssemblyDb_Id
-            });
-
             ViewBag.ServiceName = "ComponentService.GetByAltIdsAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            var records = await componentService.GetByAltIdsAsync(projectIds, modelIds, getActive).ConfigureAwait(false);
+            return new DBJsonDateISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // POST: /ComponentSrv/GetByAltIds2
         [HttpPost]
         [DBSrvAuth("Component_View")]
-        public async Task<ActionResult> GetByAltIds2(string[] projectIds = null, string[] typeIds = null, string[] assyIds = null, bool getActive = true)
+        public async Task<ActionResult> GetByAltIds2(string[] projectIds, string[] typeIds, string[] assyIds, bool getActive = true)
         {
-            var data = (await componentService.GetByAltIdsAsync(UserId, projectIds, typeIds, assyIds, getActive).ConfigureAwait(false)).Select(x => new
-            {
-                x.Id, x.CompName, x.CompAltName, x.CompAltName2, 
-                x.ComponentType.CompTypeName, x.ComponentStatus.CompStatusName, x.ComponentModel.CompModelName,
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                AssignedToAssemblyDb = new { x.AssignedToAssemblyDb.AssyName, x.AssignedToAssemblyDb.AssyAltName },
-                x.PositionInAssy, x.ProgramAddress, CalibrationReqd = x.CalibrationReqd_bl, x.LastCalibrationDate, x.Comments, IsActive = x.IsActive_bl,
-                x.ComponentExt.Attr01,x.ComponentExt.Attr02,x.ComponentExt.Attr03,x.ComponentExt.Attr04,x.ComponentExt.Attr05,
-                x.ComponentExt.Attr06,x.ComponentExt.Attr07,x.ComponentExt.Attr08,x.ComponentExt.Attr09,x.ComponentExt.Attr10,
-                x.ComponentExt.Attr11,x.ComponentExt.Attr12,x.ComponentExt.Attr13,x.ComponentExt.Attr14,x.ComponentExt.Attr15,
-                x.ComponentType_Id, x.ComponentStatus_Id, x.ComponentModel_Id, x.AssignedToProject_Id, x.AssignedToAssemblyDb_Id
-            });
-
             ViewBag.ServiceName = "ComponentService.GetByAltIdsAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            var records = await componentService.GetByAltIdsAsync(projectIds, typeIds, assyIds, getActive).ConfigureAwait(false);
+            return new DBJsonDateISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
 
         // GET: /ComponentSrv/Lookup
         public async Task<ActionResult> Lookup(string query = "", bool getActive = true)
         {
-            var records = await componentService.LookupAsync(UserId, query, getActive).ConfigureAwait(false);
-
             ViewBag.ServiceName = "ComponentService.LookupAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(records.OrderBy(x => x.CompName)
-                .Select(x => new { id = x.Id, name = x.CompName }), JsonRequestBehavior.AllowGet);
+            var records = await componentService.LookupAsync(query, getActive).ConfigureAwait(false);
+            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /ComponentSrv/LookupByProj
-        public async Task<ActionResult> LookupByProj(string projectIds = null, string query = "", bool getActive = true)
+        public async Task<ActionResult> LookupByProj(string projectIds, string query = "", bool getActive = true)
         {
             string[] projectIdsArray = null;
-            if (projectIds != null && projectIds != "") projectIdsArray = projectIds.Split(',');
-
-            var records = await componentService.LookupByProjAsync(UserId, projectIdsArray, query, getActive).ConfigureAwait(false);
+            if (!String.IsNullOrEmpty(projectIds)) { projectIdsArray = projectIds.Split(','); }
 
             ViewBag.ServiceName = "ComponentService.LookupByProjAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(records.OrderBy(x => x.CompName)
-                .Select(x => new { id = x.Id, name = x.CompName }), JsonRequestBehavior.AllowGet);
+            var records = await componentService.LookupByProjAsync(projectIdsArray, query, getActive).ConfigureAwait(false);
+            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -147,22 +83,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Component_Edit")]
         public async Task<ActionResult> Edit(Component[] records)
         {
-            var serviceResult = await componentService.EditAsync(UserId, records).ConfigureAwait(false);
-
             ViewBag.ServiceName = "ComponentService.EditAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode; 
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            var newEntryIds = await componentService.EditAsync(records).ConfigureAwait(false);
+            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /ComponentSrv/Delete
@@ -170,22 +93,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Component_Edit")]
         public async Task<ActionResult> Delete(string[] ids)
         {
-            var serviceResult = await componentService.DeleteAsync(ids).ConfigureAwait(false);
-
             ViewBag.ServiceName = "ComponentService.DeleteAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            await componentService.DeleteAsync(ids).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -195,26 +105,88 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Component_Edit")]
         public async Task<ActionResult> EditExt(ComponentExt[] records)
         {
-            var serviceResult = await componentService.EditExtAsync(records).ConfigureAwait(false);
-
-            ViewBag.ServiceName = "ComponentService.EditExtAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            ViewBag.ServiceName = "ComponentService.EditExtendedAsync";
+            await componentService.EditExtendedAsync(records).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
+
+        //filterForJsonFull - filter data from service to be passed as response
+        private object filterForJsonFull(List<Component> records)
+        {
+            return records.Select(x => new
+            {
+                x.Id,
+                x.CompName,
+                x.CompAltName,
+                x.CompAltName2,
+                ComponentType_ = new
+                {
+                    x.ComponentType.CompTypeName
+                },
+                ComponentStatus_ = new
+                {
+                    x.ComponentStatus.CompStatusName
+                },
+                ComponentModel_ = new
+                {
+                    x.ComponentModel.CompModelName
+                },
+                AssignedToProject_ = new
+                {
+                    x.AssignedToProject.ProjectName,
+                    x.AssignedToProject.ProjectAltName,
+                    x.AssignedToProject.ProjectCode
+                },
+                AssignedToAssemblyDb_ = new
+                {
+                    x.AssignedToAssemblyDb.AssyName,
+                    x.AssignedToAssemblyDb.AssyAltName
+                },
+                x.PositionInAssy,
+                x.ProgramAddress,
+                x.CalibrationReqd_bl,
+                x.LastCalibrationDate,
+                x.Comments,
+                x.IsActive_bl,
+                x.ComponentExt.Attr01,
+                x.ComponentExt.Attr02,
+                x.ComponentExt.Attr03,
+                x.ComponentExt.Attr04,
+                x.ComponentExt.Attr05,
+                x.ComponentExt.Attr06,
+                x.ComponentExt.Attr07,
+                x.ComponentExt.Attr08,
+                x.ComponentExt.Attr09,
+                x.ComponentExt.Attr10,
+                x.ComponentExt.Attr11,
+                x.ComponentExt.Attr12,
+                x.ComponentExt.Attr13,
+                x.ComponentExt.Attr14,
+                x.ComponentExt.Attr15,
+                x.ComponentType_Id,
+                x.ComponentStatus_Id,
+                x.ComponentModel_Id,
+                x.AssignedToProject_Id,
+                x.AssignedToAssemblyDb_Id
+            })
+            .ToList();
+        }
+
+        //filterForJsonLookup - filter data from service to be passed as response
+        private object filterForJsonLookup(List<Component> records)
+        {
+            return records
+                .OrderBy(x => x.CompName)
+                .Select(x => new
+                    {
+                        id = x.Id,
+                        name = x.CompName + " - " + x.AssignedToProject.ProjectName
+                    })
+                .ToList();
+        }
 
 
         #endregion

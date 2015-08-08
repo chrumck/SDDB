@@ -2,18 +2,55 @@
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
-/// <reference path="../jquery-2.1.3.js" />
-/// <reference path="../jquery-2.1.3.intellisense.js" />
+/// <reference path="../jquery-2.1.4.js" />
+/// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
 //--------------------------------------Global Properties------------------------------------//
 
-var TableMain = {};
-var IsCreate = false;
+var TableMain;
 var MagicSuggests = [];
-var CurrRecord = {};
-
+var RecordTemplate = {
+    Id: "RecordTemplateId",
+    AssyModelName: null,
+    AssyModelAltName: null,
+    Comments: null,
+    IsActive_bl: null,
+    Attr01Type: null,
+    Attr01Desc: null,
+    Attr02Type: null,
+    Attr02Desc: null,
+    Attr03Type: null,
+    Attr03Desc: null,
+    Attr04Type: null,
+    Attr04Desc: null,
+    Attr05Type: null,
+    Attr05Desc: null,
+    Attr06Type: null,
+    Attr06Desc: null,
+    Attr07Type: null,
+    Attr07Desc: null,
+    Attr08Type: null,
+    Attr08Desc: null,
+    Attr09Type: null,
+    Attr09Desc: null,
+    Attr10Type: null,
+    Attr10Desc: null,
+    Attr11Type: null,
+    Attr11Desc: null,
+    Attr12Type: null,
+    Attr12Desc: null,
+    Attr13Type: null,
+    Attr13Desc: null,
+    Attr14Type: null,
+    Attr14Desc: null,
+    Attr15Type: null,
+    Attr15Desc: null
+};
+var CurrRecords = [];
+var CurrIds = [];
+var GetActive = true;
 
 $(document).ready(function () {
 
@@ -21,26 +58,41 @@ $(document).ready(function () {
 
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
-        IsCreate = true;
+        CurrIds = [];
+        CurrRecords = [];
+        CurrRecords[0] = $.extend(true, {}, RecordTemplate);
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Assembly Model", "MainView");
         $("#EditForm select").find("option:first").prop('selected', 'selected');
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-        var selectedRows = TableMain.rows(".ui-selected").data();
-        if (selectedRows.length == 0) showModalNothingSelected();
-        else { IsCreate = false; FillFormForEdit(); }
+        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        if (CurrIds.length == 0) { showModalNothingSelected(); }
+        else {
+            if (GetActive) { $("#EditFormGroupIsActive").addClass("hide"); }
+            else { $("#EditFormGroupIsActive").removeClass("hide"); }
+
+            showModalWait();
+
+            fillFormForEditGeneric(CurrIds, "POST", "/AssemblyModelSrv/GetByIds", GetActive, "EditForm", "Edit Assembly Model", MagicSuggests)
+                .always(hideModalWait)
+                .done(function (currRecords) {
+                    CurrRecords = currRecords;
+                    $("#MainView").addClass("hide");
+                    $("#EditFormView").removeClass("hide");
+                })
+                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        }
     });
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
-        var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) showModalNothingSelected();
-        else showModalDelete(noOfRows);
+        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        if (CurrIds.length == 0) { showModalNothingSelected(); }
+        else { showModalDelete(CurrIds.length); }
     });
-
-
+    
     //wire up dropdownId1
     $("#dropdownId1").click(function (event) {
         event.preventDefault();
@@ -90,15 +142,19 @@ $(document).ready(function () {
         TableMain.columns([21, 22, 23, 24, 25, 26]).visible(false);
         TableMain.columns([27, 28, 29, 30, 31, 32]).visible(true);
     });
-    
+
     //---------------------------------------DataTables------------
 
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
-        if (($(this).prop("checked")) ? false : true)
+        if (!$(this).prop("checked")) {
+            GetActive = true;
             $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
-        else $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
-        refreshTable(TableMain, "/AssemblyModelSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
+        } else {
+            GetActive = false;
+            $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
+        }
+        refreshMainView();
     });
 
     //TableMain Assembly Models
@@ -184,7 +240,6 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        IsCreate = false;
         $("#MainView").removeClass("hide");
         $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
     });
@@ -192,14 +247,25 @@ $(document).ready(function () {
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
-        if (formIsValid("EditForm", IsCreate) && msIsValid(MagicSuggests)) SubmitEdits();
-    });
+        if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
 
+            showModalWait();
+
+            submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/AssemblyModelSrv/Edit")
+                .always(hideModalWait)
+                .done(function () {
+                    refreshMainView();
+                    $("#MainView").removeClass("hide");
+                    $("#EditFormView").addClass("hide");
+                    window.scrollTo(0, 0);
+                })
+                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+        }
+    });
 
     //--------------------------------------View Initialization------------------------------------//
 
-    refreshTable(TableMain, "/AssemblyModelSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
-
+    refreshMainView();
     $("#InitialView").addClass("hide");
     $("#MainView").removeClass("hide");
 
@@ -209,213 +275,19 @@ $(document).ready(function () {
 
 //--------------------------------------Main Methods---------------------------------------//
 
-//FillFormForEdit
-function FillFormForEdit() {
-    if ($("#ChBoxShowDeleted").prop("checked")) $("#EditFormGroupIsActive").removeClass("hide");
-    else $("#EditFormGroupIsActive").addClass("hide");
-
-    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    $.ajax({
-        type: "POST", url: "/AssemblyModelSrv/GetByIds", timeout: 20000,
-        data: { ids: ids, getActive: (($("#ChBoxShowDeleted").prop("checked")) ? false : true) }, dataType: "json",
-        beforeSend: function () { showModalWait(); }
-    })
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function (data) {
-
-            CurrRecord.AssyModelName = data[0].AssyModelName;
-            CurrRecord.AssyModelAltName = data[0].AssyModelAltName;
-            CurrRecord.Attr01Type = data[0].Attr01Type;CurrRecord.Attr01Desc = data[0].Attr01Desc;
-            CurrRecord.Attr02Type = data[0].Attr02Type;CurrRecord.Attr02Desc = data[0].Attr02Desc;
-            CurrRecord.Attr03Type = data[0].Attr03Type;CurrRecord.Attr03Desc = data[0].Attr03Desc;
-            CurrRecord.Attr04Type = data[0].Attr04Type;CurrRecord.Attr04Desc = data[0].Attr04Desc;
-            CurrRecord.Attr05Type = data[0].Attr05Type;CurrRecord.Attr05Desc = data[0].Attr05Desc;
-            CurrRecord.Attr06Type = data[0].Attr06Type;CurrRecord.Attr06Desc = data[0].Attr06Desc;
-            CurrRecord.Attr07Type = data[0].Attr07Type;CurrRecord.Attr07Desc = data[0].Attr07Desc;
-            CurrRecord.Attr08Type = data[0].Attr08Type;CurrRecord.Attr08Desc = data[0].Attr08Desc;
-            CurrRecord.Attr09Type = data[0].Attr09Type;CurrRecord.Attr09Desc = data[0].Attr09Desc;
-            CurrRecord.Attr10Type = data[0].Attr10Type;CurrRecord.Attr10Desc = data[0].Attr10Desc;
-            CurrRecord.Attr11Type = data[0].Attr11Type;CurrRecord.Attr11Desc = data[0].Attr11Desc;
-            CurrRecord.Attr12Type = data[0].Attr12Type;CurrRecord.Attr12Desc = data[0].Attr12Desc;
-            CurrRecord.Attr13Type = data[0].Attr13Type;CurrRecord.Attr13Desc = data[0].Attr13Desc;
-            CurrRecord.Attr14Type = data[0].Attr14Type;CurrRecord.Attr14Desc = data[0].Attr14Desc;
-            CurrRecord.Attr15Type = data[0].Attr15Type;CurrRecord.Attr15Desc = data[0].Attr15Desc;
-            CurrRecord.Comments = data[0].Comments;
-            CurrRecord.IsActive_bl = data[0].IsActive_bl;
-
-            var FormInput = $.extend(true, {}, CurrRecord);
-            $.each(data, function (i, dbEntry) {
-                if (FormInput.AssyModelName != dbEntry.AssyModelName) FormInput.AssyModelName = "_VARIES_";
-                if (FormInput.AssyModelAltName != dbEntry.AssyModelAltName) FormInput.AssyModelAltName = "_VARIES_";
-
-                if (FormInput.Attr01Type != dbEntry.Attr01Type) FormInput.Attr01Type = "_VARIES_";
-                if (FormInput.Attr01Desc != dbEntry.Attr01Desc) FormInput.Attr01Desc = "_VARIES_";
-                if (FormInput.Attr02Type != dbEntry.Attr02Type) FormInput.Attr02Type = "_VARIES_";
-                if (FormInput.Attr02Desc != dbEntry.Attr02Desc) FormInput.Attr02Desc = "_VARIES_";
-                if (FormInput.Attr03Type != dbEntry.Attr03Type) FormInput.Attr03Type = "_VARIES_";
-                if (FormInput.Attr03Desc != dbEntry.Attr03Desc) FormInput.Attr03Desc = "_VARIES_";
-                if (FormInput.Attr04Type != dbEntry.Attr04Type) FormInput.Attr04Type = "_VARIES_";
-                if (FormInput.Attr04Desc != dbEntry.Attr04Desc) FormInput.Attr04Desc = "_VARIES_";
-                if (FormInput.Attr05Type != dbEntry.Attr05Type) FormInput.Attr05Type = "_VARIES_";
-                if (FormInput.Attr05Desc != dbEntry.Attr05Desc) FormInput.Attr05Desc = "_VARIES_";
-                if (FormInput.Attr06Type != dbEntry.Attr06Type) FormInput.Attr06Type = "_VARIES_";
-                if (FormInput.Attr06Desc != dbEntry.Attr06Desc) FormInput.Attr06Desc = "_VARIES_";
-                if (FormInput.Attr07Type != dbEntry.Attr07Type) FormInput.Attr07Type = "_VARIES_";
-                if (FormInput.Attr07Desc != dbEntry.Attr07Desc) FormInput.Attr07Desc = "_VARIES_";
-                if (FormInput.Attr08Type != dbEntry.Attr08Type) FormInput.Attr08Type = "_VARIES_";
-                if (FormInput.Attr08Desc != dbEntry.Attr08Desc) FormInput.Attr08Desc = "_VARIES_";
-                if (FormInput.Attr09Type != dbEntry.Attr09Type) FormInput.Attr09Type = "_VARIES_";
-                if (FormInput.Attr09Desc != dbEntry.Attr09Desc) FormInput.Attr09Desc = "_VARIES_";
-                if (FormInput.Attr10Type != dbEntry.Attr10Type) FormInput.Attr10Type = "_VARIES_";
-                if (FormInput.Attr10Desc != dbEntry.Attr10Desc) FormInput.Attr10Desc = "_VARIES_";
-                if (FormInput.Attr11Type != dbEntry.Attr11Type) FormInput.Attr11Type = "_VARIES_";
-                if (FormInput.Attr11Desc != dbEntry.Attr11Desc) FormInput.Attr11Desc = "_VARIES_";
-                if (FormInput.Attr12Type != dbEntry.Attr12Type) FormInput.Attr12Type = "_VARIES_";
-                if (FormInput.Attr12Desc != dbEntry.Attr12Desc) FormInput.Attr12Desc = "_VARIES_";
-                if (FormInput.Attr13Type != dbEntry.Attr13Type) FormInput.Attr13Type = "_VARIES_";
-                if (FormInput.Attr13Desc != dbEntry.Attr13Desc) FormInput.Attr13Desc = "_VARIES_";
-                if (FormInput.Attr14Type != dbEntry.Attr14Type) FormInput.Attr14Type = "_VARIES_";
-                if (FormInput.Attr14Desc != dbEntry.Attr14Desc) FormInput.Attr14Desc = "_VARIES_";
-                if (FormInput.Attr15Type != dbEntry.Attr15Type) FormInput.Attr15Type = "_VARIES_";
-                if (FormInput.Attr15Desc != dbEntry.Attr15Desc) FormInput.Attr15Desc = "_VARIES_";
-
-                if (FormInput.Comments != dbEntry.Comments) FormInput.Comments = "_VARIES_";
-                if (FormInput.IsActive_bl != dbEntry.IsActive_bl) FormInput.IsActive_bl = "_VARIES_";
-            });
-
-            clearFormInputs("EditForm", MagicSuggests);
-            $("#EditFormLabel").text("Edit Assembly Model");
-
-            $("#AssyModelName").val(FormInput.AssyModelName);
-            $("#AssyModelAltName").val(FormInput.AssyModelAltName);
-
-            $("#Attr01Type").val(FormInput.Attr01Type); $("#Attr01Desc").val(FormInput.Attr01Desc);
-            $("#Attr02Type").val(FormInput.Attr02Type); $("#Attr02Desc").val(FormInput.Attr02Desc);
-            $("#Attr03Type").val(FormInput.Attr03Type); $("#Attr03Desc").val(FormInput.Attr03Desc);
-            $("#Attr04Type").val(FormInput.Attr04Type); $("#Attr04Desc").val(FormInput.Attr04Desc);
-            $("#Attr05Type").val(FormInput.Attr05Type); $("#Attr05Desc").val(FormInput.Attr05Desc);
-            $("#Attr06Type").val(FormInput.Attr06Type); $("#Attr06Desc").val(FormInput.Attr06Desc);
-            $("#Attr07Type").val(FormInput.Attr07Type); $("#Attr07Desc").val(FormInput.Attr07Desc);
-            $("#Attr08Type").val(FormInput.Attr08Type); $("#Attr08Desc").val(FormInput.Attr08Desc);
-            $("#Attr09Type").val(FormInput.Attr09Type); $("#Attr09Desc").val(FormInput.Attr09Desc);
-            $("#Attr10Type").val(FormInput.Attr10Type); $("#Attr10Desc").val(FormInput.Attr10Desc);
-            $("#Attr11Type").val(FormInput.Attr11Type); $("#Attr11Desc").val(FormInput.Attr11Desc);
-            $("#Attr12Type").val(FormInput.Attr12Type); $("#Attr12Desc").val(FormInput.Attr12Desc);
-            $("#Attr13Type").val(FormInput.Attr13Type); $("#Attr13Desc").val(FormInput.Attr13Desc);
-            $("#Attr14Type").val(FormInput.Attr14Type); $("#Attr14Desc").val(FormInput.Attr14Desc);
-            $("#Attr15Type").val(FormInput.Attr15Type); $("#Attr15Desc").val(FormInput.Attr15Desc);
-            $("#Comments").val(FormInput.Comments);
-            if (FormInput.IsActive_bl == true) $("#IsActive_bl").prop("checked", true);
-
-            if (data.length == 1) {
-                $("[data-val-dbisunique]").prop("disabled", false);
-                disableUniqueMs(MagicSuggests, false);
-            }
-            else {
-                $("[data-val-dbisunique]").prop("disabled", true);
-                disableUniqueMs(MagicSuggests, true);
-            }
-
-            $("#MainView").addClass("hide");
-            $("#EditFormView").removeClass("hide");
-        })
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-}
-
-//SubmitEdits to DB
-function SubmitEdits() {
-
-    var modifiedProperties = [];
-    $(".modifiable").each(function (index) {
-        if ($(this).data("ismodified")) modifiedProperties.push($(this).prop("id"));
-    });
-
-    $.each(MagicSuggests, function (i, ms) {
-        if (ms.isModified == true) modifiedProperties.push(ms.id);
-    });
-
-    var magicResults = [];
-    $.each(MagicSuggests, function (i, ms) {
-        var msValue = (ms.getSelection().length != 0) ? (ms.getSelection())[0].id : null;
-        magicResults.push(msValue);
-    });
-
-    var editRecords = [];
-    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    if (IsCreate == true) ids = ["newEntryId"];
-
-    $.each(ids, function (i, id) {
-        var editRecord = {};
-        editRecord.Id = id;
-
-        editRecord.AssyModelName = ($("#AssyModelName").data("ismodified")) ? $("#AssyModelName").val() : CurrRecord.AssyModelName;
-        editRecord.AssyModelAltName = ($("#AssyModelAltName").data("ismodified")) ? $("#AssyModelAltName").val() : CurrRecord.AssyModelAltName;
-        editRecord.Attr01Type = ($("#Attr01Type").data("ismodified")) ? $("#Attr01Type").val() : CurrRecord.Attr01Type;
-        editRecord.Attr01Desc = ($("#Attr01Desc").data("ismodified")) ? $("#Attr01Desc").val() : CurrRecord.Attr01Desc;
-        editRecord.Attr02Type = ($("#Attr02Type").data("ismodified")) ? $("#Attr02Type").val() : CurrRecord.Attr02Type;
-        editRecord.Attr02Desc = ($("#Attr02Desc").data("ismodified")) ? $("#Attr02Desc").val() : CurrRecord.Attr02Desc;
-        editRecord.Attr03Type = ($("#Attr03Type").data("ismodified")) ? $("#Attr03Type").val() : CurrRecord.Attr03Type;
-        editRecord.Attr03Desc = ($("#Attr03Desc").data("ismodified")) ? $("#Attr03Desc").val() : CurrRecord.Attr03Desc;
-        editRecord.Attr04Type = ($("#Attr04Type").data("ismodified")) ? $("#Attr04Type").val() : CurrRecord.Attr04Type;
-        editRecord.Attr04Desc = ($("#Attr04Desc").data("ismodified")) ? $("#Attr04Desc").val() : CurrRecord.Attr04Desc;
-        editRecord.Attr05Type = ($("#Attr05Type").data("ismodified")) ? $("#Attr05Type").val() : CurrRecord.Attr05Type;
-        editRecord.Attr05Desc = ($("#Attr05Desc").data("ismodified")) ? $("#Attr05Desc").val() : CurrRecord.Attr05Desc;
-        editRecord.Attr06Type = ($("#Attr06Type").data("ismodified")) ? $("#Attr06Type").val() : CurrRecord.Attr06Type;
-        editRecord.Attr06Desc = ($("#Attr06Desc").data("ismodified")) ? $("#Attr06Desc").val() : CurrRecord.Attr06Desc;
-        editRecord.Attr07Type = ($("#Attr07Type").data("ismodified")) ? $("#Attr07Type").val() : CurrRecord.Attr07Type;
-        editRecord.Attr07Desc = ($("#Attr07Desc").data("ismodified")) ? $("#Attr07Desc").val() : CurrRecord.Attr07Desc;
-        editRecord.Attr08Type = ($("#Attr08Type").data("ismodified")) ? $("#Attr08Type").val() : CurrRecord.Attr08Type;
-        editRecord.Attr08Desc = ($("#Attr08Desc").data("ismodified")) ? $("#Attr08Desc").val() : CurrRecord.Attr08Desc;
-        editRecord.Attr09Type = ($("#Attr09Type").data("ismodified")) ? $("#Attr09Type").val() : CurrRecord.Attr09Type;
-        editRecord.Attr09Desc = ($("#Attr09Desc").data("ismodified")) ? $("#Attr09Desc").val() : CurrRecord.Attr09Desc;
-        editRecord.Attr10Type = ($("#Attr10Type").data("ismodified")) ? $("#Attr10Type").val() : CurrRecord.Attr10Type;
-        editRecord.Attr10Desc = ($("#Attr10Desc").data("ismodified")) ? $("#Attr10Desc").val() : CurrRecord.Attr10Desc;
-        editRecord.Attr11Type = ($("#Attr11Type").data("ismodified")) ? $("#Attr11Type").val() : CurrRecord.Attr11Type;
-        editRecord.Attr11Desc = ($("#Attr11Desc").data("ismodified")) ? $("#Attr11Desc").val() : CurrRecord.Attr11Desc;
-        editRecord.Attr12Type = ($("#Attr12Type").data("ismodified")) ? $("#Attr12Type").val() : CurrRecord.Attr12Type;
-        editRecord.Attr12Desc = ($("#Attr12Desc").data("ismodified")) ? $("#Attr12Desc").val() : CurrRecord.Attr12Desc;
-        editRecord.Attr13Type = ($("#Attr13Type").data("ismodified")) ? $("#Attr13Type").val() : CurrRecord.Attr13Type;
-        editRecord.Attr13Desc = ($("#Attr13Desc").data("ismodified")) ? $("#Attr13Desc").val() : CurrRecord.Attr13Desc;
-        editRecord.Attr14Type = ($("#Attr14Type").data("ismodified")) ? $("#Attr14Type").val() : CurrRecord.Attr14Type;
-        editRecord.Attr14Desc = ($("#Attr14Desc").data("ismodified")) ? $("#Attr14Desc").val() : CurrRecord.Attr14Desc;
-        editRecord.Attr15Type = ($("#Attr15Type").data("ismodified")) ? $("#Attr15Type").val() : CurrRecord.Attr15Type;
-        editRecord.Attr15Desc = ($("#Attr15Desc").data("ismodified")) ? $("#Attr15Desc").val() : CurrRecord.Attr15Desc;
-        editRecord.Comments = ($("#Comments").data("ismodified")) ? $("#Comments").val() : CurrRecord.Comments;
-        editRecord.IsActive_bl = ($("#IsActive_bl").data("ismodified")) ? (($("#IsActive_bl").prop("checked")) ? true : false) : CurrRecord.IsActive_bl;
-
-        editRecord.ModifiedProperties = modifiedProperties;
-
-        editRecords.push(editRecord);
-    });
-
-    $.ajax({
-        type: "POST", url: "/AssemblyModelSrv/Edit", timeout: 20000, data: { records: editRecords }, dataType: "json",
-        beforeSend: function () { showModalWait(); }
-    })
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function (data) {
-            refreshTable(TableMain, "/AssemblyModelSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true));
-            IsCreate = false;
-            $("#MainView").removeClass("hide");
-            $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
-        })
-        .fail(function (xhr, status, error) {
-            showModalAJAXFail(xhr, status, error);
-        });
-}
 
 //Delete Records from DB
 function DeleteRecords() {
-    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    $.ajax({
-        type: "POST", url: "/AssemblyModelSrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json",
-        beforeSend: function () { showModalWait(); }
-    })
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function () { refreshTable(TableMain, "/AssemblyModelSrv/Get", (($("#ChBoxShowDeleted").prop("checked")) ? false : true)); })
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+    CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+    deleteRecordsGeneric(CurrIds, "/AssemblyModelSrv/Delete", refreshMainView);
 }
 
-//---------------------------------------Helper Methods--------------------------------------//
+//refresh Main view 
+function refreshMainView() {
+    refreshTblGenWrp(TableMain, "/AssemblyModelSrv/Get", { getActive: GetActive });
+}
 
+
+
+//---------------------------------------Helper Methods--------------------------------------//
 

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -27,13 +28,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("AssemblyStatus_View")]
         public async Task<ActionResult> Get(bool getActive = true)
         {
-            var data = (await assyStatusService.GetAsync(getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.AssyStatusName, x.AssyStatusAltName, x.Comments, IsActive = x.IsActive_bl
-            });
-
             ViewBag.ServiceName = "AssemblyStatusService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            var records = await assyStatusService.GetAsync(getActive).ConfigureAwait(false);
+            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
         }
 
         // POST: /AssemblyStatusSrv/GetByIds
@@ -41,24 +38,17 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("AssemblyStatus_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
-            var data = (await assyStatusService.GetAsync(ids, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.AssyStatusName, x.AssyStatusAltName, x.Comments, IsActive = x.IsActive_bl
-            });
-
             ViewBag.ServiceName = "AssemblyStatusService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json( data , JsonRequestBehavior.AllowGet);
+            var records = await assyStatusService.GetAsync(ids, getActive).ConfigureAwait(false);
+            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /AssemblyStatusSrv/Lookup
         public async Task<ActionResult> Lookup(string query = "", bool getActive = true)
         {
-            var records = await assyStatusService.LookupAsync(query, getActive).ConfigureAwait(false);
-
             ViewBag.ServiceName = "AssemblyStatusService.LookupAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(records.OrderBy(x => x.AssyStatusName)
-                .Select(x => new { id = x.Id, name = x.AssyStatusName }), JsonRequestBehavior.AllowGet);
+            var records = await assyStatusService.LookupAsync(query, getActive).ConfigureAwait(false);
+            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -68,22 +58,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("AssemblyStatus_Edit")]
         public async Task<ActionResult> Edit(AssemblyStatus[] records)
         {
-            var serviceResult = await assyStatusService.EditAsync(records).ConfigureAwait(false);
-
             ViewBag.ServiceName = "AssemblyStatusService.EditAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode; 
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            var newEntryIds = await assyStatusService.EditAsync(records).ConfigureAwait(false);
+            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /AssemblyStatusSrv/Delete
@@ -91,26 +68,43 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("AssemblyStatus_Edit")]
         public async Task<ActionResult> Delete(string[] ids)
         {
-            var serviceResult = await assyStatusService.DeleteAsync(ids).ConfigureAwait(false);
-
             ViewBag.ServiceName = "AssemblyStatusService.DeleteAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            await assyStatusService.DeleteAsync(ids).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
+
+        //filterForJsonFull - filter data from service to be passed as response
+        private object filterForJsonFull(List<AssemblyStatus> records)
+        {
+            return records.Select(x =>
+                new
+                {
+                    x.Id,
+                    x.AssyStatusName,
+                    x.AssyStatusAltName,
+                    x.Comments,
+                    x.IsActive_bl
+                }
+            )
+            .ToList();
+        }
+
+        //filterForJsonLookup - filter data from service to be passed as response
+        private object filterForJsonLookup(List<AssemblyStatus> records)
+        {
+            return records
+                .OrderBy(x => x.AssyStatusName)
+                .Select(x =>
+                    new
+                    {
+                        id = x.Id,
+                        name = x.AssyStatusName
+                    }
+                );
+        }
 
 
         #endregion

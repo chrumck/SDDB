@@ -225,6 +225,17 @@ function refreshTblGenWrp(table, url, data, httpType) {
 
 //-----------------------------------------------------------------------------
 
+//Delete Records from DB - generic version
+function deleteRecordsGeneric(ids, url, callback) {
+    showModalWait();
+    $.ajax({ type: "POST", url: url, timeout: 20000, data: { ids: ids }, dataType: "json" })
+        .always(hideModalWait)
+        .done(callback)
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+}
+
+//-----------------------------------------------------------------------------
+
 //checking if form is valid
 function formIsValid(id, isCreate) {
     if ($("#" + id).valid()) { return true; }
@@ -561,8 +572,17 @@ function msValidate(msArray) {
 function disableUniqueMs(msArray, disable) {
     disable = (typeof disable !== "undefined" && disable == false) ? false : true;
     $.each(msArray, function (i, ms) {
-        if (disable == true && typeof ms.dataValDbisunique !== "undefined" && ms.dataValDbisunique == "true") ms.disable();
-        else ms.enable();
+        if (disable == true && typeof ms.dataValDbisunique !== "undefined" && ms.dataValDbisunique == "true") { ms.disable(); }
+        else { ms.enable(); }
+    });
+}
+
+//enable or disable DbUnique MagicSuggests
+function disableAllMs(msArray, disable) {
+    disable = (typeof disable !== "undefined" && disable == false) ? false : true;
+    $.each(msArray, function (i, ms) {
+        if (disable == true) { ms.disable(); }
+        else { ms.enable(); }
     });
 }
 
@@ -572,3 +592,83 @@ function setMsAsModified(msArray, isModified) {
     $.each(msArray, function (i, ms) { ms.isModified = isModified; });
 }
 
+//-----------------------------------------------------------------------------
+
+//Pulls Model Information and formats edit form and column names
+function updateViewsForModelGeneric(table, url, modelId) {
+    showModalWait();
+    $.ajax({ type: "POST", url: url, timeout: 20000, data: { ids: [modelId] }, dataType: "json" })
+        .always(hideModalWait)
+        .done(function (data) {
+            for (var prop in data[0]) {
+                if (prop.indexOf("Attr") != -1 && prop.indexOf("Desc") != -1) {
+
+                    var attrName = prop.slice(prop.indexOf("Attr"), 6);
+
+                    $(table.column(attrName + ":name").header()).text(data[0][prop]);
+                    $("label[for=" + attrName + "]").text(data[0][prop]);
+                    $("#" + attrName).prop("placeholder", data[0][prop]);
+                }
+                if (prop.indexOf("Attr") != -1 && prop.indexOf("Type") != -1) {
+
+                    var attrName = prop.slice(prop.indexOf("Attr"), 6);
+                    var $targetEl = $("#" + attrName);
+                    var attrsToRemove = "";
+
+                    $.each($targetEl[0].attributes, function (i, attrib) {
+                        if (typeof attrib !== "undefined" && attrib.name.indexOf("data-val") == 0) {
+                            attrsToRemove += (attrsToRemove == "") ? attrib.name : " " + attrib.name;
+                        }
+                    });
+
+                    var picker = $targetEl.data("DateTimePicker");
+                    if (typeof picker !== "undefined") { picker.destroy(); }
+
+                    $("#FrmGrp" + attrName).removeClass("hide");
+
+                    switch (data[0][prop]) {
+                        case "NotUsed":
+                            $("#FrmGrp" + attrName).addClass("hide");
+                            break;
+                        case "String":
+                            $targetEl.removeAttr(attrsToRemove).attr({
+                                "data-val": "true",
+                                "data-val-length": "The field must be a string with a maximum length of 255.",
+                                "data-val-length-max": "255"
+                            });
+                            break;
+                        case "Int":
+                            $targetEl.removeAttr(attrsToRemove).attr({
+                                "data-val": "true",
+                                "data-val-dbisinteger": "The field must be an integer."
+                            });
+                            break;
+                        case "Decimal":
+                            $targetEl.removeAttr(attrsToRemove).attr({
+                                "data-val": "true",
+                                "data-val-number": "The field must be a number."
+                            });
+                            break;
+                        case "DateTime":
+                            $targetEl.removeAttr(attrsToRemove).attr({
+                                "data-val": "true",
+                                "data-val-dbisdatetimeiso": "The field must have YYYY-MM-DD HH:mm format."
+                            });
+                            $targetEl.datetimepicker({ format: "YYYY-MM-DD HH:mm" })
+                                .on("dp.change", function (e) { $(this).data("ismodified", true); });
+                            break;
+                        case "Bool":
+                            $targetEl.removeAttr(attrsToRemove).attr({
+                                "data-val": "true",
+                                "data-val-dbisbool": "The field must be 'true' or 'false'."
+                            });
+                            break;
+                    }
+                }
+            }
+            $("#EditForm").removeData("validator");
+            $("#EditForm").removeData('unobtrusiveValidation');
+            $.validator.unobtrusive.parse("#EditForm")
+        })
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+}

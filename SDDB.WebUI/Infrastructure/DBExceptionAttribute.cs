@@ -70,7 +70,7 @@ namespace SDDB.WebUI.Infrastructure
             }
             if (exceptionType == typeof(DbBadRequestException) || exceptionType == typeof(MySqlException))
             {
-                responseText = "Error(s) in submited request:\n " + exceptionMessage;
+                responseText = "Error(s) in submited request:\n" + exceptionMessage;
                 exceptionContext.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             }
 

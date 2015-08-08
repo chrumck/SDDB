@@ -169,7 +169,7 @@ $(document).ready(function () {
             submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/DbUserSrv/Edit")
                 .always(function () { $("#ModalWait").modal("hide"); })
                 .done(function () {
-                    refreshTableGeneric(TableMain, "/DbUserSrv/Get", null);
+                    refreshMainView();
                     $("#MainView").removeClass("hide");
                     $("#EditFormView").addClass("hide");
                     window.scrollTo(0, 0);
@@ -202,7 +202,7 @@ $(document).ready(function () {
                 $("#MainView").removeClass("hide");
                 $("#DBRolesView").addClass("hide");
                 window.scrollTo(0, 0);
-                refreshTblGenWrp(TableMain, "/DBUserSrv/Get", {}, "GET");
+                refreshMainView();
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 
@@ -246,8 +246,7 @@ $(document).ready(function () {
       
     //--------------------------------------View Initialization------------------------------------//
 
-    refreshTblGenWrp(TableMain, "/DBUserSrv/Get", {}, "GET");
-
+    refreshMainView();
     $("#InitialView").addClass("hide");
     $("#MainView").removeClass("hide");
 
@@ -260,11 +259,12 @@ $(document).ready(function () {
 //Delete Records from DB
 function DeleteRecords() {
     CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    showModalWait();
-    $.ajax({ type: "POST", url: "/DbUserSrv/Delete", timeout: 20000, data: { ids: CurrIds }, dataType: "json"})
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function () { refreshTableGeneric(TableMain, "/DbUserSrv/Get"); })
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+    deleteRecordsGeneric(CurrIds, "/DbUserSrv/Delete", refreshMainView);
+}
+
+//refresh Main view 
+function refreshMainView() {
+    refreshTblGenWrp(TableMain, "/DbUserSrv/Get");
 }
 
 

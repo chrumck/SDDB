@@ -66,10 +66,28 @@ namespace SDDB.Domain.Services
         // Create and Update records given in []  - same as BaseDbService
 
         // Delete records by their Ids - same as BaseDbService
+        // See overriden checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
 
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
+
+        //helper - check before deleting records, takes AssemblyModel ids array
+        protected override async Task checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
+        {
+            for (int i = 0; i < ids.Length; i++)
+            {
+                var currentId = ids[i];
+                var assignedAssysCount = await dbContext.AssemblyDbs
+                    .CountAsync(x => x.IsActive_bl && x.AssemblyModel_Id == currentId).ConfigureAwait(false);
+                if (assignedAssysCount > 0)
+                {
+                    var dbEntry = await dbContext.AssemblyModels.FindAsync(currentId).ConfigureAwait(false);
+                    throw new DbBadRequestException(
+                        string.Format("Some assemblies have the model {0} assigned to it.\nDelete aborted.", dbEntry.AssyModelName));
+                }
+            }
+        }
 
         #endregion
     }

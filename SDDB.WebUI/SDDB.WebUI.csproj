@@ -433,7 +433,6 @@
     <Content Include="Scripts\SDDB\Person.js" />
     <Content Include="Scripts\SDDB\Project.js" />
     <Content Include="Scripts\SDDB\PersonGroup.js" />
-    <Content Include="Scripts\SDDB\DbUser_old.js" />
     <Content Include="Scripts\SDDB\Shared.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>

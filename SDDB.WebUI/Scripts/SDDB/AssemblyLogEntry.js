@@ -274,6 +274,12 @@ $(document).ready(function () {
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }
+    else {
+        $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
+        $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
+        refreshMainView();
+    }
+
     $("#InitialView").addClass("hide");
     $("#MainView").removeClass("hide");
     
@@ -286,16 +292,12 @@ $(document).ready(function () {
 //Delete Records from DB
 function DeleteRecords() {
     CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    showModalWait();
-    $.ajax({ type: "POST", url: "/AssemblyLogEntrySrv/Delete", timeout: 20000, data: { ids: CurrIds }, dataType: "json" })
-        .always(hideModalWait)
-        .done(refreshMainView)
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+    deleteRecordsGeneric(CurrIds, "/AssemblyLogEntrySrv/Delete", refreshMainView);
 }
 
 //refresh view after magicsuggest update
 function refreshMainView() {
-    if ( ($("#FilterDateStart").val() == "" && $("#FilterDateEnd").val() == "") &&
+    if ( ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "") &&
         (MsFilterByProject.getValue().length == 0 && MsFilterByAssembly.getValue().length == 0 &&
                 MsFilterByPerson.getValue().length == 0) ) {
         $("#ChBoxShowDeleted").bootstrapToggle("disable")

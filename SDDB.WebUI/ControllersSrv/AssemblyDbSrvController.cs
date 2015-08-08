@@ -213,12 +213,14 @@ namespace SDDB.WebUI.ControllersSrv
         //filterForJsonLookup - filter data from service to be passed as response
         private object filterForJsonLookup(List<AssemblyDb> records)
         {
-            return records.OrderBy(x => x.AssyName)
+            return records
+                .OrderBy(x => x.AssyName)
                 .Select(x => new
                 {
                     id = x.Id,
                     name = x.AssyName + " - " + x.AssignedToProject.ProjectName
-                }).ToList();
+                })
+                .ToList();
         }
 
         //filterForJsonDTables - filter data from service to be passed as response

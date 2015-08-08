@@ -87,14 +87,14 @@ namespace SDDB.WebUI
             builder.RegisterType<AssemblyDbService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
             builder.RegisterType<AssemblyLogEntryService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
             builder.RegisterType<AssemblyModelService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
-            builder.RegisterType<AssemblyTypeService>().AsSelf().InstancePerDependency();
-            builder.RegisterType<AssemblyStatusService>().AsSelf().InstancePerDependency();
+            builder.RegisterType<AssemblyStatusService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
+            builder.RegisterType<AssemblyTypeService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
 
-            builder.RegisterType<ComponentService>().AsSelf().InstancePerDependency();
-            builder.RegisterType<ComponentTypeService>().AsSelf().InstancePerDependency();
-            builder.RegisterType<ComponentModelService>().AsSelf().InstancePerDependency();
+            builder.RegisterType<ComponentService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
+            builder.RegisterType<ComponentLogEntryService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
+            builder.RegisterType<ComponentModelService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
             builder.RegisterType<ComponentStatusService>().AsSelf().InstancePerDependency();
-            builder.RegisterType<ComponentLogEntryService>().AsSelf().InstancePerDependency();
+            builder.RegisterType<ComponentTypeService>().AsSelf().InstancePerDependency();
 
             //----Identity Setup-----
             builder.RegisterType<AppUserStore>().AsImplementedInterfaces().InstancePerRequest();

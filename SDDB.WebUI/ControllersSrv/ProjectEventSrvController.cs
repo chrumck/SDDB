@@ -33,7 +33,7 @@ namespace SDDB.WebUI.ControllersSrv
                 AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
                 x.EventCreated, CreatedByPerson = new { x.CreatedByPerson.FirstName, x.CreatedByPerson.LastName, x.CreatedByPerson.Initials },
                 x.EventClosed, ClosedByPerson = new { x.ClosedByPerson.FirstName, x.ClosedByPerson.LastName, x.ClosedByPerson.Initials },
-                x.Comments, IsActive = x.IsActive_bl, x.AssignedToProject_Id, x.CreatedByPerson_Id, x.ClosedByPerson_Id, 
+                x.Comments, x.IsActive_bl, x.AssignedToProject_Id, x.CreatedByPerson_Id, x.ClosedByPerson_Id, 
             });
 
             ViewBag.ServiceName = "ProjectEventService.GetAsync";
@@ -51,7 +51,7 @@ namespace SDDB.WebUI.ControllersSrv
                 AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
                 x.EventCreated, CreatedByPerson = new { x.CreatedByPerson.FirstName, x.CreatedByPerson.LastName, x.CreatedByPerson.Initials },
                 x.EventClosed, ClosedByPerson = new { x.ClosedByPerson.FirstName, x.ClosedByPerson.LastName, x.ClosedByPerson.Initials },
-                x.Comments, IsActive = x.IsActive_bl, x.AssignedToProject_Id, x.CreatedByPerson_Id, x.ClosedByPerson_Id, 
+                x.Comments, x.IsActive_bl, x.AssignedToProject_Id, x.CreatedByPerson_Id, x.ClosedByPerson_Id, 
             });
 
             ViewBag.ServiceName = "ProjectEventService.GetAsync";
@@ -70,7 +70,7 @@ namespace SDDB.WebUI.ControllersSrv
                 AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
                 x.EventCreated, CreatedByPerson = new { x.CreatedByPerson.FirstName, x.CreatedByPerson.LastName, x.CreatedByPerson.Initials },
                 x.EventClosed, ClosedByPerson = new { x.ClosedByPerson.FirstName, x.ClosedByPerson.LastName, x.ClosedByPerson.Initials },
-                x.Comments, IsActive = x.IsActive_bl, x.AssignedToProject_Id, x.CreatedByPerson_Id, x.ClosedByPerson_Id, 
+                x.Comments, x.IsActive_bl, x.AssignedToProject_Id, x.CreatedByPerson_Id, x.ClosedByPerson_Id, 
             });
 
             ViewBag.ServiceName = "ProjectEventService.GetByProjectAsync";

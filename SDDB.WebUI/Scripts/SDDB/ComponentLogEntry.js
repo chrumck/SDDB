@@ -115,8 +115,13 @@ $(document).ready(function () {
 
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
-        if (!$(this).prop("checked")) { GetActive = true; $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary"); }
-        else { GetActive = false; $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger"); }
+        if (!$(this).prop("checked")) {
+            GetActive = true;
+            $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
+        } else {
+            GetActive = false;
+            $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
+        }
         refreshMainView();
     });
 
@@ -210,6 +215,11 @@ $(document).ready(function () {
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }
+    else {
+        $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
+        $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
+        refreshMainView();
+    }
     $("#InitialView").addClass("hide");
     $("#MainView").removeClass("hide");
     
@@ -222,17 +232,13 @@ $(document).ready(function () {
 //Delete Records from DB
 function DeleteRecords() {
     CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    showModalWait();
-    $.ajax({ type: "POST", url: "/ComponentLogEntrySrv/Delete", timeout: 20000, data: { ids: CurrIds }, dataType: "json" })
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function () { refreshMainView(); })
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+    deleteRecordsGeneric(CurrIds, "/ComponentLogEntrySrv/Delete", refreshMainView);
 }
 
 //refresh view after magicsuggest update
 function refreshMainView() {
 
-    if ( ($("#FilterDateStart").val() == "" && $("#FilterDateEnd").val() == "") &&
+    if ( ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "") &&
         (MsFilterByProject.getValue().length == 0 && MsFilterByComponent.getValue().length == 0 &&
                 MsFilterByPerson.getValue().length == 0) ) {
         $("#ChBoxShowDeleted").bootstrapToggle("disable")

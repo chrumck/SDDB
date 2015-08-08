@@ -216,11 +216,7 @@ $(document).ready(function () {
 //Delete Records from DB
 function DeleteRecords() {
     var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    showModalWait();
-    $.ajax({ type: "POST", url: "/PersonLogEntrySrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json" })
-        .always(hideModalWait)
-        .done(function () { refreshMainView(); })
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+    deleteRecordsGeneric(CurrIds, "/PersonLogEntrySrv/Delete", refreshMainView);
 }
 
 //submit edits to DB

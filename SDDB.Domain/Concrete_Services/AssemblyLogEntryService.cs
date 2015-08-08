@@ -53,7 +53,7 @@ namespace SDDB.Domain.Services
         }
                 
         //get by projectIds and componentIds
-        public virtual async Task<List<AssemblyLogEntry>> GetByAltIdsAsync( string[] projectIds, string[] assemblyIds,
+        public virtual async Task<List<AssemblyLogEntry>> GetByAltIdsAsync(string[] projectIds, string[] assemblyIds, 
             string[] personIds, DateTime? startDate, DateTime? endDate, bool getActive = true)
         {
             projectIds = projectIds ?? new string[] { };

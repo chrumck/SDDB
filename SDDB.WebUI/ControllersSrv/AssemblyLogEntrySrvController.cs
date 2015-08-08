@@ -42,8 +42,8 @@ namespace SDDB.WebUI.ControllersSrv
             DateTime? startDate, DateTime? endDate, bool getActive = true)
         {
             ViewBag.ServiceName = "AssemblyLogEntryService.GetByAltIdsAsync";
-            var records = (await assyLogEntryService.GetByAltIdsAsync(projectIds, assyIds, personIds, startDate, endDate, getActive)
-                .ConfigureAwait(false));
+            var records = await assyLogEntryService.GetByAltIdsAsync(projectIds, assyIds, personIds, startDate, endDate, getActive)
+                .ConfigureAwait(false);
             return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
                 
@@ -80,20 +80,30 @@ namespace SDDB.WebUI.ControllersSrv
             {
                 x.Id,
                 x.LogEntryDateTime,
-                AssemblyDb_ = new {
-                    x.AssemblyDb.AssyName, x.AssemblyDb.AssyAltName 
+                AssemblyDb_ = new
+                {
+                    x.AssemblyDb.AssyName,
+                    x.AssemblyDb.AssyAltName
                 },
-                LastSavedByPerson_ = new {
-                    x.LastSavedByPerson.FirstName, x.LastSavedByPerson.LastName, x.LastSavedByPerson.Initials
+                LastSavedByPerson_ = new
+                {
+                    x.LastSavedByPerson.FirstName,
+                    x.LastSavedByPerson.LastName,
+                    x.LastSavedByPerson.Initials
                 },
-                AssemblyStatus_ = new {
+                AssemblyStatus_ = new
+                {
                     x.AssemblyStatus.AssyStatusName
                 },
-                AssignedToProject_ = new {
-                    x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectCode 
+                AssignedToProject_ = new
+                {
+                    x.AssignedToProject.ProjectName,
+                    x.AssignedToProject.ProjectCode
                 },
-                AssignedToLocation_ = new {
-                    x.AssignedToLocation.LocName, x.AssignedToLocation.LocAltName 
+                AssignedToLocation_ = new
+                {
+                    x.AssignedToLocation.LocName,
+                    x.AssignedToLocation.LocAltName
                 },
                 x.AssyGlobalX,
                 x.AssyGlobalY,

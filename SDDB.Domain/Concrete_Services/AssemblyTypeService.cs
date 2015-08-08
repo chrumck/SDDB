@@ -15,18 +15,14 @@ using SDDB.Domain.Infrastructure;
 
 namespace SDDB.Domain.Services
 {
-    public class AssemblyTypeService
+    public class AssemblyTypeService : BaseDbService<AssemblyType>
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
-        private IDbContextScopeFactory contextScopeFac;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
 
-        public AssemblyTypeService(IDbContextScopeFactory contextScopeFac)
-        {
-            this.contextScopeFac = contextScopeFac;
-        }
+        public AssemblyTypeService(IDbContextScopeFactory contextScopeFac, string userId) : base(contextScopeFac, userId) { }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
@@ -59,84 +55,43 @@ namespace SDDB.Domain.Services
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.AssemblyTypes.Where(x => x.IsActive_bl == getActive &&
-                    (x.AssyTypeName.Contains(query) || x.AssyTypeAltName.Contains(query) )).ToListAsync();
+                return dbContext.AssemblyTypes
+                    .Where(x => 
+                        (x.AssyTypeName.Contains(query) || x.AssyTypeAltName.Contains(query) ) &&
+                        x.IsActive_bl == getActive
+                    )
+                    .ToListAsync();
             }
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
 
-        // Create and Update records given in []
-        public virtual async Task<DBResult> EditAsync(AssemblyType[] records)
-        {
-            var errorMessage = "";
+        // Create and Update records given in []  - same as BaseDbService
 
-            using (var dbContextScope = contextScopeFac.Create())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    foreach (var record in records)
-                    {
-                        var dbEntry = await dbContext.AssemblyTypes.FindAsync(record.Id).ConfigureAwait(false);
-                        if (dbEntry == null)
-                        {
-                            record.Id = Guid.NewGuid().ToString();
-                            dbContext.AssemblyTypes.Add(record);
-                        }
-                        else
-                        {
-                            dbEntry.CopyModifiedProps(record);
-                        }
-                    }
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-                    trans.Complete();
-                }
-            }
-            if (errorMessage == "") return new DBResult();
-            else return new DBResult
-            {
-                StatusCode = HttpStatusCode.Conflict,
-                StatusDescription = "Errors editing records:\n" + errorMessage
-            };
-        }
-
-        // Delete records by their Ids
-        public virtual async Task<DBResult> DeleteAsync(string[] ids)
-        {
-            var errorMessage = ""; 
-
-            using (var dbContextScope = contextScopeFac.Create())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    foreach (var id in ids)
-                    {
-                        var dbEntry = await dbContext.AssemblyTypes.FindAsync(id).ConfigureAwait(false);
-                        if (dbEntry != null)
-                        {
-                            dbEntry.IsActive_bl = false;
-                        }
-                        else
-                        {
-                            errorMessage += string.Format("Record with Id={0} not found\n", id);
-                        }
-                    }
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-                    trans.Complete();
-                }
-            }
-            if (errorMessage == "") return new DBResult();
-            else return new DBResult {
-                StatusCode = HttpStatusCode.Conflict,
-                StatusDescription = "Errors deleting records:\n" + errorMessage
-            };
-        }
+        // Delete records by their Ids - same as BaseDbService
+        // See overriden checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
 
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
+
+        //helper - check before deleting records, takes AssemblyModel ids array
+        protected override async Task checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
+        {
+            for (int i = 0; i < ids.Length; i++)
+            {
+                var currentId = ids[i];
+                var assignedAssysCount = await dbContext.AssemblyDbs
+                    .CountAsync(x => x.IsActive_bl && x.AssemblyType_Id == currentId).ConfigureAwait(false);
+                if (assignedAssysCount > 0)
+                {
+                    var dbEntry = await dbContext.AssemblyTypes.FindAsync(currentId).ConfigureAwait(false);
+                    throw new DbBadRequestException(
+                        string.Format("Some assemblies have the type {0} assigned to it.\nDelete aborted.", dbEntry.AssyTypeName));
+                }
+            }
+        }
+
 
         #endregion
     }

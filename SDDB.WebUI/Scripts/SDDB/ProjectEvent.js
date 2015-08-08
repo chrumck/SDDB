@@ -77,7 +77,7 @@ $(document).ready(function () {
             { data: "ClosedByPerson", render: function (data, type, full, meta) { return data.Initials }, name: "ClosedByPerson" }, //7
             { data: "Comments", name: "Comments" },//8
             //------------------------------------------------never visible
-            { data: "IsActive", name: "IsActive" },//9
+            { data: "IsActive_bl", name: "IsActive_bl" },//9
             { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//10
             { data: "CreatedByPerson_Id", name: "CreatedByPerson_Id" },//11
             { data: "ClosedByPerson_Id", name: "ClosedByPerson_Id" },//12
@@ -156,7 +156,7 @@ function FillFormForEdit() {
             CurrRecord.EventCreated = data[0].EventCreated;
             CurrRecord.EventClosed = data[0].EventClosed;
             CurrRecord.Comments = data[0].Comments;
-            CurrRecord.IsActive = data[0].IsActive;
+            CurrRecord.IsActive_bl = data[0].IsActive_bl;
             CurrRecord.AssignedToProject_Id = data[0].AssignedToProject_Id;
             CurrRecord.CreatedByPerson_Id = data[0].CreatedByPerson_Id;
             CurrRecord.ClosedByPerson_Id = data[0].ClosedByPerson_Id;
@@ -168,7 +168,7 @@ function FillFormForEdit() {
                 if (FormInput.EventCreated != dbEntry.EventCreated) FormInput.EventCreated = "_VARIES_";
                 if (FormInput.EventClosed != dbEntry.EventClosed) FormInput.EventClosed = "_VARIES_";
                 if (FormInput.Comments != dbEntry.Comments) FormInput.Comments = "_VARIES_";
-                if (FormInput.IsActive != dbEntry.IsActive) FormInput.IsActive = "_VARIES_";
+                if (FormInput.IsActive_bl != dbEntry.IsActive_bl) FormInput.IsActive_bl = "_VARIES_";
 
                 if (FormInput.AssignedToProject_Id != dbEntry.AssignedToProject_Id) { FormInput.AssignedToProject_Id = "_VARIES_"; FormInput.AssignedToProject = "_VARIES_"; }
                 else FormInput.AssignedToProject = dbEntry.AssignedToProject.ProjectName + " " + dbEntry.AssignedToProject.ProjectCode;
@@ -186,7 +186,7 @@ function FillFormForEdit() {
             $("#EventCreated").val(FormInput.EventCreated);
             $("#EventClosed").val(FormInput.EventClosed);
             $("#Comments").val(FormInput.Comments);
-            if (FormInput.IsActive == true) $("#IsActive").prop("checked", true);
+            if (FormInput.IsActive_bl == true) $("#IsActive_bl").prop("checked", true);
             if (FormInput.AssignedToProject_Id != null) MagicSuggests[0].addToSelection([{ id: FormInput.AssignedToProject_Id, name: FormInput.AssignedToProject }], true);
             if (FormInput.CreatedByPerson_Id != null) MagicSuggests[1].addToSelection([{ id: FormInput.CreatedByPerson_Id, name: FormInput.CreatedByPerson }], true);
             if (FormInput.ClosedByPerson_Id != null) MagicSuggests[2].addToSelection([{ id: FormInput.ClosedByPerson_Id, name: FormInput.ClosedByPerson }], true);
@@ -237,7 +237,7 @@ function SubmitEdits() {
         editRecord.EventCreated = ($("#EventCreated").data("ismodified")) ? $("#EventCreated").val() : CurrRecord.EventCreated;
         editRecord.EventClosed = ($("#EventClosed").data("ismodified")) ? $("#EventClosed").val() : CurrRecord.EventClosed;
         editRecord.Comments = ($("#Comments").data("ismodified")) ? $("#Comments").val() : CurrRecord.Comments;
-        editRecord.IsActive = ($("#IsActive").data("ismodified")) ? (($("#IsActive").prop("checked")) ? true : false) : CurrRecord.IsActive;
+        editRecord.IsActive_bl = ($("#IsActive_bl").data("ismodified")) ? (($("#IsActive_bl").prop("checked")) ? true : false) : CurrRecord.IsActive_bl;
         editRecord.AssignedToProject_Id = (MagicSuggests[0].isModified) ? magicResults[0] : CurrRecord.AssignedToProject_Id;
         editRecord.CreatedByPerson_Id = (MagicSuggests[1].isModified) ? magicResults[1] : CurrRecord.CreatedByPerson_Id;
         editRecord.ClosedByPerson_Id = (MagicSuggests[2].isModified) ? magicResults[2] : CurrRecord.ClosedByPerson_Id;

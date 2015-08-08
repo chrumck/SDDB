@@ -43,7 +43,7 @@ namespace SDDB.UnitTests
             
             mockEfDbContext.Setup(x => x.AssemblyTypes).Returns(mockDbSet.Object);
 
-            var assyTypeService = new AssemblyTypeService(mockDbContextScopeFac.Object);
+            var assyTypeService = new AssemblyTypeService(mockDbContextScopeFac.Object,"dummyUserId");
 
             //Act
             var resultAssemblyTypes = assyTypeService.GetAsync().Result;
@@ -78,7 +78,7 @@ namespace SDDB.UnitTests
 
             mockEfDbContext.Setup(x => x.AssemblyTypes).Returns(mockDbSet.Object);
 
-            var assyTypeService = new AssemblyTypeService(mockDbContextScopeFac.Object);
+            var assyTypeService = new AssemblyTypeService(mockDbContextScopeFac.Object,"dummyUserId");
 
             //Act
             var serviceResult = assyTypeService.GetAsync(new string[] { "dummyEntryId3" }).Result;
@@ -114,7 +114,7 @@ namespace SDDB.UnitTests
 
             mockEfDbContext.Setup(x => x.AssemblyTypes).Returns(mockDbSet.Object);
 
-            var assyTypeService = new AssemblyTypeService(mockDbContextScopeFac.Object);
+            var assyTypeService = new AssemblyTypeService(mockDbContextScopeFac.Object,"dummyUserId");
 
             //Act
             var serviceResult = assyTypeService.GetAsync(new string[] { "dummyEntryId3" }).Result;
@@ -149,7 +149,7 @@ namespace SDDB.UnitTests
             mockDbSet.As<IQueryable<AssemblyType>>().Setup(m => m.GetEnumerator()).Returns(dbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.AssemblyTypes).Returns(mockDbSet.Object);
 
-            var assyTypeService = new AssemblyTypeService(mockDbContextScopeFac.Object);
+            var assyTypeService = new AssemblyTypeService(mockDbContextScopeFac.Object,"dummyUserId");
 
             //Act
             var returnedAssemblyTypes = assyTypeService.LookupAsync("", true).Result;
@@ -183,7 +183,7 @@ namespace SDDB.UnitTests
             mockDbSet.As<IQueryable<AssemblyType>>().Setup(m => m.GetEnumerator()).Returns(dbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.AssemblyTypes).Returns(mockDbSet.Object);
 
-            var assyTypeService = new AssemblyTypeService(mockDbContextScopeFac.Object);
+            var assyTypeService = new AssemblyTypeService(mockDbContextScopeFac.Object,"dummyUserId");
 
             //Act
             var returnedAssemblyTypes = assyTypeService.LookupAsync("NameAlt2", true).Result;
@@ -217,7 +217,7 @@ namespace SDDB.UnitTests
             mockDbSet.As<IQueryable<AssemblyType>>().Setup(m => m.GetEnumerator()).Returns(dbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.AssemblyTypes).Returns(mockDbSet.Object);
 
-            var assyTypeService = new AssemblyTypeService(mockDbContextScopeFac.Object);
+            var assyTypeService = new AssemblyTypeService(mockDbContextScopeFac.Object,"dummyUserId");
 
             //Act
             var returnedAssemblyTypes = assyTypeService.LookupAsync("NameAlt1", true).Result;
@@ -226,142 +226,7 @@ namespace SDDB.UnitTests
             Assert.IsTrue(returnedAssemblyTypes.Count == 0);
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------
 
-        [TestMethod]
-        public void AssemblyTypeService_EditAsync_DoesNothingIfNoAssemblyType()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var assyTypes = new AssemblyType[] { };
-
-            var assyTypeService = new AssemblyTypeService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = assyTypeService.EditAsync(assyTypes).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.AssemblyTypes.FindAsync(It.IsAny<object[]>()), Times.Never);
-        }
-
-
-        [TestMethod]
-        public void AssemblyTypeService_EditAsync_CreatesAssemblyTypeIfNotInDB()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var initialId = "dummyEntryId1";
-            var assyType1 = new AssemblyType { Id = initialId, AssyTypeName = "Name1", AssyTypeAltName = "NameAlt1", IsActive_bl = false };
-            var assyTypes = new AssemblyType[] { assyType1 };
-
-            mockEfDbContext.Setup(x => x.AssemblyTypes.FindAsync(assyType1.Id)).Returns(Task.FromResult<AssemblyType>(null));
-            mockEfDbContext.Setup(x => x.AssemblyTypes.Add(assyType1)).Returns(assyType1);
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
-
-            var assyTypeService = new AssemblyTypeService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = assyTypeService.EditAsync(assyTypes).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
-            var regex = new Regex(@"\w*-\w*-\w*-\w*-\w*"); Assert.IsTrue(regex.IsMatch(assyType1.Id));
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.AssemblyTypes.FindAsync(initialId), Times.Once);
-            mockEfDbContext.Verify(x => x.AssemblyTypes.Add(assyType1), Times.Once);
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-        }
-
-        [TestMethod]
-        public void AssemblyTypeService_EditAsync_UpdatesExistingEntries()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var assyType1 = new AssemblyType { Id = "dummyAssemblyTypeId1", AssyTypeName = "Name1", AssyTypeAltName = "NameAlt1", IsActive_bl = false,
-                                      ModifiedProperties = new string[] { "AssyTypeName", "AssyTypeAltName" }};
-            var assyType2 = new AssemblyType { Id = "dummyAssemblyTypeId2", AssyTypeName = "Name2", AssyTypeAltName = "NameAlt2", IsActive_bl = true };
-            var assyTypes = new AssemblyType[] { assyType1, assyType2 };
-
-            var dbEntry1 = new AssemblyType { Id = "dummyEntryId1", AssyTypeName = "DbEntry1", AssyTypeAltName = "DbEntryAlt1", IsActive_bl = true };
-            var dbEntry2 = new AssemblyType { Id = "dummyEntryId2", AssyTypeName = "DbEntry2", AssyTypeAltName = "DbEntryAlt2", IsActive_bl = false };
-
-            mockEfDbContext.Setup(x => x.AssemblyTypes.FindAsync(assyType1.Id)).Returns(Task.FromResult(dbEntry1));
-            mockEfDbContext.Setup(x => x.AssemblyTypes.FindAsync(assyType2.Id)).Returns(Task.FromResult(dbEntry2));
-            mockEfDbContext.Setup(x => x.AssemblyTypes.Add(assyType1)).Verifiable();
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
-
-            var assyTypeService = new AssemblyTypeService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = assyTypeService.EditAsync(assyTypes).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
-            Assert.IsTrue(assyType1.AssyTypeName == dbEntry1.AssyTypeName); Assert.IsTrue(assyType1.AssyTypeAltName == dbEntry1.AssyTypeAltName);
-            Assert.IsTrue(assyType1.IsActive_bl != dbEntry1.IsActive_bl);
-            Assert.IsTrue(assyType2.AssyTypeName != dbEntry2.AssyTypeName); Assert.IsTrue(assyType2.AssyTypeAltName != dbEntry2.AssyTypeAltName);
-            Assert.IsTrue(assyType2.IsActive_bl != dbEntry2.IsActive_bl);
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.AssemblyTypes.FindAsync(It.IsAny<string>()), Times.Exactly(2));
-            mockEfDbContext.Verify(x => x.AssemblyTypes.Add(It.IsAny<AssemblyType>()), Times.Never);
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-        }
-
-        //-----------------------------------------------------------------------------------------------------------------------
-
-        [TestMethod]
-        public void AssemblyTypeService_DeleteAsync_DeletesAndReturnsErrorIfNotFound()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var ids = new string[] { "dummyId1", "DummyId2" };
-
-            var dbEntry = new AssemblyType { IsActive_bl = true };
-            mockEfDbContext.Setup(x => x.AssemblyTypes.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
-            mockEfDbContext.Setup(x => x.AssemblyTypes.FindAsync("dummyId2")).Returns(Task.FromResult<AssemblyType>(null));
-
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
-
-            var assyTypeService = new AssemblyTypeService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = assyTypeService.DeleteAsync(ids).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("Record with Id=DummyId2 not found\n"));
-            Assert.IsTrue(dbEntry.IsActive_bl == false);
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.AssemblyTypes.FindAsync(It.IsAny<string>()), Times.Exactly(2));
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-        }
         
     }
 }

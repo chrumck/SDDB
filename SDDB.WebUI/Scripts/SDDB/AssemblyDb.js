@@ -87,7 +87,7 @@ $(document).ready(function () {
     $("#BtnDelete").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
         if (CurrIds.length == 0) { showModalNothingSelected(); }
-        else showModalDelete(CurrIds.length);
+        else { showModalDelete(CurrIds.length); }
     });
 
     //wire up dropdownId1
@@ -131,7 +131,7 @@ $(document).ready(function () {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected").data().length;
         if (noOfRows != 1) { showModalSelectOne(); }
-        else window.open("/Component?assyId=" + TableMain.cell(".ui-selected", "Id:name").data())
+        else { window.open("/Component?assyId=" + TableMain.cell(".ui-selected", "Id:name").data()) }
     });
 
     //wire up dropdownId6
@@ -139,7 +139,7 @@ $(document).ready(function () {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected").data().length;
         if (noOfRows != 1) { showModalSelectOne(); }
-        else window.open("/AssemblyLogEntry?assyId=" + TableMain.cell(".ui-selected", "Id:name").data())
+        else { window.open("/AssemblyLogEntry?assyId=" + TableMain.cell(".ui-selected", "Id:name").data()) }
     });
 
     //Initialize MagicSuggest MsFilterByType
@@ -285,7 +285,6 @@ $(document).ready(function () {
         msValidate(MagicSuggests);
         if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
             showModalWait();
-
             var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
             submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/AssemblyDbSrv/Edit", createMultiple)
                 .always(hideModalWait)
@@ -326,11 +325,7 @@ $(document).ready(function () {
 //Delete Records from DB
 function DeleteRecords() {
     CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    showModalWait();
-    $.ajax({ type: "POST", url: "/AssemblyDbSrv/Delete", timeout: 20000, data: { ids: CurrIds }, dataType: "json" })
-        .always(hideModalWait)
-        .done(refreshMainView)
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+    deleteRecordsGeneric(CurrIds, "/AssemblyDbSrv/Delete", refreshMainView);
 }
 
 //refresh view after magicsuggest update
