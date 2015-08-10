@@ -77,8 +77,8 @@ namespace SDDB.WebUI
 
             builder.RegisterType<ProjectService>().AsSelf().InstancePerDependency();
             builder.RegisterType<ProjectEventService>().AsSelf().InstancePerDependency();
-            
-            builder.RegisterType<DocumentService>().AsSelf().InstancePerDependency();
+
+            builder.RegisterType<DocumentService>().WithParameter(userIdParameter).AsSelf().InstancePerDependency();
             builder.RegisterType<DocumentTypeService>().AsSelf().InstancePerDependency();
             
             builder.RegisterType<LocationService>().AsSelf().InstancePerDependency();
@@ -93,8 +93,8 @@ namespace SDDB.WebUI
             builder.RegisterType<ComponentService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
             builder.RegisterType<ComponentLogEntryService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
             builder.RegisterType<ComponentModelService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
-            builder.RegisterType<ComponentStatusService>().AsSelf().InstancePerDependency();
-            builder.RegisterType<ComponentTypeService>().AsSelf().InstancePerDependency();
+            builder.RegisterType<ComponentStatusService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
+            builder.RegisterType<ComponentTypeService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
 
             //----Identity Setup-----
             builder.RegisterType<AppUserStore>().AsImplementedInterfaces().InstancePerRequest();

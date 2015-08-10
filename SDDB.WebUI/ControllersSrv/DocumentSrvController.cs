@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using SDDB.Domain.Entities;
 using SDDB.Domain.Services;
 using SDDB.WebUI.Infrastructure;
+using System.Collections.Generic;
 
 namespace SDDB.WebUI.ControllersSrv
 {
@@ -24,75 +25,32 @@ namespace SDDB.WebUI.ControllersSrv
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
-        // GET: /DocumentSrv/Get
-        [DBSrvAuth("Document_View")]
-        public async Task<ActionResult> Get(bool getActive = true)
-        {
-            var data = (await docService.GetAsync(UserId, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.DocName, x.DocAltName, x.DocumentType.DocTypeName, x.DocLastVersion, 
-                AuthorPerson = new { x.AuthorPerson.FirstName, x.AuthorPerson.LastName, x.AuthorPerson.Initials },
-                ReviewerPerson = new { x.ReviewerPerson.FirstName, x.ReviewerPerson.LastName, x.ReviewerPerson.Initials },
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                x.RelatesToAssyType.AssyTypeName, x.RelatesToCompType.CompTypeName, x.DocFilePath, 
-                x.Comments, IsActive = x.IsActive_bl,
-                x.DocumentType_Id, x.AuthorPerson_Id, x.ReviewerPerson_Id, x.AssignedToProject_Id, x.RelatesToAssyType_Id, x.RelatesToCompType_Id, 
-            });
-
-            ViewBag.ServiceName = "DocumentService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
-        }
-
         // POST: /DocumentSrv/GetByIds
         [HttpPost]
         [DBSrvAuth("Document_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
-            var data = (await docService.GetAsync(UserId, ids, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.DocName, x.DocAltName, x.DocumentType.DocTypeName, x.DocLastVersion, 
-                AuthorPerson = new { x.AuthorPerson.FirstName, x.AuthorPerson.LastName, x.AuthorPerson.Initials },
-                ReviewerPerson = new { x.ReviewerPerson.FirstName, x.ReviewerPerson.LastName, x.ReviewerPerson.Initials },
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                x.RelatesToAssyType.AssyTypeName, x.RelatesToCompType.CompTypeName, x.DocFilePath, 
-                x.Comments, IsActive = x.IsActive_bl,
-                x.DocumentType_Id,x.AuthorPerson_Id,x.ReviewerPerson_Id,x.AssignedToProject_Id,x.RelatesToAssyType_Id,x.RelatesToCompType_Id, 
-            });
-
             ViewBag.ServiceName = "DocumentService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json( data , JsonRequestBehavior.AllowGet);
+            var records = await docService.GetAsync(ids, getActive).ConfigureAwait(false);
+            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
         }
 
-        // POST: /DocumentSrv/GetByTypeIds
+        // POST: /DocumentSrv/GetByIds
         [HttpPost]
         [DBSrvAuth("Document_View")]
-        public async Task<ActionResult> GetByTypeIds(string[] projectIds, string[] typeIds = null, bool getActive = true)
+        public async Task<ActionResult> GetByAltIds(string[] projectIds, string[] typeIds = null, bool getActive = true)
         {
-            var data = (await docService.GetByTypeAsync(UserId, projectIds,typeIds, getActive).ConfigureAwait(false)).Select(x => new
-            {
-                x.Id, x.DocName, x.DocAltName, x.DocumentType.DocTypeName, x.DocLastVersion, 
-                AuthorPerson = new { x.AuthorPerson.FirstName, x.AuthorPerson.LastName, x.AuthorPerson.Initials },
-                ReviewerPerson = new { x.ReviewerPerson.FirstName, x.ReviewerPerson.LastName, x.ReviewerPerson.Initials },
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                x.RelatesToAssyType.AssyTypeName, x.RelatesToCompType.CompTypeName, x.DocFilePath, 
-                x.Comments, IsActive = x.IsActive_bl,
-                x.DocumentType_Id,x.AuthorPerson_Id,x.ReviewerPerson_Id,x.AssignedToProject_Id,x.RelatesToAssyType_Id,x.RelatesToCompType_Id, 
-            });
-
-            ViewBag.ServiceName = "DocumentService.GetByTypeAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            ViewBag.ServiceName = "DocumentService.GetByAltIdsAsync";
+            var records = await docService.GetByAltIdsAsync(projectIds,typeIds, getActive).ConfigureAwait(false);
+            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /DocumentSrv/Lookup
         public async Task<ActionResult> Lookup(string query = "", bool getActive = true)
         {
-            var records = await docService.LookupAsync(UserId, query, getActive).ConfigureAwait(false);
-
             ViewBag.ServiceName = "DocumentService.LookupAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(records.OrderBy(x => x.DocName)
-                .Select(x => new { id = x.Id, name = x.DocName }), JsonRequestBehavior.AllowGet);
+            var records = await docService.LookupAsync(query, getActive).ConfigureAwait(false);
+            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -102,22 +60,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Document_Edit")]
         public async Task<ActionResult> Edit(Document[] records)
         {
-            var serviceResult = await docService.EditAsync(records).ConfigureAwait(false);
-
             ViewBag.ServiceName = "DocumentService.EditAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode; 
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            var newEntryIds = await docService.EditAsync(records).ConfigureAwait(false);
+            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /DocumentSrv/Delete
@@ -125,27 +70,78 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Document_Edit")]
         public async Task<ActionResult> Delete(string[] ids)
         {
-            var serviceResult = await docService.DeleteAsync(ids).ConfigureAwait(false);
-
             ViewBag.ServiceName = "DocumentService.DeleteAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            await docService.DeleteAsync(ids).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
 
+        //filterForJsonFull - filter data from service to be passed as response
+        private object filterForJsonFull(List<Document> records)
+        {
+            return records.Select(x => new
+            {
+                x.Id,
+                x.DocName,
+                x.DocAltName,
+                DocumentType_ = new
+                {
+                    x.DocumentType.DocTypeName
+                },
+                x.DocLastVersion,
+                AuthorPerson_ = new
+                {
+                    x.AuthorPerson.FirstName,
+                    x.AuthorPerson.LastName,
+                    x.AuthorPerson.Initials
+                },
+                ReviewerPerson_ = new
+                {
+                    x.ReviewerPerson.FirstName,
+                    x.ReviewerPerson.LastName,
+                    x.ReviewerPerson.Initials
+                },
+                AssignedToProject_ = new
+                {
+                    x.AssignedToProject.ProjectName,
+                    x.AssignedToProject.ProjectAltName,
+                    x.AssignedToProject.ProjectCode
+                },
+                RelatesToAssyType_ = new
+                {
+                    x.RelatesToAssyType.AssyTypeName
+                },
+                RelatesToCompType_ = new {
+                    x.RelatesToCompType.CompTypeName
+                },
+                x.DocFilePath,
+                x.Comments,
+                x.IsActive_bl,
+                x.DocumentType_Id,
+                x.AuthorPerson_Id,
+                x.ReviewerPerson_Id,
+                x.AssignedToProject_Id,
+                x.RelatesToAssyType_Id,
+                x.RelatesToCompType_Id,
+            })
+            .ToList();
+        }
+
+
+        //filterForJsonLookup - filter data from service to be passed as response
+        private object filterForJsonLookup(List<Document> records)
+        {
+            return records
+                .OrderBy(x => x.DocName)
+                .Select(x => new
+                {
+                    id = x.Id,
+                    name = x.DocName + " - " + x.AssignedToProject.ProjectName
+                })
+                .ToList();
+        }
 
         #endregion
     }

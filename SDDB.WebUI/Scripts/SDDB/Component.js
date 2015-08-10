@@ -217,7 +217,8 @@ $(document).ready(function () {
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
         $("#MainView").removeClass("hide");
-        $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
+        $("#EditFormView").addClass("hide");
+        window.scrollTo(0, 0);
     });
     
     //Wire Up EditFormBtnOk
