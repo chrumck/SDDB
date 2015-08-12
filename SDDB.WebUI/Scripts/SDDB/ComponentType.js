@@ -10,9 +10,6 @@
 //--------------------------------------Global Properties------------------------------------//
 
 var TableMain;
-var MsFilterByProject = {};
-var MsFilterByType = {};
-var MsFilterByLoc = {};
 var MagicSuggests = [];
 var RecordTemplate = {
     Id: "RecordTemplateId",

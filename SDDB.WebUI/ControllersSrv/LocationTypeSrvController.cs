@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using SDDB.Domain.Entities;
 using SDDB.Domain.Services;
 using SDDB.WebUI.Infrastructure;
+using System.Collections.Generic;
 
 namespace SDDB.WebUI.ControllersSrv
 {
@@ -27,13 +28,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("LocationType_View")]
         public async Task<ActionResult> Get(bool getActive = true)
         {
-            var data = (await locationTypeService.GetAsync(getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.LocTypeName, x.LocTypeAltName, x.Comments, IsActive = x.IsActive_bl
-            });
-
             ViewBag.ServiceName = "LocationTypeService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            var records = await locationTypeService.GetAsync(getActive).ConfigureAwait(false);
+            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
         }
 
         // POST: /LocationTypeSrv/GetByIds
@@ -41,24 +38,17 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("LocationType_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
-            var data = (await locationTypeService.GetAsync(ids, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.LocTypeName, x.LocTypeAltName, x.Comments, IsActive = x.IsActive_bl
-            });
-
             ViewBag.ServiceName = "LocationTypeService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json( data , JsonRequestBehavior.AllowGet);
+            var records = await locationTypeService.GetAsync(ids, getActive).ConfigureAwait(false);
+            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /LocationTypeSrv/Lookup
         public async Task<ActionResult> Lookup(string query = "", bool getActive = true)
         {
-            var records = await locationTypeService.LookupAsync(query, getActive).ConfigureAwait(false);
-
             ViewBag.ServiceName = "LocationTypeService.LookupAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(records.OrderBy(x => x.LocTypeName)
-                .Select(x => new { id = x.Id, name = x.LocTypeName }), JsonRequestBehavior.AllowGet);
+            var records = await locationTypeService.LookupAsync(query, getActive).ConfigureAwait(false);
+            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -68,22 +58,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("LocationType_Edit")]
         public async Task<ActionResult> Edit(LocationType[] records)
         {
-            var serviceResult = await locationTypeService.EditAsync(records).ConfigureAwait(false);
-
             ViewBag.ServiceName = "LocationTypeService.EditAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode; 
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            var newEntryIds = await locationTypeService.EditAsync(records).ConfigureAwait(false);
+            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /LocationTypeSrv/Delete
@@ -91,27 +68,43 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("LocationType_Edit")]
         public async Task<ActionResult> Delete(string[] ids)
         {
-            var serviceResult = await locationTypeService.DeleteAsync(ids).ConfigureAwait(false);
-
             ViewBag.ServiceName = "LocationTypeService.DeleteAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK; 
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            await locationTypeService.DeleteAsync(ids).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
 
+        //filterForJsonFull - filter data from service to be passed as response
+        private object filterForJsonFull(List<LocationType> records)
+        {
+            return records.Select(x =>
+                new
+                {
+                    x.Id,
+                    x.LocTypeName,
+                    x.LocTypeAltName,
+                    x.Comments,
+                    x.IsActive_bl
+                }
+            )
+            .ToList();
+        }
+
+        //filterForJsonLookup - filter data from service to be passed as response
+        private object filterForJsonLookup(List<LocationType> records)
+        {
+            return records
+                .OrderBy(x => x.LocTypeName)
+                .Select(x =>
+                    new
+                    {
+                        id = x.Id,
+                        name = x.LocTypeName
+                    }
+                );
+        }
 
         #endregion
     }

@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -24,86 +26,43 @@ namespace SDDB.WebUI.ControllersSrv
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
-        // GET: /LocationSrv/Get
-        [DBSrvAuth("Location_View")]
-        public async Task<ActionResult> Get(bool getActive = true)
-        {
-            var data = (await locationService.GetAsync(UserId, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.LocName, x.LocAltName, x.LocationType.LocTypeName, 
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                ContactPerson = new { x.ContactPerson.FirstName, x.ContactPerson.LastName, x.ContactPerson.Initials },
-                x.Address, x.City, x.ZIP, x.State, x.Country, x.LocX, x.LocY, x.LocZ, x.LocStationing,
-                CertOfApprReqd = x.CertOfApprReqd_bl, RightOfEntryReqd = x.RightOfEntryReqd_bl, x.AccessInfo ,x.Comments, IsActive = x.IsActive_bl,
-                x.LocationType_Id,x.AssignedToProject_Id, x.ContactPerson_Id 
-            });
-
-            ViewBag.ServiceName = "LocationService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
-        }
-
         // POST: /LocationSrv/GetByIds
         [HttpPost]
         [DBSrvAuth("Location_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
-            var data = (await locationService.GetAsync(UserId, ids, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.LocName, x.LocAltName, x.LocationType.LocTypeName, 
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                ContactPerson = new { x.ContactPerson.FirstName, x.ContactPerson.LastName, x.ContactPerson.Initials },
-                x.Address, x.City, x.ZIP, x.State, x.Country, x.LocX, x.LocY, x.LocZ, x.LocStationing,
-                CertOfApprReqd = x.CertOfApprReqd_bl, RightOfEntryReqd = x.RightOfEntryReqd_bl, x.AccessInfo ,x.Comments, IsActive = x.IsActive_bl,
-                x.LocationType_Id,x.AssignedToProject_Id, x.ContactPerson_Id
-            });
-
             ViewBag.ServiceName = "LocationService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json( data , JsonRequestBehavior.AllowGet);
+            var records = await locationService.GetAsync(ids, getActive).ConfigureAwait(false);
+            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
         }
 
         // POST: /LocationSrv/GetByAltIds
         [HttpPost]
         [DBSrvAuth("Location_View")]
-        public async Task<ActionResult> GetByAltIds(string[] projectIds = null, string[] typeIds = null, bool getActive = true)
+        public async Task<ActionResult> GetByAltIds(string[] projectIds, string[] typeIds, bool getActive = true)
         {
-            var data = (await locationService.GetByAltIdsAsync(UserId, projectIds, typeIds, getActive).ConfigureAwait(false)).Select(x => new
-            {
-                x.Id, x.LocName, x.LocAltName, x.LocationType.LocTypeName, 
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                ContactPerson = new { x.ContactPerson.FirstName, x.ContactPerson.LastName, x.ContactPerson.Initials },
-                x.Address, x.City, x.ZIP, x.State, x.Country, x.LocX, x.LocY, x.LocZ, x.LocStationing,
-                CertOfApprReqd = x.CertOfApprReqd_bl, RightOfEntryReqd = x.RightOfEntryReqd_bl, x.AccessInfo ,x.Comments, IsActive = x.IsActive_bl,
-                x.LocationType_Id,x.AssignedToProject_Id, x.ContactPerson_Id
-            });
-
             ViewBag.ServiceName = "LocationService.GetByAltIdsAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            var records = await locationService.GetByAltIdsAsync(projectIds, typeIds, getActive).ConfigureAwait(false);
+            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /LocationSrv/Lookup
         public async Task<ActionResult> Lookup(string query = "", bool getActive = true)
         {
-            var records = await locationService.LookupAsync(UserId, query, getActive).ConfigureAwait(false);
-
             ViewBag.ServiceName = "LocationService.LookupAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(records.OrderBy(x => x.LocName)
-                .Select(x => new { id = x.Id, name = x.LocName + " - " + x.AssignedToProject.ProjectName }), JsonRequestBehavior.AllowGet);
+            var records = await locationService.LookupAsync(query, getActive).ConfigureAwait(false);
+            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /LocationSrv/LookupByProj
-        public async Task<ActionResult> LookupByProj(string projectIds = null, string query = "", bool getActive = true)
+        public async Task<ActionResult> LookupByProj(string projectIds, string query = "", bool getActive = true)
         {
             string[] projectIdsArray = null;
-            if (projectIds != null && projectIds != "") projectIdsArray = projectIds.Split(',');
-
-            var records = await locationService.LookupByProjAsync(UserId, projectIdsArray, query, getActive).ConfigureAwait(false);
+            if (!String.IsNullOrEmpty(projectIds)) { projectIdsArray = projectIds.Split(','); }
 
             ViewBag.ServiceName = "LocationService.LookupByProjAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(records.OrderBy(x => x.LocName)
-                .Select(x => new { id = x.Id, name = x.LocName + " - " + x.AssignedToProject.ProjectName }), JsonRequestBehavior.AllowGet);
+            var records = await locationService.LookupByProjAsync(projectIdsArray, query, getActive).ConfigureAwait(false);
+            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -113,22 +72,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Location_Edit")]
         public async Task<ActionResult> Edit(Location[] records)
         {
-            var serviceResult = await locationService.EditAsync(records).ConfigureAwait(false);
-
             ViewBag.ServiceName = "LocationService.EditAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode; 
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            var newEntryIds = await locationService.EditAsync(records).ConfigureAwait(false);
+            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /LocationSrv/Delete
@@ -136,26 +82,71 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Location_Edit")]
         public async Task<ActionResult> Delete(string[] ids)
         {
-            var serviceResult = await locationService.DeleteAsync(ids).ConfigureAwait(false);
-
             ViewBag.ServiceName = "LocationService.DeleteAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            await locationService.DeleteAsync(ids).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
+
+        //filterForJsonFull - filter data from service to be passed as response
+        private object filterForJsonFull(List<Location> records)
+        {
+            return records.Select(x => new
+            {
+                x.Id,
+                x.LocName,
+                x.LocAltName,
+                LocationType_ = new
+                {
+                    x.LocationType.LocTypeName
+                },
+                AssignedToProject_ = new 
+                {
+                    x.AssignedToProject.ProjectName,
+                    x.AssignedToProject.ProjectAltName, 
+                    x.AssignedToProject.ProjectCode 
+                },
+                ContactPerson_ = new {
+                    x.ContactPerson.FirstName,
+                    x.ContactPerson.LastName,
+                    x.ContactPerson.Initials 
+                },
+                x.Address,
+                x.City,
+                x.ZIP,
+                x.State,
+                x.Country,
+                x.LocX,
+                x.LocY,
+                x.LocZ,
+                x.LocStationing,
+                x.CertOfApprReqd_bl,
+                x.RightOfEntryReqd_bl,
+                x.AccessInfo,
+                x.Comments,
+                x.IsActive_bl,
+                x.LocationType_Id,
+                x.AssignedToProject_Id,
+                x.ContactPerson_Id
+            })
+            .ToList();
+        }
+
+
+        //filterForJsonLookup - filter data from service to be passed as response
+        private object filterForJsonLookup(List<Location> records)
+        {
+            return records
+                .OrderBy(x => x.LocName)
+                .Select(x => new
+                {
+                    id = x.Id,
+                    name = x.LocName + " - " + x.AssignedToProject.ProjectName
+                })
+                .ToList();
+        }
 
 
         #endregion

@@ -88,9 +88,9 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryAssysAsync";
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
-            var data = (await prsLogEntryService.GetPrsLogEntryAssysAsync(logEntryId).ConfigureAwait(false))
+            var records = (await prsLogEntryService.GetPrsLogEntryAssysAsync(logEntryId).ConfigureAwait(false))
                 .Select(x => new { x.Id, x.AssyName, x.AssyAltName });
-            return Json(data, JsonRequestBehavior.AllowGet);
+            return Json(records, JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonLogEntrySrv/GetPrsLogEntryAssysNot
@@ -100,9 +100,9 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryAssysNotAsync";
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
-            var data = (await prsLogEntryService.GetPrsLogEntryAssysNotAsync(logEntryId, locId).ConfigureAwait(false))
+            var records = (await prsLogEntryService.GetPrsLogEntryAssysNotAsync(logEntryId, locId).ConfigureAwait(false))
                 .Select(x => new { x.Id, x.AssyName, x.AssyAltName });
-            return Json(data, JsonRequestBehavior.AllowGet);
+            return Json(records, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /PersonLogEntrySrv/EditPrsLogEntryAssys
@@ -126,9 +126,9 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryPersonsAsync";
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
-            var data = (await prsLogEntryService.GetPrsLogEntryPersonsAsync(logEntryId).ConfigureAwait(false))
+            var records = (await prsLogEntryService.GetPrsLogEntryPersonsAsync(logEntryId).ConfigureAwait(false))
                 .Select(x => new { x.Id, x.FirstName, x.LastName, x.Initials });
-            return Json(data, JsonRequestBehavior.AllowGet);
+            return Json(records, JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonLogEntrySrv/GetPrsLogEntryPersonsNot
@@ -138,9 +138,9 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryPersonsNotAsync";
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
-            var data = (await prsLogEntryService.GetPrsLogEntryPersonsNotAsync(UserId, logEntryId).ConfigureAwait(false))
+            var records = (await prsLogEntryService.GetPrsLogEntryPersonsNotAsync(UserId, logEntryId).ConfigureAwait(false))
                 .Select(x => new { x.Id, x.FirstName, x.LastName, x.Initials });
-            return Json(data, JsonRequestBehavior.AllowGet);
+            return Json(records, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /PersonLogEntrySrv/EditPrsLogEntryPersons

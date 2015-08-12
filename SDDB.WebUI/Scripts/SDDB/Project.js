@@ -44,7 +44,7 @@ $(document).ready(function () {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected").data().length;
         if (noOfRows != 1) showModalSelectOne();
-        else window.open("/Location?projectId=" + TableMain.cell(".ui-selected", "Id:name").data())
+        else window.open("/Location?ProjectId=" + TableMain.cell(".ui-selected", "Id:name").data())
     });
 
     //---------------------------------------DataTables------------

@@ -2,20 +2,42 @@
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
-/// <reference path="../jquery-2.1.3.js" />
-/// <reference path="../jquery-2.1.3.intellisense.js" />
+/// <reference path="../jquery-2.1.4.js" />
+/// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
-
 //--------------------------------------Global Properties------------------------------------//
 
-var TableMain = {};
-var IsCreate = false;
-var MsFilterByProject = {}; var MsFilterByType = {};
+var TableMain;
+var MsFilterByProject = {};
+var MsFilterByType = {};
 var MagicSuggests = [];
-var CurrRecord = {};
-
+var RecordTemplate = {
+    Id: "RecordTemplateId",
+    LocName: null,
+    LocAltName: null,
+    Address: null,
+    City: null,
+    ZIP: null,
+    State: null,
+    Country: null,
+    LocX: null,
+    LocY: null,
+    LocZ: null,
+    LocStationing: null,
+    CertOfApprReqd_bl: null,
+    RightOfEntryReqd_bl: null,
+    AccessInfo: null,
+    Comments: null,
+    IsActive_bl: null,
+    LocationType_Id: null,
+    AssignedToProject_Id: null,
+    ContactPerson_Id: null
+};
+var CurrRecords = [];
+var CurrIds = [];
+var GetActive = true;
 
 $(document).ready(function () {
 
@@ -23,22 +45,41 @@ $(document).ready(function () {
 
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
-        IsCreate = true;
+        CurrIds = [];
+        CurrRecords = [];
+        CurrRecords[0] = $.extend(true, {}, RecordTemplate);
+        $("#EditFormCreateMultiple").removeClass("hide");
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Location", "MainView");
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-        var selectedRows = TableMain.rows(".ui-selected").data();
-        if (selectedRows.length == 0) showModalNothingSelected();
-        else { IsCreate = false; FillFormForEdit(); }
+        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        if (CurrIds.length == 0) { showModalNothingSelected(); }
+        else {
+            if (GetActive) { $("#EditFormGroupIsActive").addClass("hide"); }
+            else { $("#EditFormGroupIsActive").removeClass("hide"); }
+
+            $("#EditFormCreateMultiple").addClass("hide");
+
+            showModalWait();
+
+            fillFormForEditGeneric(CurrIds, "POST", "/LocationSrv/GetByIds", GetActive, "EditForm", "Edit Location", MagicSuggests)
+                .always(hideModalWait)
+                .done(function (currRecords) {
+                    CurrRecords = currRecords;
+                    $("#MainView").addClass("hide");
+                    $("#EditFormView").removeClass("hide");
+                })
+                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        }
     });
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
-        var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) showModalNothingSelected();
-        else showModalDelete(noOfRows);
+        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        if (CurrIds.length == 0) { showModalNothingSelected(); }
+        else { showModalDelete(CurrIds.length); }
     });
 
     //wire up dropdownId1
@@ -82,9 +123,10 @@ $(document).ready(function () {
         },
         style: "min-width: 240px;"
     });
-    $(MsFilterByType).on('selectionchange', function (e, m) { RefreshMainView(); });
+    //Wire up on change event for MsFilterByType
+    $(MsFilterByType).on('selectionchange', function (e, m) { refreshMainView(); });
 
-    //Initialize MagicSuggest MsFilterByProject
+    //Initialize MagicSuggest msFilterByProject
     MsFilterByProject = $("#MsFilterByProject").magicSuggest({
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
@@ -93,16 +135,22 @@ $(document).ready(function () {
         },
         style: "min-width: 240px;"
     });
-    $(MsFilterByProject).on('selectionchange', function (e, m) { RefreshMainView(); });
+    //Wire up on change event for MsFilterByProject
+    $(MsFilterByProject).on('selectionchange', function (e, m) { refreshMainView(); });
+    
 
     //---------------------------------------DataTables------------
 
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
-        if (($(this).prop("checked")) ? false : true)
+        if (!$(this).prop("checked")) {
+            GetActive = true;
             $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
-        else $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
-        RefreshMainView();
+        } else {
+            GetActive = false;
+            $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
+        }
+        refreshMainView();
     });
 
     //TableMain Locations
@@ -112,9 +160,9 @@ $(document).ready(function () {
             { data: "LocName", name: "LocName" },//1
             //------------------------------------------------first set of columns
             { data: "LocAltName", name: "LocAltName" },//2
-            { data: "LocTypeName", name: "LocTypeName" },//3  
-            { data: "AssignedToProject", render: function (data, type, full, meta) { return data.ProjectName }, name: "AssignedToProject" }, //4
-            { data: "ContactPerson", render: function (data, type, full, meta) { return data.Initials }, name: "ContactPerson" },//5
+            { data: "LocationType_", render: function (data, type, full, meta) { return data.LocTypeName }, name: "LocationType_" }, //3
+            { data: "AssignedToProject_", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject_" }, //4
+            { data: "ContactPerson_", render: function (data, type, full, meta) { return data.Initials }, name: "ContactPerson_" },//5
             { data: "Address", name: "Address" },//6
             { data: "City", name: "City" },//7
             //------------------------------------------------second set of columns
@@ -126,19 +174,19 @@ $(document).ready(function () {
             { data: "LocZ", name: "LocZ" },//13
             //------------------------------------------------third set of columns
             { data: "LocStationing", name: "LocStationing" },//14
-            { data: "CertOfApprReqd", name: "CertOfApprReqd" },//15
-            { data: "RightOfEntryReqd", name: "RightOfEntryReqd" },//16
+            { data: "CertOfApprReqd_bl", name: "CertOfApprReqd_bl" },//15
+            { data: "RightOfEntryReqd_bl", name: "RightOfEntryReqd_bl" },//16
             { data: "AccessInfo", name: "AccessInfo" },//17
             { data: "Comments", name: "Comments" },//18
             //------------------------------------------------never visible
-            { data: "IsActive", name: "IsActive" },//19
+            { data: "IsActive_bl", name: "IsActive_bl" },//19
             { data: "LocationType_Id", name: "LocationType_Id" },//20
             { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//21
             { data: "ContactPerson_Id", name: "ContactPerson_Id" },//22
         ],
         columnDefs: [
             { targets: [0, 19, 20, 21, 22], visible: false }, // - never show
-            { targets: [0, 15, 16, 19, 20, 21, 22 ], searchable: false },  //"orderable": false, "visible": false
+            { targets: [0, 15, 16, 19, 20, 21, 22], searchable: false },  //"orderable": false, "visible": false
             { targets: [3, 4, 5], className: "hidden-xs hidden-sm" }, // - first set of columns
             { targets: [6, 7], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
 
@@ -171,7 +219,6 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        IsCreate = false;
         $("#MainView").removeClass("hide");
         $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
     });
@@ -179,20 +226,32 @@ $(document).ready(function () {
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
-        if (formIsValid("EditForm", IsCreate) && msIsValid(MagicSuggests)) SubmitEdits();
+        if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
+            showModalWait();
+            var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
+            submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/LocationSrv/Edit", createMultiple)
+                .always(hideModalWait)
+                .done(function () {
+                    refreshMainView();
+                    $("#MainView").removeClass("hide");
+                    $("#EditFormView").addClass("hide");
+                    window.scrollTo(0, 0);
+                })
+                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+        }
     });
 
     //--------------------------------------View Initialization------------------------------------//
 
-    if (typeof projectId !== "undefined" && projectId != "") {
+    if (typeof ProjectId !== "undefined" && ProjectId != "") {
         $.ajax({
             type: "POST", url: "/ProjectSrv/GetByIds", timeout: 20000,
-            data: { ids: [projectId], getActive: true }, dataType: "json",
+            data: { ids: [ProjectId], getActive: true }, dataType: "json",
             beforeSend: function () { showModalWait(); }
         })
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function (data) {
-                MsFilterByProject.setSelection([{ id: data[0].Id, name: data[0].ProjectName, }]);
+                MsFilterByProject.setSelection([{ id: data[0].Id, name: data[0].ProjectName + " - " + data[0].ProjectCode }]);
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }
@@ -205,206 +264,33 @@ $(document).ready(function () {
 
 //--------------------------------------Main Methods---------------------------------------//
 
-//FillFormForEdit
-function FillFormForEdit() {
-    if ($("#ChBoxShowDeleted").prop("checked")) $("#EditFormGroupIsActive").removeClass("hide");
-    else $("#EditFormGroupIsActive").addClass("hide");
-
-    $("#EditFormCreateMultiple").addClass("hide");
-
-    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    $.ajax({
-        type: "POST", url: "/LocationSrv/GetByIds", timeout: 20000,
-        data: { ids: ids, getActive: (($("#ChBoxShowDeleted").prop("checked")) ? false : true) }, dataType: "json",
-        beforeSend: function () { showModalWait(); }
-    })
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function (data) {
-           
-            CurrRecord.LocName = data[0].LocName;
-            CurrRecord.LocAltName = data[0].LocAltName;
-            CurrRecord.Address = data[0].Address;
-            CurrRecord.City = data[0].City;
-            CurrRecord.ZIP = data[0].ZIP;
-            CurrRecord.State = data[0].State;
-            CurrRecord.Country = data[0].Country;
-            CurrRecord.LocX = data[0].LocX;
-            CurrRecord.LocY = data[0].LocY;
-            CurrRecord.LocZ = data[0].LocZ;
-            CurrRecord.LocStationing = data[0].LocStationing;
-            CurrRecord.CertOfApprReqd = data[0].CertOfApprReqd;
-            CurrRecord.RightOfEntryReqd = data[0].RightOfEntryReqd;
-            CurrRecord.AccessInfo = data[0].AccessInfo;
-            CurrRecord.Comments = data[0].Comments;
-            CurrRecord.IsActive = data[0].IsActive;
-            CurrRecord.LocationType_Id = data[0].LocationType_Id;
-            CurrRecord.AssignedToProject_Id = data[0].AssignedToProject_Id;
-            CurrRecord.ContactPerson_Id = data[0].ContactPerson_Id;
-            
-            var FormInput = $.extend(true, {}, CurrRecord);
-            $.each(data, function (i, dbEntry) {
-                if (FormInput.LocName != dbEntry.LocName) FormInput.LocName = "_VARIES_";
-                if (FormInput.LocAltName != dbEntry.LocAltName) FormInput.LocAltName = "_VARIES_";
-                if (FormInput.Address != dbEntry.Address) FormInput.Address = "_VARIES_";
-                if (FormInput.City != dbEntry.City) FormInput.City = "_VARIES_";
-                if (FormInput.ZIP != dbEntry.ZIP) FormInput.ZIP = "_VARIES_";
-                if (FormInput.State != dbEntry.State) FormInput.State = "_VARIES_";
-                if (FormInput.Country != dbEntry.Country) FormInput.Country = "_VARIES_";
-                if (FormInput.LocX != dbEntry.LocX) FormInput.LocX = "_VARIES_";
-                if (FormInput.LocY != dbEntry.LocY) FormInput.LocY = "_VARIES_";
-                if (FormInput.LocZ != dbEntry.LocZ) FormInput.LocZ = "_VARIES_";
-                if (FormInput.LocStationing != dbEntry.LocStationing) FormInput.LocStationing = "_VARIES_";
-                if (FormInput.CertOfApprReqd != dbEntry.CertOfApprReqd) FormInput.CertOfApprReqd = "_VARIES_";
-                if (FormInput.RightOfEntryReqd != dbEntry.RightOfEntryReqd) FormInput.RightOfEntryReqd = "_VARIES_";
-                if (FormInput.AccessInfo != dbEntry.AccessInfo) FormInput.AccessInfo = "_VARIES_";
-                if (FormInput.Comments != dbEntry.Comments) FormInput.Comments = "_VARIES_";
-                if (FormInput.IsActive != dbEntry.IsActive) FormInput.IsActive = "_VARIES_";
-
-                if (FormInput.LocationType_Id != dbEntry.LocationType_Id) { FormInput.LocationType_Id = "_VARIES_"; FormInput.LocTypeName = "_VARIES_"; }
-                else FormInput.LocTypeName = dbEntry.LocTypeName;
-                if (FormInput.AssignedToProject_Id != dbEntry.AssignedToProject_Id) { FormInput.AssignedToProject_Id = "_VARIES_"; FormInput.AssignedToProject = "_VARIES_"; }
-                else FormInput.AssignedToProject = dbEntry.AssignedToProject.ProjectName + " " + dbEntry.AssignedToProject.ProjectCode;
-                if (FormInput.ContactPerson_Id != dbEntry.ContactPerson_Id) { FormInput.ContactPerson_Id = "_VARIES_"; FormInput.ContactPerson = "_VARIES_"; }
-                else FormInput.ContactPerson = dbEntry.ContactPerson.FirstName + " " + dbEntry.ContactPerson.LastName;
-            });
-
-            clearFormInputs("EditForm", MagicSuggests);
-            $("#EditFormLabel").text("Edit Location");
-
-            $("#LocName").val(FormInput.LocName);
-            $("#LocAltName").val(FormInput.LocAltName);
-            $("#Address").val(FormInput.Address);
-            $("#City").val(FormInput.City);
-            $("#ZIP").val(FormInput.ZIP);
-            $("#State").val(FormInput.State);
-            $("#Country").val(FormInput.Country);
-            $("#LocX").val(FormInput.LocX);
-            $("#LocY").val(FormInput.LocY);
-            $("#LocZ").val(FormInput.LocZ);
-            $("#LocStationing").val(FormInput.LocStationing);
-            if (FormInput.CertOfApprReqd == true) $("#CertOfApprReqd").prop("checked", true);
-            if (FormInput.RightOfEntryReqd == true) $("#RightOfEntryReqd").prop("checked", true);
-            $("#AccessInfo").val(FormInput.AccessInfo);
-            $("#Comments").val(FormInput.Comments);
-            if (FormInput.IsActive == true) $("#IsActive").prop("checked", true);
-
-            if (FormInput.LocationType_Id != null) MagicSuggests[0].addToSelection([{ id: FormInput.LocationType_Id, name: FormInput.LocTypeName }], true);
-            if (FormInput.AssignedToProject_Id != null) MagicSuggests[1].addToSelection([{ id: FormInput.AssignedToProject_Id, name: FormInput.AssignedToProject }], true);
-            if (FormInput.ContactPerson_Id != null) MagicSuggests[2].addToSelection([{ id: FormInput.ContactPerson_Id, name: FormInput.ContactPerson }], true);
-
-            if (data.length == 1) {
-                $("[data-val-dbisunique]").prop("disabled", false);
-                disableUniqueMs(MagicSuggests, false);
-            }
-            else {
-                $("[data-val-dbisunique]").prop("disabled", true);
-                disableUniqueMs(MagicSuggests, true);
-            }
-
-            $("#MainView").addClass("hide");
-            $("#EditFormView").removeClass("hide");
-        })
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-}
-
-//SubmitEdits to DB
-function SubmitEdits() {
-
-    var modifiedProperties = [];
-    $(".modifiable").each(function (index) {
-        if ($(this).data("ismodified")) modifiedProperties.push($(this).prop("id"));
-    });
-
-    $.each(MagicSuggests, function (i, ms) {
-        if (ms.isModified == true) modifiedProperties.push(ms.id);
-    });
-
-    var editRecords = [];
-    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    if (IsCreate == true) {
-        var multipleCount = ($("#CreateMultiple").val() == "") ? 1 : $("#CreateMultiple").val();
-        ids = []; for (var i = 1; i <= multipleCount; i++) {
-            var id = "newEntryId"; ids.push(id);
-        }
-    }
-
-    var magicResults = [];
-    $.each(MagicSuggests, function (i, ms) {
-        var msValue = (ms.getSelection().length != 0) ? (ms.getSelection())[0].id : null;
-        magicResults.push(msValue);
-    });
-
-    $.each(ids, function (i, id) {
-        var editRecord = {};
-        editRecord.Id = id;
-               
-        editRecord.LocName = ($("#LocName").data("ismodified")) ? $("#LocName").val() : CurrRecord.LocName;
-        editRecord.LocAltName = ($("#LocAltName").data("ismodified")) ? $("#LocAltName").val() : CurrRecord.LocAltName;
-        editRecord.Address = ($("#Address").data("ismodified")) ? $("#Address").val() : CurrRecord.Address;
-        editRecord.City = ($("#City").data("ismodified")) ? $("#City").val() : CurrRecord.City;
-        editRecord.ZIP = ($("#ZIP").data("ismodified")) ? $("#ZIP").val() : CurrRecord.ZIP;
-        editRecord.State = ($("#State").data("ismodified")) ? $("#State").val() : CurrRecord.State;
-        editRecord.Country = ($("#Country").data("ismodified")) ? $("#Country").val() : CurrRecord.Country;
-        editRecord.LocX = ($("#LocX").data("ismodified")) ? $("#LocX").val() : CurrRecord.LocX;
-        editRecord.LocY = ($("#LocY").data("ismodified")) ? $("#LocY").val() : CurrRecord.LocY;
-        editRecord.LocZ = ($("#LocZ").data("ismodified")) ? $("#LocZ").val() : CurrRecord.LocZ;
-        editRecord.LocStationing = ($("#LocStationing").data("ismodified")) ? $("#LocStationing").val() : CurrRecord.LocStationing;
-        editRecord.CertOfApprReqd = ($("#CertOfApprReqd").data("ismodified")) ? (($("#CertOfApprReqd").prop("checked")) ? true : false) : CurrRecord.CertOfApprReqd;
-        editRecord.RightOfEntryReqd = ($("#RightOfEntryReqd").data("ismodified")) ? (($("#RightOfEntryReqd").prop("checked")) ? true : false) : CurrRecord.RightOfEntryReqd;
-        editRecord.AccessInfo = ($("#AccessInfo").data("ismodified")) ? $("#AccessInfo").val() : CurrRecord.AccessInfo;
-        editRecord.Comments = ($("#Comments").data("ismodified")) ? $("#Comments").val() : CurrRecord.Comments;
-        editRecord.IsActive = ($("#IsActive").data("ismodified")) ? (($("#IsActive").prop("checked")) ? true : false) : CurrRecord.IsActive;
-        editRecord.LocationType_Id = (MagicSuggests[0].isModified) ? magicResults[0] : CurrRecord.LocationType_Id;
-        editRecord.AssignedToProject_Id = (MagicSuggests[1].isModified) ? magicResults[1] : CurrRecord.AssignedToProject_Id;
-        editRecord.ContactPerson_Id = (MagicSuggests[2].isModified) ? magicResults[2] : CurrRecord.ContactPerson_Id;
-
-        editRecord.ModifiedProperties = modifiedProperties;
-
-        editRecords.push(editRecord);
-    });
-
-    $.ajax({
-        type: "POST", url: "/LocationSrv/Edit", timeout: 20000, data: { records: editRecords }, dataType: "json",
-        beforeSend: function () { showModalWait(); }
-    })
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function (data) {
-            RefreshMainView();
-            IsCreate = false;
-            $("#MainView").removeClass("hide");
-            $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
-        })
-        .fail(function (xhr, status, error) {
-            showModalAJAXFail(xhr, status, error);
-        });
-}
 
 //Delete Records from DB
 function DeleteRecords() {
-    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    $.ajax({
-        type: "POST", url: "/LocationSrv/Delete", timeout: 20000, data: { ids: ids }, dataType: "json",
-        beforeSend: function () { showModalWait(); }
-    })
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function () { RefreshMainView(); })
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+    CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+    deleteRecordsGeneric(CurrIds, "/LocationSrv/Delete", refreshMainView);
 }
 
 //refresh view after magicsuggest update
-function RefreshMainView() {
-    if (MsFilterByType.getValue().length == 0 && MsFilterByProject.getValue().length == 0) {
-        $("#ChBoxShowDeleted").bootstrapToggle("disable")
+function refreshMainView() {
+    if (MsFilterByType.getValue().length == 0 &&
+        MsFilterByProject.getValue().length == 0) {
+        $("#ChBoxShowDeleted").bootstrapToggle("disable");
         TableMain.clear().search("").draw();
     }
     else {
-        refreshTable(TableMain, "/LocationSrv/GetByAltIds", ($("#ChBoxShowDeleted").prop("checked") ? false : true),
-            "POST", MsFilterByProject.getValue(), [], MsFilterByType.getValue());
-        $("#ChBoxShowDeleted").bootstrapToggle("enable")
+        refreshTblGenWrp(TableMain, "/LocationSrv/GetByAltIds",
+            {
+                projectIds: MsFilterByProject.getValue(),
+                typeIds: MsFilterByType.getValue(),
+                getActive: GetActive
+            },
+            "POST")
+            .done($("#ChBoxShowDeleted").bootstrapToggle("enable"))
     }
-
 }
 
-//---------------------------------------Helper Methods--------------------------------------//
 
+
+//---------------------------------------Helper Methods--------------------------------------//
 

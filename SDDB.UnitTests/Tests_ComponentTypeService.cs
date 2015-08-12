@@ -186,7 +186,7 @@ namespace SDDB.UnitTests
             var compTypeService = new ComponentTypeService(mockDbContextScopeFac.Object, "dummyUserId");
 
             //Act
-            var returnedComponentTypes = compTypeService.LookupAsync("NameAlt2", true).Result;
+            var returnedComponentTypes = compTypeService.LookupAsync("Name2", true).Result;
 
             //Assert
             Assert.IsTrue(returnedComponentTypes.Count == 1);

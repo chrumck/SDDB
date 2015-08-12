@@ -186,7 +186,7 @@ namespace SDDB.UnitTests
             var assyTypeService = new AssemblyTypeService(mockDbContextScopeFac.Object,"dummyUserId");
 
             //Act
-            var returnedAssemblyTypes = assyTypeService.LookupAsync("NameAlt2", true).Result;
+            var returnedAssemblyTypes = assyTypeService.LookupAsync("Name2", true).Result;
 
             //Assert
             Assert.IsTrue(returnedAssemblyTypes.Count == 1);

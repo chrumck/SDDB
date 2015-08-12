@@ -43,7 +43,7 @@ namespace SDDB.UnitTests
             
             mockEfDbContext.Setup(x => x.LocationTypes).Returns(mockDbSet.Object);
 
-            var locationTypeService = new LocationTypeService(mockDbContextScopeFac.Object);
+            var locationTypeService = new LocationTypeService(mockDbContextScopeFac.Object, "dummyuserId");
 
             //Act
             var resultLocationTypes = locationTypeService.GetAsync().Result;
@@ -78,7 +78,7 @@ namespace SDDB.UnitTests
 
             mockEfDbContext.Setup(x => x.LocationTypes).Returns(mockDbSet.Object);
 
-            var locationTypeService = new LocationTypeService(mockDbContextScopeFac.Object);
+            var locationTypeService = new LocationTypeService(mockDbContextScopeFac.Object, "dummyuserId");
 
             //Act
             var serviceResult = locationTypeService.GetAsync(new string[] { "dummyEntryId3" }).Result;
@@ -114,7 +114,7 @@ namespace SDDB.UnitTests
 
             mockEfDbContext.Setup(x => x.LocationTypes).Returns(mockDbSet.Object);
 
-            var locationTypeService = new LocationTypeService(mockDbContextScopeFac.Object);
+            var locationTypeService = new LocationTypeService(mockDbContextScopeFac.Object, "dummyuserId");
 
             //Act
             var serviceResult = locationTypeService.GetAsync(new string[] { "dummyEntryId3" }).Result;
@@ -149,7 +149,7 @@ namespace SDDB.UnitTests
             mockDbSet.As<IQueryable<LocationType>>().Setup(m => m.GetEnumerator()).Returns(dbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.LocationTypes).Returns(mockDbSet.Object);
 
-            var locationTypeService = new LocationTypeService(mockDbContextScopeFac.Object);
+            var locationTypeService = new LocationTypeService(mockDbContextScopeFac.Object, "dummyuserId");
 
             //Act
             var returnedLocationTypes = locationTypeService.LookupAsync("", true).Result;
@@ -183,14 +183,14 @@ namespace SDDB.UnitTests
             mockDbSet.As<IQueryable<LocationType>>().Setup(m => m.GetEnumerator()).Returns(dbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.LocationTypes).Returns(mockDbSet.Object);
 
-            var locationTypeService = new LocationTypeService(mockDbContextScopeFac.Object);
+            var locationTypeService = new LocationTypeService(mockDbContextScopeFac.Object, "dummyuserId");
 
             //Act
-            var returnedLocationTypes = locationTypeService.LookupAsync("NameAlt2", true).Result;
+            var returnedLocationTypes = locationTypeService.LookupAsync("Name2", true).Result;
 
             //Assert
             Assert.IsTrue(returnedLocationTypes.Count == 1);
-            Assert.IsTrue(returnedLocationTypes[0].LocTypeName.Contains("Name2"));
+            Assert.IsTrue(returnedLocationTypes[0].LocTypeAltName.Contains("NameAlt2"));
         }
 
         [TestMethod]
@@ -217,7 +217,7 @@ namespace SDDB.UnitTests
             mockDbSet.As<IQueryable<LocationType>>().Setup(m => m.GetEnumerator()).Returns(dbEntries.GetEnumerator());
             mockEfDbContext.Setup(x => x.LocationTypes).Returns(mockDbSet.Object);
 
-            var locationTypeService = new LocationTypeService(mockDbContextScopeFac.Object);
+            var locationTypeService = new LocationTypeService(mockDbContextScopeFac.Object, "dummyuserId");
 
             //Act
             var returnedLocationTypes = locationTypeService.LookupAsync("NameAlt1", true).Result;
@@ -226,143 +226,9 @@ namespace SDDB.UnitTests
             Assert.IsTrue(returnedLocationTypes.Count == 0);
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------
+        
 
-        [TestMethod]
-        public void LocationTypeService_EditAsync_DoesNothingIfNoLocationType()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var locationTypes = new LocationType[] { };
-
-            var locationTypeService = new LocationTypeService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = locationTypeService.EditAsync(locationTypes).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.LocationTypes.FindAsync(It.IsAny<object[]>()), Times.Never);
-        }
-
-
-        [TestMethod]
-        public void LocationTypeService_EditAsync_CreatesLocationTypeIfNotInDB()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var initialId = "dummyEntryId1";
-            var locationType1 = new LocationType { Id = initialId, LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive_bl = false };
-            var locationTypes = new LocationType[] { locationType1 };
-
-            mockEfDbContext.Setup(x => x.LocationTypes.FindAsync(locationType1.Id)).Returns(Task.FromResult<LocationType>(null));
-            mockEfDbContext.Setup(x => x.LocationTypes.Add(locationType1)).Returns(locationType1);
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
-
-            var locationTypeService = new LocationTypeService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = locationTypeService.EditAsync(locationTypes).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
-            var regex = new Regex(@"\w*-\w*-\w*-\w*-\w*"); Assert.IsTrue(regex.IsMatch(locationType1.Id));
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.LocationTypes.FindAsync(initialId), Times.Once);
-            mockEfDbContext.Verify(x => x.LocationTypes.Add(locationType1), Times.Once);
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-        }
-
-        [TestMethod]
-        public void LocationTypeService_EditAsync_UpdatesExistingEntries()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var locationType1 = new LocationType { Id = "dummyLocationTypeId1", LocTypeName = "Name1", LocTypeAltName = "NameAlt1", IsActive_bl = false,
-                                      ModifiedProperties = new string[] { "LocTypeName", "LocTypeAltName" }};
-            var locationType2 = new LocationType { Id = "dummyLocationTypeId2", LocTypeName = "Name2", LocTypeAltName = "NameAlt2", IsActive_bl = true };
-            var locationTypes = new LocationType[] { locationType1, locationType2 };
-
-            var dbEntry1 = new LocationType { Id = "dummyEntryId1", LocTypeName = "DbEntry1", LocTypeAltName = "DbEntryAlt1", IsActive_bl = true };
-            var dbEntry2 = new LocationType { Id = "dummyEntryId2", LocTypeName = "DbEntry2", LocTypeAltName = "DbEntryAlt2", IsActive_bl = false };
-
-            mockEfDbContext.Setup(x => x.LocationTypes.FindAsync(locationType1.Id)).Returns(Task.FromResult(dbEntry1));
-            mockEfDbContext.Setup(x => x.LocationTypes.FindAsync(locationType2.Id)).Returns(Task.FromResult(dbEntry2));
-            mockEfDbContext.Setup(x => x.LocationTypes.Add(locationType1)).Verifiable();
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
-
-            var locationTypeService = new LocationTypeService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = locationTypeService.EditAsync(locationTypes).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.OK);
-            Assert.IsTrue(locationType1.LocTypeName == dbEntry1.LocTypeName); Assert.IsTrue(locationType1.LocTypeAltName == dbEntry1.LocTypeAltName);
-            Assert.IsTrue(locationType1.IsActive_bl != dbEntry1.IsActive_bl);
-            Assert.IsTrue(locationType2.LocTypeName != dbEntry2.LocTypeName); Assert.IsTrue(locationType2.LocTypeAltName != dbEntry2.LocTypeAltName);
-            Assert.IsTrue(locationType2.IsActive_bl != dbEntry2.IsActive_bl);
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.LocationTypes.FindAsync(It.IsAny<string>()), Times.Exactly(2));
-            mockEfDbContext.Verify(x => x.LocationTypes.Add(It.IsAny<LocationType>()), Times.Never);
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-        }
-
-
-        //-----------------------------------------------------------------------------------------------------------------------
-
-        [TestMethod]
-        public void LocationTypeService_DeleteAsync_DeletesAndReturnsErrorIfNotFound()
-        {
-            // Arrange
-            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
-            var mockDbContextScope = new Mock<IDbContextScope>();
-            var mockEfDbContext = new Mock<EFDbContext>();
-            mockDbContextScopeFac.Setup(x => x.Create(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
-            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
-
-            var ids = new string[] { "dummyId1", "DummyId2" };
-
-            var dbEntry = new LocationType { IsActive_bl = true };
-            mockEfDbContext.Setup(x => x.LocationTypes.FindAsync("dummyId1")).Returns(Task.FromResult(dbEntry));
-            mockEfDbContext.Setup(x => x.LocationTypes.FindAsync("dummyId2")).Returns(Task.FromResult<LocationType>(null));
-
-            mockEfDbContext.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult<int>(1));
-
-            var locationTypeService = new LocationTypeService(mockDbContextScopeFac.Object);
-
-            //Act
-            var serviceResult = locationTypeService.DeleteAsync(ids).Result;
-
-            //Assert
-            Assert.IsTrue(serviceResult.StatusCode == HttpStatusCode.Conflict);
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("Errors deleting records:\n"));
-            Assert.IsTrue(serviceResult.StatusDescription.Contains("Record with Id=DummyId2 not found\n"));
-            Assert.IsTrue(dbEntry.IsActive_bl == false);
-            mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
-            mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
-            mockEfDbContext.Verify(x => x.LocationTypes.FindAsync(It.IsAny<string>()), Times.Exactly(2));
-            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
-        }
+        
         
     }
 }

@@ -15,189 +15,152 @@ using SDDB.Domain.Infrastructure;
 
 namespace SDDB.Domain.Services
 {
-    public class PersonGroupService
+    public class PersonGroupService : BaseDbService<PersonGroup>
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
-        private IDbContextScopeFactory contextScopeFac;
-        private PersonService personService;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
 
-        public PersonGroupService(IDbContextScopeFactory contextScopeFac, PersonService personService)
-        {
-            this.contextScopeFac = contextScopeFac;
-            this.personService = personService;
-        }
+        public PersonGroupService(IDbContextScopeFactory contextScopeFac, string userId) : base(contextScopeFac, userId) { }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
         //get all 
-        public virtual async Task<List<PersonGroup>> GetAsync(bool getActive = true)
+        public virtual Task<List<PersonGroup>> GetAsync(bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                var records = await dbContext.PersonGroups.Where(x => x.IsActive_bl == getActive).ToListAsync().ConfigureAwait(false);
-                return records; 
+                return dbContext.PersonGroups.Where(x => x.IsActive_bl == getActive).ToListAsync();
             }
         }
 
         //get by ids
-        public virtual async Task<List<PersonGroup>> GetAsync(string[] ids, bool getActive = true)
+        public virtual Task<List<PersonGroup>> GetAsync(string[] ids, bool getActive = true)
         {
-            if (ids == null || ids.Length == 0) throw new ArgumentNullException("ids");
+            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                var records = await dbContext.PersonGroups.Where(x => x.IsActive_bl == getActive && ids.Contains(x.Id)).ToListAsync().ConfigureAwait(false);
-                return records; 
+                return dbContext.PersonGroups.Where(x => x.IsActive_bl == getActive && ids.Contains(x.Id)).ToListAsync();
             }
         }
 
-        //find managed froups by query
-        public virtual Task<List<PersonGroup>> LookupAsync(string userId, string query = "", bool getActive = true)
-        {
-            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
 
+        //lookup by query
+        public virtual async Task<List<PersonGroup>> LookupAsync(string query = "", bool getActive = true)
+        {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.PersonGroups.Where(x => x.GroupManagers.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
-                    (x.PrsGroupName.Contains(query) || x.PrsGroupAltName.Contains(query))).ToListAsync();
+                var records = await dbContext.PersonGroups.Where(x =>
+                        x.GroupManagers.Any(y => y.Id == userId) &&    
+                        x.PrsGroupName.Contains(query) &&
+                        x.IsActive_bl == getActive
+                    )
+                    .ToListAsync().ConfigureAwait(false);
+                return records;
             }
         }
+
 
         //-----------------------------------------------------------------------------------------------------------------------
 
-        // Create and Update records given in []
-        public virtual async Task<DBResult> EditAsync(PersonGroup[] records)
-        {
-            var errorMessage = "";
+        // Create and Update records given in []  - same as BaseDbService
 
-            using (var dbContextScope = contextScopeFac.Create())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    foreach (var record in records)
-                    {
-                        var dbEntry = await dbContext.PersonGroups.FindAsync(record.Id).ConfigureAwait(false);
-                        if (dbEntry == null)
-                        {
-                            record.Id = Guid.NewGuid().ToString();
-                            dbContext.PersonGroups.Add(record);
-                        }
-                        else
-                        {
-                            dbEntry.CopyModifiedProps(record);
-                        }
-                    }
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-                    trans.Complete();
-                }
-            }
-            if (errorMessage == "") { return new DBResult(); }
-            else
-            {
-                return new DBResult
-                {
-                    StatusCode = HttpStatusCode.Conflict,
-                    StatusDescription = "Errors editing records:\n" + errorMessage
-                };
-            }
-        }
-
-        // Delete records by their Ids
-        public virtual async Task<DBResult> DeleteAsync(string[] ids)
-        {
-            var errorMessage = "";
-            
-            using (var dbContextScope = contextScopeFac.Create())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-
-                //tasks prior to desactivating:
-                //running PersonService and deleting Persons from GroupPersons and GroupManagers
-                var personIds = await dbContext.Persons.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
-                var serviceResult = await personService.EditPersonGroupsAsync(personIds, ids, false).ConfigureAwait(false);
-                if (serviceResult.StatusCode == HttpStatusCode.OK)
-                { serviceResult = await personService.EditManagedGroupsAsync(personIds, ids, false).ConfigureAwait(false); }
-
-                if (serviceResult.StatusCode != HttpStatusCode.OK) 
-                { 
-                    errorMessage += "Error running tasks before deleting:\n" + serviceResult.StatusDescription;
-                }
-                else
-                {
-                    using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                    {
-                        foreach (var id in ids)
-                        {
-                            var dbEntry = await dbContext.PersonGroups.FindAsync(id).ConfigureAwait(false);
-                            if (dbEntry != null)
-                            {
-                                dbEntry.IsActive_bl = false;
-                            }
-                            else
-                            {
-                                errorMessage += string.Format("Record with Id={0} not found\n", id);
-                            }
-                        }
-                        await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-                        trans.Complete();
-                    }                    
-                }
-            }
-            if (errorMessage == "") { return new DBResult(); }
-            else
-            {
-                return new DBResult
-                {
-                    StatusCode = HttpStatusCode.Conflict,
-                    StatusDescription = "Errors deleting records:\n" + errorMessage
-                };
-            }
-        }
-
+        // Delete records by their Ids - same as BaseDbService
+        // See overriden checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
 
         //-----------------------------------------------------------------------------------------------------------------------
 
         //get all group managers
         public virtual Task<List<Person>> GetGroupManagersAsync(string groupId)
         {
-            if (String.IsNullOrEmpty(groupId)) throw new ArgumentNullException("groupId");
+            if (String.IsNullOrEmpty(groupId)) { throw new ArgumentNullException("groupId"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.Persons
-                    .Where(x => x.ManagedGroups.Select(y => y.Id).Contains(groupId) && x.IsActive_bl == true).ToListAsync();
+                    .Where(x => x.ManagedGroups.Select(y => y.Id).Contains(groupId) && x.IsActive_bl)
+                    .ToListAsync();
             }
         }
 
         //get all active persons not assigned to group managers
         public virtual Task<List<Person>> GetGroupManagersNotAsync(string groupId)
         {
-            if (String.IsNullOrEmpty(groupId)) throw new ArgumentNullException("groupId");
+            if (String.IsNullOrEmpty(groupId)) { throw new ArgumentNullException("groupId"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 return dbContext.Persons
-                    .Where(x => !x.ManagedGroups.Select(y => y.Id).Contains(groupId) && x.IsActive_bl == true).ToListAsync();
+                    .Where(x => !x.ManagedGroups.Select(y => y.Id).Contains(groupId) && x.IsActive_bl)
+                    .ToListAsync();
             }
         }
 
         //Add (or Remove  when set isAdd to false) managed Groups to Person
-        //already implemented in PersonService.EditManagedGroupsAsync
+        //use generic version AddRemoveRelated from BaseDbService 
 
-             
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        //get all group persons
+        public virtual Task<List<Person>> GetGroupPersonsAsync(string groupId)
+        {
+            if (String.IsNullOrEmpty(groupId)) { throw new ArgumentNullException("groupId"); }
+
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+                return dbContext.Persons
+                    .Where(x => x.PersonGroups.Select(y => y.Id).Contains(groupId) && x.IsActive_bl)
+                    .ToListAsync();
+            }
+        }
+
+        //get all active persons not assigned to group persons
+        public virtual Task<List<Person>> GetGroupPersonsNotAsync(string groupId)
+        {
+            if (String.IsNullOrEmpty(groupId)) { throw new ArgumentNullException("groupId"); }
+
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+                return dbContext.Persons
+                    .Where(x => !x.PersonGroups.Select(y => y.Id).Contains(groupId) && x.IsActive_bl)
+                    .ToListAsync();
+            }
+        }
+
+        //Add (or Remove  when set isAdd to false) person Groups to Person
+        //use generic version AddRemoveRelated from BaseDbService 
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
+
+        //helper - check before deleting records, takes LocationModel ids array
+        protected override async Task checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
+        {
+            for (int i = 0; i < ids.Length; i++)
+            {
+                var dbEntry = await dbContext.PersonGroups.FindAsync(ids[i]).ConfigureAwait(false);
+                var GroupPersonsCount  = dbEntry.GroupPersons.Count;
+                var GroupManagersCount = dbEntry.GroupManagers.Count;
+                if (GroupPersonsCount + GroupManagersCount > 0)
+                {
+                    throw new DbBadRequestException(
+                        string.Format("There are {0} persons and {1} managers assigned to the group {2}.\nDelete aborted.",
+                            GroupPersonsCount, GroupManagersCount, dbEntry.PrsGroupName));
+                }
+            }
+        }
+
 
         #endregion
     }

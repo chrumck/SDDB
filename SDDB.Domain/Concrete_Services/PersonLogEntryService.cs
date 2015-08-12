@@ -194,6 +194,7 @@ namespace SDDB.Domain.Services
         public virtual Task<List<AssemblyDb>> GetPrsLogEntryAssysNotAsync(string logEntryId, string locId)
         {
             if (String.IsNullOrEmpty(logEntryId)) { throw new ArgumentNullException("logEntryId"); }
+            
             locId = locId ?? String.Empty;
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
@@ -204,7 +205,8 @@ namespace SDDB.Domain.Services
                     .Where(x =>
                         !x.AssemblyDbPrsLogEntrys.Any(y => y.Id == logEntryId) &&
                         x.IsActive_bl && 
-                        (locId == String.Empty || x.AssignedToLocation_Id == locId))
+                        (locId == String.Empty || x.AssignedToLocation_Id == locId)
+                    )
                     .ToListAsync();
             }
         }
@@ -239,9 +241,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.PersonGroups
-                    .Where(x => x.GroupManagers.Any(y => y.Id == userId))
-                    .SelectMany(x => x.GroupPersons)
-                    .Distinct()
+                    .Where(x => x.GroupManagers.Any(y => y.Id == userId)).SelectMany(x => x.GroupPersons).Distinct()
                     .Where(x => x.IsActive_bl && !x.PersonPrsLogEntrys.Any(y => y.Id == logEntryId))
                     .ToListAsync();
             }

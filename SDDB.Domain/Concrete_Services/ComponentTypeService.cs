@@ -39,7 +39,7 @@ namespace SDDB.Domain.Services
         //get by ids
         public virtual Task<List<ComponentType>> GetAsync(string[] ids, bool getActive = true)
         {
-            if (ids == null || ids.Length == 0) throw new ArgumentNullException("ids");
+            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
@@ -50,17 +50,17 @@ namespace SDDB.Domain.Services
 
 
         //lookup by query
-        public virtual Task<List<ComponentType>> LookupAsync(string query = "", bool getActive = true)
+        public virtual async Task<List<ComponentType>> LookupAsync(string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.ComponentTypes
-                    .Where(x =>
-                        (x.CompTypeName.Contains(query) || x.CompTypeAltName.Contains(query)) &&
+                var records = await dbContext.ComponentTypes.Where(x =>
+                        x.CompTypeName.Contains(query) &&
                         x.IsActive_bl == getActive
                     )
-                    .ToListAsync();
+                    .ToListAsync().ConfigureAwait(false);
+                return records;
             }
         }
 

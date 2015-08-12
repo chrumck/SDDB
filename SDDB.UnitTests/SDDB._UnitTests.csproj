@@ -168,7 +168,7 @@
     <Compile Include="Tests_LocationTypeService .cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Tests_PersonActivityService.cs">
+    <Compile Include="Tests_PersonActivityTypeService.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Tests_PersonGroupService.cs">

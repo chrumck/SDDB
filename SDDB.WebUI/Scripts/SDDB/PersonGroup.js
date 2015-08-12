@@ -12,9 +12,19 @@
 var TableMain = {};
 var TableGroupManagersAdd = {};
 var TableGroupManagersRemove = {};
-var IsCreate = false;
+
 var MagicSuggests = [];
-var CurrRecord = {};
+var RecordTemplate = {
+    Id: "RecordTemplateId",
+    PrsGroupName: null,
+    PrsGroupAltName: null,
+    Comments: null,
+    IsActive_bl: null
+};
+
+var CurrRecords = [];
+var CurrIds = [];
+var GetActive = true;
 
 $(document).ready(function () {
 
@@ -22,31 +32,70 @@ $(document).ready(function () {
 
     //Wire up BtnCreate
     $("#BtnCreate").click(function () {
-        IsCreate = true;
+        CurrIds = [];
+        CurrRecords = [];
+        CurrRecords[0] = $.extend(true, {}, RecordTemplate);
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Person Group", "MainView");
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-        var selectedRows = TableMain.rows(".ui-selected").data();
-        if (selectedRows.length == 0) showModalNothingSelected();
-        else { IsCreate = false; FillFormForEdit(); }
-    });
+        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        if (CurrIds.length == 0) { showModalNothingSelected(); }
+        else {
+            if (GetActive) { $("#EditFormGroupIsActive").addClass("hide"); }
+            else { $("#EditFormGroupIsActive").removeClass("hide"); }
 
+            showModalWait();
+
+            fillFormForEditGeneric(CurrIds, "POST", "/PersonGroupSrv/GetByIds", GetActive, "EditForm", "Edit Person Group", MagicSuggests)
+                .always(hideModalWait)
+                .done(function (currRecords) {
+                    CurrRecords = currRecords;
+                    $("#MainView").addClass("hide");
+                    $("#EditFormView").removeClass("hide");
+                })
+                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        }
+    });
+    
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
-        var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) showModalNothingSelected();
-        else showModalDelete(noOfRows);
+        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        if (CurrIds.length == 0) { showModalNothingSelected(); }
+        else { showModalDelete(CurrIds.length); }
     });
-
+    
     //Wire Up BtnEditGroupManagers 
     $("#BtnEditGroupManagers").click(function () {
-        var noOfRows = TableMain.rows(".ui-selected").data().length;
-        if (noOfRows == 0) showModalNothingSelected();
-        else FillGroupManagersForEdit(noOfRows);
+        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
+        }
+        if (CurrIds.length == 1) {
+            var selectedRecord = TableMain.row(".ui-selected").data()
+            $("#GroupManagersViewPanel").text(selectedRecord.PrsGroupName);
+        }
+        else { $("#GroupManagersViewPanel").text("_MULTIPLE_") }
+
+        showModalWait();
+
+        fillFormForRelatedGeneric(TableGroupManagersAdd, TableGroupManagersRemove, CurrIds, "GET", "/PersonGroupSrv/GetGroupManagers", { id: CurrIds[0] },
+        "GET", "/PersonGroupSrv/GetGroupManagersNot", { id: CurrIds[0] }, "GET", "/PersonSrv/GetAll", { getActive: true }, 1)
+            .always(function () { $("#ModalWait").modal("hide"); })
+            .done(function () {
+                $("#MainView").addClass("hide");
+                $("#GroupManagersView").removeClass("hide");
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+
     });
                
+
+    //NOT FINISHED BELOW!!
+
+
     //---------------------------------------DataTables------------
 
     //Wire up ChBoxShowDeleted

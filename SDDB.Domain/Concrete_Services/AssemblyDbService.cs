@@ -234,9 +234,9 @@ namespace SDDB.Domain.Services
                     .CountAsync(x => x.IsActive_bl && x.AssignedToAssemblyDb_Id == currentId).ConfigureAwait(false);
                 if (assignedCompsCount > 0)
                 {
-                    var dbEntry = await dbContext.AssemblyDbs.FindAsync(ids[i]).ConfigureAwait(false);
+                    var dbEntry = await dbContext.AssemblyDbs.FindAsync(currentId).ConfigureAwait(false);
                     throw new DbBadRequestException(
-                        string.Format("Delete failed\n Assembly {0} has components assigned to it.", dbEntry.AssyName));
+                        string.Format("Some components are assigned to the assembly {0}.\nDelete aborted.", dbEntry.AssyName));
                 }
             }
         }

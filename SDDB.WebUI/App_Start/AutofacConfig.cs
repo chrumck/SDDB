@@ -71,18 +71,18 @@ namespace SDDB.WebUI
                 .WithParameter("ldapAuthenticationEnabled", LDAPAuthenticationEnabled).InstancePerDependency();
             builder.RegisterType<PersonService>().AsSelf().InstancePerDependency();
             builder.RegisterType<PersonGroupService>().AsSelf().InstancePerDependency();
-            builder.RegisterType<PersonActivityTypeService>().AsSelf().InstancePerDependency();
+            builder.RegisterType<PersonActivityTypeService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
             builder.RegisterType<PersonLogEntryService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
             builder.RegisterType<PersonLogEntryFileService>().AsSelf().InstancePerDependency();
 
             builder.RegisterType<ProjectService>().AsSelf().InstancePerDependency();
             builder.RegisterType<ProjectEventService>().AsSelf().InstancePerDependency();
 
-            builder.RegisterType<DocumentService>().WithParameter(userIdParameter).AsSelf().InstancePerDependency();
-            builder.RegisterType<DocumentTypeService>().AsSelf().InstancePerDependency();
-            
-            builder.RegisterType<LocationService>().AsSelf().InstancePerDependency();
-            builder.RegisterType<LocationTypeService>().AsSelf().InstancePerDependency();
+            builder.RegisterType<DocumentService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
+            builder.RegisterType<DocumentTypeService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
+
+            builder.RegisterType<LocationService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
+            builder.RegisterType<LocationTypeService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
 
             builder.RegisterType<AssemblyDbService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
             builder.RegisterType<AssemblyLogEntryService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();

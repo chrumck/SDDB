@@ -15,18 +15,14 @@ using SDDB.Domain.Infrastructure;
 
 namespace SDDB.Domain.Services
 {
-    public class PersonActivityTypeService
+    public class PersonActivityTypeService : BaseDbService<PersonActivityType>
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
-        private IDbContextScopeFactory contextScopeFac;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
 
-        public PersonActivityTypeService(IDbContextScopeFactory contextScopeFac)
-        {
-            this.contextScopeFac = contextScopeFac;
-        }
+        public PersonActivityTypeService(IDbContextScopeFactory contextScopeFac, string userId) : base(contextScopeFac, userId) { }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
@@ -43,7 +39,7 @@ namespace SDDB.Domain.Services
         //get by ids
         public virtual Task<List<PersonActivityType>> GetAsync(string[] ids, bool getActive = true)
         {
-            if (ids == null || ids.Length == 0) throw new ArgumentNullException("ids");
+            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
@@ -54,96 +50,47 @@ namespace SDDB.Domain.Services
 
 
         //lookup by query
-        public virtual Task<List<PersonActivityType>> LookupAsync(string query = "", bool getActive = true)
+        public virtual async Task<List<PersonActivityType>> LookupAsync(string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.PersonActivityTypes.Where(x => x.IsActive_bl == getActive &&
-                    (x.ActivityTypeName.Contains(query) || x.ActivityTypeAltName.Contains(query) )).ToListAsync();
+                var records = await dbContext.PersonActivityTypes.Where(x =>
+                        x.ActivityTypeName.Contains(query) &&
+                        x.IsActive_bl == getActive
+                    )
+                    .ToListAsync().ConfigureAwait(false);
+                return records;
             }
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
 
-        // Create and Update records given in []
-        public virtual async Task<DBResult> EditAsync(PersonActivityType[] records)
-        {
-            var errorMessage = "";
+        // Create and Update records given in []  - same as BaseDbService
 
-            using (var dbContextScope = contextScopeFac.Create())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    foreach (var record in records)
-                    {
-                        var dbEntry = await dbContext.PersonActivityTypes.FindAsync(record.Id).ConfigureAwait(false);
-                        if (dbEntry == null)
-                        {
-                            record.Id = Guid.NewGuid().ToString();
-                            dbContext.PersonActivityTypes.Add(record);
-                        }
-                        else
-                        {
-                            dbEntry.CopyModifiedProps(record);
-                        }
-                    }
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-                    trans.Complete();
-                }
-            }
-            if (errorMessage == "") { return new DBResult(); }
-            else
-            {
-                return new DBResult
-                {
-                    StatusCode = HttpStatusCode.Conflict,
-                    StatusDescription = "Errors editing records:\n" + errorMessage
-                };
-            }
-        }
-
-        // Delete records by their Ids
-        public virtual async Task<DBResult> DeleteAsync(string[] ids)
-        {
-            var errorMessage = "";
-
-            using (var dbContextScope = contextScopeFac.Create())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    foreach (var id in ids)
-                    {
-                        var dbEntry = await dbContext.PersonActivityTypes.FindAsync(id).ConfigureAwait(false);
-                        if (dbEntry != null)
-                        {
-                            dbEntry.IsActive_bl = false;
-                        }
-                        else
-                        {
-                            errorMessage += string.Format("Record with Id={0} not found\n", id);
-                        }
-                    }
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-                    trans.Complete();
-                }
-            }
-            if (errorMessage == "") { return new DBResult(); }
-            else
-            {
-                return new DBResult
-                {
-                    StatusCode = HttpStatusCode.Conflict,
-                    StatusDescription = "Errors deleting records:\n" + errorMessage
-                };
-            }
-        }
+        // Delete records by their Ids - same as BaseDbService
+        // see overriden checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
 
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
+
+        //helper - check before deleting records, takes LocationModel ids array
+        //protected override async Task checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
+        //{
+        //    for (int i = 0; i < ids.Length; i++)
+        //    {
+        //        var currentId = ids[i];
+        //        var assignedLogEntriesCount = await dbContext.PersonLogEntrys
+        //            .CountAsync(x => x.IsActive_bl && x.PersonActivityType_Id == currentId).ConfigureAwait(false);
+        //        if (assignedLogEntriesCount > 0)
+        //        {
+        //            var dbEntry = await dbContext.PersonActivityTypes.FindAsync(currentId).ConfigureAwait(false);
+        //            throw new DbBadRequestException(
+        //                string.Format("Some Person Log Entries have the type {0} assigned to it.\nDelete aborted.", dbEntry.ActivityTypeName));
+        //        }
+        //    }
+        //}
 
         #endregion
     }

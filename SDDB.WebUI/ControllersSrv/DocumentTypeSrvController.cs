@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using SDDB.Domain.Entities;
 using SDDB.Domain.Services;
 using SDDB.WebUI.Infrastructure;
+using System.Collections.Generic;
 
 namespace SDDB.WebUI.ControllersSrv
 {
@@ -13,12 +14,12 @@ namespace SDDB.WebUI.ControllersSrv
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
-        private DocumentTypeService docTypeService;
+        private DocumentTypeService documentTypeService;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
-        public DocumentTypeSrvController(DocumentTypeService docTypeService)
+        public DocumentTypeSrvController(DocumentTypeService documentTypeService)
         {
-            this.docTypeService = docTypeService;
+            this.documentTypeService = documentTypeService;
         }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
@@ -27,13 +28,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("DocumentType_View")]
         public async Task<ActionResult> Get(bool getActive = true)
         {
-            var data = (await docTypeService.GetAsync(getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.DocTypeName, x.DocTypeAltName, x.Comments, IsActive = x.IsActive_bl
-            });
-
             ViewBag.ServiceName = "DocumentTypeService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            var records = await documentTypeService.GetAsync(getActive).ConfigureAwait(false);
+            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
         }
 
         // POST: /DocumentTypeSrv/GetByIds
@@ -41,24 +38,17 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("DocumentType_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
-            var data = (await docTypeService.GetAsync(ids, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.DocTypeName, x.DocTypeAltName, x.Comments, IsActive = x.IsActive_bl
-            });
-
             ViewBag.ServiceName = "DocumentTypeService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json( data , JsonRequestBehavior.AllowGet);
+            var records = await documentTypeService.GetAsync(ids, getActive).ConfigureAwait(false);
+            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /DocumentTypeSrv/Lookup
         public async Task<ActionResult> Lookup(string query = "", bool getActive = true)
         {
-            var records = await docTypeService.LookupAsync(query, getActive).ConfigureAwait(false);
-
             ViewBag.ServiceName = "DocumentTypeService.LookupAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(records.OrderBy(x => x.DocTypeName)
-                .Select(x => new { id = x.Id, name = x.DocTypeName }), JsonRequestBehavior.AllowGet);
+            var records = await documentTypeService.LookupAsync(query, getActive).ConfigureAwait(false);
+            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -68,22 +58,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("DocumentType_Edit")]
         public async Task<ActionResult> Edit(DocumentType[] records)
         {
-            var serviceResult = await docTypeService.EditAsync(records).ConfigureAwait(false);
-
             ViewBag.ServiceName = "DocumentTypeService.EditAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode; 
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            var newEntryIds = await documentTypeService.EditAsync(records).ConfigureAwait(false);
+            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /DocumentTypeSrv/Delete
@@ -91,27 +68,43 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("DocumentType_Edit")]
         public async Task<ActionResult> Delete(string[] ids)
         {
-            var serviceResult = await docTypeService.DeleteAsync(ids).ConfigureAwait(false);
-
             ViewBag.ServiceName = "DocumentTypeService.DeleteAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK; 
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            await documentTypeService.DeleteAsync(ids).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
 
+        //filterForJsonFull - filter data from service to be passed as response
+        private object filterForJsonFull(List<DocumentType> records)
+        {
+            return records.Select(x =>
+                new
+                {
+                    x.Id,
+                    x.DocTypeName,
+                    x.DocTypeAltName,
+                    x.Comments,
+                    x.IsActive_bl
+                }
+            )
+            .ToList();
+        }
+
+        //filterForJsonLookup - filter data from service to be passed as response
+        private object filterForJsonLookup(List<DocumentType> records)
+        {
+            return records
+                .OrderBy(x => x.DocTypeName)
+                .Select(x =>
+                    new
+                    {
+                        id = x.Id,
+                        name = x.DocTypeName
+                    }
+                );
+        }
 
         #endregion
     }
