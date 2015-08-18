@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -28,14 +29,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Person_View,PersonGroup_View")]
         public async Task<ActionResult> GetAll(bool getActive = true)
         {
-            var data = (await personService.GetAllAsync(getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.LastName, x.FirstName, x.Initials, x.Phone, x.PhoneMobile, x.Email, x.Comments, x.IsActive_bl,
-                x.IsCurrentEmployee_bl, x.EmployeePosition, x.IsSalaried_bl, x.EmployeeStart, x.EmployeeEnd, x.EmployeeDetails
-            });
-
             ViewBag.ServiceName = "PersonService.GetAllAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            var records = await personService.GetAllAsync(getActive).ConfigureAwait(false);
+            return new DBJsonDateISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // POST: /PersonSrv/GetAllByIds
@@ -43,62 +39,43 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Person_View,PersonGroup_View")]
         public async Task<ActionResult> GetAllByIds(string[] ids, bool getActive = true)
         {
-            var data = (await personService.GetAllAsync(ids, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.LastName, x.FirstName, x.Initials, x.Phone, x.PhoneMobile, x.Email, x.Comments, x.IsActive_bl,
-                x.IsCurrentEmployee_bl, x.EmployeePosition, x.IsSalaried_bl, x.EmployeeStart, x.EmployeeEnd, x.EmployeeDetails
-            });
-
             ViewBag.ServiceName = "PersonService.GetAllAsync"; 
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
-        }
-
-        // GET: /PersonSrv/Get
-        public async Task<ActionResult> Get(bool getActive = true)
-        {
-            var data = (await personService.GetAsync(UserId, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.LastName, x.FirstName, x.Initials, x.Phone, x.PhoneMobile, x.Email, x.Comments, x.IsActive_bl,
-                x.IsCurrentEmployee_bl, x.EmployeePosition, x.IsSalaried_bl, x.EmployeeStart, x.EmployeeEnd, x.EmployeeDetails
-            });
-
-            ViewBag.ServiceName = "PersonService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            var records = await personService.GetAllAsync(ids, getActive).ConfigureAwait(false);
+            return new DBJsonDateISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // GET: /PersonSrv/PersonsWoDBUser
         [DBSrvAuth("Person_View,DBUser_View")]
         public async Task<ActionResult> PersonsWoDBUser(bool getActive = true)
         {
-            var persons = await personService.GetWoDBUserAsync(getActive).ConfigureAwait(false);
-
             ViewBag.ServiceName = "PersonService.GetWoDBUserAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(persons.OrderBy(p => p.LastName)
-                .Select(x => new { id = x.Id, name = x.FirstName + " " + x.LastName + " " + x.Initials }), JsonRequestBehavior.AllowGet);
+            var records = await personService.GetWoDBUserAsync(getActive).ConfigureAwait(false);
+            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonSrv/LookupAll
         [DBSrvAuth("Person_View,Project_View")]
         public async Task<ActionResult> LookupAll(string query = "", bool getActive = true)
         {
-            var records = await personService.LookupAllAsync(query, getActive).ConfigureAwait(false);
-
             ViewBag.ServiceName = "PersonService.LookupAllAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(records.OrderBy(x => x.LastName)
-                .Select(x => new { id = x.Id, name = x.FirstName + " " + x.LastName + " " + x.Initials }), JsonRequestBehavior.AllowGet);
+            var records = await personService.LookupAllAsync(query, getActive).ConfigureAwait(false);
+            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
+        }
+
+        // GET: /PersonSrv/Get
+        public async Task<ActionResult> Get(bool getActive = true)
+        {
+            ViewBag.ServiceName = "PersonService.GetAsync";
+            var records = await personService.GetAsync(getActive).ConfigureAwait(false);
+            return new DBJsonDateISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // GET: /PersonSrv/Lookup
         public async Task<ActionResult> Lookup(string query = "", bool getActive = true)
         {
-            var records = await personService.LookupAsync(UserId, query, getActive).ConfigureAwait(false);
-
             ViewBag.ServiceName = "PersonService.LookupAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(records.OrderBy(x => x.LastName)
-                .Select(x => new { id = x.Id, name = x.FirstName + " " + x.LastName + " " + x.Initials }), JsonRequestBehavior.AllowGet);
+            var records = await personService.LookupAsync(query, getActive).ConfigureAwait(false);
+            return Json(filterForJsonLookup(records) , JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -108,22 +85,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Person_Edit")]
         public async Task<ActionResult> Edit(Person[] records)
         {
-            var serviceResult = await personService.EditAsync(records).ConfigureAwait(false);
-
             ViewBag.ServiceName = "PersonService.EditAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode; 
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            var newEntryIds = await personService.EditAsync(records).ConfigureAwait(false);
+            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /PersonSrv/Delete
@@ -131,22 +95,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Person_Edit")]
         public async Task<ActionResult> Delete(string[] ids)
         {
-            var serviceResult = await personService.DeleteAsync(ids).ConfigureAwait(false);
-
             ViewBag.ServiceName = "PersonService.DeleteAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK; 
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            await personService.DeleteAsync(ids).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -155,24 +106,18 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Person_View,Project_View")]
         public async Task<ActionResult> GetPersonProjects(string id)
         {
-            var data = (await personService.GetPersonProjectsAsync(id).ConfigureAwait(false))
-                .Select(x => new { x.Id, x.ProjectName, x.ProjectAltName, x.ProjectCode });
-
             ViewBag.ServiceName = "PersonService.GetPersonProjectsAsync"; 
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            var records = await personService.GetPersonProjectsAsync(id).ConfigureAwait(false);
+            return Json(filterForJsonProjects(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonSrv/GetPersonProjectsNot
         [DBSrvAuth("Person_View,Project_View")]
         public async Task<ActionResult> GetPersonProjectsNot(string id)
         {
-            var data = (await personService.GetPersonProjectsNotAsync(id).ConfigureAwait(false))
-                .Select(x => new { x.Id, x.ProjectName, x.ProjectAltName, x.ProjectCode });
-
             ViewBag.ServiceName = "PersonService.GetPersonProjectsNotAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            var records = await personService.GetPersonProjectsNotAsync(id).ConfigureAwait(false);
+            return Json(filterForJsonProjects(records), JsonRequestBehavior.AllowGet);
         }
 
         // POST: /PersonSrv/EditPersonProjects
@@ -180,22 +125,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Person_Edit,Project_Edit")]
         public async Task<ActionResult> EditPersonProjects(string[] ids, string[] idsAddRem, bool isAdd)
         {
-            var serviceResult = await personService.EditPersonProjectsAsync(ids, idsAddRem, isAdd).ConfigureAwait(false);
-
             ViewBag.ServiceName = "PersonService.EditPersonProjectsAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            await personService.AddRemoveRelated(ids, idsAddRem, x => x.PersonProjects, isAdd).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -204,24 +136,18 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Person_View,PersonGroup_View")]
         public async Task<ActionResult> GetPersonGroups(string id)
         {
-            var data = (await personService.GetPersonGroupsAsync(id).ConfigureAwait(false))
-                .Select(x => new { x.Id, x.PrsGroupName, x.PrsGroupAltName });
-
             ViewBag.ServiceName = "PersonService.GetPersonGroupsAsync"; 
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            var records = await personService.GetPersonGroupsAsync(id).ConfigureAwait(false);
+            return Json(filterForJsonPrsGroups(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonSrv/GetPersonGroupsNot
         [DBSrvAuth("Person_View,PersonGroup_View")]
         public async Task<ActionResult> GetPersonGroupsNot(string id)
         {
-            var data = (await personService.GetPersonGroupsNotAsync(id).ConfigureAwait(false))
-                .Select(x => new { x.Id, x.PrsGroupName, x.PrsGroupAltName });
-
             ViewBag.ServiceName = "PersonService.GetPersonGroupsNotAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            var records = await personService.GetPersonGroupsNotAsync(id).ConfigureAwait(false);
+            return Json(filterForJsonPrsGroups(records), JsonRequestBehavior.AllowGet);
         }
 
         // POST: /PersonSrv/EditPersonGroups
@@ -229,22 +155,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Person_Edit,PersonGroup_Edit")]
         public async Task<ActionResult> EditPersonGroups(string[] ids, string[] idsAddRem, bool isAdd)
         {
-            var serviceResult = await personService.EditPersonGroupsAsync(ids, idsAddRem, isAdd).ConfigureAwait(false);
-
             ViewBag.ServiceName = "PersonService.EditPersonGroupsAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK; 
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            await personService.AddRemoveRelated(ids, idsAddRem, x => x.PersonGroups, isAdd).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -253,24 +166,18 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Person_View,PersonGroup_View")]
         public async Task<ActionResult> GetManagedGroups(string id)
         {
-            var data = (await personService.GetManagedGroupsAsync(id).ConfigureAwait(false))
-                .Select(x => new { x.Id, x.PrsGroupName, x.PrsGroupAltName });
-
             ViewBag.ServiceName = "PersonService.GetManagedGroupsAsyn";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            var records = await personService.GetManagedGroupsAsync(id).ConfigureAwait(false);
+            return Json(filterForJsonPrsGroups(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonSrv/GetManagedGroupsNot
         [DBSrvAuth("Person_View,PersonGroup_View")]
         public async Task<ActionResult> GetManagedGroupsNot(string id)
         {
-            var data = (await personService.GetManagedGroupsNotAsync(id).ConfigureAwait(false))
-                .Select(x => new { x.Id, x.PrsGroupName, x.PrsGroupAltName });
-
             ViewBag.ServiceName = "PersonService.GetManagedGroupsNotAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(data, JsonRequestBehavior.AllowGet);
+            var records = await personService.GetManagedGroupsNotAsync(id).ConfigureAwait(false);
+            return Json(filterForJsonPrsGroups(records), JsonRequestBehavior.AllowGet);
         }
 
         // POST: /PersonSrv/EditManagedGroups
@@ -278,27 +185,73 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("Person_Edit,PersonGroup_Edit")]
         public async Task<ActionResult> EditManagedGroups(string[] ids, string[] idsAddRem, bool isAdd)
         {
-            var serviceResult = await personService.EditManagedGroupsAsync(ids, idsAddRem, isAdd).ConfigureAwait(false);
-
             ViewBag.ServiceName = "PersonService.EditManagedGroupsAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            await personService.AddRemoveRelated(ids, idsAddRem, x => x.ManagedGroups, isAdd).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
 
+        //filterForJsonFull - filter data from service to be passed as response
+        private object filterForJsonFull(List<Person> records)
+        {
+            return records.Select(x =>
+                new
+                {
+                    x.Id,
+                    x.LastName,
+                    x.FirstName,
+                    x.Initials,
+                    x.Phone,
+                    x.PhoneMobile,
+                    x.Email,
+                    x.Comments,
+                    x.IsActive_bl,
+                    x.IsCurrentEmployee_bl,
+                    x.EmployeePosition,
+                    x.IsSalaried_bl,
+                    x.EmployeeStart,
+                    x.EmployeeEnd,
+                    x.EmployeeDetails
+                }
+            )
+            .ToList();
+        }
+
+        //filterForJsonLookup - filter data from service to be passed as response
+        private object filterForJsonLookup(List<Person> records)
+        {
+            return records
+                .OrderBy(x => x.LastName)
+                .Select(x => new {
+                    id = x.Id,
+                    name = x.FirstName + " " + x.LastName + " " + x.Initials 
+                });
+        }
+
+        //filterForJsonProjects - filter data from service to be passed as response
+        private object filterForJsonProjects(List<Project> records)
+        {
+            return records
+                .Select(x => new {
+                    x.Id,
+                    x.ProjectName,
+                    x.ProjectAltName,
+                    x.ProjectCode 
+                });
+        }
+
+        //filterForJsonPrsGroups - filter data from service to be passed as response
+        private object filterForJsonPrsGroups(List<PersonGroup> records)
+        {
+            return records
+                .Select(x => new {
+                    x.Id,
+                    x.PrsGroupName,
+                    x.PrsGroupAltName
+                });
+        }
 
         #endregion
     }

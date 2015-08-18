@@ -165,6 +165,7 @@ namespace SDDB.WebUI.ControllersSrv
                 });
         }
 
+        //filterForJsonPersons - filter data from service to be passed as response
         private object filterForJsonPersons(List<Person> records)
         {
             return records

@@ -181,9 +181,7 @@
     <Compile Include="Tests_ProjectEventService.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Tests_ProjectService.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Tests_ProjectService.cs" />
     <Compile Include="Tests___EFDbContextExtensions.cs" />
     <Compile Include="Tests__BaseDbService.cs" />
   </ItemGroup>
