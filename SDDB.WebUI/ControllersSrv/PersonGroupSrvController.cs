@@ -31,7 +31,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonGroupService.GetAsync"; 
             var records = await personGroupService.GetAsync(getActive).ConfigureAwait(false);
-            return Json(records, JsonRequestBehavior.AllowGet);
+            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
         }
 
         // POST: /PersonGroupSrv/GetByIds
@@ -41,7 +41,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonGroupService.GetAsync";
             var records = await personGroupService.GetAsync(ids, getActive).ConfigureAwait(false);
-            return Json( records , JsonRequestBehavior.AllowGet);
+            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonGroupSrv/Lookup
@@ -136,6 +136,22 @@ namespace SDDB.WebUI.ControllersSrv
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
+
+        //filterForJsonFull - filter data from service to be passed as response
+        private object filterForJsonFull(List<PersonGroup> records)
+        {
+            return records.Select(x =>
+                new
+                {
+                    x.Id,
+                    x.PrsGroupName,
+                    x.PrsGroupAltName,
+                    x.Comments,
+                    x.IsActive_bl
+                }
+            )
+            .ToList();
+        }
 
         //filterForJsonLookup - filter data from service to be passed as response
         private object filterForJsonLookup(List<PersonGroup> records)

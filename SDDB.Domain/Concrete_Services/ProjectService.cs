@@ -150,7 +150,7 @@ namespace SDDB.Domain.Services
                             else
                             {
                                 //tasks prior to desactivating: running PersonService and deleting ManagedProjects
-                                var serviceResult = await personService.EditPersonProjectsAsync(personIds, new string[] { id }, false).ConfigureAwait(false);
+                                var serviceResult = new DBResult(); // await personService.EditPersonProjectsAsync(personIds, new string[] { id }, false).ConfigureAwait(false);
                                 if (serviceResult.StatusCode != HttpStatusCode.OK)
                                     errorMessage += string.Format("Error Removing Persons from Project {0}: {1} \n", dbEntry.ProjectName, serviceResult.StatusDescription);
                                 else

@@ -183,7 +183,8 @@ $(document).ready(function () {
     //Wire Up DBRolesViewBtnCancel
     $("#DBRolesViewBtnCancel, #DBRolesViewBtnBack").click(function () {
         $("#MainView").removeClass("hide");
-        $("#DBRolesView").addClass("hide"); window.scrollTo(0, 0);
+        $("#DBRolesView").addClass("hide");
+        window.scrollTo(0, 0);
     });
 
     //Wire Up DBRolesViewBtnOk
@@ -197,7 +198,7 @@ $(document).ready(function () {
 
         submitEditsForRelatedGeneric(CurrIds, TableDBRolesAdd.cells(".ui-selected", "Name:name").data().toArray(),
                 TableDBRolesRemove.cells(".ui-selected", "Name:name").data().toArray(), "/DBUserSrv/EditRoles")
-            .always(function () { $("#ModalWait").modal("hide"); })
+            .always(hideModalWait)
             .done(function () {
                 $("#MainView").removeClass("hide");
                 $("#DBRolesView").addClass("hide");

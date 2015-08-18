@@ -149,14 +149,20 @@ namespace SDDB.Domain.Services
         {
             for (int i = 0; i < ids.Length; i++)
             {
-                var dbEntry = await dbContext.PersonGroups.FindAsync(ids[i]).ConfigureAwait(false);
-                var GroupPersonsCount  = dbEntry.GroupPersons.Count;
-                var GroupManagersCount = dbEntry.GroupManagers.Count;
-                if (GroupPersonsCount + GroupManagersCount > 0)
+                var currentId = ids[i];
+                if (await dbContext.PersonGroups
+                    .AnyAsync(x => x.Id == currentId && x.GroupPersons.Count > 0).ConfigureAwait(false))
                 {
+                    var dbEntry = await dbContext.PersonGroups.FindAsync(currentId).ConfigureAwait(false);
                     throw new DbBadRequestException(
-                        string.Format("There are {0} persons and {1} managers assigned to the group {2}.\nDelete aborted.",
-                            GroupPersonsCount, GroupManagersCount, dbEntry.PrsGroupName));
+                        string.Format("There are persons assigned to the group {0}.\nDelete aborted.", dbEntry.PrsGroupName));
+                }
+                if (await dbContext.PersonGroups
+                    .AnyAsync(x => x.Id == currentId && x.GroupManagers.Count > 0).ConfigureAwait(false))
+                {
+                    var dbEntry = await dbContext.PersonGroups.FindAsync(currentId).ConfigureAwait(false);
+                    throw new DbBadRequestException(
+                        string.Format("There are managers assigned to the group {0}.\nDelete aborted.", dbEntry.PrsGroupName));
                 }
             }
         }
