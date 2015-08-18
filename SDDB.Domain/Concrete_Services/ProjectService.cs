@@ -2,36 +2,27 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Net;
-using Mehdime.Entity;
-
-using SDDB.Domain.Entities;
-using SDDB.Domain.Abstract;
-using SDDB.Domain.DbContexts;
-using SDDB.Domain.Infrastructure;
-using MySql.Data.MySqlClient;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Transactions;
+using Mehdime.Entity;
+
+using SDDB.Domain.Entities;
+using SDDB.Domain.DbContexts;
+using SDDB.Domain.Infrastructure;
 
 namespace SDDB.Domain.Services
 {
-    public class ProjectService
+    public class ProjectService : BaseDbService<Project>
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
-        private IDbContextScopeFactory contextScopeFac;
-        private PersonService personService;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
 
-        public ProjectService(IDbContextScopeFactory contextScopeFac, PersonService personService)
-        {
-            this.contextScopeFac = contextScopeFac;
-            this.personService = personService;
-        }
+        public ProjectService(IDbContextScopeFactory contextScopeFac, string userId) : base(contextScopeFac, userId) { }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
@@ -41,146 +32,144 @@ namespace SDDB.Domain.Services
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                var records = await dbContext.Projects.Where(x => x.IsActive_bl == getActive)
-                    .Include(x => x.ProjectManager).ToListAsync().ConfigureAwait(false);
+                var records = await dbContext.Projects
+                    .Where(x => x.IsActive_bl == getActive)
+                    .Include(x => x.ProjectManager)
+                    .ToListAsync().ConfigureAwait(false);
 
-                foreach (var record in records) { record.FillRelatedIfNull(); }
-
-                return records; 
+                records.FillRelatedIfNull();
+                return records;
             }
         }
 
         //get by ids
         public virtual async Task<List<Project>> GetAsync(string[] ids, bool getActive = true)
         {
-            if (ids == null || ids.Length == 0) throw new ArgumentNullException("ids");
+            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                var records = await dbContext.Projects.Where(x => x.IsActive_bl == getActive && ids.Contains(x.Id))
-                    .Include(x => x.ProjectManager).ToListAsync().ConfigureAwait(false);
+                var records = await dbContext.Projects
+                    .Where(x => 
+                            ids.Contains(x.Id) &&
+                            x.IsActive_bl == getActive
+                        )
+                    .Include(x => x.ProjectManager)
+                    .ToListAsync().ConfigureAwait(false);
 
-                foreach (var record in records) { record.FillRelatedIfNull(); }
-
-                return records; 
+                records.FillRelatedIfNull();
+                return records;
             }
         }
 
         //lookup by query - returns only projects the person is assigned to
-        public virtual Task<List<Project>> LookupAsync(string userId, string query = "", bool getActive = true)
+        public virtual async Task<List<Project>> LookupAsync(string query = "", bool getActive = true)
         {
-            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
-
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-
-                return dbContext.Projects.Where(x => x.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
-                    (x.ProjectName.Contains(query) || x.ProjectAltName.Contains(query) || x.ProjectCode.Contains(query))).ToListAsync();
+                var records = await dbContext.Projects
+                    .Where(x =>
+                            x.ProjectPersons.Any(y => y.Id == userId) &&
+                           (x.ProjectName.Contains(query) || x.ProjectCode.Contains(query)) &&
+                            x.IsActive_bl == getActive
+                        )
+                        .ToListAsync().ConfigureAwait(false);
+                return records;
             }
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
 
-        // Create and Update records given in []
-        public virtual async Task<DBResult> EditAsync(Project[] records)
-        {
-            var errorMessage = "";
+        // Create and Update records given in []  - same as BaseDbService
 
-            using (var dbContextScope = contextScopeFac.Create())
+        // Delete records by their Ids - same as BaseDbService
+        // See overriden checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
+
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        //get all project persons
+        public virtual Task<List<Person>> GetProjectPersonsAsync(string Id)
+        {
+            if (String.IsNullOrEmpty(Id)) { throw new ArgumentNullException("Id"); }
+
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    foreach (var record in records)
-                    {
-                        var dbEntry = await dbContext.Projects.FindAsync(record.Id).ConfigureAwait(false);
-                        if (dbEntry == null)
-                        {
-                            record.Id = Guid.NewGuid().ToString();
-                            dbContext.Projects.Add(record);
-                        }
-                        else
-                        {
-                            dbEntry.CopyModifiedProps(record);
-                        }
-                    }
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-                    trans.Complete();
-                }
-            }
-            if (errorMessage == "") { return new DBResult(); }
-            else
-            {
-                return new DBResult
-                {
-                    StatusCode = HttpStatusCode.Conflict,
-                    StatusDescription = "Errors editing records:\n" + errorMessage
-                };
+                return dbContext.Persons.Where(x =>
+                        x.PersonProjects.Any(y => y.Id == Id) &&
+                        x.IsActive_bl == true
+                    )
+                    .ToListAsync();
             }
         }
 
-        // Delete records by their Ids
-        public virtual async Task<DBResult> DeleteAsync(string[] ids)
+        //get all project persons
+        public virtual Task<List<Person>> GetProjectPersonsNotAsync(string Id)
         {
-            var errorMessage = "";
+            if (String.IsNullOrEmpty(Id)) { throw new ArgumentNullException("Id"); }
 
-            using (var dbContextScope = contextScopeFac.Create())
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    var personIds = await dbContext.Persons.Select(x => x.Id).ToArrayAsync().ConfigureAwait(false);
-
-                    foreach (var id in ids)
-                    {
-                        var dbEntry = await dbContext.Projects.FindAsync(id).ConfigureAwait(false);
-                        if (dbEntry != null)
-                        {
-                            //tasks prior to desactivating: check if documents, locations, assemblies, components assigned to projects
-                            if ((await dbContext.Documents.Where(x => x.IsActive_bl == true && x.AssignedToProject_Id == id).CountAsync().ConfigureAwait(false)) > 0)
-                                errorMessage += string.Format("Project {0} not deleted, it has documents assigned to it\n", dbEntry.ProjectName);
-                            else if ((await dbContext.Locations.Where(x => x.IsActive_bl == true && x.AssignedToProject_Id == id).CountAsync().ConfigureAwait(false)) > 0)
-                                errorMessage += string.Format("Project {0} not deleted, it has locations assigned to it\n", dbEntry.ProjectName);
-                            else if ((await dbContext.AssemblyDbs.Where(x => x.IsActive_bl == true && x.AssignedToProject_Id == id).CountAsync().ConfigureAwait(false)) > 0)
-                                errorMessage += string.Format("Project {0} not deleted, it has assemblies assigned to it\n", dbEntry.ProjectName);
-                            else if ((await dbContext.Components.Where(x => x.IsActive_bl == true && x.AssignedToProject_Id == id).CountAsync().ConfigureAwait(false)) > 0)
-                                errorMessage += string.Format("Project {0} not deleted, it has components assigned to it\n", dbEntry.ProjectName);
-                            else
-                            {
-                                //tasks prior to desactivating: running PersonService and deleting ManagedProjects
-                                var serviceResult = new DBResult(); // await personService.EditPersonProjectsAsync(personIds, new string[] { id }, false).ConfigureAwait(false);
-                                if (serviceResult.StatusCode != HttpStatusCode.OK)
-                                    errorMessage += string.Format("Error Removing Persons from Project {0}: {1} \n", dbEntry.ProjectName, serviceResult.StatusDescription);
-                                else
-                                    dbEntry.IsActive_bl = false;
-                            }
-                        }
-                        else
-                        {
-                            errorMessage += string.Format("Record with Id={0} not found\n", id);
-                        }
-                    }
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-                    trans.Complete();
-                }
-                
-            }
-            if (errorMessage == "") { return new DBResult(); }
-            else
-            {
-                return new DBResult
-                {
-                    StatusCode = HttpStatusCode.Conflict,
-                    StatusDescription = "Errors deleting records:\n" + errorMessage
-                };
+                return dbContext.Persons.Where(x =>
+                        !x.PersonProjects.Any(y => y.Id == Id) &&
+                        x.IsActive_bl == true
+                    )
+                    .ToListAsync();
             }
         }
-
+        
+        //Add (or Remove  when set isAdd to false) persons to Project
+        //use generic version AddRemoveRelated from BaseDbService 
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
+
+        //helper - check before deleting records, takes LocationModel ids array
+        protected override async Task checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
+        {
+            for (int i = 0; i < ids.Length; i++)
+            {
+                var currentId = ids[i];
+                if (await dbContext.Documents.AnyAsync(x => x.IsActive_bl && x.AssignedToProject_Id == currentId)
+                    .ConfigureAwait(false))
+                {
+                    var dbEntry = await dbContext.Projects.FindAsync(currentId).ConfigureAwait(false);
+                    throw new DbBadRequestException(
+                        string.Format("Project {0} has documents assigned to it.\nDelete aborted.", dbEntry.ProjectName));
+                }
+                if (await dbContext.Locations.AnyAsync(x => x.IsActive_bl && x.AssignedToProject_Id == currentId)
+                    .ConfigureAwait(false))
+                {
+                    var dbEntry = await dbContext.Projects.FindAsync(currentId).ConfigureAwait(false);
+                    throw new DbBadRequestException(
+                        string.Format("Project {0} has locations assigned to it.\nDelete aborted.", dbEntry.ProjectName));
+                }
+                if (await dbContext.AssemblyDbs.AnyAsync(x => x.IsActive_bl && x.AssignedToProject_Id == currentId)
+                    .ConfigureAwait(false))
+                {
+                    var dbEntry = await dbContext.Projects.FindAsync(currentId).ConfigureAwait(false);
+                    throw new DbBadRequestException(
+                        string.Format("Project {0} has assemblies assigned to it.\nDelete aborted.", dbEntry.ProjectName));
+                }
+                if (await dbContext.Components.AnyAsync(x => x.IsActive_bl && x.AssignedToProject_Id == currentId)
+                    .ConfigureAwait(false))
+                {
+                    var dbEntry = await dbContext.Projects.FindAsync(currentId).ConfigureAwait(false);
+                    throw new DbBadRequestException(
+                        string.Format("Project {0} has components assigned to it.\nDelete aborted.", dbEntry.ProjectName));
+                }
+                if (await dbContext.Projects.AnyAsync(x => x.Id == currentId && x.ProjectPersons.Count > 0).ConfigureAwait(false))
+                {
+                    var dbEntry = await dbContext.Projects.FindAsync(currentId).ConfigureAwait(false);
+                    throw new DbBadRequestException(
+                        string.Format("Project {0} has persons assigned to it.\nDelete aborted.", dbEntry.ProjectName));
+                }
+            }
+        }
+
 
         #endregion
     }

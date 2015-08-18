@@ -55,22 +55,7 @@ namespace SDDB.Domain.Services
             }
         }
 
-        //get all : WITH by-group filtering
-        public virtual async Task<List<Person>> GetAsync(bool getActive = true)
-        {
-            using (var dbContextScope = contextScopeFac.CreateReadOnly())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                var records = await dbContext.Persons.Where(x =>
-                        x.PersonGroups.Any(y => y.GroupManagers.Any(z => z.Id == userId)) &&
-                        x.IsActive_bl == getActive
-                    )
-                    .ToListAsync().ConfigureAwait(false);
-                return records;
-            }
-        }
-
-        //get persons without DBUser
+        //get persons without DBUser, no by-group filtering
         public virtual async Task<List<Person>> GetWoDBUserAsync(bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
@@ -85,7 +70,7 @@ namespace SDDB.Domain.Services
             }
         }
 
-        //find all persons by query
+        //find all persons by query, no by-group filtering
         public virtual async Task<List<Person>> LookupAllAsync(string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
@@ -99,7 +84,22 @@ namespace SDDB.Domain.Services
             }
         }
 
-        //find managed persons by query
+        //get: WITH by-group filtering
+        public virtual async Task<List<Person>> GetAsync(bool getActive = true)
+        {
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+                var records = await dbContext.Persons.Where(x =>
+                        x.PersonGroups.Any(y => y.GroupManagers.Any(z => z.Id == userId)) &&
+                        x.IsActive_bl == getActive
+                    )
+                    .ToListAsync().ConfigureAwait(false);
+                return records;
+            }
+        }
+
+        //find managed persons by query, WITH by-group filtering
         public async virtual Task<List<Person>> LookupAsync(string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())

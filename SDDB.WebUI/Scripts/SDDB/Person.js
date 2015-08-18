@@ -59,7 +59,7 @@ $(document).ready(function () {
             showModalWait();
 
             fillFormForEditGeneric(CurrIds, "POST", "/PersonSrv/GetAllByIds", GetActive, "EditForm", "Edit Person", MagicSuggests)
-                .always(function () { $("#ModalWait").modal("hide"); })
+                .always(hideModalWait)
                 .done(function (currRecords) {
                     CurrRecords = currRecords;
                     $("#MainView").addClass("hide");
@@ -89,7 +89,7 @@ $(document).ready(function () {
 
             fillFormForRelatedGeneric(TableProjectsAdd, TableProjectsRemove, CurrIds, "GET", "/PersonSrv/GetPersonProjects", { id: CurrIds[0] },
             "GET", "/PersonSrv/GetPersonProjectsNot", { id: CurrIds[0] }, "GET", "/ProjectSrv/Get", { getActive: true })
-                .always(function () { $("#ModalWait").modal("hide"); })
+                .always(hideModalWait)
                 .done(function () {
                     $("#MainView").addClass("hide");
                     $("#PrsProjView").removeClass("hide");
@@ -111,7 +111,7 @@ $(document).ready(function () {
 
             fillFormForRelatedGeneric(TablePersonGroupsAdd, TablePersonGroupsRemove, CurrIds, "GET", "/PersonSrv/GetPersonGroups", { id: CurrIds[0] },
             "GET", "/PersonSrv/GetPersonGroupsNot", { id: CurrIds[0] }, "GET", "/PersonGroupSrv/Get", { getActive: true })
-                .always(function () { $("#ModalWait").modal("hide"); })
+                .always(hideModalWait)
                 .done(function () {
                     $("#MainView").addClass("hide");
                     $("#PersonGroupsView").removeClass("hide");
@@ -133,7 +133,7 @@ $(document).ready(function () {
 
             fillFormForRelatedGeneric(TableManagedGroupsAdd, TableManagedGroupsRemove, CurrIds, "GET", "/PersonSrv/GetManagedGroups", { id: CurrIds[0] },
             "GET", "/PersonSrv/GetManagedGroupsNot", { id: CurrIds[0] }, "GET", "/PersonGroupSrv/Get", { getActive: true })
-                .always(function () { $("#ModalWait").modal("hide"); })
+                .always(hideModalWait)
                 .done(function () {
                     $("#MainView").addClass("hide");
                     $("#ManagedGroupsView").removeClass("hide");
@@ -168,9 +168,14 @@ $(document).ready(function () {
 
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
-        if (!$(this).prop("checked")) { GetActive = true; $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary"); }
-        else { GetActive = false; $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger"); }
-        refreshTblGenWrp(TableMain, "/PersonSrv/GetAll", { getActive: GetActive });
+        if (!$(this).prop("checked")) {
+            GetActive = true;
+            $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
+        } else {
+            GetActive = false;
+            $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
+        }
+        refreshMainView();
     });
 
     //TableMain Persons
@@ -237,7 +242,7 @@ $(document).ready(function () {
             showModalWait();
 
             submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonSrv/Edit")
-                .always(function () { $("#ModalWait").modal("hide"); })
+                .always(hideModalWait)
                 .done(function () {
                     refreshTableGeneric(TableMain, "/PersonSrv/GetAll", { getActive: GetActive });
                     $("#MainView").removeClass("hide");
@@ -264,11 +269,11 @@ $(document).ready(function () {
 
             submitEditsForRelatedGeneric(CurrIds, TableProjectsAdd.cells(".ui-selected", "Id:name").data().toArray(),
                     TableProjectsRemove.cells(".ui-selected", "Id:name").data().toArray(), "/PersonSrv/EditPersonProjects")
-                .always(function () { $("#ModalWait").modal("hide"); })
+                .always(hideModalWait)
                 .done(function () {
                     $("#MainView").removeClass("hide");
                     $("#PrsProjView").addClass("hide"); window.scrollTo(0, 0);
-                    refreshTblGenWrp(TableMain, "/PersonSrv/GetAll", { getActive: GetActive });
+                    refreshMainView();
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
         }
@@ -341,11 +346,11 @@ $(document).ready(function () {
 
             submitEditsForRelatedGeneric(CurrIds, TablePersonGroupsAdd.cells(".ui-selected", "Id:name").data().toArray(),
                     TablePersonGroupsRemove.cells(".ui-selected", "Id:name").data().toArray(), "/PersonSrv/EditPersonGroups")
-                .always(function () { $("#ModalWait").modal("hide"); })
+                .always(hideModalWait)
                 .done(function () {
                     $("#MainView").removeClass("hide");
                     $("#PersonGroupsView").addClass("hide"); window.scrollTo(0, 0);
-                    refreshTblGenWrp(TableMain, "/PersonSrv/GetAll", { getActive: GetActive });
+                    refreshMainView();
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
         }
@@ -418,11 +423,11 @@ $(document).ready(function () {
 
             submitEditsForRelatedGeneric(CurrIds, TableManagedGroupsAdd.cells(".ui-selected", "Id:name").data().toArray(),
                     TableManagedGroupsRemove.cells(".ui-selected", "Id:name").data().toArray(), "/PersonSrv/EditManagedGroups")
-                .always(function () { $("#ModalWait").modal("hide"); })
+                .always(hideModalWait)
                 .done(function () {
                     $("#MainView").removeClass("hide");
                     $("#ManagedGroupsView").addClass("hide"); window.scrollTo(0, 0);
-                    refreshTblGenWrp(TableMain, "/PersonSrv/GetAll", { getActive: GetActive });
+                    refreshMainView();
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
         }
@@ -481,7 +486,7 @@ $(document).ready(function () {
 
     //--------------------------------------View Initialization------------------------------------//
 
-    refreshTblGenWrp(TableMain, "/PersonSrv/GetAll", { getActive: GetActive });
+    refreshMainView();
 
     $("#InitialView").addClass("hide");
     $("#MainView").removeClass("hide");
@@ -497,11 +502,20 @@ function DeleteRecords() {
     CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
     showModalWait();
     $.ajax({ type: "POST", url: "/PersonSrv/Delete", timeout: 20000, data: { ids: CurrIds }, dataType: "json" })
-        .always(function () { $("#ModalWait").modal("hide"); })
+        .always(hideModalWait)
         .done(function () { refreshTableGeneric(TableMain, "/PersonSrv/GetAll", { getActive: GetActive }); })
         .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
+//Delete Records from DB
+function DeleteRecords() {
+    CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+    deleteRecordsGeneric(CurrIds, "/PersonSrv/Delete", refreshMainView);
+}
+
+function refreshMainView() {
+    refreshTblGenWrp(TableMain, "/PersonSrv/GetAll", { getActive: GetActive });
+}
 
 
 //---------------------------------------Helper Methods--------------------------------------//

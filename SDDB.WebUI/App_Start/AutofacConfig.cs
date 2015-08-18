@@ -69,7 +69,7 @@ namespace SDDB.WebUI
             
             builder.RegisterType<DBUserService>().AsSelf()
                 .WithParameter("ldapAuthenticationEnabled", LDAPAuthenticationEnabled).InstancePerDependency();
-            builder.RegisterType<PersonService>().AsSelf().InstancePerDependency();
+            builder.RegisterType<PersonService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
             builder.RegisterType<PersonGroupService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
             builder.RegisterType<PersonActivityTypeService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
             builder.RegisterType<PersonLogEntryService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
