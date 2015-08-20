@@ -231,7 +231,8 @@ $(document).ready(function () {
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
         $("#MainView").removeClass("hide");
-        $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
+        $("#EditFormView").addClass("hide");
+        window.scrollTo(0, 0);
     });
 
     //Wire Up EditFormBtnOk
@@ -244,9 +245,10 @@ $(document).ready(function () {
             submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonSrv/Edit")
                 .always(hideModalWait)
                 .done(function () {
-                    refreshTableGeneric(TableMain, "/PersonSrv/GetAll", { getActive: GetActive });
                     $("#MainView").removeClass("hide");
-                    $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
+                    $("#EditFormView").addClass("hide");
+                    window.scrollTo(0, 0);
+                    refreshMainView();
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
         }
@@ -257,7 +259,8 @@ $(document).ready(function () {
     //Wire Up PrsProjViewBtnCancel
     $("#PrsProjViewBtnCancel, #PrsProjViewBtnBack").click(function () {
         $("#MainView").removeClass("hide");
-        $("#PrsProjView").addClass("hide"); window.scrollTo(0, 0);
+        $("#PrsProjView").addClass("hide");
+        window.scrollTo(0, 0);
     });
 
     //Wire Up PrsProjViewBtnOk
@@ -272,7 +275,8 @@ $(document).ready(function () {
                 .always(hideModalWait)
                 .done(function () {
                     $("#MainView").removeClass("hide");
-                    $("#PrsProjView").addClass("hide"); window.scrollTo(0, 0);
+                    $("#PrsProjView").addClass("hide");
+                    window.scrollTo(0, 0);
                     refreshMainView();
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -334,7 +338,8 @@ $(document).ready(function () {
     //Wire Up PersonGroupsViewBtnCancel
     $("#PersonGroupsViewBtnCancel, #PersonGroupsViewBtnBack").click(function () {
         $("#MainView").removeClass("hide");
-        $("#PersonGroupsView").addClass("hide"); window.scrollTo(0, 0);
+        $("#PersonGroupsView").addClass("hide");
+        window.scrollTo(0, 0);
     });
 
     //Wire Up PersonGroupsViewBtnOk
@@ -349,7 +354,8 @@ $(document).ready(function () {
                 .always(hideModalWait)
                 .done(function () {
                     $("#MainView").removeClass("hide");
-                    $("#PersonGroupsView").addClass("hide"); window.scrollTo(0, 0);
+                    $("#PersonGroupsView").addClass("hide");
+                    window.scrollTo(0, 0);
                     refreshMainView();
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -411,7 +417,8 @@ $(document).ready(function () {
     //Wire Up ManagedGroupsViewBtnCancel
     $("#ManagedGroupsViewBtnCancel, #ManagedGroupsViewBtnBack").click(function () {
         $("#MainView").removeClass("hide");
-        $("#ManagedGroupsView").addClass("hide"); window.scrollTo(0, 0);
+        $("#ManagedGroupsView").addClass("hide");
+        window.scrollTo(0, 0);
     });
 
     //Wire Up ManagedGroupsViewBtnOk
@@ -426,7 +433,8 @@ $(document).ready(function () {
                 .always(hideModalWait)
                 .done(function () {
                     $("#MainView").removeClass("hide");
-                    $("#ManagedGroupsView").addClass("hide"); window.scrollTo(0, 0);
+                    $("#ManagedGroupsView").addClass("hide");
+                    window.scrollTo(0, 0);
                     refreshMainView();
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -496,16 +504,6 @@ $(document).ready(function () {
 
 
 //--------------------------------------Main Methods---------------------------------------//
-
-//Delete Records from DB
-function DeleteRecords() {
-    CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
-    showModalWait();
-    $.ajax({ type: "POST", url: "/PersonSrv/Delete", timeout: 20000, data: { ids: CurrIds }, dataType: "json" })
-        .always(hideModalWait)
-        .done(function () { refreshTableGeneric(TableMain, "/PersonSrv/GetAll", { getActive: GetActive }); })
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-}
 
 //Delete Records from DB
 function DeleteRecords() {

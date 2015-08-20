@@ -29,7 +29,7 @@ namespace SDDB.Domain.Services
         //get by ids
         public virtual async Task<List<Location>> GetAsync(string[] ids, bool getActive = true)
         {
-            if (ids == null || ids.Length == 0) throw new ArgumentNullException("ids");
+            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
@@ -123,6 +123,7 @@ namespace SDDB.Domain.Services
         // Create and Update records given in [] - same as BaseDbService
 
         // Delete records by their Ids - same as BaseDbService
+        // See overriden checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
 
         //-----------------------------------------------------------------------------------------------------------------------
 

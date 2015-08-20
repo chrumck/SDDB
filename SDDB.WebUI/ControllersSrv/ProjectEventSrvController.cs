@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -28,17 +29,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("ProjectEvent_View")]
         public async Task<ActionResult> Get(bool getActive = true)
         {
-            var data = (await projectEventService.GetAsync(UserId, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.EventName, x.EventAltName,
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                x.EventCreated, CreatedByPerson = new { x.CreatedByPerson.FirstName, x.CreatedByPerson.LastName, x.CreatedByPerson.Initials },
-                x.EventClosed, ClosedByPerson = new { x.ClosedByPerson.FirstName, x.ClosedByPerson.LastName, x.ClosedByPerson.Initials },
-                x.Comments, x.IsActive_bl, x.AssignedToProject_Id, x.CreatedByPerson_Id, x.ClosedByPerson_Id, 
-            });
-
             ViewBag.ServiceName = "ProjectEventService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateTimeISO { Data = new { data}, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            var records = await projectEventService.GetAsync(getActive).ConfigureAwait(false);
+            return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // POST: /ProjectEventSrv/GetByIds
@@ -46,17 +39,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("ProjectEvent_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
-            var data = (await projectEventService.GetAsync(UserId, ids, getActive).ConfigureAwait(false)).Select(x => new {
-                x.Id, x.EventName, x.EventAltName,
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                x.EventCreated, CreatedByPerson = new { x.CreatedByPerson.FirstName, x.CreatedByPerson.LastName, x.CreatedByPerson.Initials },
-                x.EventClosed, ClosedByPerson = new { x.ClosedByPerson.FirstName, x.ClosedByPerson.LastName, x.ClosedByPerson.Initials },
-                x.Comments, x.IsActive_bl, x.AssignedToProject_Id, x.CreatedByPerson_Id, x.ClosedByPerson_Id, 
-            });
-
             ViewBag.ServiceName = "ProjectEventService.GetAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateTimeISO { Data =  data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            var records = await projectEventService.GetAsync(ids, getActive).ConfigureAwait(false);
+            return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // POST: /ProjectEventSrv/GetByProjectIds
@@ -64,43 +49,28 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("ProjectEvent_View")]
         public async Task<ActionResult> GetByProjectIds(string[] projectIds, bool getActive = true)
         {
-            var data = (await projectEventService.GetByProjectAsync(UserId, projectIds, getActive).ConfigureAwait(false)).Select(x => new
-            {
-                x.Id, x.EventName, x.EventAltName,
-                AssignedToProject = new { x.AssignedToProject.ProjectName, x.AssignedToProject.ProjectAltName, x.AssignedToProject.ProjectCode },
-                x.EventCreated, CreatedByPerson = new { x.CreatedByPerson.FirstName, x.CreatedByPerson.LastName, x.CreatedByPerson.Initials },
-                x.EventClosed, ClosedByPerson = new { x.ClosedByPerson.FirstName, x.ClosedByPerson.LastName, x.ClosedByPerson.Initials },
-                x.Comments, x.IsActive_bl, x.AssignedToProject_Id, x.CreatedByPerson_Id, x.ClosedByPerson_Id, 
-            });
-
             ViewBag.ServiceName = "ProjectEventService.GetByProjectAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            var records = await projectEventService.GetByProjectAsync(projectIds, getActive).ConfigureAwait(false);
+            return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         // GET: /ProjectEventSrv/Lookup
         public async Task<ActionResult> Lookup(string query = "", bool getActive = true)
         {
-            var records = await projectEventService.LookupAsync(UserId, query, getActive).ConfigureAwait(false);
-
             ViewBag.ServiceName = "ProjectEventService.LookupAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(records.OrderBy(x => x.EventName)
-                .Select(x => new { id = x.Id, name = x.EventName }), JsonRequestBehavior.AllowGet);
+            var records = await projectEventService.LookupAsync(query, getActive).ConfigureAwait(false);
+            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /ProjectEventSrv/LookupByProj
-        public async Task<ActionResult> LookupByProj(string projectIds = null, string query = "", bool getActive = true)
+        public async Task<ActionResult> LookupByProj(string projectIds, string query = "", bool getActive = true)
         {
+            ViewBag.ServiceName = "ProjectEventService.LookupByProjAsync";
+            
             string[] projectIdsArray = null;
             if (projectIds != null && projectIds != "") projectIdsArray = projectIds.Split(',');
-
-            var records = await projectEventService.LookupByProjAsync(UserId, projectIdsArray, query, getActive).ConfigureAwait(false);
-
-            ViewBag.ServiceName = "ProjectEventService.LookupByProjAsync";
-            ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(records.OrderBy(x => x.EventName)
-                .Select(x => new { id = x.Id, name = x.EventName }), JsonRequestBehavior.AllowGet);
+            var records = await projectEventService.LookupByProjAsync(projectIdsArray, query, getActive).ConfigureAwait(false);
+            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -110,22 +80,9 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("ProjectEvent_Edit")]
         public async Task<ActionResult> Edit(ProjectEvent[] records)
         {
-            var serviceResult = await projectEventService.EditAsync(records).ConfigureAwait(false);
-
             ViewBag.ServiceName = "ProjectEventService.EditAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode; 
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            var newEntryIds = await projectEventService.EditAsync(records).ConfigureAwait(false);
+            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
         }
 
         // POST: /ProjectEventSrv/Delete
@@ -133,27 +90,60 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("ProjectEvent_Edit")]
         public async Task<ActionResult> Delete(string[] ids)
         {
-            var serviceResult = await projectEventService.DeleteAsync(ids).ConfigureAwait(false);
-
             ViewBag.ServiceName = "ProjectEventService.DeleteAsync";
-            ViewBag.StatusCode = serviceResult.StatusCode;
-            ViewBag.StatusDescription = serviceResult.StatusDescription;
-
-            if (serviceResult.StatusCode == HttpStatusCode.OK)
-            {
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                Response.StatusCode = (int)serviceResult.StatusCode;
-                return Json(new { Success = "False", responseText = serviceResult.StatusDescription }, JsonRequestBehavior.AllowGet);
-            }
+            await projectEventService.DeleteAsync(ids).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
 
+        //filterForJsonFull - filter data from service to be passed as response
+        private object filterForJsonFull(List<ProjectEvent> records)
+        {
+            return records.Select(x => new
+            {
+                x.Id,
+                x.EventName,
+                x.EventAltName,
+                AssignedToProject_ = new {
+                    x.AssignedToProject.ProjectName,
+                    x.AssignedToProject.ProjectAltName,
+                    x.AssignedToProject.ProjectCode
+                },
+                x.EventCreated,
+                CreatedByPerson_ = new {
+                    x.CreatedByPerson.FirstName,
+                    x.CreatedByPerson.LastName,
+                    x.CreatedByPerson.Initials
+                },
+                x.EventClosed,
+                ClosedByPerson_ = new {
+                    x.ClosedByPerson.FirstName,
+                    x.ClosedByPerson.LastName,
+                    x.ClosedByPerson.Initials
+                },
+                x.Comments,
+                x.IsActive_bl,
+                x.AssignedToProject_Id,
+                x.CreatedByPerson_Id,
+                x.ClosedByPerson_Id,
+            })
+            .ToList();
+        }
+
+
+        //filterForJsonLookup - filter data from service to be passed as response
+        private object filterForJsonLookup(List<ProjectEvent> records)
+        {
+            return records
+                .OrderBy(x => x.EventName)
+                .Select(x => new {
+                    id = x.Id,
+                    name = x.EventName 
+                })
+                .ToList();
+        }
 
         #endregion
     }

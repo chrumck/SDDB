@@ -15,200 +15,152 @@ using SDDB.Domain.Infrastructure;
 
 namespace SDDB.Domain.Services
 {
-    public class ProjectEventService
+    public class ProjectEventService: BaseDbService<ProjectEvent>
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
-        private IDbContextScopeFactory contextScopeFac;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
 
-        public ProjectEventService(IDbContextScopeFactory contextScopeFac)
-        {
-            this.contextScopeFac = contextScopeFac;
-        }
-
+        public ProjectEventService(IDbContextScopeFactory contextScopeFac, string userId) : base(contextScopeFac, userId) { }
+        
         //Methods--------------------------------------------------------------------------------------------------------------//
 
         //get all 
-        public virtual async Task<List<ProjectEvent>> GetAsync(string userId, bool getActive = true)
+        public virtual async Task<List<ProjectEvent>> GetAsync(bool getActive = true)
         {
-            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
-
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                
+
                 var records = await dbContext.ProjectEvents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive)
-                    .Include( x => x.AssignedToProject).Include( x => x.CreatedByPerson).Include( x => x.ClosedByPerson)
+                    .Where(x =>
+                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
+                        x.IsActive_bl == getActive
+                        )
+                    .Include(x => x.AssignedToProject)
+                    .Include(x => x.CreatedByPerson)
+                    .Include(x => x.ClosedByPerson)
                     .ToListAsync().ConfigureAwait(false);
 
-                foreach (var record in records) { record.FillRelatedIfNull(); }
-
+                records.FillRelatedIfNull();
                 return records;
             }
         }
 
         //get by ids
-        public virtual async Task<List<ProjectEvent>> GetAsync(string userId, string[] ids, bool getActive = true)
+        public virtual async Task<List<ProjectEvent>> GetAsync(string[] ids, bool getActive = true)
         {
-            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
-            if (ids == null || ids.Length == 0) throw new ArgumentNullException("ids");
+            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                
+
                 var records = await dbContext.ProjectEvents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive && ids.Contains(x.Id))
-                    .Include(x => x.AssignedToProject).Include(x => x.CreatedByPerson).Include(x => x.ClosedByPerson)
+                    .Where(x =>
+                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
+                        ids.Contains(x.Id) &&
+                        x.IsActive_bl == getActive
+                        )
+                    .Include(x => x.AssignedToProject)
+                    .Include(x => x.CreatedByPerson)
+                    .Include(x => x.ClosedByPerson)
                     .ToListAsync().ConfigureAwait(false);
 
-                foreach (var record in records) { record.FillRelatedIfNull(); }
-
+                records.FillRelatedIfNull();
                 return records;
             }
         }
 
         //get by projectIds 
-        public virtual async Task<List<ProjectEvent>> GetByProjectAsync(string userId, string[] projectIds = null, bool getActive = true)
+        public virtual async Task<List<ProjectEvent>> GetByProjectAsync(string[] projectIds, bool getActive = true)
         {
-            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+            projectIds = projectIds ?? new string[] { };
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
-                projectIds = projectIds ?? new string[] { };
-                
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
                 var records = await dbContext.ProjectEvents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
-                        (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) )
-                    .Include(x => x.AssignedToProject).Include(x => x.CreatedByPerson).Include(x => x.ClosedByPerson)
-                    .ToListAsync().ConfigureAwait(false);
+                   .Where(x =>
+                       x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
+                       (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
+                       x.IsActive_bl == getActive
+                       )
+                   .Include(x => x.AssignedToProject)
+                   .Include(x => x.CreatedByPerson)
+                   .Include(x => x.ClosedByPerson)
+                   .ToListAsync().ConfigureAwait(false);
 
-                foreach (var record in records) { record.FillRelatedIfNull(); }
-
+                records.FillRelatedIfNull();
                 return records;
             }
         }
                         
         //lookup by query
-        public virtual Task<List<ProjectEvent>> LookupAsync(string userId, string query = "", bool getActive = true)
+        public virtual async Task<List<ProjectEvent>> LookupAsync(string query = "", bool getActive = true)
         {
-            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
-
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.ProjectEvents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
-                    (x.EventName.Contains(query) || x.EventAltName.Contains(query))).ToListAsync();
+                var records = await dbContext.ProjectEvents
+                    .Where(x =>
+                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
+                        x.EventName.Contains(query) &&
+                        x.IsActive_bl == getActive
+                        )
+                    .ToListAsync().ConfigureAwait(false);
+                return records;
             }
         }
 
         //lookup by query and project
-        public virtual async Task<List<ProjectEvent>> LookupByProjAsync(string userId, string[] projectIds = null, string query = "", bool getActive = true)
+        public virtual async Task<List<ProjectEvent>> LookupByProjAsync(string[] projectIds = null, string query = "", bool getActive = true)
         {
-            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+            projectIds = projectIds ?? new string[] { };
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
-                projectIds = projectIds ?? new string[] { };
-
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 var records = await dbContext.ProjectEvents
-                    .Where(x => x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && x.IsActive_bl == getActive &&
+                    .Where(x =>
+                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
-                        (x.EventName.Contains(query) || x.EventAltName.Contains(query))).ToListAsync();
-
+                        x.EventName.Contains(query) &&
+                        x.IsActive_bl == getActive
+                        )
+                        .ToListAsync().ConfigureAwait(false);
                 return records;
             }
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
 
-        // Create and Update records given in []
-        public virtual async Task<DBResult> EditAsync(ProjectEvent[] records)
-        {
-            var errorMessage = ""; 
+        // Create and Update records given in [] - same as BaseDbService
 
-            using (var dbContextScope = contextScopeFac.Create())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    foreach (var record in records)
-                    {
-                        var dbEntry = await dbContext.ProjectEvents.FindAsync(record.Id).ConfigureAwait(false);
-                        if (dbEntry == null)
-                        {
-                            record.Id = Guid.NewGuid().ToString();
-                            dbContext.ProjectEvents.Add(record);
-                        }
-                        else
-                        {
-                            dbEntry.CopyModifiedProps(record);
-                        }
-                    }
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-                    trans.Complete();
-                }
-            }
-            if (errorMessage == "") { return new DBResult(); }
-            else
-            {
-                return new DBResult
-                {
-                    StatusCode = HttpStatusCode.Conflict,
-                    StatusDescription = "Errors editing records:\n" + errorMessage
-                };
-            }
-        }
-
-        // Delete records by their Ids
-        public virtual async Task<DBResult> DeleteAsync(string[] ids)
-        {
-            var errorMessage = "";
-
-            using (var dbContextScope = contextScopeFac.Create())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    foreach (var id in ids)
-                    {
-                        var dbEntry = await dbContext.ProjectEvents.FindAsync(id).ConfigureAwait(false);
-                        if (dbEntry != null)
-                        {
-                            if (String.IsNullOrEmpty(dbEntry.ClosedByPerson_Id) || dbEntry.EventClosed == null)
-                                errorMessage += string.Format("Event {0} not deleted. Please close with date and person before deleting\n", dbEntry.EventName);
-                            else
-                                dbEntry.IsActive_bl = false;
-                        }
-                        else
-                        {
-                            errorMessage += string.Format("Record with Id={0} not found\n", id);
-                        }
-                    }
-                    await dbContext.SaveChangesWithRetryAsync().ConfigureAwait(false);
-                    trans.Complete();
-                }
-            }
-            if (errorMessage == "") { return new DBResult(); }
-            else
-            {
-                return new DBResult
-                {
-                    StatusCode = HttpStatusCode.Conflict,
-                    StatusDescription = "Errors deleting records:\n" + errorMessage
-                };
-            }
-        }
+        // Delete records by their Ids - same as BaseDbService
+        // See overriden checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
 
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
+
+        //helper - check before deleting records, takes record ids array
+        protected override async Task checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
+        {
+            for (int i = 0; i < ids.Length; i++)
+            {
+                var currentId = ids[i];
+                var dbEntry = await dbContext.ProjectEvents.FindAsync(currentId).ConfigureAwait(false);
+                if (String.IsNullOrEmpty(dbEntry.ClosedByPerson_Id) || dbEntry.EventClosed == null)
+                {
+                    throw new DbBadRequestException(
+                        string.Format("Event {0} not closed and/or no closed-by value specified.\nDelete aborted.",
+                            dbEntry.EventName));
+                }
+            }
+        }
 
         #endregion
     }
