@@ -19,12 +19,15 @@ namespace SDDB.WebUI.ControllersSrv
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
-        private PersonLogEntryService prsLogEntryService;
+        private PersonLogEntryService personLogEntryService;
+        private PersonLogEntryFileService personLogEntryFileService;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
-        public PersonLogEntrySrvController(PersonLogEntryService prsLogEntryService)
+        
+        public PersonLogEntrySrvController(PersonLogEntryService personLogEntryService, PersonLogEntryFileService personLogEntryFileService)
         {
-            this.prsLogEntryService = prsLogEntryService;
+            this.personLogEntryService = personLogEntryService;
+            this.personLogEntryFileService = personLogEntryFileService;
         }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
@@ -35,7 +38,7 @@ namespace SDDB.WebUI.ControllersSrv
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
             ViewBag.ServiceName = "PersonLogEntryService.GetAsync";
-            var records = await prsLogEntryService.GetAsync(ids, getActive).ConfigureAwait(false);
+            var records = await personLogEntryService.GetAsync(ids, getActive).ConfigureAwait(false);
             if (!User.IsInRole("PersonLogEntry_View")) { records = records.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
             return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
@@ -47,7 +50,7 @@ namespace SDDB.WebUI.ControllersSrv
             DateTime? startDate, DateTime? endDate, bool getActive = true)
         {
             ViewBag.ServiceName = "PersonLogEntryService.GetByAltIdsAsync";
-            var records = await prsLogEntryService.GetByAltIdsAsync(personIds, projectIds, assyIds, typeIds, startDate, endDate, getActive)
+            var records = await personLogEntryService.GetByAltIdsAsync(personIds, projectIds, assyIds, typeIds, startDate, endDate, getActive)
                 .ConfigureAwait(false);
             if (!User.IsInRole("PersonLogEntry_View")) { records = records.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
             return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
@@ -63,7 +66,7 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonLogEntryService.EditAsync";
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(records).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
-            var newEntryIds = await prsLogEntryService.EditAsync(records).ConfigureAwait(false);
+            var newEntryIds = await personLogEntryService.EditAsync(records).ConfigureAwait(false);
             return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
         }
 
@@ -75,7 +78,7 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonLogEntryService.DeleteAsync";
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(ids).ConfigureAwait(false)))
             { return JsonResponseForNoRights(); }
-            await prsLogEntryService.DeleteAsync(ids).ConfigureAwait(false);
+            await personLogEntryService.DeleteAsync(ids).ConfigureAwait(false);
             return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
@@ -88,9 +91,8 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryAssysAsync";
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
-            var records = (await prsLogEntryService.GetPrsLogEntryAssysAsync(logEntryId).ConfigureAwait(false))
-                .Select(x => new { x.Id, x.AssyName, x.AssyAltName });
-            return Json(records, JsonRequestBehavior.AllowGet);
+            var records = await personLogEntryService.GetPrsLogEntryAssysAsync(logEntryId).ConfigureAwait(false);
+            return Json(filterForJsonAssys(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonLogEntrySrv/GetPrsLogEntryAssysNot
@@ -100,9 +102,8 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryAssysNotAsync";
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
-            var records = (await prsLogEntryService.GetPrsLogEntryAssysNotAsync(logEntryId, locId).ConfigureAwait(false))
-                .Select(x => new { x.Id, x.AssyName, x.AssyAltName });
-            return Json(records, JsonRequestBehavior.AllowGet);
+            var records = await personLogEntryService.GetPrsLogEntryAssysNotAsync(logEntryId, locId).ConfigureAwait(false);
+            return Json(filterForJsonAssys(records), JsonRequestBehavior.AllowGet);
         }
 
         // POST: /PersonLogEntrySrv/EditPrsLogEntryAssys
@@ -113,7 +114,7 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonLogEntryService.AddRemoveRelated";
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(ids).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
-            await prsLogEntryService.AddRemoveRelated(ids, idsAddRem, x => x.PrsLogEntryAssemblyDbs, isAdd).ConfigureAwait(false);
+            await personLogEntryService.AddRemoveRelated(ids, idsAddRem, x => x.PrsLogEntryAssemblyDbs, isAdd).ConfigureAwait(false);
             return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
@@ -126,9 +127,8 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryPersonsAsync";
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
-            var records = (await prsLogEntryService.GetPrsLogEntryPersonsAsync(logEntryId).ConfigureAwait(false))
-                .Select(x => new { x.Id, x.FirstName, x.LastName, x.Initials });
-            return Json(records, JsonRequestBehavior.AllowGet);
+            var records = await personLogEntryService.GetPrsLogEntryPersonsAsync(logEntryId).ConfigureAwait(false);
+            return Json(filterForJsonPersons(records), JsonRequestBehavior.AllowGet);
         }
 
         // GET: /PersonLogEntrySrv/GetPrsLogEntryPersonsNot
@@ -138,9 +138,8 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryPersonsNotAsync";
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
-            var records = (await prsLogEntryService.GetPrsLogEntryPersonsNotAsync(UserId, logEntryId).ConfigureAwait(false))
-                .Select(x => new { x.Id, x.FirstName, x.LastName, x.Initials });
-            return Json(records, JsonRequestBehavior.AllowGet);
+            var records = await personLogEntryService.GetPrsLogEntryPersonsNotAsync(UserId, logEntryId).ConfigureAwait(false);
+            return Json(filterForJsonPersons(records), JsonRequestBehavior.AllowGet);
         }
 
         // POST: /PersonLogEntrySrv/EditPrsLogEntryPersons
@@ -151,29 +150,39 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonLogEntryService.AddRemoveRelated";
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(ids).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
-            await prsLogEntryService.AddRemoveRelated(ids, idsAddRem, x => x.PrsLogEntryPersons, isAdd).ConfigureAwait(false);
+            await personLogEntryService.AddRemoveRelated(ids, idsAddRem, x => x.PrsLogEntryPersons, isAdd).ConfigureAwait(false);
             return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
 
+        // GET: /PersonLogEntrySrv/ListFiles
+        [DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
+        public async Task<ActionResult> ListFiles(string logEntryId)
+        {
+            ViewBag.ServiceName = "PersonLogEntryFileService.ListAsync";
+            if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
+                { return JsonResponseForNoRights(); }
+            var records = await personLogEntryFileService.ListAsync(logEntryId).ConfigureAwait(false);
+            return new DBJsonDateTimeISO { Data = filterForJsonFiles(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+        }
+
+        // POST: /PersonLogEntrySrv/UploadFiles
+        [HttpPost]
+        [DBSrvAuth("PersonLogEntry_Edit,YourActivity_Edit")]
+        public async Task<ActionResult> UploadFiles(string logEntryId)
+        {
+            ViewBag.ServiceName = "fileRepoService.AddFilesAsync";
+            if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
+                { return JsonResponseForNoRights(); }
+            var filesList = await returnFileListFromRequestHelper(logEntryId).ConfigureAwait(false);
+            await personLogEntryFileService.AddFilesAsync(filesList).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+        }
+
         //// GET: /PersonLogEntrySrv/GetFiles
         //[DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
         //public async Task<ActionResult> GetFiles(string id)
-        //{
-        //    if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { id }).ConfigureAwait(false)))
-        //    { return JsonResponseForNoRights(); }
-
-        //    var data = (await fileRepoService.GetAsync(id).ConfigureAwait(false));
-
-        //    ViewBag.ServiceName = "IFileRepoService.Get";
-        //    ViewBag.StatusCode = HttpStatusCode.OK;
-        //    return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
-        //}
-
-        //// GET: /PersonLogEntrySrv/ListFiles
-        //[DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
-        //public async Task<ActionResult> ListFiles(string id)
         //{
         //    if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { id }).ConfigureAwait(false)))
         //    { return JsonResponseForNoRights(); }
@@ -194,7 +203,7 @@ namespace SDDB.WebUI.ControllersSrv
         //    { return JsonResponseForNoRights(); }
 
         //    var data = await fileRepoService.DownloadAsync(id, names).ConfigureAwait(false);
-                       
+
         //    var tokenCookie = new HttpCookie("DlToken", DlToken.ToString());
         //    Response.Cookies.Set(tokenCookie);
 
@@ -209,33 +218,6 @@ namespace SDDB.WebUI.ControllersSrv
         //    }
         //}
 
-        //// POST: /PersonLogEntrySrv/UploadFiles
-        //[HttpPost]
-        //[DBSrvAuth("PersonLogEntry_Edit,YourActivity_Edit")]
-        //public async Task<ActionResult> UploadFiles(string id)
-        //{
-        //    if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(new[] { id }).ConfigureAwait(false)))
-        //    { return JsonResponseForNoRights(); }
-
-        //    var filesList = new List<FileMemStream>();
-        //    foreach (string fileName in Request.Files)
-        //    {
-        //        var fileContent = Request.Files[fileName];
-        //        if (fileContent != null && fileContent.ContentLength > 0)
-        //        {
-        //            var fileMemStream = new FileMemStream();
-        //            await fileContent.InputStream.CopyToAsync(fileMemStream).ConfigureAwait(false);
-        //            fileMemStream.FileName = fileContent.FileName;
-        //            filesList.Add(fileMemStream);
-        //        }
-        //    }
-            
-        //    await fileRepoService.UploadAsync(id, filesList.ToArray()).ConfigureAwait(false);
-            
-        //    ViewBag.ServiceName = "fileRepoService.UploadAsync";
-        //    ViewBag.StatusCode = HttpStatusCode.OK;
-        //    return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-        //}
 
         //// POST: /PersonLogEntrySrv/DeleteFiles
         //[HttpPost]
@@ -258,8 +240,7 @@ namespace SDDB.WebUI.ControllersSrv
         //take data and select fields for JSON - full data set
         private object filterForJsonFull(List<PersonLogEntry> records) 
         {
-            return records.Select(x => new
-            {
+            return records.Select(x => new {
                 x.Id,
                 x.LogEntryDateTime,
                 EnteredByPerson_ = new {
@@ -293,6 +274,43 @@ namespace SDDB.WebUI.ControllersSrv
             }).ToList();
         }
 
+        //filterForJsonPersons - filter data from service to be passed as response
+        private object filterForJsonPersons(List<Person> records)
+        {
+            return records
+                .Select(x => new {
+                    x.Id,
+                    x.LastName,
+                    x.FirstName,
+                    x.Initials
+                });
+        }
+
+        //filterForJsonAssys - filter data from service to be passed as response
+        private object filterForJsonAssys(List<AssemblyDb> records)
+        {
+            return records
+                .Select(x => new {
+                    x.Id,
+                    x.AssyName,
+                    x.AssyAltName
+                });
+        }
+
+        //filterForJsonPersons - filter data from service to be passed as response
+        private object filterForJsonFiles(List<PersonLogEntryFile> records)
+        {
+            return records
+                .Select(x => new
+                {
+                    x.Id,
+                    x.FileName,
+                    x.FileType,
+                    FileSize = x.FileSize / 1000,
+                    x.FileDateTime,
+                });
+        }
+
         //check if person log entry belongs to user - overload for single id
         private async Task<bool> isUserActivity(string id)
         {
@@ -303,7 +321,7 @@ namespace SDDB.WebUI.ControllersSrv
         //check if person log entry belongs to user
         private async Task<bool> isUserActivity(string[] ids)
         {
-            var dbEntries = await prsLogEntryService.GetAllAsync(ids).ConfigureAwait(false);
+            var dbEntries = await personLogEntryService.GetAllAsync(ids).ConfigureAwait(false);
             if (dbEntries.Count() == 0) { return true; }
             return dbEntries.All(x => x.EnteredByPerson_Id == UserId);
         }
@@ -323,6 +341,36 @@ namespace SDDB.WebUI.ControllersSrv
             Response.StatusCode = (int)ViewBag.StatusCode;
             return Json(new { Success = "False", responseText = ViewBag.StatusDescription }, JsonRequestBehavior.AllowGet); 
         }
+
+        //returnFileListFromRequestHelper
+        private async Task<PersonLogEntryFile[]> returnFileListFromRequestHelper(string logEntryId)
+        {
+            var filesList = new List<PersonLogEntryFile>();
+            foreach (string fileName in Request.Files)
+            {
+                var fileContent = Request.Files[fileName];
+                if (fileContent != null && fileContent.ContentLength > 0)
+                {
+                    var personLogEntryFile = new PersonLogEntryFile();
+                    personLogEntryFile.FileName = fileContent.FileName;
+                    personLogEntryFile.FileType = fileContent.ContentType;
+                    personLogEntryFile.FileDateTime = DateTime.Now;
+                    personLogEntryFile.AssignedToPersonLogEntry_Id = logEntryId;
+                    using (var fileData = new MemoryStream())
+                    {
+                        await fileContent.InputStream.CopyToAsync(fileData).ConfigureAwait(false);
+                        personLogEntryFile.FileData = fileData.ToArray();
+                    }
+                    personLogEntryFile.FileSize = personLogEntryFile.FileData.Length;
+                    filesList.Add(personLogEntryFile);
+                }
+            }
+            return filesList.ToArray();
+        }
+
+        
+
+
 
 
         #endregion

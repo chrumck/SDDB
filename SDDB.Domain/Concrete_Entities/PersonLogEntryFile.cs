@@ -27,7 +27,7 @@ namespace SDDB.Domain.Entities
         public string FileType { get; set; }
 
         [Required(ErrorMessage = "File Size field is required")]
-        public Int64 FileSize { get; set; }
+        public int FileSize { get; set; }
 
         [Required(ErrorMessage = "File DateTime field is required")]
         [DBIsDateTimeISO] 

@@ -57,14 +57,14 @@ namespace SDDB.Domain.Entities
         public string[] ModifiedProperties { get; set; }
 
         [NotMapped]
-        public const int DataLength = 65535;
-
-        [NotMapped]
         [DefaultValue(true)]
         public bool IsActive_bl { get; set; }
 
         [NotMapped]
         public string LastSavedByPerson_Id { get; set; }
+
+        [NotMapped]
+        public const int DataChunkLength = 65535;
     }
   
 

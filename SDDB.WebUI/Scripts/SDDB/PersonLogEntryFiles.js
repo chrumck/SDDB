@@ -77,7 +77,7 @@ $(document).ready(function () {
                 }
                 $("#ModalUpload").modal({ show: true, backdrop: "static", keyboard: false });
                 $.ajax({
-                    type: "POST", url: "/PersonLogEntrySrv/UploadFiles?id=" + CurrIds[0],
+                    type: "POST", url: "/PersonLogEntrySrv/UploadFiles?logEntryId=" + CurrIds[0],
                     contentType: false, processData: false, data: data,
                     xhr: function () {
                         XHR.upload.addEventListener("progress", function (e) {
@@ -134,14 +134,17 @@ $(document).ready(function () {
     //TableLogEntryFiles
     TableLogEntryFiles = $("#TableLogEntryFiles").DataTable({
         columns: [
-            { data: "Name", name: "Name" },//0
-            { data: "Size", name: "Size" },//1
-            { data: "Modified", name: "Modified" }//2
+            { data: "Id", name: "Id" },//0
+            { data: "FileName", name: "FileName" },//1
+            { data: "FileType", name: "FileType" },//2
+            { data: "FileSize", name: "FileSize" },//3
+            { data: "FileDateTime", name: "FileDateTime" }//4
         ],
         columnDefs: [
-            { targets: [], visible: false }, // - never show
-            { targets: [], searchable: false },  //"orderable": false, "visible": false
-            { targets: [2], className: "hidden-xs" }
+            { targets: [0], visible: false }, // - never show
+            { targets: [0], searchable: false },  //"orderable": false, "visible": false
+            { targets: [2], className: "hidden-xs" }, // - first set of columns
+            { targets: [4], className: "hidden-xs hidden-sm" }, // - first set of columns
         ],
         bAutoWidth: false,
         language: {
@@ -177,7 +180,7 @@ function fillLogEntryFilesForm(panelText) {
 
     showModalWait();
 
-    refreshTableGeneric(TableLogEntryFiles, "/PersonLogEntrySrv/GetFiles", { id: CurrIds[0] }, "GET")
+    refreshTableGeneric(TableLogEntryFiles, "/PersonLogEntrySrv/ListFiles", { logEntryId: CurrIds[0] }, "GET")
         .always(hideModalWait)
         .done(function () {
             $("#MainView").addClass("hide");

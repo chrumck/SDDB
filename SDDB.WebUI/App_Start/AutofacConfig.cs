@@ -73,7 +73,7 @@ namespace SDDB.WebUI
             builder.RegisterType<PersonGroupService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
             builder.RegisterType<PersonActivityTypeService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
             builder.RegisterType<PersonLogEntryService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
-            builder.RegisterType<PersonLogEntryFileService>().AsSelf().InstancePerDependency();
+            builder.RegisterType<PersonLogEntryFileService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
 
             builder.RegisterType<ProjectService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();
             builder.RegisterType<ProjectEventService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();

@@ -16,22 +16,14 @@ using SDDB.Domain.Infrastructure;
 
 namespace SDDB.Domain.Services
 {
-    public class PersonLogEntryFileService
+    public class PersonLogEntryFileService :BaseDbService<PersonLogEntryFile>
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
-        private IDbContextScopeFactory contextScopeFac;
-        private string userId;
-
         //Constructors---------------------------------------------------------------------------------------------------------//
 
-        public PersonLogEntryFileService(IDbContextScopeFactory contextScopeFac, string userId)
-        {
-            if (String.IsNullOrEmpty(userId)) { throw new ArgumentNullException("userId"); }
-
-            this.contextScopeFac = contextScopeFac;
-            this.userId = userId;
-        }
+        public PersonLogEntryFileService(IDbContextScopeFactory contextScopeFac, string userId) 
+            : base(contextScopeFac, userId) { }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
@@ -49,37 +41,26 @@ namespace SDDB.Domain.Services
                         x.AssignedToPersonLogEntry.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
                         x.AssignedToPersonLogEntry_Id == logEntryId)
                     .ToListAsync().ConfigureAwait(false);
-
                 return records;
             }
         }
-
-        //get by PersonLogEntryFile ids
-        public virtual async Task<List<PersonLogEntryFile>> ListAsync(string[] ids)
-        {
-            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
-
-            using (var dbContextScope = contextScopeFac.CreateReadOnly())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-
-                var records = await dbContext.PersonLogEntryFiles
-                    .Where(x => 
-                        x.AssignedToPersonLogEntry.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
-                        ids.Contains(x.Id))
-                    .ToListAsync().ConfigureAwait(false);
-
-                return records;
-            }
-        }
-        
+                
         //-----------------------------------------------------------------------------------------------------------------------
 
-        ////upload file
-        //public virtual async Task UploadAsync(PersonLogEntryFile file)
-        //{
 
-        //}
+        //upload file - overload for PersonLogEntryFile[]
+        public virtual async Task<List<String>> AddFilesAsync(PersonLogEntryFile[] records)
+        {
+            if (records == null || records.Length == 0) { throw new ArgumentNullException("files"); }
+
+            var newEntryIds = await dbScopeHelperAsync(dbContext =>
+            {
+                return Task.FromResult(addToPersonLogEntryFilesHelper(dbContext, records));
+            })
+            .ConfigureAwait(false);
+
+            return newEntryIds;
+        }
 
 
         ////DownloadAsync - download log entry files from database. Return file if only one or .zip if many
@@ -95,14 +76,56 @@ namespace SDDB.Domain.Services
         //}
 
 
-        
-
-        //-----------------------------------------------------------------------------------------------------------------------
-
+                
         
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
+
+        //upload (save to database) - overload for PersonLogEntryFile[]
+        private List<string> addToPersonLogEntryFilesHelper(EFDbContext dbContext, PersonLogEntryFile[] records)
+        {
+            var newEntryIds = new List<string>();
+            for (int i = 0; i < records.Length; i++)
+            {
+                var newEntryId = addToPersonLogEntryFilesHelper(dbContext, records[i]);
+                newEntryIds.Add(newEntryId);
+            }
+            return newEntryIds;
+        }
+
+        //upload (save to database) single PersonLogEntryFile
+        private string addToPersonLogEntryFilesHelper(EFDbContext dbContext, PersonLogEntryFile record)
+        {
+            if (record == null) { throw new ArgumentNullException("record"); }
+
+            record.Id = Guid.NewGuid().ToString();
+            record.LastSavedByPerson_Id = userId;
+            dbContext.PersonLogEntryFiles.Add(record);
+
+            addFileDataToDbHelper(dbContext, record);
+
+            return record.Id;
+        }
+
+        //add data from PersonLogEntryFile.fileData to PersonLogEntryFileDatas
+        private void addFileDataToDbHelper(EFDbContext dbContext, PersonLogEntryFile record)
+        {
+            int noOfChunks = record.FileSize / PersonLogEntryFileData.DataChunkLength + 1;
+            for (int i = 0; i < noOfChunks; i++)
+            {
+                dbContext.PersonLogEntryFileDatas.Add(new PersonLogEntryFileData
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    ChunkNumber = i,
+                    Data = record.FileData
+                        .Skip(i * PersonLogEntryFileData.DataChunkLength)
+                        .Take(PersonLogEntryFileData.DataChunkLength).ToArray(),
+                    PersonLogEntryFile_Id = record.Id
+                });
+            }
+        }
+
 
         #endregion
     }
