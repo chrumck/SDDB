@@ -163,7 +163,7 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonLogEntryFileService.ListAsync";
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
-            var records = await personLogEntryFileService.ListAsync(logEntryId).ConfigureAwait(false);
+            List<PersonLogEntryFile> records = await personLogEntryFileService.ListAsync(logEntryId).ConfigureAwait(false);
             return new DBJsonDateTimeISO { Data = filterForJsonFiles(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
@@ -172,51 +172,32 @@ namespace SDDB.WebUI.ControllersSrv
         [DBSrvAuth("PersonLogEntry_Edit,YourActivity_Edit")]
         public async Task<ActionResult> UploadFiles(string logEntryId)
         {
-            ViewBag.ServiceName = "fileRepoService.AddFilesAsync";
+            ViewBag.ServiceName = "fileRepoService.UploadFilesAsync";
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
-            var filesList = await returnFileListFromRequestHelper(logEntryId).ConfigureAwait(false);
-            await personLogEntryFileService.AddFilesAsync(filesList).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            List<PersonLogEntryFile> records = await returnFileListFromRequestHelper(logEntryId).ConfigureAwait(false);
+            List<string> newEntryIds = await personLogEntryFileService.UploadFilesAsync(records).ConfigureAwait(false);
+            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
         }
 
-        //// GET: /PersonLogEntrySrv/GetFiles
-        //[DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
-        //public async Task<ActionResult> GetFiles(string id)
-        //{
-        //    if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { id }).ConfigureAwait(false)))
-        //    { return JsonResponseForNoRights(); }
+        // POST: /PersonLogEntrySrv/DownloadFiles
+        [HttpPost]
+        [DBSrvAuth("PersonLogEntry_View,YourActivity_View", false)]
+        public async Task<ActionResult> DownloadFiles(long DlToken, string logEntryId, string[] fileIds)
+        {
+            ViewBag.ServiceName = "personLogEntryFileService.DownloadAsync";
 
-        //    var data = (await fileRepoService.GetAsync(id).ConfigureAwait(false));
+            var tokenCookie = new HttpCookie("DlToken", DlToken.ToString());
+            Response.Cookies.Set(tokenCookie);
 
-        //    ViewBag.ServiceName = "IFileRepoService.Get";
-        //    ViewBag.StatusCode = HttpStatusCode.OK;
-        //    return new DBJsonDateTimeISO { Data = data, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
-        //}
+            if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
+                { return JsonResponseForNoRights(); }
 
-        //// POST: /PersonLogEntrySrv/DownloadFiles
-        //[HttpPost]
-        //[DBSrvAuth("PersonLogEntry_View,YourActivity_View", false)]
-        //public async Task<ActionResult> DownloadFiles(long DlToken, string id, string[] names)
-        //{
-        //    if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { id }).ConfigureAwait(false)))
-        //    { return JsonResponseForNoRights(); }
-
-        //    var data = await fileRepoService.DownloadAsync(id, names).ConfigureAwait(false);
-
-        //    var tokenCookie = new HttpCookie("DlToken", DlToken.ToString());
-        //    Response.Cookies.Set(tokenCookie);
-
-        //    var fileName = (names.Length == 1) ? names[0] : "SDDBFiles_" + String.Format("_{0:yyyyMMdd_HHmm}", DateTime.Now) + ".zip";
-        //    ViewBag.ServiceName = "IFileRepoService.DownloadAsync";
-        //    ViewBag.StatusCode = HttpStatusCode.OK;
-        //    if (data != null && data.LongLength != 0) return File(data, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
-        //    else
-        //    {
-        //        Response.StatusCode = (int)HttpStatusCode.Gone;
-        //        return Content("File(s) not found.");
-        //    }
-        //}
+            PersonLogEntryFile file = await personLogEntryFileService.DownloadAsync(fileIds).ConfigureAwait(false);
+            byte[] fileData = file.FileData.ToArray();
+            file.FileData.Dispose();
+            return File(fileData, System.Net.Mime.MediaTypeNames.Application.Octet, file.FileName);
+        }
 
 
         //// POST: /PersonLogEntrySrv/DeleteFiles
@@ -243,25 +224,30 @@ namespace SDDB.WebUI.ControllersSrv
             return records.Select(x => new {
                 x.Id,
                 x.LogEntryDateTime,
-                EnteredByPerson_ = new {
+                EnteredByPerson_ = new
+                {
                     x.EnteredByPerson.FirstName,
                     x.EnteredByPerson.LastName,
-                    x.EnteredByPerson.Initials 
+                    x.EnteredByPerson.Initials
                 },
-                PersonActivityType_ = new { 
-                    x.PersonActivityType.ActivityTypeName 
+                PersonActivityType_ = new
+                {
+                    x.PersonActivityType.ActivityTypeName
                 },
                 x.ManHours,
-                AssignedToProject_ = new { 
+                AssignedToProject_ = new
+                {
                     x.AssignedToProject.ProjectName,
                     x.AssignedToProject.ProjectAltName,
-                    x.AssignedToProject.ProjectCode 
+                    x.AssignedToProject.ProjectCode
                 },
-                AssignedToLocation_ = new { 
+                AssignedToLocation_ = new
+                {
                     x.AssignedToLocation.LocName,
-                    x.AssignedToLocation.LocAltName 
+                    x.AssignedToLocation.LocAltName
                 },
-                AssignedToProjectEvent_ = new {
+                AssignedToProjectEvent_ = new
+                {
                     x.AssignedToProjectEvent.EventName
                 },
                 x.Comments,
@@ -308,6 +294,12 @@ namespace SDDB.WebUI.ControllersSrv
                     x.FileType,
                     FileSize = x.FileSize / 1000,
                     x.FileDateTime,
+                    LastSavedByPerson_ = new
+                    {
+                        x.LastSavedByPerson.FirstName,
+                        x.LastSavedByPerson.LastName,
+                        x.LastSavedByPerson.Initials
+                    }
                 });
         }
 
@@ -343,7 +335,7 @@ namespace SDDB.WebUI.ControllersSrv
         }
 
         //returnFileListFromRequestHelper
-        private async Task<PersonLogEntryFile[]> returnFileListFromRequestHelper(string logEntryId)
+        private async Task<List<PersonLogEntryFile>> returnFileListFromRequestHelper(string logEntryId)
         {
             var filesList = new List<PersonLogEntryFile>();
             foreach (string fileName in Request.Files)
@@ -361,7 +353,7 @@ namespace SDDB.WebUI.ControllersSrv
                     filesList.Add(personLogEntryFile);
                 }
             }
-            return filesList.ToArray();
+            return filesList;
         }
 
         

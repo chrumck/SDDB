@@ -12,7 +12,7 @@ using SDDB.Domain.Abstract;
 
 namespace SDDB.Domain.Services
 {
-    public class DbFtpRepoService : IFileRepoService
+    public class DbFtpRepoService 
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
@@ -112,7 +112,7 @@ namespace SDDB.Domain.Services
                     using (var zipStream = new MemoryStream())
                     {
                         var zipEntriesCount = 0;
-                        using (var zip = new ZipArchive(zipStream,ZipArchiveMode.Create,true))
+                        using (ZipArchive zip = new ZipArchive(zipStream,ZipArchiveMode.Create,true))
                         {
                             var i = 0; var downloadedCount = 0; var dlTasks = new List<Task<FileMemStream>>();
                             while (downloadedCount < names.Length)
@@ -305,6 +305,23 @@ namespace SDDB.Domain.Services
         
         #endregion
         //---------------------------------------------------------------------------------------------------------------------//
+
+        //MemoryStream + file metadata
+        public class FileMemStream : MemoryStream
+        {
+            public string FileName { get; set; }
+            public string FileType { get; set; }
+            public Int64 FileSize { get; set; }
+            public DateTime FileDateTime { get; set; }
+
+        }
+
+        public class FtpFileDetail
+        {
+            public string Name { get; set; }
+            public double Size { get; set; }
+            public DateTime Modified { get; set; }
+        }
     }
 
     

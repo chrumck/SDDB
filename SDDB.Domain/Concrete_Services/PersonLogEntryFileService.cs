@@ -3,6 +3,8 @@ using System.Data.Entity;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -20,12 +22,18 @@ namespace SDDB.Domain.Services
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
+        private int dataChunkLength;
+
         //Constructors---------------------------------------------------------------------------------------------------------//
 
         public PersonLogEntryFileService(IDbContextScopeFactory contextScopeFac, string userId) 
-            : base(contextScopeFac, userId) { }
+            : base(contextScopeFac, userId) 
+        {
+            this.dataChunkLength = PersonLogEntryFileData.DataChunkLength;
+        }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
+
 
         //list files by PersonLogEntry_Id 
         public virtual async Task<List<PersonLogEntryFile>> ListAsync(string logEntryId)
@@ -39,7 +47,9 @@ namespace SDDB.Domain.Services
                 var records = await dbContext.PersonLogEntryFiles
                     .Where(x => 
                         x.AssignedToPersonLogEntry.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
-                        x.AssignedToPersonLogEntry_Id == logEntryId)
+                        x.AssignedToPersonLogEntry_Id == logEntryId
+                    )
+                    .Include(x => x.LastSavedByPerson)
                     .ToListAsync().ConfigureAwait(false);
                 return records;
             }
@@ -47,27 +57,39 @@ namespace SDDB.Domain.Services
                 
         //-----------------------------------------------------------------------------------------------------------------------
 
+        // Create and Update records given in []
+        public override Task<List<string>> EditAsync(PersonLogEntryFile[] records)
+        {
+            throw new NotImplementedException();
+        }
 
         //upload file - overload for PersonLogEntryFile[]
-        public virtual async Task<List<String>> AddFilesAsync(PersonLogEntryFile[] records)
+        public virtual async Task<List<String>> UploadFilesAsync(List<PersonLogEntryFile> records)
         {
-            if (records == null || records.Length == 0) { throw new ArgumentNullException("files"); }
+            if (records == null || records.Count == 0) { throw new ArgumentNullException("records"); }
 
             var newEntryIds = await dbScopeHelperAsync(dbContext =>
             {
-                return addToPersonLogEntryFilesHelper(dbContext, records);
+                return addPersonLogEntryFile(dbContext, records);
             })
             .ConfigureAwait(false);
-
             return newEntryIds;
         }
 
+        //DownloadAsync - download log entry file from database. 
+        public virtual async Task<PersonLogEntryFile> DownloadAsync(string[] fileIds)
+        {
+            if (fileIds == null || fileIds.Length == 0) { throw new ArgumentNullException("fileIds"); }
 
-        ////DownloadAsync - download log entry files from database. Return file if only one or .zip if many
-        //public virtual async Task<byte[]> DownloadAsync(string id, string[] names)
-        //{ 
-        //}
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
+                if (fileIds.Length == 1) { return await getPersonLogEntryFile(dbContext, fileIds[0]); }
+
+                return await getZipFileFromEntryFiles(dbContext, fileIds);
+            }
+        }
 
         ////DeleteAsync - upload received files to ftp
         //public virtual async Task DeleteAsync(string id)
@@ -82,20 +104,20 @@ namespace SDDB.Domain.Services
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
 
-        //upload (save to database) - overload for PersonLogEntryFile[]
-        private async Task<List<string>> addToPersonLogEntryFilesHelper(EFDbContext dbContext, PersonLogEntryFile[] records)
+        //upload (save to database) PersonLogEntryFile - overload for PersonLogEntryFile[]
+        private async Task<List<string>> addPersonLogEntryFile(EFDbContext dbContext, List<PersonLogEntryFile> records)
         {
             var newEntryIds = new List<string>();
-            for (int i = 0; i < records.Length; i++)
+            foreach (PersonLogEntryFile record in records)
             {
-                var newEntryId = await addToPersonLogEntryFilesHelper(dbContext, records[i]).ConfigureAwait(false);
+                var newEntryId = await addPersonLogEntryFile(dbContext, record).ConfigureAwait(false);
                 newEntryIds.Add(newEntryId);
             }
             return newEntryIds;
         }
 
-        //upload (save to database) single PersonLogEntryFile
-        private async Task<string> addToPersonLogEntryFilesHelper(EFDbContext dbContext, PersonLogEntryFile record)
+        //upload (save to database) PersonLogEntryFile
+        private async Task<string> addPersonLogEntryFile(EFDbContext dbContext, PersonLogEntryFile record)
         {
             if (record == null) { throw new ArgumentNullException("record"); }
 
@@ -103,21 +125,21 @@ namespace SDDB.Domain.Services
             record.LastSavedByPerson_Id = userId;
             dbContext.PersonLogEntryFiles.Add(record);
 
-            await addFileDataToDbHelper(dbContext, record).ConfigureAwait(false);
-
+            await addPersonLogEntryFileData(dbContext, record).ConfigureAwait(false);
             return record.Id;
         }
 
-        //add data from PersonLogEntryFile.fileData to PersonLogEntryFileDatas
-        private async Task addFileDataToDbHelper(EFDbContext dbContext, PersonLogEntryFile record)
+        //add data from PersonLogEntryFile.FileData to PersonLogEntryFileDatas
+        private async Task addPersonLogEntryFileData(EFDbContext dbContext, PersonLogEntryFile record)
         {
-            var dataLength = PersonLogEntryFileData.DataChunkLength;
-            int noOfChunks = record.FileSize / dataLength + 1;
-            var chunkDataBuffer = new byte[dataLength];
+            var noOfChunks = (record.FileSize % dataChunkLength == 0) ?
+                    record.FileSize / dataChunkLength : record.FileSize / dataChunkLength + 1;
 
+            record.FileData.Position = 0;
             for (int i = 0; i < noOfChunks; i++)
             {
-                await record.FileData.ReadAsync(chunkDataBuffer, 0, dataLength).ConfigureAwait(false);
+                var chunkDataBuffer = new byte[dataChunkLength];
+                await record.FileData.ReadAsync(chunkDataBuffer, 0, dataChunkLength).ConfigureAwait(false);
                 dbContext.PersonLogEntryFileDatas.Add(new PersonLogEntryFileData
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -126,9 +148,56 @@ namespace SDDB.Domain.Services
                     PersonLogEntryFile_Id = record.Id
                 });
             }
+            record.FileData.Dispose();
         }
 
+        //getPersonLogEntryFile - get all data chunks and merge them into getPersonLogEntryFile.FileData 
+        private async Task<PersonLogEntryFile> getPersonLogEntryFile(EFDbContext dbContext, string fileId)
+        {
+            PersonLogEntryFile record = await dbContext.PersonLogEntryFiles.FirstOrDefaultAsync(x => x.Id == fileId)
+                .ConfigureAwait(false);
+            if (record == null)
+                { throw new DbBadRequestException( String.Format("Log Entry File with Id={0} not found", fileId)); }
 
+            int noOfChunks = (record.FileSize % dataChunkLength == 0) ?
+                record.FileSize / dataChunkLength : record.FileSize / dataChunkLength + 1;
+
+            for (int i = 0; i < noOfChunks; i++)
+            {
+                PersonLogEntryFileData fileDataChunk = await dbContext.PersonLogEntryFileDatas.FirstOrDefaultAsync(x =>
+                        x.PersonLogEntryFile_Id == fileId && x.ChunkNumber == i).ConfigureAwait(false);
+                if (fileDataChunk == null)
+                {
+                    record.FileData.Dispose();
+                    throw new DbBadRequestException(
+                        String.Format("Data Chunk for Log Entry File {0} not found", record.FileName)); 
+                }
+                await record.FileData.WriteAsync(fileDataChunk.Data, 0, fileDataChunk.Data.Length);
+            }
+            return record;
+        }
+
+        //getZipFileFromEntryFiles - get all files from fileIds and zip them into getPersonLogEntryFile.FileData
+        private async Task<PersonLogEntryFile> getZipFileFromEntryFiles(EFDbContext dbContext, string[] fileIds)
+        {
+            var zipFile = new PersonLogEntryFile();
+            zipFile.FileName = "SDDBFiles_" + String.Format("_{0:yyyyMMdd_HHmm}", DateTime.Now) + ".zip";
+
+            using (ZipArchive zip = new ZipArchive(zipFile.FileData, ZipArchiveMode.Create, true))
+            {
+                for (int i = 0; i < fileIds.Length; i++)
+                {
+                    PersonLogEntryFile record =  await getPersonLogEntryFile(dbContext, fileIds[i]); 
+                    Stream newZipEntryStream = zip.CreateEntry(record.FileName).Open();
+                    record.FileData.WriteTo(newZipEntryStream);
+                    record.FileData.Dispose();
+                    newZipEntryStream.Close();
+                }
+            }
+            return zipFile;
+        }
+
+        
         #endregion
     }
 }

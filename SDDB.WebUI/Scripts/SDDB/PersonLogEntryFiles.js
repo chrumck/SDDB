@@ -36,8 +36,8 @@ $(document).ready(function () {
 
     //Wire Up LogEntryFilesBtnDload
     $("#LogEntryFilesBtnDload").click(function () {
-        var fileNames = TableLogEntryFiles.cells(".ui-selected", "Name:name").data().toArray();
-        if (fileNames.length == 0) showModalNothingSelected();
+        var fileIds = TableLogEntryFiles.cells(".ui-selected", "Id:name").data().toArray();
+        if (fileIds.length == 0) showModalNothingSelected();
         else {
             showModalWait();
 
@@ -59,7 +59,7 @@ $(document).ready(function () {
             var form = $('<form method="POST" action="/PersonLogEntrySrv/DownloadFiles" target="LogEntryFilesIframe">');
             form.append($('<input type="hidden" name="DlToken" value="' + DlToken + '">'));
             form.append($('<input type="hidden" name="id" value="' + CurrIds[0] + '">'));
-            $.each(fileNames, function (i, name) { form.append($('<input type="hidden" name="names[' + i + ']" value="' + name + '">')); });
+            $.each(fileIds, function (i, name) { form.append($('<input type="hidden" name="fileIds[' + i + ']" value="' + name + '">')); });
             $("body").append(form);
             form.submit();
         }
@@ -138,12 +138,13 @@ $(document).ready(function () {
             { data: "FileName", name: "FileName" },//1
             { data: "FileType", name: "FileType" },//2
             { data: "FileSize", name: "FileSize" },//3
-            { data: "FileDateTime", name: "FileDateTime" }//4
+            { data: "FileDateTime", name: "FileDateTime" },//4
+            { data: "LastSavedByPerson_", render: function (data, type, full, meta) { return data.Initials }, name: "LastSavedByPerson_" }, //5
         ],
         columnDefs: [
             { targets: [0], visible: false }, // - never show
             { targets: [0], searchable: false },  //"orderable": false, "visible": false
-            { targets: [2], className: "hidden-xs" }, // - first set of columns
+            { targets: [2, 5], className: "hidden-xs" }, // - first set of columns
             { targets: [4], className: "hidden-xs hidden-sm" }, // - first set of columns
         ],
         bAutoWidth: false,
@@ -158,6 +159,7 @@ $(document).ready(function () {
         pageLength: 10
     });
         
+
     //--------------------------------End of execution at Start-----------
 });
 
