@@ -356,12 +356,8 @@ namespace SDDB.WebUI.ControllersSrv
                     personLogEntryFile.FileType = fileContent.ContentType;
                     personLogEntryFile.FileDateTime = DateTime.Now;
                     personLogEntryFile.AssignedToPersonLogEntry_Id = logEntryId;
-                    using (var fileData = new MemoryStream())
-                    {
-                        await fileContent.InputStream.CopyToAsync(fileData).ConfigureAwait(false);
-                        personLogEntryFile.FileData = fileData.ToArray();
-                    }
-                    personLogEntryFile.FileSize = personLogEntryFile.FileData.Length;
+                    await fileContent.InputStream.CopyToAsync(personLogEntryFile.FileData).ConfigureAwait(false);
+                    personLogEntryFile.FileSize = (int)personLogEntryFile.FileData.Length;
                     filesList.Add(personLogEntryFile);
                 }
             }

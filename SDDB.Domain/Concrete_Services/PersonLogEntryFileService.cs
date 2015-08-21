@@ -55,7 +55,7 @@ namespace SDDB.Domain.Services
 
             var newEntryIds = await dbScopeHelperAsync(dbContext =>
             {
-                return Task.FromResult(addToPersonLogEntryFilesHelper(dbContext, records));
+                return addToPersonLogEntryFilesHelper(dbContext, records);
             })
             .ConfigureAwait(false);
 
@@ -83,19 +83,19 @@ namespace SDDB.Domain.Services
         #region Helpers
 
         //upload (save to database) - overload for PersonLogEntryFile[]
-        private List<string> addToPersonLogEntryFilesHelper(EFDbContext dbContext, PersonLogEntryFile[] records)
+        private async Task<List<string>> addToPersonLogEntryFilesHelper(EFDbContext dbContext, PersonLogEntryFile[] records)
         {
             var newEntryIds = new List<string>();
             for (int i = 0; i < records.Length; i++)
             {
-                var newEntryId = addToPersonLogEntryFilesHelper(dbContext, records[i]);
+                var newEntryId = await addToPersonLogEntryFilesHelper(dbContext, records[i]).ConfigureAwait(false);
                 newEntryIds.Add(newEntryId);
             }
             return newEntryIds;
         }
 
         //upload (save to database) single PersonLogEntryFile
-        private string addToPersonLogEntryFilesHelper(EFDbContext dbContext, PersonLogEntryFile record)
+        private async Task<string> addToPersonLogEntryFilesHelper(EFDbContext dbContext, PersonLogEntryFile record)
         {
             if (record == null) { throw new ArgumentNullException("record"); }
 
@@ -103,24 +103,26 @@ namespace SDDB.Domain.Services
             record.LastSavedByPerson_Id = userId;
             dbContext.PersonLogEntryFiles.Add(record);
 
-            addFileDataToDbHelper(dbContext, record);
+            await addFileDataToDbHelper(dbContext, record).ConfigureAwait(false);
 
             return record.Id;
         }
 
         //add data from PersonLogEntryFile.fileData to PersonLogEntryFileDatas
-        private void addFileDataToDbHelper(EFDbContext dbContext, PersonLogEntryFile record)
+        private async Task addFileDataToDbHelper(EFDbContext dbContext, PersonLogEntryFile record)
         {
-            int noOfChunks = record.FileSize / PersonLogEntryFileData.DataChunkLength + 1;
+            var dataLength = PersonLogEntryFileData.DataChunkLength;
+            int noOfChunks = record.FileSize / dataLength + 1;
+            var chunkDataBuffer = new byte[dataLength];
+
             for (int i = 0; i < noOfChunks; i++)
             {
+                await record.FileData.ReadAsync(chunkDataBuffer, 0, dataLength).ConfigureAwait(false);
                 dbContext.PersonLogEntryFileDatas.Add(new PersonLogEntryFileData
                 {
                     Id = Guid.NewGuid().ToString(),
                     ChunkNumber = i,
-                    Data = record.FileData
-                        .Skip(i * PersonLogEntryFileData.DataChunkLength)
-                        .Take(PersonLogEntryFileData.DataChunkLength).ToArray(),
+                    Data = chunkDataBuffer,
                     PersonLogEntryFile_Id = record.Id
                 });
             }

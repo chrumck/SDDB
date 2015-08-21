@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.IO;
 
 using SDDB.Domain.Abstract;
 using SDDB.Domain.Infrastructure;
@@ -76,6 +77,7 @@ namespace SDDB.Domain.Entities
         public PersonLogEntryFile()
         {
             this.PersonLogEntryFileDatas = new HashSet<PersonLogEntryFileData>();
+            this.FileData = new MemoryStream();
         }
         
         //Non-persisten Properties---------------------------------------------------------------------------------------------//
@@ -84,7 +86,7 @@ namespace SDDB.Domain.Entities
         public string[] ModifiedProperties { get; set; }
 
         [NotMapped]
-        public byte[] FileData { get; set; }
+        public MemoryStream FileData { get; set; }
 
         [NotMapped]
         [DefaultValue(true)]
