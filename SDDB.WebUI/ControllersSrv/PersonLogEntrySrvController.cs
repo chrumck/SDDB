@@ -251,6 +251,7 @@ namespace SDDB.WebUI.ControllersSrv
                     x.AssignedToProjectEvent.EventName
                 },
                 x.Comments,
+                PersonLogEntryFilesCount = x.PersonLogEntryFiles.Count,
                 x.IsActive_bl,
                 x.EnteredByPerson_Id,
                 x.PersonActivityType_Id,

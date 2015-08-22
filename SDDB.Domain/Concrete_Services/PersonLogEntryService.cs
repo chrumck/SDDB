@@ -48,6 +48,7 @@ namespace SDDB.Domain.Services
                     .Include(x => x.AssignedToProject)
                     .Include(x => x.AssignedToLocation)
                     .Include(x => x.AssignedToProjectEvent)
+                    .Include(x => x.PersonLogEntryFiles)
                     .ToListAsync().ConfigureAwait(false);
                 
                 records.FillRelatedIfNull();
@@ -72,6 +73,7 @@ namespace SDDB.Domain.Services
                     .Include(x => x.AssignedToProject)
                     .Include(x => x.AssignedToLocation)
                     .Include(x => x.AssignedToProjectEvent)
+                    .Include(x => x.PersonLogEntryFiles)
                     .ToListAsync().ConfigureAwait(false);
 
                 records.FillRelatedIfNull();
@@ -109,6 +111,7 @@ namespace SDDB.Domain.Services
                        .Include(x => x.AssignedToProject)
                        .Include(x => x.AssignedToLocation)
                        .Include(x => x.AssignedToProjectEvent)
+                       .Include(x => x.PersonLogEntryFiles)
                        .ToListAsync().ConfigureAwait(false);
 
                 records.FillRelatedIfNull();

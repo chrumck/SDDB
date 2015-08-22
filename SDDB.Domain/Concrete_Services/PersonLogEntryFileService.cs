@@ -120,7 +120,8 @@ namespace SDDB.Domain.Services
         private async Task<string> addPersonLogEntryFile(EFDbContext dbContext, PersonLogEntryFile record)
         {
             if (record == null) { throw new ArgumentNullException("record"); }
-
+            
+            record.FileName = await getNewFileNameIfDuplicate(dbContext, record.AssignedToPersonLogEntry_Id, record.FileName);
             record.Id = Guid.NewGuid().ToString();
             record.LastSavedByPerson_Id = userId;
             dbContext.PersonLogEntryFiles.Add(record);
@@ -195,6 +196,28 @@ namespace SDDB.Domain.Services
                 }
             }
             return zipFile;
+        }
+
+        //changeFileNameIfDuplicate - checks if file with given name exists and is assigned to log entry and returns new file name
+        private async Task<string> getNewFileNameIfDuplicate(EFDbContext dbContext, string logEntryId, string currentFileName)
+        {
+            string[] existingFileNames = await dbContext.PersonLogEntryFiles
+                    .Where(x => x.AssignedToPersonLogEntry_Id == logEntryId)
+                    .Select(x => x.FileName)
+                    .ToArrayAsync().ConfigureAwait(false);
+
+            var i = 1;
+            do
+            {
+                currentFileName = currentFileName.TrimEnd(new[] { ')' });
+                currentFileName = currentFileName.TrimEnd(new[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' });
+                currentFileName = currentFileName.TrimEnd(new[] { '(' });
+                currentFileName += "(" + i + ")";
+                i++;
+            }
+            while (existingFileNames.Contains(currentFileName));
+
+            return currentFileName;
         }
 
         
