@@ -91,15 +91,28 @@ namespace SDDB.Domain.Services
             }
         }
 
-        ////DeleteAsync - upload received files to ftp
-        //public virtual async Task DeleteAsync(string id)
-        //{
+        // Delete records by their Ids
+        public override async Task DeleteAsync(string[] ids)
+        {
+            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
 
-        //}
+            var filesToDelete = new List<PersonLogEntryFile>();
+            for (int i = 0; i < ids.Length; i++)
+            {
+                filesToDelete.Add(new PersonLogEntryFile { Id = ids[i] });
+            }
 
-
-                
-        
+            await dbScopeHelperAsync(dbContext =>
+            {
+                foreach (var file in filesToDelete)
+                {
+                    dbContext.PersonLogEntryFiles.Attach(file);
+                }
+                dbContext.PersonLogEntryFiles.RemoveRange(filesToDelete);
+                return Task.FromResult(default(int));
+            })
+            .ConfigureAwait(false);
+        }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
@@ -133,14 +146,15 @@ namespace SDDB.Domain.Services
         //add data from PersonLogEntryFile.FileData to PersonLogEntryFileDatas
         private async Task addPersonLogEntryFileData(EFDbContext dbContext, PersonLogEntryFile record)
         {
-            var noOfChunks = (record.FileSize % dataChunkLength == 0) ?
-                    record.FileSize / dataChunkLength : record.FileSize / dataChunkLength + 1;
+            int lastChunkLength = record.FileSize % dataChunkLength;
+            int noOfChunks = (lastChunkLength == 0) ? record.FileSize / dataChunkLength : record.FileSize / dataChunkLength + 1;
 
             record.FileData.Position = 0;
             for (int i = 0; i < noOfChunks; i++)
             {
-                var chunkDataBuffer = new byte[dataChunkLength];
-                await record.FileData.ReadAsync(chunkDataBuffer, 0, dataChunkLength).ConfigureAwait(false);
+                byte[] chunkDataBuffer = new byte[dataChunkLength];
+                if (i == noOfChunks - 1 && lastChunkLength > 0) { chunkDataBuffer = new byte[lastChunkLength]; }
+                await record.FileData.ReadAsync(chunkDataBuffer, 0, chunkDataBuffer.Length).ConfigureAwait(false);
                 dbContext.PersonLogEntryFileDatas.Add(new PersonLogEntryFileData
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -207,7 +221,7 @@ namespace SDDB.Domain.Services
                     .ToArrayAsync().ConfigureAwait(false);
 
             var i = 1;
-            do
+            while (existingFileNames.Contains(currentFileName))
             {
                 currentFileName = currentFileName.TrimEnd(new[] { ')' });
                 currentFileName = currentFileName.TrimEnd(new[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' });
@@ -215,8 +229,6 @@ namespace SDDB.Domain.Services
                 currentFileName += "(" + i + ")";
                 i++;
             }
-            while (existingFileNames.Contains(currentFileName));
-
             return currentFileName;
         }
 

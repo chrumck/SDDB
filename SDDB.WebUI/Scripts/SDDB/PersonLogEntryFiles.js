@@ -9,7 +9,8 @@
 
 //--------------------------------------Global Properties------------------------------------//
 var TableLogEntryFiles = {};
-var FileCurrNames = [];
+var FileCurrIds = [];
+var FilesAreChanged = false;
 var DlToken;
 var DlTimer;
 var DlAttempts;
@@ -31,7 +32,13 @@ $(document).ready(function () {
     //Wire Up EditFormBtnCancel
     $("#LogEntryFilesViewBtnCancel, #LogEntryFilesViewBtnBack").click(function () {
         $("#MainView").removeClass("hide");
-        $("#LogEntryFilesView").addClass("hide"); window.scrollTo(0, 0);
+        $("#LogEntryFilesView").addClass("hide");
+        window.scrollTo(0, 0);
+        if (FilesAreChanged) {
+            refreshMainView();
+            FilesAreChanged = false;
+        }
+        
     });
 
     //Wire Up LogEntryFilesBtnDload
@@ -89,7 +96,10 @@ $(document).ready(function () {
                     }
                 })
                     .always(function () { $("#ModalUpload").modal("hide"); })
-                    .done(function () { setTimeout(fillLogEntryFilesForm, 200); })
+                    .done(function () {
+                        FilesAreChanged = true;
+                        setTimeout(fillLogEntryFilesForm, 200);
+                    })
                     .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 
             } else showModalFail("Browser Error", "This browser doesn't support HTML5 file uploads!");
@@ -100,10 +110,10 @@ $(document).ready(function () {
 
     //Wire Up LogEntryFilesBtnDelete 
     $("#LogEntryFilesBtnDelete").click(function () {
-        FileCurrNames = TableLogEntryFiles.cells(".ui-selected", "Name:name").data().toArray();
-        if (FileCurrNames.length == 0) showModalNothingSelected();
+        FileCurrIds = TableLogEntryFiles.cells(".ui-selected", "Id:name").data().toArray();
+        if (FileCurrIds.length == 0) showModalNothingSelected();
         else {
-            $("#ModalDeleteFilesBody").text("Confirm deleting " + FileCurrNames.length + " file(s).");
+            $("#ModalDeleteFilesBody").text("Confirm deleting " + FileCurrIds.length + " file(s).");
             $("#ModalDeleteFiles").modal("show");
         }
     });
@@ -122,10 +132,13 @@ $(document).ready(function () {
         showModalWait();
         $.ajax({
             type: "POST", url: "/PersonLogEntrySrv/DeleteFiles", timeout: 20000,
-            data: { id: CurrIds[0], names: FileCurrNames }, dataType: "json"
+            data: { logEntryId: CurrIds[0], ids: FileCurrIds }, dataType: "json"
         })
             .always(hideModalWait)
-            .done(function () { setTimeout(fillLogEntryFilesForm, 200); })
+            .done(function () {
+                FilesAreChanged = true;
+                setTimeout(fillLogEntryFilesForm, 200);
+            })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 

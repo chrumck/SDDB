@@ -119,20 +119,21 @@ $(document).ready(function () {
                 render: function (data, type, full, meta) { return data.EventName }
             }, //7
             { data: "Comments", name: "Comments" },//8
+            { data: "PersonLogEntryFilesCount", name: "PersonLogEntryFilesCount" },//9
             //------------------------------------------------never visible
-            { data: "IsActive_bl", name: "IsActive_bl" },//9
-            { data: "EnteredByPerson_Id", name: "EnteredByPerson_Id" },//10
-            { data: "PersonActivityType_Id", name: "PersonActivityType_Id" },//11
-            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//12
-            { data: "AssignedToLocation_Id", name: "AssignedToLocation_Id" },//13
-            { data: "AssignedToProjectEvent_Id", name: "AssignedToProjectEvent_Id" }//14
+            { data: "IsActive_bl", name: "IsActive_bl" },//10
+            { data: "EnteredByPerson_Id", name: "EnteredByPerson_Id" },//11
+            { data: "PersonActivityType_Id", name: "PersonActivityType_Id" },//12
+            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//13
+            { data: "AssignedToLocation_Id", name: "AssignedToLocation_Id" },//14
+            { data: "AssignedToProjectEvent_Id", name: "AssignedToProjectEvent_Id" }//15
         ],
         columnDefs: [
-            { targets: [0, 9, 10, 11, 12, 13, 14], visible: false }, // - never show
-            { targets: [0, 1, 4, 9, 10, 11, 12, 13, 14], searchable: false },  //"orderable": false, "visible": false
-            { targets: [3, 6], className: "hidden-xs" }, // - first set of columns
-            { targets: [7, 8], className: "hidden-xs hidden-sm" }, // - first set of columns
-            { targets: [], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
+            { targets: [0, 10, 11, 12, 13, 14, 15], visible: false }, // - never show
+            { targets: [0, 1, 4, 9, 10, 11, 12, 13, 14, 15], searchable: false },  //"orderable": false, "visible": false
+            { targets: [2, 3, 6], className: "hidden-xs" }, // - first set of columns
+            { targets: [7, 9], className: "hidden-xs hidden-sm" }, // - first set of columns
+            { targets: [8], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,

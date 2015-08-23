@@ -198,22 +198,20 @@ namespace SDDB.WebUI.ControllersSrv
             file.FileData.Dispose();
             return File(fileData, System.Net.Mime.MediaTypeNames.Application.Octet, file.FileName);
         }
+        
+        // POST: /PersonLogEntrySrv/DeleteFiles
+        [HttpPost]
+        [DBSrvAuth("PersonLogEntry_Edit,YourActivity_Edit")]
+        public async Task<ActionResult> DeleteFiles(string logEntryId, string[] ids)
+        {
+            ViewBag.ServiceName = "personLogEntryFileService.DeleteAsync";
+        
+            if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
+            { return JsonResponseForNoRights(); }
 
-
-        //// POST: /PersonLogEntrySrv/DeleteFiles
-        //[HttpPost]
-        //[DBSrvAuth("PersonLogEntry_Edit,YourActivity_Edit")]
-        //public async Task<ActionResult> DeleteFiles(string id, string[] names)
-        //{
-        //    if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(new[] { id }).ConfigureAwait(false)))
-        //    { return JsonResponseForNoRights(); }
-
-        //    await fileRepoService.DeleteAsync(id, names).ConfigureAwait(false);
-            
-        //    ViewBag.ServiceName = "fileRepoService.DeleteAsync";
-        //    ViewBag.StatusCode = HttpStatusCode.OK;
-        //    return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
-        //}
+            await personLogEntryFileService.DeleteAsync(ids).ConfigureAwait(false);
+            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+        }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
@@ -293,7 +291,7 @@ namespace SDDB.WebUI.ControllersSrv
                     x.Id,
                     x.FileName,
                     x.FileType,
-                    FileSize = x.FileSize / 1000,
+                    FileSize = x.FileSize / 1024,
                     x.FileDateTime,
                     LastSavedByPerson_ = new
                     {
