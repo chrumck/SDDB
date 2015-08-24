@@ -57,13 +57,9 @@ namespace SDDB.Domain.Services
                 
         //-----------------------------------------------------------------------------------------------------------------------
 
-        // Create and Update records given in []
-        public override Task<List<string>> EditAsync(PersonLogEntryFile[] records)
-        {
-            throw new NotImplementedException();
-        }
+        //Create and Update records given in [] - same as BaseDbService
 
-        //upload file - overload for PersonLogEntryFile[]
+        //Upload PersonLogEntryFile[]
         public virtual async Task<List<String>> UploadFilesAsync(List<PersonLogEntryFile> records)
         {
             if (records == null || records.Count == 0) { throw new ArgumentNullException("records"); }
@@ -92,27 +88,8 @@ namespace SDDB.Domain.Services
         }
 
         // Delete records by their Ids
-        public override async Task DeleteAsync(string[] ids)
-        {
-            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
-
-            var filesToDelete = new List<PersonLogEntryFile>();
-            for (int i = 0; i < ids.Length; i++)
-            {
-                filesToDelete.Add(new PersonLogEntryFile { Id = ids[i] });
-            }
-
-            await dbScopeHelperAsync(dbContext =>
-            {
-                foreach (var file in filesToDelete)
-                {
-                    dbContext.PersonLogEntryFiles.Attach(file);
-                }
-                dbContext.PersonLogEntryFiles.RemoveRange(filesToDelete);
-                return Task.FromResult(default(int));
-            })
-            .ConfigureAwait(false);
-        }
+        // same as BaseDbService - see overriden deleteHelperAsync(dbContext, ids);
+        
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
@@ -230,6 +207,13 @@ namespace SDDB.Domain.Services
                 i++;
             }
             return currentFileName;
+        }
+
+        //helper -  deleting db entries - overriden fron BaseDbService
+        protected override async Task deleteHelperAsync(EFDbContext dbContext, string[] ids)
+        {
+            var dbEntries = await getEntriesFromContextHelperAsync<PersonLogEntryFile>(dbContext, ids).ConfigureAwait(false);
+            dbContext.PersonLogEntryFiles.RemoveRange(dbEntries);
         }
 
         

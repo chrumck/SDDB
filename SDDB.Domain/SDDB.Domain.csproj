@@ -174,7 +174,6 @@
     <Compile Include="Concrete_Services\PersonGroupService.cs" />
     <Compile Include="Concrete_Services\_AppRoleManager.cs" />
     <Compile Include="Concrete_Services\_AppUserManager.cs" />
-    <Compile Include="Concrete_Services\_DbFtpRepoService.cs" />
     <Compile Include="Concrete_Services\_DBLogger.cs" />
     <Compile Include="Concrete_Services\DBUserService.cs" />
     <Compile Include="Concrete_Services\DocumentTypeService.cs" />
