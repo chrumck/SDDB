@@ -98,6 +98,7 @@ namespace SDDB.WebUI.ControllersSrv
                 x.Id,
                 x.LocName,
                 x.LocAltName,
+                x.LocAltName2,
                 LocationType_ = new
                 {
                     x.LocationType.LocTypeName
@@ -114,10 +115,6 @@ namespace SDDB.WebUI.ControllersSrv
                     x.ContactPerson.Initials 
                 },
                 x.Address,
-                x.City,
-                x.ZIP,
-                x.State,
-                x.Country,
                 x.LocX,
                 x.LocY,
                 x.LocZ,

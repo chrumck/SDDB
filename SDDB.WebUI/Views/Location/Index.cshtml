@@ -53,15 +53,12 @@
                 <tr>
                     <th>ID</th>
                     <th>Name</th>
-                    <th>Alternate Name</th>
+                    <th>Alt. Name</th>
+                    <th>Alt. Name2</th>
                     <th>Type</th>
                     <th>Project</th>
                     <th>Contact Prs.</th>
                     <th>Address</th>
-                    <th>City</th>
-                    <th>ZIP</th>
-                    <th>State</th>
-                    <th>Country</th>
                     <th>Position X</th>
                     <th>Position Y</th>
                     <th>Position Z</th>
@@ -120,10 +117,17 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.LocAltName, "Alternate Name", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.LocAltName, "Alt. Name", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.LocAltName, new { @class = "form-control modifiable", placeholder = "Location Alternate Name" })
+                            @Html.TextBoxFor(x => x.LocAltName, new { @class = "form-control modifiable", placeholder = "Location Alt. Name" })
                             @Html.ValidationMessageFor(x => x.LocAltName)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.LocAltName2, "Alt. Name2", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.LocAltName2, new { @class = "form-control modifiable", placeholder = "Location Alt. Name 2" })
+                            @Html.ValidationMessageFor(x => x.LocAltName2)
                         </div>
                     </div>
                     <div class="form-group">
@@ -155,37 +159,6 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.City, "City", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.City, new { @class = "form-control modifiable", placeholder = "City" })
-                            @Html.ValidationMessageFor(x => x.City)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.ZIP, "ZIP", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.ZIP, new { @class = "form-control modifiable", placeholder = "Postal Code" })
-                            @Html.ValidationMessageFor(x => x.ZIP)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.State, "State", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.State, new { @class = "form-control modifiable", placeholder = "State or Province" })
-                            @Html.ValidationMessageFor(x => x.State)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.Country, "Country", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.Country, new { @class = "form-control modifiable", placeholder = "Country" })
-                            @Html.ValidationMessageFor(x => x.Country)
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="form-group">
                         @Html.LabelFor(x => x.LocX, "X", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.LocX, new { @class = "form-control modifiable", placeholder = "Position X" })
@@ -206,6 +179,9 @@
                             @Html.ValidationMessageFor(x => x.LocZ)
                         </div>
                     </div>
+                </div>
+
+                <div class="col-md-6">
                     <div class="form-group">
                         @Html.LabelFor(x => x.LocStationing, "Stationing", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">

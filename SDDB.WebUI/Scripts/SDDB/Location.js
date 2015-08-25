@@ -17,11 +17,8 @@ var RecordTemplate = {
     Id: "RecordTemplateId",
     LocName: null,
     LocAltName: null,
+    LocAltName2: null,
     Address: null,
-    City: null,
-    ZIP: null,
-    State: null,
-    Country: null,
     LocX: null,
     LocY: null,
     LocZ: null,
@@ -85,25 +82,25 @@ $(document).ready(function () {
     //wire up dropdownId1
     $("#dropdownId1").click(function (event) {
         event.preventDefault();
-        TableMain.columns([2, 3, 4, 5, 6, 7]).visible(true);
-        TableMain.columns([8, 9, 10, 11, 12, 13]).visible(false);
-        TableMain.columns([14, 15, 16, 17, 18]).visible(false);
+        TableMain.columns([2, 3, 4, 5, 6]).visible(true);
+        TableMain.columns([7, 8, 9, 10, 11]).visible(false);
+        TableMain.columns([12, 13, 14, 15]).visible(false);
     });
 
     //wire up dropdownId2
     $("#dropdownId2").click(function (event) {
         event.preventDefault();
-        TableMain.columns([2, 3, 4, 5, 6, 7]).visible(false);
-        TableMain.columns([8, 9, 10, 11, 12, 13]).visible(true);
-        TableMain.columns([14, 15, 16, 17, 18]).visible(false);
+        TableMain.columns([2, 3, 4, 5, 6]).visible(false);
+        TableMain.columns([7, 8, 9, 10, 11]).visible(true);
+        TableMain.columns([12, 13, 14, 15]).visible(false);
     });
 
     //wire up dropdownId3
     $("#dropdownId3").click(function (event) {
         event.preventDefault();
-        TableMain.columns([2, 3, 4, 5, 6, 7]).visible(false);
-        TableMain.columns([8, 9, 10, 11, 12, 13]).visible(false);
-        TableMain.columns([14, 15, 16, 17, 18]).visible(true);
+        TableMain.columns([2, 3, 4, 5, 6]).visible(false);
+        TableMain.columns([7, 8, 9, 10, 11]).visible(false);
+        TableMain.columns([12, 13, 14, 15]).visible(true);
     });
 
     //wire up dropdownId4
@@ -160,43 +157,40 @@ $(document).ready(function () {
             { data: "LocName", name: "LocName" },//1
             //------------------------------------------------first set of columns
             { data: "LocAltName", name: "LocAltName" },//2
-            { data: "LocationType_", render: function (data, type, full, meta) { return data.LocTypeName }, name: "LocationType_" }, //3
-            { data: "AssignedToProject_", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject_" }, //4
-            { data: "ContactPerson_", render: function (data, type, full, meta) { return data.Initials }, name: "ContactPerson_" },//5
-            { data: "Address", name: "Address" },//6
-            { data: "City", name: "City" },//7
+            { data: "LocAltName2", name: "LocAltName2" },//3
+            { data: "LocationType_", render: function (data, type, full, meta) { return data.LocTypeName }, name: "LocationType_" }, //4
+            { data: "AssignedToProject_", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject_" }, //5
+            { data: "ContactPerson_", render: function (data, type, full, meta) { return data.Initials }, name: "ContactPerson_" },//6
             //------------------------------------------------second set of columns
-            { data: "ZIP", name: "ZIP" },//8
-            { data: "State", name: "State" },//9
-            { data: "Country", name: "Country" },//10
-            { data: "LocX", name: "LocX" },//11
-            { data: "LocY", name: "LocY" },//12
-            { data: "LocZ", name: "LocZ" },//13
+            { data: "Address", name: "Address" },//7
+            { data: "LocX", name: "LocX" },//8
+            { data: "LocY", name: "LocY" },//9
+            { data: "LocZ", name: "LocZ" },//10
+            { data: "LocStationing", name: "LocStationing" },//11
             //------------------------------------------------third set of columns
-            { data: "LocStationing", name: "LocStationing" },//14
-            { data: "CertOfApprReqd_bl", name: "CertOfApprReqd_bl" },//15
-            { data: "RightOfEntryReqd_bl", name: "RightOfEntryReqd_bl" },//16
-            { data: "AccessInfo", name: "AccessInfo" },//17
-            { data: "Comments", name: "Comments" },//18
+            { data: "CertOfApprReqd_bl", name: "CertOfApprReqd_bl" },//12
+            { data: "RightOfEntryReqd_bl", name: "RightOfEntryReqd_bl" },//13
+            { data: "AccessInfo", name: "AccessInfo" },//14
+            { data: "Comments", name: "Comments" },//15
             //------------------------------------------------never visible
-            { data: "IsActive_bl", name: "IsActive_bl" },//19
-            { data: "LocationType_Id", name: "LocationType_Id" },//20
-            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//21
-            { data: "ContactPerson_Id", name: "ContactPerson_Id" },//22
+            { data: "IsActive_bl", name: "IsActive_bl" },//16
+            { data: "LocationType_Id", name: "LocationType_Id" },//17
+            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//18
+            { data: "ContactPerson_Id", name: "ContactPerson_Id" },//19
         ],
         columnDefs: [
-            { targets: [0, 19, 20, 21, 22], visible: false }, // - never show
-            { targets: [0, 15, 16, 19, 20, 21, 22], searchable: false },  //"orderable": false, "visible": false
-            { targets: [3, 4, 5], className: "hidden-xs hidden-sm" }, // - first set of columns
-            { targets: [6, 7], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
+            { targets: [0, 16, 17, 18, 19], visible: false }, // - never show
+            { targets: [0, 12, 13, 16, 17, 18, 19], searchable: false },  //"orderable": false, "visible": false
+            { targets: [4, 5, 6], className: "hidden-xs hidden-sm" }, // - first set of columns
+            { targets: [6], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
 
-            { targets: [8, 9, 10, 11, 12, 13], visible: false }, // - second set of columns - to toggle with options
-            { targets: [11, 12, 13], className: "hidden-xs hidden-sm" }, // - second set of columns
-            { targets: [9, 10], className: "hidden-xs hidden-sm hidden-md" }, // - second set of columns
+            { targets: [7, 8, 9, 10, 11], visible: false }, // - second set of columns - to toggle with options
+            { targets: [8, 9, 10], className: "hidden-xs hidden-sm" }, // - second set of columns
+            { targets: [11], className: "hidden-xs hidden-sm hidden-md" }, // - second set of columns
 
-            { targets: [14, 15, 16, 17, 18], visible: false }, // - third set of columns - to toggle with options
-            { targets: [15, 16, 17], className: "hidden-xs hidden-sm" }, // - third set of columns
-            { targets: [18], className: "hidden-xs hidden-sm hidden-md" } // - third set of columns
+            { targets: [12, 13, 14, 15], visible: false }, // - third set of columns - to toggle with options
+            { targets: [12, 13, 14], className: "hidden-xs hidden-sm" }, // - third set of columns
+            { targets: [], className: "hidden-xs hidden-sm hidden-md" } // - third set of columns
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,

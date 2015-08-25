@@ -27,6 +27,9 @@ namespace SDDB.Domain.Entities
         [StringLength(255)]
         public string LocAltName { get; set; }
 
+        [StringLength(255)]
+        public string LocAltName2 { get; set; }
+
         [Required( ErrorMessage = "Loc. Type field is required")]
         [StringLength(40)]
         [ForeignKey("LocationType")]
@@ -43,19 +46,7 @@ namespace SDDB.Domain.Entities
 
         [StringLength(255)]
         public string Address { get; set; }
-
-        [StringLength(128)]
-        public string City { get; set; }
-
-        [StringLength(64)]
-        public string ZIP { get; set; }
-
-        [StringLength(64)]
-        public string State { get; set; }
-
-        [StringLength(64)]
-        public string Country { get; set; }
-
+        
         public decimal? LocX { get; set; }
 
         public decimal? LocY { get; set; }
