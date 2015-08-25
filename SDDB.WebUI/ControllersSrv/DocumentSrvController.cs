@@ -32,7 +32,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "DocumentService.GetAsync";
             var records = await docService.GetAsync(ids, getActive).ConfigureAwait(false);
-            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonFull(records));
         }
 
         // POST: /DocumentSrv/GetByIds
@@ -42,7 +42,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "DocumentService.GetByAltIdsAsync";
             var records = await docService.GetByAltIdsAsync(projectIds,typeIds, getActive).ConfigureAwait(false);
-            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonFull(records));
         }
 
         // GET: /DocumentSrv/Lookup
@@ -50,7 +50,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "DocumentService.LookupAsync";
             var records = await docService.LookupAsync(query, getActive).ConfigureAwait(false);
-            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonLookup(records));
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "DocumentService.EditAsync";
             var newEntryIds = await docService.EditAsync(records).ConfigureAwait(false);
-            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True", newEntryIds = newEntryIds });
         }
 
         // POST: /DocumentSrv/Delete
@@ -72,7 +72,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "DocumentService.DeleteAsync";
             await docService.DeleteAsync(ids).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
@@ -105,9 +105,8 @@ namespace SDDB.WebUI.ControllersSrv
                 },
                 AssignedToProject_ = new
                 {
-                    x.AssignedToProject.ProjectName,
-                    x.AssignedToProject.ProjectAltName,
-                    x.AssignedToProject.ProjectCode
+                    x.AssignedToProject.ProjectCode,
+                    x.AssignedToProject.ProjectName
                 },
                 RelatesToAssyType_ = new
                 {

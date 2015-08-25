@@ -30,7 +30,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "LocationTypeService.GetAsync";
             var records = await locationTypeService.GetAsync(getActive).ConfigureAwait(false);
-            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonFull(records));
         }
 
         // POST: /LocationTypeSrv/GetByIds
@@ -40,7 +40,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "LocationTypeService.GetAsync";
             var records = await locationTypeService.GetAsync(ids, getActive).ConfigureAwait(false);
-            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonFull(records));
         }
 
         // GET: /LocationTypeSrv/Lookup
@@ -48,7 +48,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "LocationTypeService.LookupAsync";
             var records = await locationTypeService.LookupAsync(query, getActive).ConfigureAwait(false);
-            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonLookup(records));
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "LocationTypeService.EditAsync";
             var newEntryIds = await locationTypeService.EditAsync(records).ConfigureAwait(false);
-            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True", newEntryIds = newEntryIds });
         }
 
         // POST: /LocationTypeSrv/Delete
@@ -70,7 +70,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "LocationTypeService.DeleteAsync";
             await locationTypeService.DeleteAsync(ids).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//

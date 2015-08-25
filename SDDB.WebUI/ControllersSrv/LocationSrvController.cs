@@ -33,7 +33,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "LocationService.GetAsync";
             var records = await locationService.GetAsync(ids, getActive).ConfigureAwait(false);
-            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonFull(records));
         }
 
         // POST: /LocationSrv/GetByAltIds
@@ -43,7 +43,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "LocationService.GetByAltIdsAsync";
             var records = await locationService.GetByAltIdsAsync(projectIds, typeIds, getActive).ConfigureAwait(false);
-            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonFull(records));
         }
 
         // GET: /LocationSrv/Lookup
@@ -51,7 +51,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "LocationService.LookupAsync";
             var records = await locationService.LookupAsync(query, getActive).ConfigureAwait(false);
-            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonLookup(records));
         }
 
         // GET: /LocationSrv/LookupByProj
@@ -62,7 +62,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "LocationService.LookupByProjAsync";
             var records = await locationService.LookupByProjAsync(projectIdsArray, query, getActive).ConfigureAwait(false);
-            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonLookup(records));
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "LocationService.EditAsync";
             var newEntryIds = await locationService.EditAsync(records).ConfigureAwait(false);
-            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True", newEntryIds = newEntryIds });
         }
 
         // POST: /LocationSrv/Delete
@@ -84,7 +84,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "LocationService.DeleteAsync";
             await locationService.DeleteAsync(ids).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
@@ -105,9 +105,8 @@ namespace SDDB.WebUI.ControllersSrv
                 },
                 AssignedToProject_ = new 
                 {
-                    x.AssignedToProject.ProjectName,
-                    x.AssignedToProject.ProjectAltName, 
-                    x.AssignedToProject.ProjectCode 
+                    x.AssignedToProject.ProjectCode,
+                    x.AssignedToProject.ProjectName
                 },
                 ContactPerson_ = new {
                     x.ContactPerson.FirstName,

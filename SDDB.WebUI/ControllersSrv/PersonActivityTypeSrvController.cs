@@ -30,7 +30,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonActivityTypeService.GetAsync";
             var records = await personActivityTypeService.GetAsync(getActive).ConfigureAwait(false);
-            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonFull(records));
         }
 
         // POST: /PersonActivityTypeSrv/GetByIds
@@ -40,7 +40,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonActivityTypeService.GetAsync";
             var records = await personActivityTypeService.GetAsync(ids, getActive).ConfigureAwait(false);
-            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonFull(records));
         }
 
         // GET: /PersonActivityTypeSrv/Lookup
@@ -48,7 +48,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonActivityTypeService.LookupAsync";
             var records = await personActivityTypeService.LookupAsync(query, getActive).ConfigureAwait(false);
-            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonLookup(records));
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonActivityTypeService.EditAsync";
             var newEntryIds = await personActivityTypeService.EditAsync(records).ConfigureAwait(false);
-            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True", newEntryIds = newEntryIds });
         }
 
         // POST: /PersonActivityTypeSrv/Delete
@@ -70,7 +70,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonActivityTypeService.DeleteAsync";
             await personActivityTypeService.DeleteAsync(ids).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//

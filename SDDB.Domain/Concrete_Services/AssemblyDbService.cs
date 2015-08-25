@@ -126,6 +126,32 @@ namespace SDDB.Domain.Services
             }
         }
 
+        //count records by projectIds, typeIds and locIds
+        public virtual async Task<int> CountByAltIdsAsync(string[] projectIds, string[] typeIds, string[] locIds,
+            bool getActive = true)
+        {
+            projectIds = projectIds ?? new string[] { };
+            typeIds = typeIds ?? new string[] { };
+            locIds = locIds ?? new string[] { };
+
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+                var count = await dbContext.AssemblyDbs
+                        .CountAsync(x =>
+                            x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
+                            (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
+                            (typeIds.Count() == 0 || typeIds.Contains(x.AssemblyType_Id)) &&
+                            (locIds.Count() == 0 || locIds.Contains(x.AssignedToLocation_Id)) &&
+                            x.IsActive_bl == getActive
+                            )
+                        .ConfigureAwait(false);
+
+                return count;
+            }
+        }
+
         //lookup by query
         public virtual async Task<List<AssemblyDb>> LookupAsync(string query = "", bool getActive = true)
         {

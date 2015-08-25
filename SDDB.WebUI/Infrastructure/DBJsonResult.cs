@@ -8,7 +8,7 @@ namespace SDDB.WebUI.Infrastructure
 {
     //DBJsonDateTime-----------------------------------------------------------------------------------------------------------//
 
-    public class DBJsonDateISO : JsonResult
+    public class JsonResultDateISO : JsonResult
     {
         private const string _dateFormat = "yyyy-MM-dd";
 
@@ -42,7 +42,7 @@ namespace SDDB.WebUI.Infrastructure
 
     //DBJsonDateTimeISO--------------------------------------------------------------------------------------------------------//
 
-    public class DBJsonDateTimeISO : JsonResult
+    public class JsonResultDateTimeISO : JsonResult
     {
         private const string _dateFormat = "yyyy-MM-dd HH:mm";
 

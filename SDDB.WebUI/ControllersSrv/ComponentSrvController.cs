@@ -33,7 +33,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ComponentService.GetAsync";
             var records = await componentService.GetAsync(ids, getActive).ConfigureAwait(false);
-            return new DBJsonDateISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return DbJsonDate(filterForJsonFull(records));
         }
 
         // POST: /ComponentSrv/GetByAltIds
@@ -43,7 +43,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ComponentService.GetByAltIdsAsync";
             var records = await componentService.GetByAltIdsAsync(projectIds, modelIds, getActive).ConfigureAwait(false);
-            return new DBJsonDateISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return DbJsonDate(filterForJsonFull(records));
         }
 
         // POST: /ComponentSrv/GetByAltIds2
@@ -53,7 +53,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ComponentService.GetByAltIdsAsync";
             var records = await componentService.GetByAltIdsAsync(projectIds, typeIds, assyIds, getActive).ConfigureAwait(false);
-            return new DBJsonDateISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return DbJsonDate(filterForJsonFull(records));
         }
 
 
@@ -62,7 +62,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ComponentService.LookupAsync";
             var records = await componentService.LookupAsync(query, getActive).ConfigureAwait(false);
-            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonLookup(records));
         }
 
         // GET: /ComponentSrv/LookupByProj
@@ -73,7 +73,7 @@ namespace SDDB.WebUI.ControllersSrv
 
             ViewBag.ServiceName = "ComponentService.LookupByProjAsync";
             var records = await componentService.LookupByProjAsync(projectIdsArray, query, getActive).ConfigureAwait(false);
-            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonLookup(records));
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ComponentService.EditAsync";
             var newEntryIds = await componentService.EditAsync(records).ConfigureAwait(false);
-            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True", newEntryIds = newEntryIds });
         }
 
         // POST: /ComponentSrv/Delete
@@ -95,7 +95,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ComponentService.DeleteAsync";
             await componentService.DeleteAsync(ids).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ComponentService.EditExtendedAsync";
             await componentService.EditExtendedAsync(records).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
@@ -136,9 +136,8 @@ namespace SDDB.WebUI.ControllersSrv
                 },
                 AssignedToProject_ = new
                 {
-                    x.AssignedToProject.ProjectName,
-                    x.AssignedToProject.ProjectAltName,
-                    x.AssignedToProject.ProjectCode
+                    x.AssignedToProject.ProjectCode,
+                    x.AssignedToProject.ProjectName
                 },
                 AssignedToAssemblyDb_ = new
                 {

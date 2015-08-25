@@ -31,7 +31,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ProjectEventService.GetAsync";
             var records = await projectEventService.GetAsync(getActive).ConfigureAwait(false);
-            return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return DbJsonDateTime(filterForJsonFull(records));
         }
 
         // POST: /ProjectEventSrv/GetByIds
@@ -41,7 +41,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ProjectEventService.GetAsync";
             var records = await projectEventService.GetAsync(ids, getActive).ConfigureAwait(false);
-            return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return DbJsonDateTime(filterForJsonFull(records));
         }
 
         // POST: /ProjectEventSrv/GetByProjectIds
@@ -51,7 +51,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ProjectEventService.GetByProjectAsync";
             var records = await projectEventService.GetByProjectAsync(projectIds, getActive).ConfigureAwait(false);
-            return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return DbJsonDateTime(filterForJsonFull(records));
         }
 
         // GET: /ProjectEventSrv/Lookup
@@ -59,7 +59,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ProjectEventService.LookupAsync";
             var records = await projectEventService.LookupAsync(query, getActive).ConfigureAwait(false);
-            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonLookup(records));
         }
 
         // GET: /ProjectEventSrv/LookupByProj
@@ -70,7 +70,7 @@ namespace SDDB.WebUI.ControllersSrv
             string[] projectIdsArray = null;
             if (projectIds != null && projectIds != "") projectIdsArray = projectIds.Split(',');
             var records = await projectEventService.LookupByProjAsync(projectIdsArray, query, getActive).ConfigureAwait(false);
-            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonLookup(records));
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ProjectEventService.EditAsync";
             var newEntryIds = await projectEventService.EditAsync(records).ConfigureAwait(false);
-            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True", newEntryIds = newEntryIds });
         }
 
         // POST: /ProjectEventSrv/Delete
@@ -92,7 +92,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ProjectEventService.DeleteAsync";
             await projectEventService.DeleteAsync(ids).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
@@ -106,19 +106,21 @@ namespace SDDB.WebUI.ControllersSrv
                 x.Id,
                 x.EventName,
                 x.EventAltName,
-                AssignedToProject_ = new {
-                    x.AssignedToProject.ProjectName,
-                    x.AssignedToProject.ProjectAltName,
-                    x.AssignedToProject.ProjectCode
+                AssignedToProject_ = new
+                {
+                    x.AssignedToProject.ProjectCode,
+                    x.AssignedToProject.ProjectName
                 },
                 x.EventCreated,
-                CreatedByPerson_ = new {
+                CreatedByPerson_ = new
+                {
                     x.CreatedByPerson.FirstName,
                     x.CreatedByPerson.LastName,
                     x.CreatedByPerson.Initials
                 },
                 x.EventClosed,
-                ClosedByPerson_ = new {
+                ClosedByPerson_ = new
+                {
                     x.ClosedByPerson.FirstName,
                     x.ClosedByPerson.LastName,
                     x.ClosedByPerson.Initials

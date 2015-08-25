@@ -40,7 +40,7 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "PersonLogEntryService.GetAsync";
             var records = await personLogEntryService.GetAsync(ids, getActive).ConfigureAwait(false);
             if (!User.IsInRole("PersonLogEntry_View")) { records = records.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
-            return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return DbJsonDateTime(filterForJsonFull(records));
         }
 
         // POST: /PersonLogEntrySrv/GetByAltIds
@@ -53,7 +53,7 @@ namespace SDDB.WebUI.ControllersSrv
             var records = await personLogEntryService.GetByAltIdsAsync(personIds, projectIds, assyIds, typeIds, startDate, endDate, getActive)
                 .ConfigureAwait(false);
             if (!User.IsInRole("PersonLogEntry_View")) { records = records.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
-            return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return DbJsonDateTime(filterForJsonFull(records));
         }
         
         //-----------------------------------------------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ namespace SDDB.WebUI.ControllersSrv
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(records).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
             var newEntryIds = await personLogEntryService.EditAsync(records).ConfigureAwait(false);
-            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True", newEntryIds = newEntryIds });
         }
 
         // POST: /PersonLogEntrySrv/Delete
@@ -79,7 +79,7 @@ namespace SDDB.WebUI.ControllersSrv
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(ids).ConfigureAwait(false)))
             { return JsonResponseForNoRights(); }
             await personLogEntryService.DeleteAsync(ids).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ namespace SDDB.WebUI.ControllersSrv
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
             var records = await personLogEntryService.GetPrsLogEntryAssysAsync(logEntryId).ConfigureAwait(false);
-            return Json(filterForJsonAssys(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonAssys(records));
         }
 
         // GET: /PersonLogEntrySrv/GetPrsLogEntryAssysNot
@@ -103,7 +103,7 @@ namespace SDDB.WebUI.ControllersSrv
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
             var records = await personLogEntryService.GetPrsLogEntryAssysNotAsync(logEntryId, locId).ConfigureAwait(false);
-            return Json(filterForJsonAssys(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonAssys(records));
         }
 
         // POST: /PersonLogEntrySrv/EditPrsLogEntryAssys
@@ -115,7 +115,7 @@ namespace SDDB.WebUI.ControllersSrv
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(ids).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
             await personLogEntryService.AddRemoveRelated(ids, idsAddRem, x => x.PrsLogEntryAssemblyDbs, isAdd).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -128,7 +128,7 @@ namespace SDDB.WebUI.ControllersSrv
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
             var records = await personLogEntryService.GetPrsLogEntryPersonsAsync(logEntryId).ConfigureAwait(false);
-            return Json(filterForJsonPersons(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonPersons(records));
         }
 
         // GET: /PersonLogEntrySrv/GetPrsLogEntryPersonsNot
@@ -139,7 +139,7 @@ namespace SDDB.WebUI.ControllersSrv
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
             var records = await personLogEntryService.GetPrsLogEntryPersonsNotAsync(UserId, logEntryId).ConfigureAwait(false);
-            return Json(filterForJsonPersons(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonPersons(records));
         }
 
         // POST: /PersonLogEntrySrv/EditPrsLogEntryPersons
@@ -151,7 +151,7 @@ namespace SDDB.WebUI.ControllersSrv
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(ids).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
             await personLogEntryService.AddRemoveRelated(ids, idsAddRem, x => x.PrsLogEntryPersons, isAdd).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -164,7 +164,7 @@ namespace SDDB.WebUI.ControllersSrv
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
             List<PersonLogEntryFile> records = await personLogEntryFileService.ListAsync(logEntryId).ConfigureAwait(false);
-            return new DBJsonDateTimeISO { Data = filterForJsonFiles(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return DbJsonDateTime(filterForJsonFiles(records));
         }
 
         // POST: /PersonLogEntrySrv/UploadFiles
@@ -177,7 +177,7 @@ namespace SDDB.WebUI.ControllersSrv
                 { return JsonResponseForNoRights(); }
             List<PersonLogEntryFile> records = await returnFileListFromRequestHelper(logEntryId).ConfigureAwait(false);
             List<string> newEntryIds = await personLogEntryFileService.UploadFilesAsync(records).ConfigureAwait(false);
-            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True", newEntryIds = newEntryIds });
         }
 
         // POST: /PersonLogEntrySrv/DownloadFiles
@@ -210,7 +210,7 @@ namespace SDDB.WebUI.ControllersSrv
             { return JsonResponseForNoRights(); }
 
             await personLogEntryFileService.DeleteAsync(ids).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
@@ -235,9 +235,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.ManHours,
                 AssignedToProject_ = new
                 {
-                    x.AssignedToProject.ProjectName,
-                    x.AssignedToProject.ProjectAltName,
-                    x.AssignedToProject.ProjectCode
+                    x.AssignedToProject.ProjectCode,
+                    x.AssignedToProject.ProjectName
                 },
                 AssignedToLocation_ = new
                 {
@@ -330,7 +329,7 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.StatusCode = HttpStatusCode.BadRequest;
             ViewBag.StatusDescription = "You have insufficient privileges to edit or view other person's entries.";
             Response.StatusCode = (int)ViewBag.StatusCode;
-            return Json(new { Success = "False", responseText = ViewBag.StatusDescription }, JsonRequestBehavior.AllowGet); 
+            return DbJson(new { Success = "False", responseText = ViewBag.StatusDescription }); 
         }
 
         //returnFileListFromRequestHelper

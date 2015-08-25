@@ -31,7 +31,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ProjectService.GetAsync";
             var records = await projectService.GetAsync(getActive).ConfigureAwait(false);
-            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonFull(records));
         }
 
         // GET: /ProjectSrv/GetByIds
@@ -41,7 +41,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ProjectService.GetAsync";
             var records = await projectService.GetAsync(ids, getActive).ConfigureAwait(false);
-            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonFull(records));
         }
 
         // GET: /ProjectSrv/Lookup
@@ -51,7 +51,7 @@ namespace SDDB.WebUI.ControllersSrv
             var records = await projectService.LookupAsync(query, getActive).ConfigureAwait(false);
 
             ViewBag.StatusCode = HttpStatusCode.OK;
-            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonLookup(records));
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ProjectService.EditAsync";
             var newEntryIds = await projectService.EditAsync(records).ConfigureAwait(false);
-            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True", newEntryIds = newEntryIds });
         }
 
         // POST: /ProjectSrv/Delete
@@ -73,7 +73,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ProjectService.DeleteAsync";
             await projectService.DeleteAsync(ids).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
 
@@ -85,7 +85,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ProjectService.GetProjectPersonsAsync";
             var records = await projectService.GetProjectPersonsAsync(id).ConfigureAwait(false);
-            return Json(filterForJsonPersons(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonPersons(records));
         }
 
         // GET: /ProjectSrv/GetProjectPersonsNot
@@ -94,7 +94,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ProjectService.GetProjectPersonsNotAsync";
             var records = await projectService.GetProjectPersonsNotAsync(id).ConfigureAwait(false);
-            return Json(filterForJsonPersons(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonPersons(records));
         }
 
         // POST: /PersonSrv/EditProjectPersons
@@ -104,7 +104,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ProjectService.AddRemoveRelated";
             await projectService.AddRemoveRelated(ids, idsAddRem, x => x.ProjectPersons, isAdd).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
         
 
@@ -132,10 +132,10 @@ namespace SDDB.WebUI.ControllersSrv
         private object filterForJsonLookup(List<Project> records)
         {
             return records
-                .OrderBy(x => x.ProjectName)
+                .OrderBy(x => x.ProjectCode)
                 .Select(x => new {
                     id = x.Id,
-                    name = x.ProjectName + " " + x.ProjectCode
+                    name = x.ProjectCode + " " + x.ProjectName
                 })
                 .ToList();
         }

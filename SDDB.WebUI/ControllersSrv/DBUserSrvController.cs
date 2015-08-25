@@ -32,7 +32,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "DBUserService.GetAsync";
             var records = await dbUserService.GetAsync().ConfigureAwait(false);
-            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonFull(records));
         }
 
         //POST: /DBUserSrv/Get By Ids
@@ -42,7 +42,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "DBUserService.GetAsync";
             var records = await dbUserService.GetAsync(ids).ConfigureAwait(false);
-            return Json(filterForJsonFull(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonFull(records));
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "DBUserService.EditAsync";
             await dbUserService.EditAsync(records).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         // POST: /DBUserSrv/Delete
@@ -64,7 +64,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "DBUserService.DeleteAsync";
             await dbUserService.DeleteAsync(ids).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
 
@@ -76,7 +76,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "DBUserService.GetAllRolesAsync";
             var records = (await dbUserService.GetAllRolesAsync().ConfigureAwait(false)).Select(x => new { Name = x });
-            return Json(records, JsonRequestBehavior.AllowGet);
+            return DbJson(records);
         }
 
         // GET: /DBUserSrv/GetUserRoles
@@ -85,7 +85,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "DBUserService.GetUserRolesAsync";
             var records = (await dbUserService.GetUserRolesAsync(id).ConfigureAwait(false)).Select(x => new { Name = x });
-            return Json(records, JsonRequestBehavior.AllowGet);
+            return DbJson(records);
         }
 
         // GET: /DBUserSrv/GetUserRolesNot
@@ -94,7 +94,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "DBUserService.GetUserRolesNotAsync";
             var records = (await dbUserService.GetUserRolesNotAsync(id).ConfigureAwait(false)).Select(x => new { Name = x });
-            return Json(records, JsonRequestBehavior.AllowGet);
+            return DbJson(records);
         }
 
         // POST: /DBUserSrv/EditRoles
@@ -104,7 +104,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "DBUserService.EditRolesAsync";
             await dbUserService.AddRemoveRolesAsync(ids, idsAddRem, isAdd).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//

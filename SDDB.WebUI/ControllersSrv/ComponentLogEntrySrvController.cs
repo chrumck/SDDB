@@ -32,7 +32,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ComponentLogEntryService.GetAsync";
             var records = await compLogEntryService.GetAsync(ids, getActive).ConfigureAwait(false);
-            return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return DbJsonDateTime(filterForJsonFull(records));
         }
 
         // POST: /ComponentLogEntrySrv/GetByAltIds
@@ -44,7 +44,7 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "ComponentLogEntryService.GetByAltIdsAsync"; 
             var records = await compLogEntryService.GetByAltIdsAsync(projectIds, componentIds, personIds, startDate, endDate, getActive)
                 .ConfigureAwait(false);
-            return new DBJsonDateTimeISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return DbJsonDateTime(filterForJsonFull(records));
         }
                 
         
@@ -57,7 +57,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ComponentLogEntryService.EditAsync";
             var newEntryIds = await compLogEntryService.EditAsync(records).ConfigureAwait(false);
-            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True", newEntryIds = newEntryIds });
         }
 
         // POST: /ComponentLogEntrySrv/Delete
@@ -67,7 +67,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "ComponentLogEntryService.DeleteAsync";
             await compLogEntryService.DeleteAsync(ids).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
@@ -97,8 +97,8 @@ namespace SDDB.WebUI.ControllersSrv
                 },
                 AssignedToProject_ = new
                 {
-                    x.AssignedToProject.ProjectName,
-                    x.AssignedToProject.ProjectCode
+                    x.AssignedToProject.ProjectCode,
+                    x.AssignedToProject.ProjectName
                 },
                 AssignedToAssemblyDb_ = new
                 {

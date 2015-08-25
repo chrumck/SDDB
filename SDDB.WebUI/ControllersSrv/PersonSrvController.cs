@@ -31,7 +31,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonService.GetAllAsync";
             var records = await personService.GetAllAsync(getActive).ConfigureAwait(false);
-            return new DBJsonDateISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return DbJsonDate(filterForJsonFull(records));
         }
 
         // POST: /PersonSrv/GetAllByIds
@@ -41,7 +41,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonService.GetAllAsync"; 
             var records = await personService.GetAllAsync(ids, getActive).ConfigureAwait(false);
-            return new DBJsonDateISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return DbJsonDate(filterForJsonFull(records));
         }
 
         // GET: /PersonSrv/PersonsWoDBUser
@@ -50,7 +50,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonService.GetWoDBUserAsync";
             var records = await personService.GetWoDBUserAsync(getActive).ConfigureAwait(false);
-            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonLookup(records));
         }
 
         // GET: /PersonSrv/LookupAll
@@ -59,7 +59,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonService.LookupAllAsync";
             var records = await personService.LookupAllAsync(query, getActive).ConfigureAwait(false);
-            return Json(filterForJsonLookup(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonLookup(records));
         }
 
         // GET: /PersonSrv/Get
@@ -67,7 +67,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonService.GetAsync";
             var records = await personService.GetAsync(getActive).ConfigureAwait(false);
-            return new DBJsonDateISO { Data = filterForJsonFull(records), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return DbJsonDate(filterForJsonFull(records));
         }
 
         // GET: /PersonSrv/Lookup
@@ -75,7 +75,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonService.LookupAsync";
             var records = await personService.LookupAsync(query, getActive).ConfigureAwait(false);
-            return Json(filterForJsonLookup(records) , JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonLookup(records) );
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonService.EditAsync";
             var newEntryIds = await personService.EditAsync(records).ConfigureAwait(false);
-            return Json(new { Success = "True", newEntryIds = newEntryIds }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True", newEntryIds = newEntryIds });
         }
 
         // POST: /PersonSrv/Delete
@@ -97,7 +97,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonService.DeleteAsync";
             await personService.DeleteAsync(ids).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonService.GetPersonProjectsAsync"; 
             var records = await personService.GetPersonProjectsAsync(id).ConfigureAwait(false);
-            return Json(filterForJsonProjects(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonProjects(records));
         }
 
         // GET: /PersonSrv/GetPersonProjectsNot
@@ -117,7 +117,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonService.GetPersonProjectsNotAsync";
             var records = await personService.GetPersonProjectsNotAsync(id).ConfigureAwait(false);
-            return Json(filterForJsonProjects(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonProjects(records));
         }
 
         // POST: /PersonSrv/EditPersonProjects
@@ -127,7 +127,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonService.EditPersonProjectsAsync";
             await personService.AddRemoveRelated(ids, idsAddRem, x => x.PersonProjects, isAdd).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -138,7 +138,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonService.GetPersonGroupsAsync"; 
             var records = await personService.GetPersonGroupsAsync(id).ConfigureAwait(false);
-            return Json(filterForJsonPrsGroups(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonPrsGroups(records));
         }
 
         // GET: /PersonSrv/GetPersonGroupsNot
@@ -147,7 +147,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonService.GetPersonGroupsNotAsync";
             var records = await personService.GetPersonGroupsNotAsync(id).ConfigureAwait(false);
-            return Json(filterForJsonPrsGroups(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonPrsGroups(records));
         }
 
         // POST: /PersonSrv/EditPersonGroups
@@ -157,7 +157,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonService.EditPersonGroupsAsync";
             await personService.AddRemoveRelated(ids, idsAddRem, x => x.PersonGroups, isAdd).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
@@ -168,7 +168,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonService.GetManagedGroupsAsyn";
             var records = await personService.GetManagedGroupsAsync(id).ConfigureAwait(false);
-            return Json(filterForJsonPrsGroups(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonPrsGroups(records));
         }
 
         // GET: /PersonSrv/GetManagedGroupsNot
@@ -177,7 +177,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonService.GetManagedGroupsNotAsync";
             var records = await personService.GetManagedGroupsNotAsync(id).ConfigureAwait(false);
-            return Json(filterForJsonPrsGroups(records), JsonRequestBehavior.AllowGet);
+            return DbJson(filterForJsonPrsGroups(records));
         }
 
         // POST: /PersonSrv/EditManagedGroups
@@ -187,7 +187,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonService.EditManagedGroupsAsync";
             await personService.AddRemoveRelated(ids, idsAddRem, x => x.ManagedGroups, isAdd).ConfigureAwait(false);
-            return Json(new { Success = "True" }, JsonRequestBehavior.AllowGet);
+            return DbJson(new { Success = "True" });
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
