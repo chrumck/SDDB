@@ -76,14 +76,13 @@ namespace SDDB.Domain.Infrastructure
 
     public class DBIsDateISOAttribute : ValidationAttribute, IClientValidatable
     {
-        public DBIsDateISOAttribute() : base("{0} has to be in 'yyyy-MM-dd' format.") { }
+        public DBIsDateISOAttribute() : base("{0} has to be a date") { }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
 
-            DateTime output; var formats = new string[] { "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH:mm:ss" };
-            if (value != null && !DateTime.TryParseExact(value.ToString(), formats, CultureInfo.InvariantCulture,
-                DateTimeStyles.None, out output) && output.TimeOfDay.Ticks != 0)
+            DateTime output;
+            if (value != null && !DateTime.TryParse(value.ToString(), out output) && output.TimeOfDay.Ticks != 0)
                 return new ValidationResult(FormatErrorMessage(validationContext.DisplayName));
             else
                 return ValidationResult.Success;
@@ -102,12 +101,12 @@ namespace SDDB.Domain.Infrastructure
 
     public class DBIsDateTimeISOAttribute : ValidationAttribute, IClientValidatable
     {
-        public DBIsDateTimeISOAttribute() : base("{0} has to be in 'yyyy-MM-dd HH:mm' format.") { }
+        public DBIsDateTimeISOAttribute() : base("{0} has to be a date-time.") { }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            DateTime output; var formats = new string[] { "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH:mm:ss" };
-            if (value != null && !DateTime.TryParseExact(value.ToString(), formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out output))
+            DateTime output;
+            if (value != null && !DateTime.TryParse(value.ToString(), out output))
                 return new ValidationResult(FormatErrorMessage(validationContext.DisplayName));
             else
                 return ValidationResult.Success;

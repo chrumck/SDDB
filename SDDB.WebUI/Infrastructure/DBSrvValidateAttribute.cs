@@ -39,7 +39,7 @@ namespace SDDB.WebUI.Infrastructure
                     UserName = filterContext.HttpContext.User.Identity.Name,
                     UserHostAddress = filterContext.HttpContext.Request.UserHostAddress,
                     StatusCode = HttpStatusCode.BadRequest,
-                    StatusDescription = "Error 0102: Error(s) in submitted values:\n" + errorsFromModelState,
+                    StatusDescription = "Error(s) in submitted values:\n" + errorsFromModelState,
                 };
                 Logger.LogResult(filterResult);
                 filterContext.HttpContext.Response.StatusCode = (int)filterResult.StatusCode;
