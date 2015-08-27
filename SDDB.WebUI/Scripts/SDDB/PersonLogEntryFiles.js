@@ -38,38 +38,44 @@ $(document).ready(function () {
             refreshMainView();
             FilesAreChanged = false;
         }
-        
     });
 
     //Wire Up LogEntryFilesBtnDload
     $("#LogEntryFilesBtnDload").click(function () {
         var fileIds = TableLogEntryFiles.cells(".ui-selected", "Id:name").data().toArray();
-        if (fileIds.length == 0) showModalNothingSelected();
-        else {
-            showModalWait();
-
-            DlToken = new Date().getTime(); DlAttempts = 60;
-            DlTimer = window.setInterval(function () {
-                if ((getCookie("DlToken") == DlToken) || (DlAttempts == 0)) {
-                    hideModalWait();
-                    window.clearInterval(DlTimer);
-                    expireCookie("DlToken");
-                    if (DlAttempts == 0) showModalFail("Server Error", "Server response timed out.");
-                    else if ($("#LogEntryFilesIframe").contents().find("body").html() != "")
-                        showModalFail("Server Error", $("#LogEntryFilesIframe").contents().find("body").html());
-                }
-                else DlAttempts--;
-            }, 500);
-
-            $("#LogEntryFilesIframe").contents().find("body").html("");
-
-            var form = $('<form method="POST" action="/PersonLogEntrySrv/DownloadFiles" target="LogEntryFilesIframe">');
-            form.append($('<input type="hidden" name="DlToken" value="' + DlToken + '">'));
-            form.append($('<input type="hidden" name="id" value="' + CurrIds[0] + '">'));
-            $.each(fileIds, function (i, name) { form.append($('<input type="hidden" name="fileIds[' + i + ']" value="' + name + '">')); });
-            $("body").append(form);
-            form.submit();
+        if (fileIds.length == 0) {
+            showModalNothingSelected();
+            return;
         }
+
+        showModalWait();
+        $("#LogEntryFilesIframe").contents().find("body").html("");
+
+        DlToken = new Date().getTime(); DlAttempts = 60;
+        DlTimer = window.setInterval(function () {
+            if ((getCookie("DlToken") == DlToken) || (DlAttempts == 0)) {
+                hideModalWait();
+                window.clearInterval(DlTimer);
+                expireCookie("DlToken");
+                if (DlAttempts == 0) {
+                    showModalFail("Server Error", "Server response timed out.");
+                    return;
+                }
+                var iFrameBodyHtml = $("#LogEntryFilesIframe").contents().find("body").html();
+                if (typeof iFrameBodyHtml !== "undefined" && iFrameBodyHtml != "") {
+                    showModalFail("Server Error", $("#LogEntryFilesIframe").contents().find("body").html());
+                    return;
+                }
+            }
+            DlAttempts--
+        }, 500);
+
+        var form = $('<form method="POST" action="/PersonLogEntrySrv/DownloadFiles" target="LogEntryFilesIframe">');
+        form.append($('<input type="hidden" name="DlToken" value="' + DlToken + '">'));
+        form.append($('<input type="hidden" name="id" value="' + CurrIds[0] + '">'));
+        $.each(fileIds, function (i, name) { form.append($('<input type="hidden" name="fileIds[' + i + ']" value="' + name + '">')); });
+        $("body").append(form);
+        form.submit();
     });
 
     //wire up LogEntryFilesBtnUpload

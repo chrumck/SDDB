@@ -196,7 +196,7 @@ namespace SDDB.WebUI.ControllersSrv
             PersonLogEntryFile file = await personLogEntryFileService.DownloadAsync(fileIds).ConfigureAwait(false);
             byte[] fileData = file.FileData.ToArray();
             file.FileData.Dispose();
-            return File(fileData, System.Net.Mime.MediaTypeNames.Application.Octet, file.FileName);
+            return File(fileData, file.FileType, file.FileName);
         }
         
         // POST: /PersonLogEntrySrv/DeleteFiles

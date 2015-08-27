@@ -23,6 +23,7 @@ namespace SDDB.Domain.Services
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
         private int dataChunkLength;
+        private List<string> newFileNames;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
 
@@ -30,6 +31,7 @@ namespace SDDB.Domain.Services
             : base(contextScopeFac, userId) 
         {
             this.dataChunkLength = PersonLogEntryFileData.DataChunkLength;
+            this.newFileNames = new List<string>();
         }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
@@ -173,6 +175,7 @@ namespace SDDB.Domain.Services
         private async Task<PersonLogEntryFile> getZipFileFromEntryFiles(EFDbContext dbContext, string[] fileIds)
         {
             var zipFile = new PersonLogEntryFile();
+            zipFile.FileType = System.Net.Mime.MediaTypeNames.Application.Octet;
             zipFile.FileName = "SDDBFiles_" + String.Format("_{0:yyyyMMdd_HHmm}", DateTime.Now) + ".zip";
 
             using (ZipArchive zip = new ZipArchive(zipFile.FileData, ZipArchiveMode.Create, true))
@@ -198,14 +201,15 @@ namespace SDDB.Domain.Services
                     .ToArrayAsync().ConfigureAwait(false);
 
             var i = 1;
-            while (existingFileNames.Contains(currentFileName))
+            while (existingFileNames.Contains(currentFileName) || newFileNames.Contains(currentFileName))
             {
-                currentFileName = currentFileName.TrimEnd(new[] { ')' });
-                currentFileName = currentFileName.TrimEnd(new[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' });
-                currentFileName = currentFileName.TrimEnd(new[] { '(' });
-                currentFileName += "(" + i + ")";
+                currentFileName = currentFileName.TrimStart(new[] { '(' });
+                currentFileName = currentFileName.TrimStart(new[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' });
+                currentFileName = currentFileName.TrimStart(new[] { ')' });
+                currentFileName = "(" + i + ")" + currentFileName ;
                 i++;
             }
+            newFileNames.Add(currentFileName);
             return currentFileName;
         }
 
