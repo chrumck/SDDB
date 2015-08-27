@@ -15,6 +15,7 @@ var DlToken;
 var DlTimer;
 var DlAttempts;
 var XHR = new window.XMLHttpRequest();
+var MAX_UPLOAD_SIZE = 20971520;
 
 $(document).ready(function () {
 
@@ -85,9 +86,17 @@ $(document).ready(function () {
             if (window.FormData !== undefined) {
 
                 var data = new FormData();
+                var dataSize = 0;
                 for (var x = 0; x < files.length; x++) {
                     data.append("file" + x, files[x]);
+                    dataSize += files[x].size;
+                    if (dataSize > MAX_UPLOAD_SIZE) {
+                        showModalFail("Upload Too Large",
+                            "The total single upload is limited to " + MAX_UPLOAD_SIZE / 1024 + " kB");
+                        return;
+                    }
                 }
+
                 $("#ModalUpload").modal({ show: true, backdrop: "static", keyboard: false });
                 $.ajax({
                     type: "POST", url: "/PersonLogEntrySrv/UploadFiles?logEntryId=" + CurrIds[0],

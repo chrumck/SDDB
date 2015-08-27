@@ -203,10 +203,13 @@ namespace SDDB.Domain.Services
             var i = 1;
             while (existingFileNames.Contains(currentFileName) || newFileNames.Contains(currentFileName))
             {
-                currentFileName = currentFileName.TrimStart(new[] { '(' });
-                currentFileName = currentFileName.TrimStart(new[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' });
-                currentFileName = currentFileName.TrimStart(new[] { ')' });
-                currentFileName = "(" + i + ")" + currentFileName ;
+                string extension = System.IO.Path.GetExtension(currentFileName);
+                string currentFileNameWoExt = currentFileName.Substring(0, currentFileName.Length - extension.Length);
+
+                currentFileNameWoExt = currentFileNameWoExt.TrimEnd(new[] { ')' });
+                currentFileNameWoExt = currentFileNameWoExt.TrimEnd(new[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' });
+                currentFileNameWoExt = currentFileNameWoExt.TrimEnd(new[] { '(' });
+                currentFileName = currentFileNameWoExt + "(" + i + ")" + extension;
                 i++;
             }
             newFileNames.Add(currentFileName);
