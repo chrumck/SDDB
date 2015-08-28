@@ -118,6 +118,30 @@ namespace SDDB.Domain.Services
                 return records;
             }
         }
+
+        ////get by personIds, projectIds, typeIds, startDate, endDate
+        //public virtual async Task<List<PersonLogEntry>> GetForTimesheetAsync(string personId, DateTime startDate, DateTime endDate, bool getActive = true)
+        //{
+        //    if (String.IsNullOrEmpty(personId)) { throw new ArgumentNullException("personId"); }
+
+        //    using (var dbContextScope = contextScopeFac.CreateReadOnly())
+        //    {
+        //        var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+        //        var records = await dbContext.PersonLogEntrys
+        //               .GroupBy(x => x.AssignedToProject_Id,)
+        //               .Include(x => x.EnteredByPerson)
+        //               .Include(x => x.PersonActivityType)
+        //               .Include(x => x.AssignedToProject)
+        //               .Include(x => x.AssignedToLocation)
+        //               .Include(x => x.AssignedToProjectEvent)
+        //               .Include(x => x.PersonLogEntryFiles)
+        //               .ToListAsync().ConfigureAwait(false);
+
+        //        records.FillRelatedIfNull();
+        //        return records;
+        //    }
+        //}
         
         //lookup by query
         public virtual async Task<List<PersonLogEntry>> LookupAsync(string query, bool getActive = true)
