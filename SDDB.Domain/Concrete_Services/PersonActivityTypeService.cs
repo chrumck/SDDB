@@ -69,28 +69,12 @@ namespace SDDB.Domain.Services
         // Create and Update records given in []  - same as BaseDbService
 
         // Delete records by their Ids - same as BaseDbService
-        // see overriden checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
 
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
 
-        //helper - check before deleting records, takes LocationModel ids array
-        //protected override async Task checkBeforeDeleteHelperAsync(EFDbContext dbContext, string[] ids)
-        //{
-        //    for (int i = 0; i < ids.Length; i++)
-        //    {
-        //        var currentId = ids[i];
-        //        var assignedLogEntriesCount = await dbContext.PersonLogEntrys
-        //            .CountAsync(x => x.IsActive_bl && x.PersonActivityType_Id == currentId).ConfigureAwait(false);
-        //        if (assignedLogEntriesCount > 0)
-        //        {
-        //            var dbEntry = await dbContext.PersonActivityTypes.FindAsync(currentId).ConfigureAwait(false);
-        //            throw new DbBadRequestException(
-        //                string.Format("Some Person Log Entries have the type {0} assigned to it.\nDelete aborted.", dbEntry.ActivityTypeName));
-        //        }
-        //    }
-        //}
+        
 
         #endregion
     }

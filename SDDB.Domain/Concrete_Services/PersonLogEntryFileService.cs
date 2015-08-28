@@ -83,9 +83,10 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
-                if (fileIds.Length == 1) { return await getPersonLogEntryFile(dbContext, fileIds[0]); }
+                if (fileIds.Length == 1) 
+                    { return await getPersonLogEntryFile(dbContext, fileIds[0]).ConfigureAwait(false); }
 
-                return await getZipFileFromEntryFiles(dbContext, fileIds);
+                return await getZipFileFromEntryFiles(dbContext, fileIds).ConfigureAwait(false);
             }
         }
 
@@ -113,7 +114,8 @@ namespace SDDB.Domain.Services
         {
             if (record == null) { throw new ArgumentNullException("record"); }
             
-            record.FileName = await getNewFileNameIfDuplicate(dbContext, record.AssignedToPersonLogEntry_Id, record.FileName);
+            record.FileName = await getNewFileNameIfDuplicate(dbContext,
+                record.AssignedToPersonLogEntry_Id, record.FileName).ConfigureAwait(false);
             record.Id = Guid.NewGuid().ToString();
             record.LastSavedByPerson_Id = userId;
             dbContext.PersonLogEntryFiles.Add(record);
@@ -166,7 +168,7 @@ namespace SDDB.Domain.Services
                     throw new DbBadRequestException(
                         String.Format("Data Chunk for Log Entry File {0} not found", record.FileName)); 
                 }
-                await record.FileData.WriteAsync(fileDataChunk.Data, 0, fileDataChunk.Data.Length);
+                await record.FileData.WriteAsync(fileDataChunk.Data, 0, fileDataChunk.Data.Length).ConfigureAwait(false);
             }
             return record;
         }
@@ -182,7 +184,7 @@ namespace SDDB.Domain.Services
             {
                 for (int i = 0; i < fileIds.Length; i++)
                 {
-                    PersonLogEntryFile record =  await getPersonLogEntryFile(dbContext, fileIds[i]); 
+                    PersonLogEntryFile record =  await getPersonLogEntryFile(dbContext, fileIds[i]).ConfigureAwait(false); 
                     Stream newZipEntryStream = zip.CreateEntry(record.FileName).Open();
                     record.FileData.WriteTo(newZipEntryStream);
                     record.FileData.Dispose();

@@ -65,8 +65,8 @@ namespace SDDB.Domain.Services
         {
             if (records == null || records.Length == 0) { throw new ArgumentNullException("records"); }
 
-            checkDbUserBeforeEditHelperAsync(records);
-            await editDbUserHelperAsync(records);
+            checkDbUserBeforeEditHelper(records);
+            await editDbUserHelperAsync(records).ConfigureAwait(false);
         }
 
         // Delete records by their Ids
@@ -139,7 +139,7 @@ namespace SDDB.Domain.Services
         #region Helpers
 
         //checkDbUserBeforeEditHelperAsync - single record
-        private void checkDbUserBeforeEditHelperAsync(DBUser record)
+        private void checkDbUserBeforeEditHelper(DBUser record)
         {
             if (record.PropIsModified(x => x.LDAPAuthenticated_bl) && !record.LDAPAuthenticated_bl && String.IsNullOrEmpty(record.Password))
             {
@@ -149,11 +149,11 @@ namespace SDDB.Domain.Services
         }
 
         //checkDbUserBeforeEditHelperAsync - override for array of records
-        private void checkDbUserBeforeEditHelperAsync(DBUser[] records)
+        private void checkDbUserBeforeEditHelper(DBUser[] records)
         {
             for (int i = 0; i < records.Length; i++)
             {
-                checkDbUserBeforeEditHelperAsync(records[i]);
+                checkDbUserBeforeEditHelper(records[i]);
             }
         }
 
@@ -193,7 +193,7 @@ namespace SDDB.Domain.Services
         {
             for (int i = 0; i < records.Length; i++)
             {
-                await editDbUserHelperAsync(records[i]);
+                await editDbUserHelperAsync(records[i]).ConfigureAwait(false);
             }
         }
 

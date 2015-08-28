@@ -320,7 +320,7 @@ namespace SDDB.WebUI.ControllersSrv
         private async Task<bool> isUserActivity(PersonLogEntry[] records)
         {
             var ids = records.Select(x => x.Id).ToArray();
-            return (await isUserActivity(ids) && records.All(x => x.EnteredByPerson_Id == UserId));
+            return (await isUserActivity(ids).ConfigureAwait(false) && records.All(x => x.EnteredByPerson_Id == UserId));
         }
 
         //set viewbag, response http code and return JSON if user does not have PersonLogEntry_ rights

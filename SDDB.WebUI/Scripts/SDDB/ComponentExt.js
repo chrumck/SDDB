@@ -102,6 +102,14 @@ $(document).ready(function () {
         TableMain.columns([16, 17, 18, 19, 20]).visible(true);
     });
 
+    //wire up dropdownId5
+    $("#dropdownId5").click(function (event) {
+        event.preventDefault();
+        var noOfRows = TableMain.rows(".ui-selected").data().length;
+        if (noOfRows != 1) showModalSelectOne();
+        else window.open("/ComponentLogEntry?compId=" + TableMain.cell(".ui-selected", "Id:name").data())
+    });
+
     //Initialize MagicSuggest MsFilterByModel
     MsFilterByModel = $("#MsFilterByModel").magicSuggest({
         data: "/ComponentModelSrv/Lookup",
