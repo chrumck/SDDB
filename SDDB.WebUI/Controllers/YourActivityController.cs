@@ -11,8 +11,8 @@ namespace SDDB.WebUI.Controllers
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
-        // GET: Document
-        [Authorize]
+        // GET: YourActivity
+        [Authorize(Roles = "YourActivity_View")]
         public ActionResult Index()
         {
             return View();

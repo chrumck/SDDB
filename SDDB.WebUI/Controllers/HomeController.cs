@@ -25,6 +25,12 @@ namespace SDDB.WebUI.Controllers
             return View();
         }
 
+        // GET: Error
+        public ActionResult Maintenance()
+        {
+            return View();
+        }
+
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
