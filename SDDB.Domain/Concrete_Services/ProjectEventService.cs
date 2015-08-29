@@ -109,7 +109,8 @@ namespace SDDB.Domain.Services
                         x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
                         x.EventName.Contains(query) &&
                         x.IsActive_bl == getActive
-                        )
+                    )
+                    .Take(maxRecordsFromLookup)
                     .ToListAsync().ConfigureAwait(false);
                 return records;
             }
@@ -129,8 +130,9 @@ namespace SDDB.Domain.Services
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         x.EventName.Contains(query) &&
                         x.IsActive_bl == getActive
-                        )
-                        .ToListAsync().ConfigureAwait(false);
+                    )
+                    .Take(maxRecordsFromLookup)
+                    .ToListAsync().ConfigureAwait(false);
                 return records;
             }
         }

@@ -75,7 +75,8 @@ namespace SDDB.Domain.Services
                            (x.ProjectName.Contains(query) || x.ProjectCode.Contains(query)) &&
                             x.IsActive_bl == getActive
                         )
-                        .ToListAsync().ConfigureAwait(false);
+                    .Take(maxRecordsFromLookup)
+                    .ToListAsync().ConfigureAwait(false);
                 return records;
             }
         }

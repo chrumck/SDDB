@@ -92,6 +92,28 @@ namespace SDDB.Domain.Services
             }
         }
 
+        //count by projectIds and modelIds
+        public virtual async Task<int> CountByAltIdsAsync(string[] projectIds, string[] modelIds, bool getActive = true)
+        {
+            projectIds = projectIds ?? new string[] { };
+            modelIds = modelIds ?? new string[] { };
+
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+                var count = await dbContext.AssemblyDbs
+                    .CountAsync(x =>
+                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
+                        (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
+                        (modelIds.Count() == 0 || modelIds.Contains(x.AssemblyModel_Id)) &&
+                        x.IsActive_bl == getActive
+                        )
+                    .ConfigureAwait(false);
+                return count;
+            }
+        }
+
         //get by projectIds, typeIds and locIds
         public virtual async Task<List<AssemblyDb>> GetByAltIdsAsync(string[] projectIds, string[] typeIds, string[] locIds,
             bool getActive = true)
@@ -126,7 +148,7 @@ namespace SDDB.Domain.Services
             }
         }
 
-        //count records by projectIds, typeIds and locIds
+        //count by projectIds, typeIds and locIds
         public virtual async Task<int> CountByAltIdsAsync(string[] projectIds, string[] typeIds, string[] locIds,
             bool getActive = true)
         {
@@ -147,7 +169,6 @@ namespace SDDB.Domain.Services
                             x.IsActive_bl == getActive
                             )
                         .ConfigureAwait(false);
-
                 return count;
             }
         }
@@ -166,6 +187,7 @@ namespace SDDB.Domain.Services
                         x.IsActive_bl == getActive
                         )
                     .Include(x => x.AssignedToProject)
+                    .Take(maxRecordsFromLookup)
                     .ToListAsync().ConfigureAwait(false);
                 return records;
             }
@@ -189,8 +211,8 @@ namespace SDDB.Domain.Services
                         x.IsActive_bl == getActive
                         )
                     .Include(x => x.AssignedToProject)
+                    .Take(maxRecordsFromLookup)
                     .ToListAsync().ConfigureAwait(false);
-
                 return records;
             }
         }
@@ -209,8 +231,8 @@ namespace SDDB.Domain.Services
                         x.IsActive_bl == getActive
                         )
                     .Include(x => x.AssignedToProject)
+                    .Take(maxRecordsFromLookup)
                     .ToListAsync().ConfigureAwait(false);
-
                 return records;
             }
         }

@@ -142,56 +142,7 @@ namespace SDDB.Domain.Services
         //        return records;
         //    }
         //}
-        
-        //lookup by query
-        public virtual async Task<List<PersonLogEntry>> LookupAsync(string query, bool getActive = true)
-        {
-            query = query ?? String.Empty;
-
-            using (var dbContextScope = contextScopeFac.CreateReadOnly())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-
-                var records = await dbContext.PersonLogEntrys
-                    .Where(x => 
-                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
-                        x.IsActive_bl == getActive &&
-                        (x.EnteredByPerson.Initials.Contains(query) || x.EnteredByPerson.LastName.Contains(query) ||
-                            x.Comments.Contains(query) )
-                        )
-                    .Include(x => x.EnteredByPerson)
-                    .ToListAsync().ConfigureAwait(false);
                 
-                return records;
-            }
-        }
-
-        //lookup by query and project
-        public virtual async Task<List<PersonLogEntry>> LookupByProjAsync(string[] projectIds, 
-            string query, bool getActive = true)
-        {
-            projectIds = projectIds ?? new string[] { };
-            query = query ?? String.Empty;
-
-            using (var dbContextScope = contextScopeFac.CreateReadOnly())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                                
-                var records = await dbContext.PersonLogEntrys
-                    .Where(x =>
-                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
-                        x.IsActive_bl == getActive &&
-                        (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
-                        (x.EnteredByPerson.Initials.Contains(query) || x.EnteredByPerson.LastName.Contains(query) ||
-                            x.Comments.Contains(query))
-                    )
-                    .Include(x => x.EnteredByPerson)
-                    .ToListAsync().ConfigureAwait(false);
-                
-                return records;
-            }
-        }
-        
         //-----------------------------------------------------------------------------------------------------------------------
 
         // Create and Update records given in [] - same as BaseDbService

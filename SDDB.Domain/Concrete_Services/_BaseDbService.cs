@@ -21,6 +21,7 @@ namespace SDDB.Domain.Services
 
         protected IDbContextScopeFactory contextScopeFac;
         protected string userId;
+        protected const int maxRecordsFromLookup = 100;
 
         protected IReadOnlyList<string> loggedProperties = new List<string> { };
 

@@ -70,7 +70,7 @@ namespace SDDB.Domain.Services
             }
         }
 
-        //find all persons by query, no by-group filtering
+        //look up all persons by query, no by-group filtering
         public virtual async Task<List<Person>> LookupAllAsync(string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
@@ -79,7 +79,9 @@ namespace SDDB.Domain.Services
                 var records = await dbContext.Persons.Where(x =>
                         (x.LastName.Contains(query) || x.FirstName.Contains(query) || x.Initials.Contains(query)) &&
                         x.IsActive_bl == getActive
-                    ).ToListAsync().ConfigureAwait(false);
+                    )
+                    .Take(maxRecordsFromLookup)
+                    .ToListAsync().ConfigureAwait(false);
                 return records;
             }
         }
@@ -99,7 +101,7 @@ namespace SDDB.Domain.Services
             }
         }
 
-        //find managed persons by query, WITH by-group filtering
+        //look up managed persons by query, WITH by-group filtering
         public async virtual Task<List<Person>> LookupAsync(string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
@@ -110,6 +112,7 @@ namespace SDDB.Domain.Services
                         (x.LastName.Contains(query) || x.FirstName.Contains(query) || x.Initials.Contains(query)) &&
                         x.IsActive_bl == getActive
                     )
+                    .Take(maxRecordsFromLookup)
                     .ToListAsync().ConfigureAwait(false);
                 return records;
             }

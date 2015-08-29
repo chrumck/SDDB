@@ -52,17 +52,19 @@ namespace SDDB.Domain.Services
         }
 
         //lookup by query
-        public virtual Task<List<ComponentStatus>> LookupAsync(string query = "", bool getActive = true)
+        public virtual async Task<List<ComponentStatus>> LookupAsync(string query = "", bool getActive = true)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.ComponentStatuss
+                var records = await dbContext.ComponentStatuss
                     .Where(x =>
                         (x.CompStatusName.Contains(query) || x.CompStatusAltName.Contains(query)) &&
                         x.IsActive_bl == getActive
                     )
-                    .ToListAsync();
+                    .Take(maxRecordsFromLookup)
+                    .ToListAsync().ConfigureAwait(false);
+                return records;
             }
         }
 

@@ -97,6 +97,7 @@ namespace SDDB.Domain.Services
                         x.IsActive_bl == getActive
                         )
                     .Include(x => x.AssignedToProject)
+                    .Take(maxRecordsFromLookup)
                     .ToListAsync().ConfigureAwait(false);
                 return records;
             }

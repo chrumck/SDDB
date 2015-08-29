@@ -301,6 +301,8 @@ namespace SDDB.WebUI.ControllersSrv
                 });
         }
 
+        //-----------------------------------------------------------------------------------------------------------------------
+
         //check if person log entry belongs to user - overload for single id
         private async Task<bool> isUserActivity(string id)
         {

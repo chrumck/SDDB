@@ -59,6 +59,7 @@ namespace SDDB.Domain.Services
                         x.DocTypeName.Contains(query) &&
                         x.IsActive_bl == getActive
                     )
+                    .Take(maxRecordsFromLookup)
                     .ToListAsync().ConfigureAwait(false);
                 return records;
             }
