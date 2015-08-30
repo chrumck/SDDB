@@ -9,14 +9,21 @@
 
 <!------- MainView ------->
 <div class="container-fluid hide" id="MainView">
-    <div class="btn-group margin-bottom-2px">
-        <button class="btn btn-default" id="BtnCreate">Create</button>
-        <button class="btn btn-primary" id="BtnEdit">Edit</button>
-        <button class="btn btn-danger" id="BtnDelete">Delete</button>
+    
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="btn-group margin-bottom-2px">
+                <button class="btn btn-default" id="BtnCreate">Create</button>
+                <button class="btn btn-primary" id="BtnEdit">Edit</button>
+                <button class="btn btn-danger" id="BtnDelete">Delete</button>
+            </div>
+            &nbsp;&nbsp;
+            <div class="btn-group margin-bottom-2px">
+                <button class="btn btn-warning" id="BtnEditRoles">DB Roles</button>
+            </div>
+        </div>
     </div>
-    <div class="btn-group margin-bottom-2px">
-        <button class="btn btn-warning" id="BtnEditRoles">DB Roles</button>
-    </div>
+    
     <div class="panel panel-primary">
         <div class="panel-heading text-center" style="font-size:130%">
             <strong>SDDB User Accounts</strong>
@@ -35,6 +42,7 @@
             <tbody class="selectable"></tbody>
         </table>
     </div>
+
 </div>
 
 <!------- EditFormView ------->

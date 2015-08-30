@@ -101,7 +101,7 @@ namespace SDDB.Domain.Entities
         [DefaultValue(true)]
         public bool IsActive_bl { get; set; }
 
-        //TSP Column Wireup ---------------------------------------------------------------------------------------------------//
+        //TSP Column Wireup ----------------------------------------------------------------
         [Column(TypeName = "timestamp")]
         public DateTime TSP
         {
@@ -111,7 +111,7 @@ namespace SDDB.Domain.Entities
         [NotMapped]
         private DateTime? tsp;
 
-        //LastSavedByPerson_Id -------------------------------------------------------------------------------------------------//
+        //LastSavedByPerson_Id -------------------------------------------------------------
         //[Required(ErrorMessage = "LastSavedByPerson Id field is required")]
         [StringLength(40)]
         [ForeignKey("LastSavedByPerson")]
@@ -143,6 +143,13 @@ namespace SDDB.Domain.Entities
         [InverseProperty("PrsLogEntryAssemblyDbs")]
         public virtual ICollection<PersonLogEntry> AssemblyDbPrsLogEntrys { get; set; }
 
+
+        //Non-persistent Properties--------------------------------------------------------------------------------------------//
+
+        [NotMapped]
+        public string[] ModifiedProperties { get; set; }
+
+
         //Constructors---------------------------------------------------------------------------------------------------------//
 
         public AssemblyDb()
@@ -153,10 +160,6 @@ namespace SDDB.Domain.Entities
         }
 
         
-        //Non-persisten Properties---------------------------------------------------------------------------------------------//
-
-        [NotMapped]
-        public string[] ModifiedProperties { get; set; }
 
     }
   

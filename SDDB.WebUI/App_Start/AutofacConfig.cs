@@ -32,8 +32,12 @@ namespace SDDB.WebUI
             var procTooLongmSec = int.Parse(ConfigurationManager.AppSettings["procTooLongmSec"] ?? "0");
 
             var userIdParameter = new ResolvedParameter(
-                (pi, ctx) => pi.ParameterType == typeof(string) && pi.Name == "userId",
-                (pi, ctx) => ((ClaimsIdentity)HttpContext.Current.User.Identity).FindFirst(ClaimTypes.Sid).Value
+                    (pi, ctx) => pi.ParameterType == typeof(string) && pi.Name == "userId",
+                    (pi, ctx) => 
+                    {
+                        var userId = ((ClaimsIdentity)HttpContext.Current.User.Identity).FindFirstValue(ClaimTypes.Sid);
+                        return userId ?? "NotLoggedIn";
+                    }
                 );
 
             //following Krystian's advice - file storage on FTP is discontinued

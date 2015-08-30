@@ -33,7 +33,7 @@ namespace SDDB.Domain.Entities
         [DefaultValue(true)]
         public bool IsActive_bl { get; set; }
 
-        //TSP Column Wireup ---------------------------------------------------------------------------------------------------//
+        //TSP Column Wireup ----------------------------------------------------------------
         [Column(TypeName = "timestamp")]
         public DateTime TSP
         {
@@ -43,13 +43,14 @@ namespace SDDB.Domain.Entities
         [NotMapped]
         private DateTime? tsp;
 
-        //LastSavedByPerson_Id -------------------------------------------------------------------------------------------------//
+        //LastSavedByPerson_Id -------------------------------------------------------------
         //[Required(ErrorMessage = "LastSavedByPerson Id field is required")]
         [StringLength(40)]
         [ForeignKey("LastSavedByPerson")]
         public string LastSavedByPerson_Id { get; set; }
         //Navigation Property
         public virtual Person LastSavedByPerson { get; set; }
+
 
         //EF Navigation Properties---------------------------------------------------------------------------------------------//
 
@@ -62,13 +63,13 @@ namespace SDDB.Domain.Entities
         //many to many
 
 
-        //Constructors---------------------------------------------------------------------------------------------------------//
-
-
-        //Non-persisten Properties---------------------------------------------------------------------------------------------//
+        //Non-persistent Properties--------------------------------------------------------------------------------------------//
 
         [NotMapped]
         public string[] ModifiedProperties { get; set; }
+
+
+        //Constructors---------------------------------------------------------------------------------------------------------//
 
     }
 }

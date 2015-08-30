@@ -479,6 +479,7 @@
     <Compile Include="Controllers\ComponentModelController.cs" />
     <Compile Include="Controllers\AssemblyModelController.cs" />
     <Compile Include="Controllers\AssemblyDbController.cs" />
+    <Compile Include="Controllers\ActivitySummaryController.cs" />
     <Compile Include="Controllers\YourActivityController.cs" />
     <Compile Include="Controllers\PersonLogEntryController.cs" />
     <Compile Include="Controllers\ProjectEventController.cs" />
@@ -542,6 +543,7 @@
     <Content Include="Views\YourActivity\Index.cshtml" />
     <Content Include="Views\Shared\_PersonLogEntryShared.cshtml" />
     <Content Include="Views\Home\Maintenance.cshtml" />
+    <Content Include="Views\ActivitySummary\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -551,7 +553,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Maintenance\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SDDB.Domain\SDDB.Domain.csproj">

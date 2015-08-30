@@ -11,13 +11,23 @@
 <div class="container-fluid hide" id="MainView">
 
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-sm-12 col-md-4">
             <div class="btn-group margin-bottom-2px">
                 <button class="btn btn-default" id="BtnCreate">Create</button>
                 <button class="btn btn-primary" id="BtnEdit">Edit</button>
                 <button class="btn btn-danger" id="BtnDelete">Delete</button>
             </div>
-
+            <div class="btn-group margin-bottom-2px">
+                <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown">Options</button>
+                <ul class="dropdown-menu dropdown-menu-left">
+                    <li><a href=# id="dropdownId1">Show 1st Columns</a></li>
+                    <li><a href=# id="dropdownId2">Show 2nd Columns</a></li>
+                    <li class="divider"></li>
+                    <li><a href=# id="dropdownId3">Show Comp. Log</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-8">
             <div class="btn-group margin-bottom-2px">
                 <div id="MsFilterByType" placeholder="Select Type"></div>
             </div>
@@ -27,18 +37,6 @@
             <div class="btn-group margin-bottom-2px">
                 <div id="MsFilterByAssy" placeholder="Select Assembly"></div>
             </div>
-
-            <div class="pull-right">
-                <div class="dropdown">
-                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Options <span class="caret"></span></button>
-                    <ul class="dropdown-menu dropdown-menu-right">
-                        <li><a href=# id="dropdownId1">Show 1st Columns</a></li>
-                        <li><a href=# id="dropdownId2">Show 2nd Columns</a></li>
-                        <li class="divider"></li>
-                        <li><a href=# id="dropdownId3">Show Comp. Log</a></li>
-                    </ul>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -46,7 +44,8 @@
         <div class="panel-heading text-center" style="font-size:130%">
             <strong>Components</strong>
             <div class="pull-right">
-                <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="100" data-onstyle="warning" data-on="Deleted Shown" data-off="Show Deleted" disabled>
+                <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="65"
+                        data-onstyle="warning" data-offstyle="primary" data-on="Deleted" data-off="Active" disabled>
             </div>
         </div>
         <table class="table table-striped" id="TableMain">

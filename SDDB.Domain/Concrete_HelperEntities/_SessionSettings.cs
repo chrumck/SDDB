@@ -10,9 +10,7 @@ namespace SDDB.Domain.Entities
 
         //Constructors---------------------------------------------------------------------------------------------------------//
 
-        public SessionSettings()
-        {
-        }
+        
     }
 
 

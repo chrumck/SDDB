@@ -42,7 +42,7 @@ namespace SDDB.Domain.Entities
         [Column(TypeName = "text")] [StringLength(65535)]
         public string Comments { get; set; }
     
-        //TSP Column Wireup ---------------------------------------------------------------------------------------------------//
+        //TSP Column Wireup ----------------------------------------------------------------
         [Column(TypeName = "timestamp")]
         public DateTime TSP
         {
@@ -52,7 +52,7 @@ namespace SDDB.Domain.Entities
         [NotMapped]
         private DateTime? tsp;
 
-        //LastSavedByPerson_Id -------------------------------------------------------------------------------------------------//
+        //LastSavedByPerson_Id -------------------------------------------------------------
         //[Required(ErrorMessage = "LastSavedByPerson Id field is required")]
         [StringLength(40)]
         [ForeignKey("LastSavedByPerson")]
@@ -72,15 +72,8 @@ namespace SDDB.Domain.Entities
 
         //many to many
 
-        //Constructors---------------------------------------------------------------------------------------------------------//
 
-        public PersonLogEntryFile()
-        {
-            this.PersonLogEntryFileDatas = new HashSet<PersonLogEntryFileData>();
-            this.FileData = new MemoryStream();
-        }
-        
-        //Non-persisten Properties---------------------------------------------------------------------------------------------//
+        //Non-persistent Properties--------------------------------------------------------------------------------------------//
 
         [NotMapped]
         public string[] ModifiedProperties { get; set; }
@@ -92,6 +85,15 @@ namespace SDDB.Domain.Entities
         [DefaultValue(true)]
         public bool IsActive_bl { get; set; }
 
+
+        //Constructors---------------------------------------------------------------------------------------------------------//
+
+        public PersonLogEntryFile()
+        {
+            this.PersonLogEntryFileDatas = new HashSet<PersonLogEntryFileData>();
+            this.FileData = new MemoryStream();
+        }
+        
     }
   
 

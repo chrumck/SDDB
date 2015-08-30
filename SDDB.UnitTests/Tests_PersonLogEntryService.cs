@@ -223,5 +223,73 @@ namespace SDDB.UnitTests
 
             //Assert
         }
+
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        [TestMethod]
+        public void BaseDbService_GetActivitySummariesAsync_ReturnsProperGroups()
+        {
+            // Arrange
+            var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
+            var mockDbContextScope = new Mock<IDbContextReadOnlyScope>();
+            var mockEfDbContext = new Mock<EFDbContext>();
+            mockDbContextScopeFac.Setup(x => x.CreateReadOnly(DbContextScopeOption.JoinExisting)).Returns(mockDbContextScope.Object);
+            mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
+
+            var personId = "DummyUserId";
+            var startDate = new DateTime(2000,1,1);
+            var endDate = new DateTime(2000,1,3);
+
+            var person = new Person { Id = personId };
+
+            var project1 = new Project {Id = "ProjectId1", ProjectName = "ProjectName1", ProjectCode = "ProjectCode1" };
+            var project2 = new Project { Id = "ProjectId2", ProjectName = "ProjectName2", ProjectCode = "ProjectCode2" };
+
+            var dbEntry1 = new PersonLogEntry { Id = "Id1", LogEntryDateTime = new DateTime(2000, 1, 1, 10, 0, 0), IsActive_bl = true, EnteredByPerson_Id = "otherPersonId",
+                                                AssignedToProject_Id = "ProjectId1", AssignedToProject = project1, ManHours = 3, PrsLogEntryPersons = new List<Person> {person}};
+            var dbEntry2 = new PersonLogEntry { Id = "Id2", LogEntryDateTime = new DateTime(2000, 1, 1, 11, 0, 0), IsActive_bl = true, EnteredByPerson_Id = personId,
+                                                AssignedToProject_Id = "ProjectId2", AssignedToProject = project2, ManHours = 4};
+            var dbEntry3 = new PersonLogEntry { Id = "Id3", LogEntryDateTime = new DateTime(2000, 1, 1, 12, 0, 0), IsActive_bl = true, EnteredByPerson_Id = personId,
+                                                AssignedToProject_Id = "ProjectId1", AssignedToProject = project1, ManHours = 5};
+            var dbEntry4 = new PersonLogEntry { Id = "Id4", LogEntryDateTime = new DateTime(2000, 1, 1, 13, 0, 0), IsActive_bl = true, EnteredByPerson_Id = personId,
+                                                AssignedToProject_Id = "ProjectId2", AssignedToProject = project2, ManHours = 6};
+            
+            var dbEntry5 = new PersonLogEntry { Id = "Id5", LogEntryDateTime = new DateTime(2000, 1, 2, 10, 0, 0), IsActive_bl = true, EnteredByPerson_Id = personId,
+                                                AssignedToProject_Id = "ProjectId1", AssignedToProject = project1, ManHours = 7};
+            var dbEntry6 = new PersonLogEntry { Id = "Id6", LogEntryDateTime = new DateTime(2000, 1, 2, 11, 0, 0), IsActive_bl = true, EnteredByPerson_Id = personId,
+                                                AssignedToProject_Id = "ProjectId2", AssignedToProject = project2, ManHours = 8 };
+
+            var dbEntry7 = new PersonLogEntry { Id = "Id7", LogEntryDateTime = new DateTime(2000, 1, 1, 9, 0, 0), IsActive_bl = true, EnteredByPerson_Id = "otherPersonId",
+                                                AssignedToProject_Id = "ProjectId2", AssignedToProject = project2, ManHours = 100 };
+            var dbEntry8 = new PersonLogEntry { Id = "Id8", LogEntryDateTime = new DateTime(2000, 1, 4, 10, 0, 0), IsActive_bl = true, EnteredByPerson_Id = personId,
+                                                AssignedToProject_Id = "ProjectId1", AssignedToProject = project1, ManHours = 1000 };
+
+            var dbEntrys = new PersonLogEntry[] { dbEntry1, dbEntry2, dbEntry3, dbEntry4, dbEntry5, dbEntry6, dbEntry7, dbEntry8 }.AsQueryable();
+
+            var mockDbSet = new Mock<DbSet<PersonLogEntry>>();
+            mockDbSet.As<IDbAsyncEnumerable<PersonLogEntry>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<PersonLogEntry>(dbEntrys.GetEnumerator()));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<PersonLogEntry>(dbEntrys.Provider));
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.Expression).Returns(dbEntrys.Expression);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.ElementType).Returns(dbEntrys.ElementType);
+            mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.GetEnumerator()).Returns(dbEntrys.GetEnumerator());
+            mockDbSet.Setup(x => x.Include(It.IsAny<string>())).Returns(mockDbSet.Object);
+
+            mockEfDbContext.Setup(x => x.PersonLogEntrys).Returns(mockDbSet.Object);
+
+            var personLogEntryService = new PersonLogEntryService(mockDbContextScopeFac.Object, personId);
+
+            //Act
+            var serviceResult = personLogEntryService.GetActivitySummariesAsync(personId, startDate, endDate).Result;
+
+            //Assert
+            Assert.IsTrue(serviceResult.Count == 2);
+            Assert.IsTrue(serviceResult[0].TotalManHours == dbEntry1.ManHours + dbEntry2.ManHours + dbEntry3.ManHours + dbEntry4.ManHours);
+            Assert.IsTrue(serviceResult[0].SummaryDay == dbEntry4.LogEntryDateTime.Date);
+            Assert.IsTrue(serviceResult[1].SummaryDetails.Count() == 2);
+            Assert.IsTrue(serviceResult[1].TotalManHours == dbEntry5.ManHours + dbEntry6.ManHours);
+            Assert.IsTrue(serviceResult.All(x => x.PersonId == personId));
+
+        }
+
     }
 }

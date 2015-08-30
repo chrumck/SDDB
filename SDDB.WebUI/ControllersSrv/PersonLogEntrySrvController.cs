@@ -24,7 +24,8 @@ namespace SDDB.WebUI.ControllersSrv
 
         //Constructors---------------------------------------------------------------------------------------------------------//
         
-        public PersonLogEntrySrvController(PersonLogEntryService personLogEntryService, PersonLogEntryFileService personLogEntryFileService)
+        public PersonLogEntrySrvController(PersonLogEntryService personLogEntryService,
+            PersonLogEntryFileService personLogEntryFileService)
         {
             this.personLogEntryService = personLogEntryService;
             this.personLogEntryFileService = personLogEntryFileService;
@@ -39,7 +40,6 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonLogEntryService.GetAsync";
             var records = await personLogEntryService.GetAsync(ids, getActive).ConfigureAwait(false);
-            if (!User.IsInRole("PersonLogEntry_View")) { records = records.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
             return DbJsonDateTime(filterForJsonFull(records));
         }
 
@@ -50,10 +50,22 @@ namespace SDDB.WebUI.ControllersSrv
             DateTime? startDate, DateTime? endDate, bool getActive = true)
         {
             ViewBag.ServiceName = "PersonLogEntryService.GetByAltIdsAsync";
-            var records = await personLogEntryService.GetByAltIdsAsync(personIds, projectIds, assyIds, typeIds, startDate, endDate, getActive)
-                .ConfigureAwait(false);
-            if (!User.IsInRole("PersonLogEntry_View")) { records = records.Where(x => x.EnteredByPerson_Id == UserId).ToList(); }
+            var records = await personLogEntryService
+                .GetByAltIdsAsync(personIds, projectIds, assyIds, typeIds, startDate, endDate, getActive).ConfigureAwait(false);
             return DbJsonDateTime(filterForJsonFull(records));
+        }
+
+        // POST: /PersonLogEntrySrv/GetActivitySummaries
+        [HttpPost]
+        [DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
+        public async Task<ActionResult> GetActivitySummaries(string personId,
+            DateTime startDate, DateTime endDate, bool getActive = true)
+        {
+            ViewBag.ServiceName = "PersonLogEntryService.GetActivitySummaries";
+            if (!User.IsInRole("PersonLogEntry_View") && personId != UserId) { return JsonResponseForNoRights(); }
+            var records = await personLogEntryService.GetActivitySummariesAsync(personId, startDate, endDate, getActive)
+                .ConfigureAwait(false);
+            return DbJsonDate(records);
         }
         
         //-----------------------------------------------------------------------------------------------------------------------

@@ -45,7 +45,7 @@ namespace SDDB.Domain.Entities
         [DefaultValue(true)]
         public bool IsActive_bl { get; set; }
         
-        //TSP Column Wireup ---------------------------------------------------------------------------------------------------//
+        //TSP Column Wireup ----------------------------------------------------------------
         [Column(TypeName = "timestamp")]
         public DateTime TSP
         {
@@ -55,7 +55,7 @@ namespace SDDB.Domain.Entities
         [NotMapped]
         private DateTime? tsp;
 
-        //LastSavedByPerson_Id -------------------------------------------------------------------------------------------------//
+        //LastSavedByPerson_Id -------------------------------------------------------------
         //[Required(ErrorMessage = "LastSavedByPerson Id field is required")]
         [StringLength(40)]
         [ForeignKey("LastSavedByPerson")]
@@ -77,6 +77,13 @@ namespace SDDB.Domain.Entities
         //many to many
         [InverseProperty("PersonProjects")]
         public virtual ICollection<Person> ProjectPersons { get; set; }
+        
+
+        //Non-persistent Properties--------------------------------------------------------------------------------------------//
+
+        [NotMapped]
+        public string[] ModifiedProperties { get; set; }
+
 
         //Constructors---------------------------------------------------------------------------------------------------------//
         
@@ -87,12 +94,6 @@ namespace SDDB.Domain.Entities
             
             this.ProjectPersons = new HashSet<Person>();
         }
-
-        //Non-persisten Properties---------------------------------------------------------------------------------------------//
-
-        [NotMapped]
-        public string[] ModifiedProperties { get; set; }
-
     }
 
 

@@ -30,7 +30,7 @@ namespace SDDB.Domain.Entities
         [ForeignKey("PersonLogEntryFile")]
         public string PersonLogEntryFile_Id { get; set; }
 
-        //TSP Column Wireup ---------------------------------------------------------------------------------------------------//
+        //TSP Column Wireup ----------------------------------------------------------------
         [Column(TypeName = "timestamp")]
         public DateTime TSP
         {
@@ -49,9 +49,8 @@ namespace SDDB.Domain.Entities
 
         //many to many
 
-        //Constructors---------------------------------------------------------------------------------------------------------//
-        
-        //Non-persisten Properties---------------------------------------------------------------------------------------------//
+
+        //Non-persistent Properties--------------------------------------------------------------------------------------------//
 
         [NotMapped]
         public string[] ModifiedProperties { get; set; }
@@ -65,6 +64,10 @@ namespace SDDB.Domain.Entities
 
         [NotMapped]
         public const int DataChunkLength = 65535;
+        
+
+        //Constructors---------------------------------------------------------------------------------------------------------//
+        
     }
   
 

@@ -1,8 +1,8 @@
-﻿@model SDDB.Domain.Entities.PersonLogEntry
-@using SDDB.WebUI.Infrastructure
+﻿@using SDDB.WebUI.Infrastructure
 @{
-    ViewBag.Title = "Your Activity";
+    ViewBag.Title = "ActivitySummary";
 }
+
 <!------- InitialView ------->
 <div class="container-fluid" id="InitialView">
     <h4>Please wait for page to load...</h4>
@@ -14,46 +14,34 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="btn-group margin-bottom-2px">
-                <button class="btn btn-default" id="BtnCreate">Create</button>
-                <button class="btn btn-primary" id="BtnEdit">Edit</button>
-                <button class="btn btn-danger" id="BtnDelete">Delete</button>
-            </div>
-            <div class="btn-group margin-bottom-2px">
-                <button class="btn btn-success" id="BtnEditLogEntryFiles">&nbsp; Files &nbsp;</button>
-            </div>
-            &nbsp;
-            <div class="btn-group margin-bottom-2px">
                 <input class="form-control input-tdo-warning" data-val="true" data-val-dbisdateiso="The field must have YYYY-MM-DD format."
                        id="FilterDateStart" placeholder="Select Day" type="text" value="">
             </div>
-        </div>
 
+            <div class="btn-group margin-bottom-2px">
+                <div id="MsFilterByPerson" placeholder="Select Person"></div>
+            </div>
+        </div>
     </div>
 
     <div class="panel panel-tdo-success " id="PanelTableMain">
         <div class="panel-heading text-center" style="font-size:130%">
-            <strong>Your Activity</strong>
-            <div class="pull-right">
-                <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="65" 
-                       data-onstyle="warning" data-offstyle="success" data-on="Deleted" data-off="Active" disabled>
-            </div>
+            <strong>Activity Summary</strong>
         </div>
         <table class="table table-striped" id="TableMain">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Time</th>
-                    <th>Entered By</th>
-                    <th>Activity</th>
-                    <th>Hours</th>
                     <th>Project</th>
-                    <th>Location</th>
-                    <th>Event</th>
-                    <th>Comments</th>
-                    <th>Files</th>
+                    <th>1</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th>4</th>
+                    <th>5</th>
+                    <th>6</th>
+                    <th>7</th>
                 </tr>
             </thead>
-            <tbody class="selectable"></tbody>
+            <tbody></tbody>
         </table>
     </div>
 </div>
@@ -247,7 +235,7 @@
             </div>
         </div>
     }
-    
+
     <div class="row">
         <div class="col-xs-4">
             <button class="btn btn-default" type="button" id="EditFormBtnCancel">Cancel</button>
@@ -289,4 +277,6 @@
     @Styles.Render("~/bundles/magicsuggest-css")
     @Styles.Render("~/bundles/bootstrap-datetimepicker-CSS")
 }
+
+
 

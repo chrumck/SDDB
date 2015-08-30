@@ -84,6 +84,7 @@ $(document).ready(function () {
         ajaxConfig: {
             error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
+        infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
@@ -95,6 +96,7 @@ $(document).ready(function () {
         ajaxConfig: {
             error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
+        infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     $(MsFilterByComponent).on("selectionchange", function (e, m) { refreshMainView(); });
@@ -106,6 +108,7 @@ $(document).ready(function () {
         ajaxConfig: {
             error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
+        infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     $(MsFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });

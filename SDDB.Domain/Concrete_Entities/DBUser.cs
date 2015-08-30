@@ -32,7 +32,7 @@ namespace SDDB.Domain.Entities
         [Required]
         public bool LDAPAuthenticated_bl { get; set; }
 
-        //TSP Column Wireup ---------------------------------------------------------------------------------------------------//
+        //TSP Column Wireup ----------------------------------------------------------------
         [Column(TypeName = "timestamp")]
         public DateTime TSP
         {
@@ -51,11 +51,8 @@ namespace SDDB.Domain.Entities
 
         //many to many
 
-        //Constructors---------------------------------------------------------------------------------------------------------//
 
-        public DBUser() : base() { }
-
-        //Non-persisten Properties---------------------------------------------------------------------------------------------//
+        //Non-persistent Properties--------------------------------------------------------------------------------------------//
 
         [NotMapped]
         public string Password { get; set; }
@@ -73,5 +70,11 @@ namespace SDDB.Domain.Entities
 
         [NotMapped]
         public string LastSavedByPerson_Id { get; set; }
+
+
+        //Constructors---------------------------------------------------------------------------------------------------------//
+
+        public DBUser() : base() { }
+
     }
 }

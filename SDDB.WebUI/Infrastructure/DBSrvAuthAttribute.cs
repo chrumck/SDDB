@@ -49,7 +49,9 @@ namespace SDDB.WebUI.Infrastructure
             if (!context.HttpContext.Request.IsAuthenticated || (dbRoles != "" && !isInRole))
             {
                 filterResult.StatusCode = HttpStatusCode.Conflict;
-                filterResult.StatusDescription = "Request not authorized, contact SDDB administrator to obtain appropriate privileges";
+                filterResult.StatusDescription = 
+                    "You are not logged in or request not authorized.\n" + 
+                    "Try to log in again or contact SDDB administrator to obtain appropriate privileges.";
                 Logger.LogResult(filterResult);
                 context.HttpContext.Response.StatusCode = (int)filterResult.StatusCode;
                 context.Result = new JsonResult()

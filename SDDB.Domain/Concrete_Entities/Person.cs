@@ -68,7 +68,7 @@ namespace SDDB.Domain.Entities
         [Column(TypeName = "text")] [StringLength(65535)]
         public string EmployeeDetails { get; set; }
 
-        //TSP Column Wireup ---------------------------------------------------------------------------------------------------//
+        //TSP Column Wireup ----------------------------------------------------------------
         [Column(TypeName = "timestamp")]
         public DateTime TSP
         {
@@ -78,7 +78,7 @@ namespace SDDB.Domain.Entities
         [NotMapped]
         private DateTime? tsp;
 
-        //LastSavedByPerson_Id -------------------------------------------------------------------------------------------------//
+        //LastSavedByPerson_Id -------------------------------------------------------------
         //[Required(ErrorMessage = "LastSavedByPerson Id field is required")]
         [StringLength(40)]
         [ForeignKey("LastSavedByPerson")]
@@ -123,6 +123,13 @@ namespace SDDB.Domain.Entities
         [InverseProperty("PrsLogEntryPersons")]
         public virtual ICollection<PersonLogEntry> PersonPrsLogEntrys { get; set; }
 
+
+        //Non-persistent Properties--------------------------------------------------------------------------------------------//
+
+        [NotMapped]
+        public string[] ModifiedProperties { get; set; }
+
+
         //Constructors---------------------------------------------------------------------------------------------------------//
 
         public Person()
@@ -138,11 +145,6 @@ namespace SDDB.Domain.Entities
             this.ManagedGroups = new HashSet<PersonGroup>();
             this.PersonPrsLogEntrys = new HashSet<PersonLogEntry>();
         }
-
-        //Non-persisten Properties---------------------------------------------------------------------------------------------//
-
-        [NotMapped]
-        public string[] ModifiedProperties { get; set; }
 
     }
   

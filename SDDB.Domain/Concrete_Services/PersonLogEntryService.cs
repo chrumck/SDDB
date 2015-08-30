@@ -119,29 +119,30 @@ namespace SDDB.Domain.Services
             }
         }
 
-        ////get by personIds, projectIds, typeIds, startDate, endDate
-        //public virtual async Task<List<PersonLogEntry>> GetForTimesheetAsync(string personId, DateTime startDate, DateTime endDate, bool getActive = true)
-        //{
-        //    if (String.IsNullOrEmpty(personId)) { throw new ArgumentNullException("personId"); }
+        //GetActivitySummariesAsync - get by personId, endDate
+        public virtual async Task<List<ActivitySummary>> GetActivitySummariesAsync(string personId, 
+            DateTime startDate, DateTime endDate, bool getActive = true)
+        {
+            if (String.IsNullOrEmpty(personId)) { throw new ArgumentNullException("personId"); }
 
-        //    using (var dbContextScope = contextScopeFac.CreateReadOnly())
-        //    {
-        //        var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
-        //        var records = await dbContext.PersonLogEntrys
-        //               .GroupBy(x => x.AssignedToProject_Id,)
-        //               .Include(x => x.EnteredByPerson)
-        //               .Include(x => x.PersonActivityType)
-        //               .Include(x => x.AssignedToProject)
-        //               .Include(x => x.AssignedToLocation)
-        //               .Include(x => x.AssignedToProjectEvent)
-        //               .Include(x => x.PersonLogEntryFiles)
-        //               .ToListAsync().ConfigureAwait(false);
+                var recordGroupsByDay = await dbContext.PersonLogEntrys
+                    .Where(x =>
+                           (x.PrsLogEntryPersons.Any(y => personId == y.Id) || personId == x.EnteredByPerson_Id) &&
+                           (x.LogEntryDateTime >= startDate) &&
+                           (x.LogEntryDateTime <= endDate) &&
+                           x.IsActive_bl == getActive
+                           )
+                    .Include(x => x.AssignedToProject)
+                    .GroupBy(x => x.LogEntryDateTime.Date)
+                    .ToListAsync().ConfigureAwait(false);
 
-        //        records.FillRelatedIfNull();
-        //        return records;
-        //    }
-        //}
+                return getSummariesFromGroups(personId, recordGroupsByDay);
+            }
+        }
                 
         //-----------------------------------------------------------------------------------------------------------------------
 
@@ -231,6 +232,31 @@ namespace SDDB.Domain.Services
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
 
+        //returning List<ActivitySummary> from List<IGrouping<DateTime,PersonLogEntry>>
+        private List<ActivitySummary> getSummariesFromGroups(string personId, 
+            List<IGrouping<DateTime,PersonLogEntry>> groups)
+        {
+            var activitySummaries = new List<ActivitySummary>();
+
+            foreach (var group in groups)
+            {
+                List<ActivitySummaryDetail> summaryDetails = group.GroupBy(
+                    x => x.AssignedToProject_Id,
+                    (projectId, logEntries) => new ActivitySummaryDetail(
+                        projectId,
+                        logEntries.First().AssignedToProject.ProjectName,
+                        logEntries.First().AssignedToProject.ProjectCode,
+                        logEntries.Sum(logEntry => logEntry.ManHours)
+                        )
+                    ).ToList();
+                var activitySummary = new ActivitySummary(personId, group.Key, group.Sum(x => x.ManHours), summaryDetails);
+                activitySummaries.Add(activitySummary);
+            }
+            return activitySummaries;
+        }
+
+        //-----------------------------------------------------------------------------------------------------------------------
+        
         //checking if log entry, event and location belong to the same project - overriden from BaseDbService
         protected override async Task checkBeforeEditHelperAsync(EFDbContext dbContext, PersonLogEntry record)
         {

@@ -149,6 +149,7 @@ $(document).ready(function () {
         ajaxConfig: {
             error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
+        infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     //Wire up on change event for MsFilterByType
@@ -161,6 +162,7 @@ $(document).ready(function () {
         ajaxConfig: {
             error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
+        infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     //Wire up on change event for MsFilterByProject
@@ -174,6 +176,7 @@ $(document).ready(function () {
         ajaxConfig: {
             error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
+        infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     //Wire up on change event for MsFilterByLoc
