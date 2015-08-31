@@ -131,7 +131,7 @@ $(document).ready(function () {
         columnDefs: [
             { targets: [0, 10, 11, 12, 13, 14, 15], visible: false }, // - never show
             { targets: [0, 1, 4, 9, 10, 11, 12, 13, 14, 15], searchable: false },  //"orderable": false, "visible": false
-            { targets: [2, 3, 6], className: "hidden-xs" }, // - first set of columns
+            { targets: [3, 6], className: "hidden-xs" }, // - first set of columns
             { targets: [7, 9], className: "hidden-xs hidden-sm" }, // - first set of columns
             { targets: [8], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
         ],

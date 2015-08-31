@@ -249,7 +249,13 @@ $(document).ready(function () {
         })
             .always(hideModalWait)
             .done(function (data) {
-                MsFilterByPerson.setSelection([{ id: data[0].Id, name: data[0].FirstName + " " + data[0].LastName + " " + data[0].Initials }]);
+                if (typeof data[0].Id !== undefined) {
+                    MsFilterByPerson.setSelection([{
+                        id: data[0].Id,
+                        name: data[0].FirstName + " " + data[0].LastName + " " + data[0].Initials
+                    }]);
+                }
+                
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }

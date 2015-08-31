@@ -1,11 +1,11 @@
 ﻿@using SDDB.WebUI.Infrastructure
 @{
-    ViewBag.Title = "ActivitySummary";
+    ViewBag.Title = "Activity Summary";
 }
 
 <!------- InitialView ------->
 <div class="container-fluid" id="InitialView">
-    <h4>Please wait for page to load...</h4>
+    <h4>Please wait, page loading...</h4>
 </div>
 
 <!------- MainView ------->
@@ -17,7 +17,7 @@
                 <input class="form-control input-tdo-warning" data-val="true" data-val-dbisdateiso="The field must have YYYY-MM-DD format."
                        id="FilterDateStart" placeholder="Select Day" type="text" value="">
             </div>
-
+            &nbsp; &nbsp;
             <div class="btn-group margin-bottom-2px">
                 <div id="MsFilterByPerson" placeholder="Select Person"></div>
             </div>
@@ -31,233 +31,36 @@
         <table class="table table-striped" id="TableMain">
             <thead>
                 <tr>
-                    <th>Project</th>
-                    <th>1</th>
-                    <th>2</th>
-                    <th>3</th>
-                    <th>4</th>
-                    <th>5</th>
-                    <th>6</th>
-                    <th>7</th>
+                    <th id="thNo0">Project</th>
+                    <th id="thNo1"></th>
+                    <th id="thNo2"></th>
+                    <th id="thNo3"></th>
+                    <th id="thNo4"></th>
+                    <th id="thNo5"></th>
+                    <th id="thNo6"></th>
+                    <th id="thNo7"></th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                <tr>
+                    <td>DumTxt</td>
+                    <td>DumTxt</td>
+                    <td>DumTxt</td>
+                    <td>DumTxt</td>
+                    <td>DumTxt</td>
+                    <td>DumTxt</td>
+                    <td>DumTxt</td>
+                    <td>DumTxt</td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </div>
 
-<!------- EditFormView ------->
-<div class="container-fluid hide" id="EditFormView">
-    <div class="row">
-        <div class="col-xs-8">
-            <h3 id="EditFormLabel">Create/Edit Activity</h3>
-        </div>
-        <div class="col-xs-4">
-            <h3><button class="btn btn-default pull-right" type="button" id="EditFormBtnBack">Cancel</button></h3>
-        </div>
-    </div>
-    <div class="well well-tdo">
-        <form class="form-horizontal" role="form" id="EditForm">
-            <div class="row">
-
-                <div class="col-md-6">
-
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="panel panel-info">
-                                <div class="panel-heading">
-                                    <strong>Hour of the Day</strong>
-                                </div>
-                                <div class="panel-body">
-                                    <div id="LogEntryTime"></div>
-                                    <input type="text" class="modifiable" name="LogEntryDateTime" id="LogEntryDateTime" value="" hidden />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="panel panel-success">
-                                <div class="panel-heading">
-                                    <strong>Hours Worked</strong>
-                                </div>
-                                <div class="panel-body">
-                                    <div id="HoursWorkedPicker"></div>
-                                    <input type="text" class="modifiable" name="ManHours" id="ManHours" value="" hidden />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="col-md-6">
-                    <div class="form-group hide">
-                        @Html.LabelFor(x => x.EnteredByPerson_Id, "Entered By", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.EnteredByPerson_Id, new { @class = "form-control modifiable", placeholder = "Entered By Person" })
-                            @Html.ValidationMessageFor(x => x.EnteredByPerson_Id)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.PersonActivityType_Id, "Activity", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.PersonActivityType_Id, new { @class = "form-control modifiable", placeholder = "Type of Activity" })
-                            @Html.ValidationMessageFor(x => x.PersonActivityType_Id)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.AssignedToProject_Id, "Project", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.AssignedToProject_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Project" })
-                            @Html.ValidationMessageFor(x => x.AssignedToProject_Id)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.AssignedToLocation_Id, "Location", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            <div class="small"><em> Choose Project first</em></div>
-                            @Html.TextBoxFor(x => x.AssignedToLocation_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Location" })
-                            @Html.ValidationMessageFor(x => x.AssignedToLocation_Id)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.AssignedToProjectEvent_Id, "Event", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.AssignedToProjectEvent_Id, new { @class = "form-control modifiable", placeholder = "Assigned To Project Event" })
-                            @Html.ValidationMessageFor(x => x.AssignedToProjectEvent_Id)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.Comments, "Comments", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextAreaFor(x => x.Comments, 3, 10, new { @class = "form-control modifiable", placeholder = "Comments" })
-                            @Html.ValidationMessageFor(x => x.Comments)
-                        </div>
-                    </div>
-                    <div class="form-group hide" id="EditFormGroupIsActive">
-                        <div class="col-sm-10 col-sm-offset-2">
-                            @Html.CheckBoxFor(x => x.IsActive_bl, new { @class = "modifiable" }) &nbsp;&nbsp;
-                            @Html.LabelFor(x => x.IsActive_bl, "Is Active") &nbsp;&nbsp; <em>(Marking as 'Active' un-deletes record.)</em>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </form>
-    </div>
-
-    <div class="well well-tdo">
-        <div class="row" id="LogEntryAssysView">
-            <div class="col-xs-12 col-sm-6">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <div class="row">
-                            <div class="col-xs-12">
-                                @if (User.IsInRole("Assembly_EditStatus"))
-                                {
-                                    <button class="btn btn-sm btn-warning pull-right" id="EditFormBtnChngSts" type="button">Change Status</button>
-                                }
-                                <strong>Add Assemblies </strong><small><em> Choose Location first.</em></small>
-                            </div>
-                        </div>
-                    </div>
-                    <table class="table table-striped" id="TableLogEntryAssysAdd">
-                        <thead class="hide">
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                            </tr>
-                        </thead>
-                        <tbody class="selectable"></tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-6">
-                <div class="panel panel-default">
-                    <div class="panel-heading"><strong>Remove Assemblies </strong><small><em> Choose Location first</em></small></div>
-                    <table class="table table-striped" id="TableLogEntryAssysRemove">
-                        <thead class="hide">
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                            </tr>
-                        </thead>
-                        <tbody class="selectable"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @if (Html.UserIsGrManager())
-    {
-        <div class="well well-tdo">
-            <div class="row">
-                <div class="col-xs-12">
-                    <button class="btn btn-primary margin-bottom-5px" id="EditFormBtnPrsAddRemove" type="button">
-                        Add/Remove Other Persons
-                    </button>
-
-                </div>
-            </div>
-            <div class="row hide" id="LogEntryPersonsView">
-                <div class="col-xs-12 col-sm-6">
-                    <div class="panel panel-tdo-info">
-                        <div class="panel-heading" style="font-weight:bold">Add People</div>
-                        <table class="table table-striped" id="TableLogEntryPersonsAdd">
-                            <thead class="hide">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Last Name</th>
-                                    <th>First Name</th>
-                                    <th>Initials</th>
-                                </tr>
-                            </thead>
-                            <tbody class="selectable"></tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="col-xs-12 col-sm-6">
-                    <div class="panel panel-tdo-info">
-                        <div class="panel-heading" style="font-weight:bold">Remove People</div>
-                        <table class="table table-striped" id="TableLogEntryPersonsRemove">
-                            <thead class="hide">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Last Name</th>
-                                    <th>First Name</th>
-                                    <th>Initials</th>
-                                </tr>
-                            </thead>
-                            <tbody class="selectable"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-
-    <div class="row">
-        <div class="col-xs-4">
-            <button class="btn btn-default" type="button" id="EditFormBtnCancel">Cancel</button>
-        </div>
-        <div class="col-xs-8">
-            <div class="btn-group pull-right">
-                <button class="btn btn-success " type="button" id="EditFormBtnOkFiles">
-                    <span class="glyphicon glyphicon-ok"></span> & Files
-                </button>
-                <button class="btn btn-tdo-success" type="button" id="EditFormBtnOk">
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-@Html.Partial("_PersonLogEntryShared")
-
 <!------- ScriptVariables ------->
 <script>var UserId = "@Html.GetUserId()";</script>
 <script>var UserFullName = "@Html.GetUserFullName()";</script>
+<script>var CanViewOthers = @User.IsInRole("ActivitySummary_ViewOthers").ToString().ToLower();</script>
 
 
 
@@ -266,9 +69,7 @@
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
     @Scripts.Render("~/bundles/bootstrap-datetimepicker")
-    <script src="~/Scripts/SDDB/YourActivity.js"></script>
-    <script src="~/Scripts/SDDB/PersonLogEntryShared.js"></script>
-    <script src="~/Scripts/SDDB/PersonLogEntryFiles.js"></script>
+    <script src="~/Scripts/SDDB/ActivitySummary.js"></script>
 }
 
 @section CSS {

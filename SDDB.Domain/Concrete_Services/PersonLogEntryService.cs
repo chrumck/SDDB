@@ -28,34 +28,6 @@ namespace SDDB.Domain.Services
         
         //Methods--------------------------------------------------------------------------------------------------------------//
 
-        //get by PersonLogEntry ids
-        public virtual async Task<List<PersonLogEntry>> GetAsync(string[] ids, bool getActive = true)
-        {
-            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
-
-            using (var dbContextScope = contextScopeFac.CreateReadOnly())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-
-                var records = await dbContext.PersonLogEntrys
-                    .Where(x => 
-                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
-                        ids.Contains(x.Id) &&
-                        x.IsActive_bl == getActive
-                        )
-                    .Include(x => x.EnteredByPerson)
-                    .Include(x => x.PersonActivityType)
-                    .Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToLocation)
-                    .Include(x => x.AssignedToProjectEvent)
-                    .Include(x => x.PersonLogEntryFiles)
-                    .ToListAsync().ConfigureAwait(false);
-                
-                records.FillRelatedIfNull();
-                return records;
-            }
-        }
-
         //get by PersonLogEntry ids - no filters on person Id and getActive
         //used by PersonLogEntrySrvController.isUserActivity(string[] ids)
         public virtual async Task<List<PersonLogEntry>> GetAllAsync(string[] ids)
@@ -81,6 +53,42 @@ namespace SDDB.Domain.Services
             }
         }
 
+        //get by PersonLogEntry ids
+        public virtual async Task<List<PersonLogEntry>> GetAsync(string[] ids, bool getActive = true)
+        {
+            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
+
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+                var records = await dbContext.PersonLogEntrys
+                    .Where(x => 
+                        ids.Contains(x.Id) &&
+                        x.IsActive_bl == getActive
+                        )
+                    .Include(x => x.EnteredByPerson)
+                    .Include(x => x.PersonActivityType)
+                    .Include(x => x.AssignedToProject)
+                    .Include(x => x.AssignedToLocation)
+                    .Include(x => x.AssignedToProjectEvent)
+                    .Include(x => x.PrsLogEntryPersons)
+                    .Include(x => x.PersonLogEntryFiles)
+                    .ToListAsync().ConfigureAwait(false);
+
+                if (!(await userIsInRoleHelperAsync("PersonLogEntry_View").ConfigureAwait(false)))
+                {
+                    records = records.Where(x =>
+                        x.EnteredByPerson_Id == userId ||
+                        x.PrsLogEntryPersons.Any(y => y.Id == userId)
+                        )
+                        .ToList();
+                }
+                records.FillRelatedIfNull();
+                return records;
+            }
+        }
+
         //get by personIds, projectIds, typeIds, startDate, endDate
         public virtual async Task<List<PersonLogEntry>> GetByAltIdsAsync(string[] personIds, string[] projectIds, 
             string[] assyIds, string[] typeIds, DateTime? startDate, DateTime? endDate, bool getActive = true)
@@ -96,7 +104,6 @@ namespace SDDB.Domain.Services
                 
                 var records = await dbContext.PersonLogEntrys
                        .Where(x => 
-                           x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) && 
                            (personIds.Count() == 0 || x.PrsLogEntryPersons.Any(y => personIds.Contains(y.Id)) ||
                                 personIds.Contains(x.EnteredByPerson_Id) ) &&
                            (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
@@ -111,9 +118,18 @@ namespace SDDB.Domain.Services
                        .Include(x => x.AssignedToProject)
                        .Include(x => x.AssignedToLocation)
                        .Include(x => x.AssignedToProjectEvent)
+                       .Include(x => x.PrsLogEntryPersons)
                        .Include(x => x.PersonLogEntryFiles)
                        .ToListAsync().ConfigureAwait(false);
 
+                if (!(await userIsInRoleHelperAsync("PersonLogEntry_View").ConfigureAwait(false)))
+                {
+                    records = records.Where(x =>
+                        x.EnteredByPerson_Id == userId ||
+                        x.PrsLogEntryPersons.Any(y => y.Id == userId)
+                        )
+                        .ToList();
+                }
                 records.FillRelatedIfNull();
                 return records;
             }
@@ -129,7 +145,7 @@ namespace SDDB.Domain.Services
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
-                var recordGroupsByDay = await dbContext.PersonLogEntrys
+                var records = await dbContext.PersonLogEntrys
                     .Where(x =>
                            (x.PrsLogEntryPersons.Any(y => personId == y.Id) || personId == x.EnteredByPerson_Id) &&
                            (x.LogEntryDateTime >= startDate) &&
@@ -137,9 +153,8 @@ namespace SDDB.Domain.Services
                            x.IsActive_bl == getActive
                            )
                     .Include(x => x.AssignedToProject)
-                    .GroupBy(x => x.LogEntryDateTime.Date)
                     .ToListAsync().ConfigureAwait(false);
-
+                var recordGroupsByDay = records.GroupBy(x => x.LogEntryDateTime.Date).ToList();
                 return getSummariesFromGroups(personId, recordGroupsByDay);
             }
         }

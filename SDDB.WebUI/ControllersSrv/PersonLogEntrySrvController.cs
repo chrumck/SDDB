@@ -57,12 +57,12 @@ namespace SDDB.WebUI.ControllersSrv
 
         // POST: /PersonLogEntrySrv/GetActivitySummaries
         [HttpPost]
-        [DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
+        [DBSrvAuth("YourActivity_View,ActivitySummary_ViewOthers")]
         public async Task<ActionResult> GetActivitySummaries(string personId,
             DateTime startDate, DateTime endDate, bool getActive = true)
         {
             ViewBag.ServiceName = "PersonLogEntryService.GetActivitySummaries";
-            if (!User.IsInRole("PersonLogEntry_View") && personId != UserId) { return JsonResponseForNoRights(); }
+            if (!User.IsInRole("ActivitySummary_ViewOthers") && personId != UserId) { return JsonResponseForNoRights(); }
             var records = await personLogEntryService.GetActivitySummariesAsync(personId, startDate, endDate, getActive)
                 .ConfigureAwait(false);
             return DbJsonDate(records);
@@ -89,7 +89,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonLogEntryService.DeleteAsync";
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(ids).ConfigureAwait(false)))
-            { return JsonResponseForNoRights(); }
+                { return JsonResponseForNoRights(); }
             await personLogEntryService.DeleteAsync(ids).ConfigureAwait(false);
             return DbJson(new { Success = "True" });
         }
@@ -217,10 +217,8 @@ namespace SDDB.WebUI.ControllersSrv
         public async Task<ActionResult> DeleteFiles(string logEntryId, string[] ids)
         {
             ViewBag.ServiceName = "personLogEntryFileService.DeleteAsync";
-        
             if (!User.IsInRole("PersonLogEntry_Edit") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
-            { return JsonResponseForNoRights(); }
-
+                { return JsonResponseForNoRights(); }
             await personLogEntryFileService.DeleteAsync(ids).ConfigureAwait(false);
             return DbJson(new { Success = "True" });
         }

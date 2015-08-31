@@ -24,6 +24,7 @@ namespace SDDB.WebUI
                 new DBRole {Name = "PersonActivityType_View" },new DBRole {Name = "PersonActivityType_Edit" },
                 new DBRole {Name = "PersonLogEntry_View" },new DBRole {Name = "PersonLogEntry_Edit" },
                 new DBRole {Name = "YourActivity_View" },new DBRole {Name = "YourActivity_Edit" },
+                new DBRole {Name = "ActivitySummary_ViewOthers" },
                                 
                 new DBRole {Name = "Project_View" },new DBRole {Name = "Project_Edit" },
                 new DBRole {Name = "ProjectEvent_View" },new DBRole {Name = "ProjectEvent_Edit" },
