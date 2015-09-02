@@ -39,7 +39,7 @@ $(document).ready(function () {
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) showModalNothingSelected();
         else showModalDelete(CurrIds.length);
     });
@@ -75,7 +75,7 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnChngSts
     $("#EditFormBtnChngSts").click(function () {
-        ChngStsAssyIds = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name").data().toArray();
+        ChngStsAssyIds = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (ChngStsAssyIds.length == 0) {
             showModalNothingSelected("Please select one or more rows from 'Add Assemblies' table.");
         }
@@ -216,7 +216,7 @@ $(document).ready(function () {
 
 //Delete Records from DB
 function DeleteRecords() {
-    var ids = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+    var ids = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
     deleteRecordsGeneric(CurrIds, "/PersonLogEntrySrv/Delete", refreshMainView);
 }
 
@@ -232,10 +232,10 @@ function submitEdits() {
             var deferred1 = $.Deferred();
 
             CurrIds = (CurrIds.length == 0) ? data.newEntryIds : CurrIds;
-            var idsAssysAdd = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name").data().toArray();
-            var idsAssysRemove = TableLogEntryAssysRemove.cells(".ui-selected", "Id:name").data().toArray();
-            var idsPersonsAdd = TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name").data().toArray();
-            var idsPersonsRemove = TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name").data().toArray();
+            var idsAssysAdd = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+            var idsAssysRemove = TableLogEntryAssysRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+            var idsPersonsAdd = TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+            var idsPersonsRemove = TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
 
             $.when(
                 submitEditsForRelatedGeneric(CurrIds, idsAssysAdd, idsAssysRemove, "/PersonLogEntrySrv/EditPrsLogEntryAssys"),
@@ -271,7 +271,7 @@ function changeAssyStatus() {
         showModalWait();
         $.ajax({
             type: "POST", url: "/AssemblyDbSrv/EditStatus",
-            timeout: 20000,
+            timeout: 120000,
             data: {
                 ids: ChngStsAssyIds,
                 statusId: ModalChngStsMs.getValue()[0]

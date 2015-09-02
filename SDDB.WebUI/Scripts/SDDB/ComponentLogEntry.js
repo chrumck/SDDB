@@ -43,7 +43,7 @@ $(document).ready(function () {
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) showModalNothingSelected();
         else {
             if (GetActive) $("#EditFormGroupIsActive").addClass("hide");
@@ -64,7 +64,7 @@ $(document).ready(function () {
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) showModalNothingSelected();
         else showModalDelete(CurrIds.length);
     });
@@ -211,7 +211,7 @@ $(document).ready(function () {
     if (typeof compId !== "undefined" && compId != "") {
         showModalWait();
         $.ajax({
-            type: "POST", url: "/ComponentSrv/GetByIds", timeout: 20000, data: { ids: [compId], getActive: true }, dataType: "json"})
+            type: "POST", url: "/ComponentSrv/GetByIds", timeout: 120000, data: { ids: [compId], getActive: true }, dataType: "json"})
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function (data) {
                 MsFilterByComponent.setSelection([{ id: data[0].Id, name: data[0].CompName, }]);
@@ -234,7 +234,7 @@ $(document).ready(function () {
 
 //Delete Records from DB
 function DeleteRecords() {
-    CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
     deleteRecordsGeneric(CurrIds, "/ComponentLogEntrySrv/Delete", refreshMainView);
 }
 

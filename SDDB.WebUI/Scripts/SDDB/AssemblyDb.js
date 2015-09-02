@@ -62,7 +62,7 @@ $(document).ready(function () {
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) { showModalNothingSelected(); }
         else {
             if (GetActive) { $("#EditFormGroupIsActive").addClass("hide"); }
@@ -72,7 +72,8 @@ $(document).ready(function () {
 
             showModalWait();
 
-            fillFormForEditGeneric(CurrIds, "POST", "/AssemblyDbSrv/GetByIds", GetActive, "EditForm", "Edit Assembly", MagicSuggests)
+            fillFormForEditGeneric(CurrIds, "POST", "/AssemblyDbSrv/GetByIds",
+                    GetActive, "EditForm", "Edit Assembly", MagicSuggests)
                 .always(hideModalWait)
                 .done(function (currRecords) {
                     CurrRecords = currRecords;
@@ -85,7 +86,7 @@ $(document).ready(function () {
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) { showModalNothingSelected(); }
         else { showModalDelete(CurrIds.length); }
     });
@@ -129,17 +130,18 @@ $(document).ready(function () {
     //wire up dropdownId5
     $("#dropdownId5").click(function (event) {
         event.preventDefault();
-        var noOfRows = TableMain.rows(".ui-selected").data().length;
+        var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) { showModalSelectOne(); }
-        else { window.open("/Component?assyId=" + TableMain.cell(".ui-selected", "Id:name").data()) }
+        else { window.open("/Component?assyId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
+}
     });
 
     //wire up dropdownId6
     $("#dropdownId6").click(function (event) {
         event.preventDefault();
-        var noOfRows = TableMain.rows(".ui-selected").data().length;
+        var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) { showModalSelectOne(); }
-        else { window.open("/AssemblyLogEntry?assyId=" + TableMain.cell(".ui-selected", "Id:name").data()) }
+        else { window.open("/AssemblyLogEntry?assyId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data()) }
     });
 
     //Initialize MagicSuggest MsFilterByType
@@ -306,7 +308,7 @@ $(document).ready(function () {
     if (typeof LocId !== "undefined" && LocId != "") {
         showModalWait();
         $.ajax({
-            type: "POST", url: "/LocationSrv/GetByIds", timeout: 20000,
+            type: "POST", url: "/LocationSrv/GetByIds", timeout: 120000,
             data: { ids: [LocId], getActive: true }, dataType: "json",
         })
             .always(hideModalWait)
@@ -327,7 +329,7 @@ $(document).ready(function () {
 
 //Delete Records from DB
 function DeleteRecords() {
-    CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
     deleteRecordsGeneric(CurrIds, "/AssemblyDbSrv/Delete", refreshMainView);
 }
 

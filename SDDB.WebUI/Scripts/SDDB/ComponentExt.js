@@ -49,7 +49,7 @@ $(document).ready(function () {
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) { showModalNothingSelected(); }
         else {
             showModalWait();
@@ -105,9 +105,9 @@ $(document).ready(function () {
     //wire up dropdownId5
     $("#dropdownId5").click(function (event) {
         event.preventDefault();
-        var noOfRows = TableMain.rows(".ui-selected").data().length;
+        var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) showModalSelectOne();
-        else window.open("/ComponentLogEntry?compId=" + TableMain.cell(".ui-selected", "Id:name").data())
+        else window.open("/ComponentLogEntry?compId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
     });
 
     //Initialize MagicSuggest MsFilterByModel

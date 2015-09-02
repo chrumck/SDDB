@@ -42,7 +42,7 @@ $(document).ready(function () {
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) { showModalNothingSelected(); }
         else {
             if (GetActive) { $("#EditFormGroupIsActive").addClass("hide"); }
@@ -63,20 +63,20 @@ $(document).ready(function () {
     
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) { showModalNothingSelected(); }
         else { showModalDelete(CurrIds.length); }
     });
     
     //Wire Up BtnEditGroupPersons 
     $("#BtnEditGroupPersons").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) {
             showModalNothingSelected();
             return;
         }
         if (CurrIds.length == 1) {
-            var selectedRecord = TableMain.row(".ui-selected").data()
+            var selectedRecord = TableMain.row(".ui-selected", { page: "current"}).data()
             $("#GroupPersonsViewPanel").text(selectedRecord.PrsGroupName);
         }
         else { $("#GroupPersonsViewPanel").text("_MULTIPLE_") }
@@ -96,13 +96,13 @@ $(document).ready(function () {
 
     //Wire Up BtnEditGroupManagers 
     $("#BtnEditGroupManagers").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) {
             showModalNothingSelected();
             return;
         }
         if (CurrIds.length == 1) {
-            var selectedRecord = TableMain.row(".ui-selected").data()
+            var selectedRecord = TableMain.row(".ui-selected", { page: "current"}).data()
             $("#GroupManagersViewPanel").text(selectedRecord.PrsGroupName);
         }
         else { $("#GroupManagersViewPanel").text("_MULTIPLE_") }
@@ -197,14 +197,17 @@ $(document).ready(function () {
 
     //Wire Up GroupPersonsViewBtnOk
     $("#GroupPersonsViewBtnOk").click(function () {
-        if (TableGroupPersonsAdd.rows(".ui-selected").data().length +
-            TableGroupPersonsRemove.rows(".ui-selected").data().length == 0) {
+        if (TableGroupPersonsAdd.rows(".ui-selected", { page: "current" }).data().length +
+            TableGroupPersonsRemove.rows(".ui-selected", { page: "current" }).data().length == 0) {
             showModalNothingSelected();
             return;
         }
         showModalWait();
-        submitEditsForRelatedGeneric(CurrIds, TableGroupPersonsAdd.cells(".ui-selected", "Id:name").data().toArray(),
-                TableGroupPersonsRemove.cells(".ui-selected", "Id:name").data().toArray(), "/PersonGroupSrv/EditGroupPersons")
+        submitEditsForRelatedGeneric(
+                CurrIds,
+                TableGroupPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                TableGroupPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                "/PersonGroupSrv/EditGroupPersons")
             .always(hideModalWait)
             .done(function () {
                 $("#MainView").removeClass("hide");
@@ -279,14 +282,17 @@ $(document).ready(function () {
 
     //Wire Up GroupManagersViewBtnOk
     $("#GroupManagersViewBtnOk").click(function () {
-        if (TableGroupManagersAdd.rows(".ui-selected").data().length +
-            TableGroupManagersRemove.rows(".ui-selected").data().length == 0) {
+        if (TableGroupManagersAdd.rows(".ui-selected", { page: "current" }).data().length +
+            TableGroupManagersRemove.rows(".ui-selected", { page: "current" }).data().length == 0) {
             showModalNothingSelected();
             return;
         }
         showModalWait();
-        submitEditsForRelatedGeneric(CurrIds, TableGroupManagersAdd.cells(".ui-selected", "Id:name").data().toArray(),
-                TableGroupManagersRemove.cells(".ui-selected", "Id:name").data().toArray(), "/PersonGroupSrv/EditGroupManagers")
+        submitEditsForRelatedGeneric(
+                CurrIds,
+                TableGroupManagersAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                TableGroupManagersRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                "/PersonGroupSrv/EditGroupManagers")
             .always(hideModalWait)
             .done(function () {
                 $("#MainView").removeClass("hide");
@@ -365,7 +371,7 @@ $(document).ready(function () {
 
 //Delete Records from DB
 function DeleteRecords() {
-    CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
     deleteRecordsGeneric(CurrIds, "/PersonGroupSrv/Delete", refreshMainView);
 }
 

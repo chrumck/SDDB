@@ -39,7 +39,7 @@ $(document).ready(function () {
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) { showModalNothingSelected(); }
         else {
             if (GetActive) { $("#EditFormGroupIsActive").addClass("hide"); }
@@ -60,7 +60,7 @@ $(document).ready(function () {
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) { showModalNothingSelected(); }
         else { showModalDelete(CurrIds.length); }
     });
@@ -146,7 +146,7 @@ $(document).ready(function () {
 
 //Delete Records from DB
 function DeleteRecords() {
-    CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
     deleteRecordsGeneric(CurrIds, "/AssemblyStatusSrv/Delete", refreshMainView);
 }
 

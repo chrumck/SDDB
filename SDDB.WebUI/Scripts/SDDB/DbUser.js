@@ -43,7 +43,7 @@ $(document).ready(function () {
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) {
             showModalNothingSelected();
             return;
@@ -77,20 +77,20 @@ $(document).ready(function () {
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) { showModalNothingSelected(); }
         else { showModalDelete(CurrIds.length); }
     });
 
     //Wire Up BtnEditRoles 
     $("#BtnEditRoles").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) {
             showModalNothingSelected();
             return;
         }
         if (CurrIds.length == 1) {
-            var selectedRecord = TableMain.row(".ui-selected").data()
+            var selectedRecord = TableMain.row(".ui-selected", { page: "current"}).data()
             $("#DBRolesViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
         }
         else { $("#DBRolesViewPanel").text("_MULTIPLE_"); }
@@ -189,15 +189,17 @@ $(document).ready(function () {
 
     //Wire Up DBRolesViewBtnOk
     $("#DBRolesViewBtnOk").click(function () {
-        if (TableDBRolesAdd.rows(".ui-selected").data().length +
-            TableDBRolesRemove.rows(".ui-selected").data().length == 0) {
+        if (TableDBRolesAdd.rows(".ui-selected", { page: "current" }).data().length +
+            TableDBRolesRemove.rows(".ui-selected", { page: "current" }).data().length == 0) {
             showModalNothingSelected();
             return;
         }
         showModalWait();
 
-        submitEditsForRelatedGeneric(CurrIds, TableDBRolesAdd.cells(".ui-selected", "Name:name").data().toArray(),
-                TableDBRolesRemove.cells(".ui-selected", "Name:name").data().toArray(), "/DBUserSrv/EditRoles")
+        submitEditsForRelatedGeneric(CurrIds, 
+                TableDBRolesAdd.cells(".ui-selected", "Name:name", { page: "current"}).data().toArray(),
+                TableDBRolesRemove.cells(".ui-selected", "Name:name", { page: "current"}).data().toArray(),
+                "/DBUserSrv/EditRoles")
             .always(hideModalWait)
             .done(function () {
                 $("#MainView").removeClass("hide");
@@ -259,7 +261,7 @@ $(document).ready(function () {
 
 //Delete Records from DB
 function DeleteRecords() {
-    CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
     deleteRecordsGeneric(CurrIds, "/DbUserSrv/Delete", refreshMainView);
 }
 

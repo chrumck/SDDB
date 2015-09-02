@@ -23,7 +23,7 @@ $(document).ready(function () {
 
     //Wire up BtnEditLogEntryFiles 
     $("#BtnEditLogEntryFiles").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length != 1) showModalSelectOne();
         else { fillLogEntryFilesForm(); }
     });
@@ -43,7 +43,7 @@ $(document).ready(function () {
 
     //Wire Up LogEntryFilesBtnDload
     $("#LogEntryFilesBtnDload").click(function () {
-        var fileIds = TableLogEntryFiles.cells(".ui-selected", "Id:name").data().toArray();
+        var fileIds = TableLogEntryFiles.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (fileIds.length == 0) {
             showModalNothingSelected();
             return;
@@ -125,7 +125,7 @@ $(document).ready(function () {
 
     //Wire Up LogEntryFilesBtnDelete 
     $("#LogEntryFilesBtnDelete").click(function () {
-        FileCurrIds = TableLogEntryFiles.cells(".ui-selected", "Id:name").data().toArray();
+        FileCurrIds = TableLogEntryFiles.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (FileCurrIds.length == 0) showModalNothingSelected();
         else {
             $("#ModalDeleteFilesBody").text("Confirm deleting " + FileCurrIds.length + " file(s).");
@@ -146,7 +146,7 @@ $(document).ready(function () {
         $("#ModalDeleteFiles").modal("hide");
         showModalWait();
         $.ajax({
-            type: "POST", url: "/PersonLogEntrySrv/DeleteFiles", timeout: 20000,
+            type: "POST", url: "/PersonLogEntrySrv/DeleteFiles", timeout: 120000,
             data: { logEntryId: CurrIds[0], ids: FileCurrIds }, dataType: "json"
         })
             .always(hideModalWait)
@@ -198,7 +198,7 @@ $(document).ready(function () {
 function fillLogEntryFilesForm(panelText) {
     var deferred0 = $.Deferred();
 
-    var selectedRecord = TableMain.row(".ui-selected").data();
+    var selectedRecord = TableMain.row(".ui-selected", { page: "current"}).data();
     if (typeof panelText !== "undefined") { $("#LogEntryFilesViewPanel").text(panelText); }
     else if (typeof selectedRecord !== "undefined") {
         $("#LogEntryFilesViewPanel").text(selectedRecord.EnteredByPerson_.FirstName + " " +

@@ -65,7 +65,7 @@ function refreshMainView() {
         $.ajax({
             type: "POST",
             url: "/PersonLogEntrySrv/GetActivitySummaries",
-            timeout: 20000,
+            timeout: 120000,
             data: {
                 personId: (MsFilterByPerson.getSelection())[0].id,
                 startDate: startDate,

@@ -23,7 +23,7 @@ $(document).ready(function () {
         CurrIds = [];
         CurrRecords = [];
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
-        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Log Entry", "MainView");
+        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Activity", "MainView");
         MagicSuggests[3].disable();
         MagicSuggests[4].disable();
         TableLogEntryAssysAdd.clear().search("").draw();
@@ -41,7 +41,7 @@ $(document).ready(function () {
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) showModalNothingSelected();
         else {
             if (GetActive) $("#EditFormGroupIsActive").addClass("hide");
@@ -54,7 +54,7 @@ $(document).ready(function () {
 
             $.when(
                 fillFormForEditGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
-                    GetActive, "EditForm", "Edit Person Log Entry", MagicSuggests),
+                    GetActive, "EditForm", "Edit Person Activity", MagicSuggests),
 
                 fillFormForRelatedGeneric(TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
                     "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { logEntryId: CurrIds[0] },
@@ -244,7 +244,7 @@ $(document).ready(function () {
     if (typeof PersonId !== "undefined" && PersonId != "") {
         showModalWait();
         $.ajax({
-            type: "POST", url: "/PersonSrv/GetAllByIds", timeout: 20000,
+            type: "POST", url: "/PersonSrv/GetAllByIds", timeout: 120000,
             data: { ids: [PersonId], getActive: true }, dataType: "json"
         })
             .always(hideModalWait)

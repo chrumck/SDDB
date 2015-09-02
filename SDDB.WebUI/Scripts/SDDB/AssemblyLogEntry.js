@@ -53,7 +53,7 @@ $(document).ready(function () {
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) showModalNothingSelected();
         else {
             if (GetActive) $("#EditFormGroupIsActive").addClass("hide");
@@ -74,7 +74,7 @@ $(document).ready(function () {
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) showModalNothingSelected();
         else showModalDelete(CurrIds.length);
     });
@@ -270,7 +270,7 @@ $(document).ready(function () {
     if (typeof AssyId !== "undefined" && AssyId != "") {
         showModalWait();
         $.ajax({
-            type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 20000, data: { ids: [AssyId], getActive: true }, dataType: "json"})
+            type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 120000, data: { ids: [AssyId], getActive: true }, dataType: "json"})
             .always(hideModalWait)
             .done(function (data) {
                 MsFilterByAssembly.setSelection([{ id: data[0].Id, name: data[0].AssyName, }]);
@@ -294,7 +294,7 @@ $(document).ready(function () {
 
 //Delete Records from DB
 function DeleteRecords() {
-    CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
     deleteRecordsGeneric(CurrIds, "/AssemblyLogEntrySrv/Delete", refreshMainView);
 }
 

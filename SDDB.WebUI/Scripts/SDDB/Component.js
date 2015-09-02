@@ -50,7 +50,7 @@ $(document).ready(function () {
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) { showModalNothingSelected(); }
         else {
             if (GetActive) { $("#EditFormGroupIsActive").addClass("hide"); }
@@ -73,7 +73,7 @@ $(document).ready(function () {
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) { showModalNothingSelected(); }
         else { showModalDelete(CurrIds.length); }
     });
@@ -95,9 +95,9 @@ $(document).ready(function () {
     //wire up dropdownId3
     $("#dropdownId3").click(function (event) {
         event.preventDefault();
-        var noOfRows = TableMain.rows(".ui-selected").data().length;
+        var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) showModalSelectOne();
-        else window.open("/ComponentLogEntry?compId=" + TableMain.cell(".ui-selected", "Id:name").data())
+        else window.open("/ComponentLogEntry?compId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
     });
 
     //Initialize MagicSuggest MsFilterByType
@@ -247,7 +247,7 @@ $(document).ready(function () {
     if (typeof assyId !== "undefined" && assyId != "") {
         showModalWait();
         $.ajax({
-            type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 20000,
+            type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 120000,
             data: { ids: [assyId], getActive: true }, dataType: "json",
         })
             .always(hideModalWait)
@@ -268,7 +268,7 @@ $(document).ready(function () {
 
 //Delete Records from DB
 function DeleteRecords() {
-    CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
     deleteRecordsGeneric(CurrIds, "/ComponentSrv/Delete", refreshMainView);
 }
 

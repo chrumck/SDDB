@@ -171,7 +171,7 @@ function refreshTable(table, url, getActive, httpType, projectIds, modelIds, typ
     showModalWait();
 
     $.ajax({
-        type: httpType, url: url, timeout: 20000,
+        type: httpType, url: url, timeout: 120000,
         data: {getActive: getActive, projectIds: projectIds, modelIds: modelIds, typeIds: typeIds,
             locIds: locIds, assyIds: assyIds, personIds: personIds, startDate: startDate, endDate: endDate
         },
@@ -196,7 +196,7 @@ function refreshTableGeneric(table, url, data, httpType) {
 
     table.clear().search("").draw();
 
-    $.ajax({ type: httpType, url: url, timeout: 20000, data: data, dataType: "json", })
+    $.ajax({ type: httpType, url: url, timeout: 120000, data: data, dataType: "json", })
         .done(function (dbEntries) {
             table.rows.add(dbEntries).order([1, "asc"]).draw();
             deferred0.resolve();
@@ -228,7 +228,7 @@ function refreshTblGenWrp(table, url, data, httpType) {
 //Delete Records from DB - generic version
 function deleteRecordsGeneric(ids, url, callback) {
     showModalWait();
-    $.ajax({ type: "POST", url: url, timeout: 20000, data: { ids: ids }, dataType: "json" })
+    $.ajax({ type: "POST", url: url, timeout: 120000, data: { ids: ids }, dataType: "json" })
         .always(hideModalWait)
         .done(callback)
         .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -281,7 +281,7 @@ function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
     clearFormInputs(formId, msArray);
     $("#" + formId + "Label").text(labelText);
 
-    $.ajax({ type: httpType, url: url, timeout: 20000, data: { ids: ids, getActive: getActive }, dataType: "json" })
+    $.ajax({ type: httpType, url: url, timeout: 120000, data: { ids: ids, getActive: getActive }, dataType: "json" })
         .done(function (dbEntries) {
             var formInput = $.extend(true, {}, dbEntries[0]);
             $.each(dbEntries, function (i, dbEntry) {
@@ -397,7 +397,7 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
         multiplyRecordsAndModifyUniqueProps(formId, currRecords, noOfNewRecords);
     }
 
-    $.ajax({ type: httpType, url: url, timeout: 20000, data: { records: currRecords }, dataType: "json" })
+    $.ajax({ type: httpType, url: url, timeout: 120000, data: { records: currRecords }, dataType: "json" })
         .done(function (newEntryIds) { deferred0.resolve(newEntryIds); })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 
@@ -442,8 +442,8 @@ function fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
 
     if (ids.length == 1) {
         $.when(
-            $.ajax({type: httpTypeNot, url: urlNot, timeout: 20000, data: dataNot, dataType: "json" }),
-            $.ajax({type: httpType, url: url, timeout: 20000, data: data, dataType: "json" })
+            $.ajax({type: httpTypeNot, url: urlNot, timeout: 120000, data: dataNot, dataType: "json" }),
+            $.ajax({type: httpType, url: url, timeout: 120000, data: data, dataType: "json" })
         )
         .done(function (done1, done2) {
             tableAdd.rows.add(done1[0]).order([sortColumn, "asc"]).draw();
@@ -453,7 +453,7 @@ function fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
     }
     else {
-        $.ajax({ type: httpTypeMany, url: urlMany, timeout: 20000, data: dataMany, dataType: "json" })
+        $.ajax({ type: httpTypeMany, url: urlMany, timeout: 120000, data: dataMany, dataType: "json" })
             .done(function (data) {
                 tableAdd.rows.add(data).order([sortColumn, "asc"]).draw();
                 if (ids.length != 0) tableRemove.rows.add(data).order([sortColumn, "asc"]).draw();
@@ -474,7 +474,7 @@ function submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
 
     if (idsAdd.length == 0) deferred1.resolve();
     else {
-        $.ajax({type: "POST", url: url, timeout: 20000, data: { ids: ids, idsAddRem: idsAdd, isAdd: true }, dataType: "json" })
+        $.ajax({type: "POST", url: url, timeout: 120000, data: { ids: ids, idsAddRem: idsAdd, isAdd: true }, dataType: "json" })
             .done(function () { deferred1.resolve(); })
             .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
     }
@@ -482,7 +482,7 @@ function submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
     if (idsRemove.length == 0) deferred2.resolve();
     else {
         setTimeout(function () {
-            $.ajax({ type: "POST", url: url, timeout: 20000, data: { ids: ids, idsAddRem: idsRemove, isAdd: false }, dataType: "json" })
+            $.ajax({ type: "POST", url: url, timeout: 120000, data: { ids: ids, idsAddRem: idsRemove, isAdd: false }, dataType: "json" })
                 .done(function () { deferred2.resolve(); })
                 .fail(function (xhr, status, error) { deferred2.reject(xhr, status, error); });
         }, 500);
@@ -597,7 +597,7 @@ function setMsAsModified(msArray, isModified) {
 //Pulls Model Information and formats edit form and column names
 function updateViewsForModelGeneric(table, url, modelId) {
     showModalWait();
-    $.ajax({ type: "POST", url: url, timeout: 20000, data: { ids: [modelId] }, dataType: "json" })
+    $.ajax({ type: "POST", url: url, timeout: 120000, data: { ids: [modelId] }, dataType: "json" })
         .always(hideModalWait)
         .done(function (data) {
             for (var prop in data[0]) {

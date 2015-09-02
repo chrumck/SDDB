@@ -40,7 +40,7 @@ $(document).ready(function () {
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) showModalNothingSelected();
         else {
             if (GetActive) $("#EditFormGroupIsActive").addClass("hide");
@@ -61,7 +61,7 @@ $(document).ready(function () {
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) showModalNothingSelected();
         else showModalDelete(CurrIds.length);
     });
@@ -69,10 +69,10 @@ $(document).ready(function () {
 
     //Wire Up BtnEditProjectPersons
     $("#BtnEditProjectPersons").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) showModalNothingSelected();
         else {
-            var selectedRecord = TableMain.row(".ui-selected").data()
+            var selectedRecord = TableMain.row(".ui-selected", { page: "current"}).data()
             if (CurrIds.length == 1)
                 { $("#ProjectPersonsViewPanel").text(selectedRecord.ProjectName + " " + selectedRecord.ProjectCode); }
             else { $("#ProjectPersonsViewPanel").text("_MULTIPLE_"); }
@@ -95,9 +95,9 @@ $(document).ready(function () {
     //wire up dropdownId1
     $("#dropdownId1").click(function (event) {
         event.preventDefault();
-        var noOfRows = TableMain.rows(".ui-selected").data().length;
+        var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) showModalSelectOne();
-        else window.open("/Location?ProjectId=" + TableMain.cell(".ui-selected", "Id:name").data())
+        else window.open("/Location?ProjectId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
     })
 
     //---------------------------------------DataTables------------
@@ -187,13 +187,17 @@ $(document).ready(function () {
 
     //Wire Up ProjectPersonsViewBtnOk
     $("#ProjectPersonsViewBtnOk").click(function () {
-        if (TableProjectPersonsAdd.rows(".ui-selected").data().length +
-            TableProjectPersonsRemove.rows(".ui-selected").data().length == 0) { showModalNothingSelected(); }
+        if (TableProjectPersonsAdd.rows(".ui-selected", { page: "current" }).data().length +
+            TableProjectPersonsRemove.rows(".ui-selected", { page: "current" }).data().length == 0) {
+            showModalNothingSelected();
+        }
         else {
             showModalWait();
 
-            submitEditsForRelatedGeneric(CurrIds, TableProjectPersonsAdd.cells(".ui-selected", "Id:name").data().toArray(),
-                    TableProjectPersonsRemove.cells(".ui-selected", "Id:name").data().toArray(), "/ProjectSrv/EditProjectPersons")
+            submitEditsForRelatedGeneric(CurrIds,
+                    TableProjectPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                    TableProjectPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                    "/ProjectSrv/EditProjectPersons")
                 .always(hideModalWait)
                 .done(function () {
                     $("#MainView").removeClass("hide");
@@ -272,7 +276,7 @@ $(document).ready(function () {
 
 //Delete Records from DB
 function DeleteRecords() {
-    CurrIds = TableMain.cells(".ui-selected", "Id:name").data().toArray();
+    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
     deleteRecordsGeneric(CurrIds, "/ProjectSrv/Delete", refreshMainView);
 }
 
