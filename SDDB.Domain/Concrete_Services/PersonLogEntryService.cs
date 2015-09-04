@@ -54,16 +54,20 @@ namespace SDDB.Domain.Services
         }
 
         //get by PersonLogEntry ids
-        public virtual async Task<List<PersonLogEntry>> GetAsync(string[] ids, bool getActive = true)
+        public virtual async Task<List<PersonLogEntry>> GetAsync(string[] ids, bool getActive = true,
+            bool filterForPLEView = false)
         {
             if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
+
+            if (!(await userIsInRoleHelperAsync("YourActivity_View").ConfigureAwait(false))) { filterForPLEView = true; }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 var records = await dbContext.PersonLogEntrys
-                    .Where(x => 
+                    .Where(x =>
+                        (!filterForPLEView || x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId)) &&
                         ids.Contains(x.Id) &&
                         x.IsActive_bl == getActive
                         )
@@ -91,19 +95,23 @@ namespace SDDB.Domain.Services
 
         //get by personIds, projectIds, typeIds, startDate, endDate
         public virtual async Task<List<PersonLogEntry>> GetByAltIdsAsync(string[] personIds, string[] projectIds, 
-            string[] assyIds, string[] typeIds, DateTime? startDate, DateTime? endDate, bool getActive = true)
+            string[] assyIds, string[] typeIds, DateTime? startDate, DateTime? endDate, bool getActive = true,
+            bool filterForPLEView = false)
         {
             personIds = personIds ?? new string[] { };
             projectIds = projectIds ?? new string[] { };
             assyIds = assyIds ?? new string[] { };
             typeIds = typeIds ?? new string[] { };
 
+            if (!(await userIsInRoleHelperAsync("YourActivity_View").ConfigureAwait(false))) { filterForPLEView = true; }
+
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 
                 var records = await dbContext.PersonLogEntrys
-                       .Where(x => 
+                       .Where(x =>
+                           (!filterForPLEView || x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId)) && 
                            (personIds.Count() == 0 || x.PrsLogEntryPersons.Any(y => personIds.Contains(y.Id)) ||
                                 personIds.Contains(x.EnteredByPerson_Id) ) &&
                            (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&

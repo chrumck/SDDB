@@ -299,7 +299,8 @@ function refreshMainView() {
                 assyIds: MsFilterByAssy.getValue(),
                 startDate: $("#FilterDateStart").val(),
                 endDate: endDate,
-                getActive: GetActive
+                getActive: GetActive,
+                filterForPLEView: true
             },
             "POST")
             .done(function () { $("#ChBoxShowDeleted").bootstrapToggle("enable"); })

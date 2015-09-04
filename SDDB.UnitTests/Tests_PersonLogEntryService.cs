@@ -13,6 +13,7 @@ using SDDB.Domain.Entities;
 using SDDB.Domain.Services;
 using System.Data.Entity.Infrastructure;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace SDDB.UnitTests
 {
@@ -98,6 +99,21 @@ namespace SDDB.UnitTests
             mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.ElementType).Returns(dbEntries.ElementType);
             mockDbSet.As<IQueryable<PersonLogEntry>>().Setup(m => m.GetEnumerator()).Returns(dbEntries.GetEnumerator());
             mockDbSet.Setup(x => x.Include(It.IsAny<string>())).Returns(mockDbSet.Object);
+
+            //var userRole1 = new IdentityRole { Id = "dummyRoleId1", Name = "YourActivity_View", };
+            //var userRole2 = new IdentityRole { Id = "dummyRoleId2", Name = "PersonLogEntry_View" };
+
+            //var userRoles = new List<IdentityRole> { userRole1, userRole2 }.AsQueryable();
+
+            //var mockDbSetRoles = new Mock<DbSet<IdentityRole>>();
+            //mockDbSetRoles.As<IDbAsyncEnumerable<IdentityRole>>().Setup(m => m.GetAsyncEnumerator()).Returns(new MockDbAsyncEnumerator<IdentityRole>(userRoles.GetEnumerator()));
+            //mockDbSetRoles.As<IQueryable<IdentityRole>>().Setup(m => m.Provider).Returns(new MockDbAsyncQueryProvider<IdentityRole>(userRoles.Provider));
+            //mockDbSetRoles.As<IQueryable<IdentityRole>>().Setup(m => m.Expression).Returns(dbEntries.Expression);
+            //mockDbSetRoles.As<IQueryable<IdentityRole>>().Setup(m => m.ElementType).Returns(dbEntries.ElementType);
+            //mockDbSetRoles.As<IQueryable<IdentityRole>>().Setup(m => m.GetEnumerator()).Returns(userRoles.GetEnumerator());
+            //mockDbSetRoles.Setup(x => x.Include(It.IsAny<string>())).Returns(mockDbSetRoles.Object);
+
+            //mockEfDbContext.Setup(x => x.Roles).Returns(mockDbSetRoles.Object);
 
             mockEfDbContext.Setup(x => x.PersonLogEntrys).Returns(mockDbSet.Object);
 

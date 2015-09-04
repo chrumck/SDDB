@@ -12,7 +12,7 @@ namespace SDDB.WebUI.Controllers
         //Methods--------------------------------------------------------------------------------------------------------------//
 
         // GET: ActivitySummary
-        [Authorize(Roles = "YourActivity_View,PersonLogEntry_View")]
+        [Authorize(Roles = "YourActivity_View")]
         public ActionResult Index()
         {
             return View();

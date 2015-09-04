@@ -36,10 +36,10 @@ namespace SDDB.WebUI.ControllersSrv
         // POST: /PersonLogEntrySrv/GetByIds
         [HttpPost]
         [DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
-        public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
+        public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true, bool filterForPLEView = false)
         {
             ViewBag.ServiceName = "PersonLogEntryService.GetAsync";
-            var records = await personLogEntryService.GetAsync(ids, getActive).ConfigureAwait(false);
+            var records = await personLogEntryService.GetAsync(ids, getActive, filterForPLEView).ConfigureAwait(false);
             return DbJsonDateTime(filterForJsonFull(records));
         }
 
@@ -47,11 +47,12 @@ namespace SDDB.WebUI.ControllersSrv
         [HttpPost]
         [DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
         public async Task<ActionResult> GetByAltIds(string[] personIds, string[] projectIds, string[] assyIds, string[] typeIds,
-            DateTime? startDate, DateTime? endDate, bool getActive = true)
+            DateTime? startDate, DateTime? endDate, bool getActive = true, bool filterForPLEView = false)
         {
             ViewBag.ServiceName = "PersonLogEntryService.GetByAltIdsAsync";
             var records = await personLogEntryService
-                .GetByAltIdsAsync(personIds, projectIds, assyIds, typeIds, startDate, endDate, getActive).ConfigureAwait(false);
+                .GetByAltIdsAsync(personIds, projectIds, assyIds, typeIds, startDate, endDate, getActive, filterForPLEView)
+                .ConfigureAwait(false);
             return DbJsonDateTime(filterForJsonFull(records));
         }
 

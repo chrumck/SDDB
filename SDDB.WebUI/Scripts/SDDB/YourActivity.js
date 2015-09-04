@@ -258,7 +258,8 @@ function refreshMainView() {
                 personIds: [UserId],
                 startDate: $("#FilterDateStart").val(),
                 endDate: endDate,
-                getActive: GetActive
+                getActive: GetActive,
+                filterForPLEView: false
             },
             "POST")
             .done(function () { $("#ChBoxShowDeleted").bootstrapToggle("enable"); })

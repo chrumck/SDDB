@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Transactions;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Mehdime.Entity;
 
 using SDDB.Domain.DbContexts;
@@ -21,6 +22,7 @@ namespace SDDB.Domain.Services
 
         protected IDbContextScopeFactory contextScopeFac;
         protected string userId;
+        protected List<IdentityRole> userRoles;
         protected const int maxRecordsFromLookup = 100;
 
         protected IReadOnlyList<string> loggedProperties = new List<string> { };
@@ -307,20 +309,20 @@ namespace SDDB.Domain.Services
         }
 
         //helper - checks if user is in Role
-        protected async Task<bool> userIsInRoleHelperAsync(string roleName)
+        protected async Task<bool> userIsInRoleHelperAsync(string roleName, bool refreshRoles = false)
         {
             if (String.IsNullOrEmpty(roleName)) { throw new ArgumentNullException("roleName"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                var role = await dbContext.Roles.SingleAsync(x => x.Name == roleName).ConfigureAwait(false);
-                return await dbContext.Users
-                    .AnyAsync(x =>
-                        x.Id == userId &&
-                        x.Roles.Any(y => y.RoleId == role.Id)
-                    )
-                    .ConfigureAwait(false);
+
+                if (refreshRoles || userRoles == null)
+                {
+                    userRoles = await dbContext.Roles.Where(x => x.Users.Any(y => y.UserId == userId)).ToListAsync()
+                        .ConfigureAwait(false);
+                }
+                return userRoles.Any(x => x.Name == roleName);
             }
         }
 
