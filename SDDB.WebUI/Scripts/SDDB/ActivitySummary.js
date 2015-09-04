@@ -30,6 +30,7 @@ $(document).ready(function () {
         ajaxConfig: {
             error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
+        maxSelection: 1,
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
@@ -40,13 +41,15 @@ $(document).ready(function () {
     if (typeof CanViewOthers === "undefined" || !CanViewOthers) { MsFilterByPerson.disable(); } 
            
     //--------------------------------------View Initialization------------------------------------//
-
-    $("#FilterDateStart").val(moment().day(0).format("YYYY-MM-DD"));
-    MsFilterByPerson.setSelection([{ id: UserId, name: UserFullName }]);
-       
+           
     $("#InitialView").addClass("hide");
     $("#MainView").removeClass("hide");
-  
+
+    var weekOffset = 0
+    if ($("#thNo6").is(":hidden") && $("#thNo7").is(":hidden")) { weekOffset = 1; }
+    $("#FilterDateStart").val(moment().day(weekOffset).format("YYYY-MM-DD"));
+
+    MsFilterByPerson.setSelection([{ id: UserId, name: UserFullName }]);
 
     //--------------------------------End of execution at Start-----------
 });
@@ -56,11 +59,14 @@ $(document).ready(function () {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
-    var tableId = "TableMain";
-    $("#" + tableId + " tbody").empty();
-    if ($("#FilterDateStart").val() != "") {
+    var $table = $("#TableMain");
+    var startDate = $("#FilterDateStart").val();
+
+    $table.find("tbody").empty();
+    clearSumTblFirstRowHelper($table);
+
+    if (startDate != "" && MsFilterByPerson.getSelection().length != 0) {
         showModalWait();
-        var startDate = $("#FilterDateStart").val();
         var endDate = moment(startDate).add(6, "days").hour(23).minute(59).format("YYYY-MM-DD HH:mm");
         $.ajax({
             type: "POST",
@@ -76,7 +82,7 @@ function refreshMainView() {
         })
             .always(hideModalWait)
             .done(function (records) {
-                fillSummaryTable(tableId, records);
+                fillSummaryTableHelper($table, startDate, records);
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }
@@ -84,41 +90,85 @@ function refreshMainView() {
 
 //---------------------------------------Helper Methods--------------------------------------//
 
-function fillSummaryTable(tableId, records) {
-    var colDate = moment($("#FilterDateStart").val());
-    var colDates = [];
-    $("#" + tableId + " thead th").each(function (i) {
-        if (i == 0) { return true; }
-        $(this).text(colDate.format("dd DD"));
-        colDates.push(colDate);
-        colDate.add(1, "days");
-    });
-
-    var maxNoOfRows = 0;
-    var projectNames = [];
-    for (var i in records) {
-        maxNoOfRows = Math.max(maxNoOfRows, records[i].SummaryDetails.length)
-        for (var j in records[i].SummaryDetails) {
-
-        }
-    }
-
-
-    for (var i = 0; i <= maxNoOfRows; i++) {
-        var row = $("<tr/>");
-        var columnHours = 0
-        if (i == 0) {
-            row.append($("<td />").text("TOTAL"));
-            for (var i in colDates) {
-                
-            }
-        }
-    }
-
-    //$.each(records, function (i, record) {
-    //    columnNumber = i + 2;
-    //    columnName = moment(record.SummaryDay).format("dd DD")
-    //    $("#" + tableId + " thead th:nth-child(" + columnNumber + ")").text(columnName)
-    //});
+//fillSummaryTableHelper - used by refreshMainView
+function fillSummaryTableHelper($table, startDate, records) {
     
+    var columnDates = getColumnDatesHelper(startDate);
+
+    fillSumTblFirstRowHelper($table, columnDates);
+
+    var projectNames = getProjectNamesHelper(records);
+
+    $.each(projectNames, function (i, projectName) {
+
+        var row = $("<tr/>");
+        row.append($("<td />").text(projectName));
+        $.each(columnDates, function (j, columnDate) {
+            var columnHours = getColumnHoursHelper(records, columnDate, projectName, i == 0);
+            row.append($("<td />").text(columnHours));
+            if (j >= columnDates.length - 2) { row.find("td:last").addClass("hidden-xs"); }
+        });
+        $table.append(row);
+    });
 }
+
+//getColumnDatesHelper - used by fillSummaryTableHelper
+function getColumnDatesHelper(startDate) {
+    var columnDate = moment(startDate);
+    var columnDates = [];
+    for (var i = 0; i < 7; i++) {
+        columnDates.push(columnDate.clone());
+        columnDate.add(1, "days");
+    }
+    return columnDates;
+}
+
+//fillSumTblFirstRowHelper - used by fillSummaryTableHelper
+function fillSumTblFirstRowHelper($table, columnDates) {
+    $table.find("thead th").each(function (i) {
+        if (i == 0) { return true; }
+        $(this).text(columnDates[i - 1].format("dd DD"));
+    });
+}
+
+//clearSumTblFirstRowHelper - used by refreshMainView
+function clearSumTblFirstRowHelper($table) {
+    $table.find("thead th").each(function (i) {
+        if (i == 0) { return true; }
+        $(this).text(i);
+    });
+}
+
+//getProjectNamesHelper - used by fillSummaryTableHelper
+function getProjectNamesHelper(records) {
+    var projectNames = [];
+    projectNames.push("_TOTAL_");
+    $.each(records, function (i, record) {
+        $.each(record.SummaryDetails, function (j, detail) {
+            if ($.inArray(detail.ProjectName, projectNames) == -1) { projectNames.push(detail.ProjectName); }
+        });
+    });
+    return projectNames;
+}
+
+//getColumnHoursHelper - used by fillSummaryTableHelper
+function getColumnHoursHelper(records, columnDate, projectName, isTotalHoursRow) {
+    var columnHours = 0;
+    $.each(records, function (i, record) {
+        if (moment(record.SummaryDay).isSame(columnDate)) {
+            if (isTotalHoursRow) {
+                columnHours = record.TotalManHours;
+                return false;
+            }
+            $.each(record.SummaryDetails, function (j, detail) {
+                if (detail.ProjectName == projectName) {
+                    columnHours = detail.ManHours;
+                    return false;
+                }
+            });
+            return false;
+        }
+    });
+    return columnHours;
+}
+

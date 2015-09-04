@@ -226,7 +226,7 @@ namespace SDDB.WebUI.ControllersSrv
                 .OrderBy(x => x.LastName)
                 .Select(x => new {
                     id = x.Id,
-                    name = x.FirstName + " " + x.LastName + " " + x.Initials 
+                    name = x.LastName + " " + x.FirstName +" " + x.Initials 
                 });
         }
 
