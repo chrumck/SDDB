@@ -108,7 +108,7 @@ $(document).ready(function () {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) showModalSelectOne();
-        else window.open("/AssemblyDb?LocId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
+        else window.open("/AssemblyDb?LocationId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
     });
 
     //Initialize MagicSuggest MsFilterByType

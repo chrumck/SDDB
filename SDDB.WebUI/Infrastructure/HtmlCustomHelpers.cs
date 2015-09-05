@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
+using System.Web.Script.Serialization;
 
 using SDDB.Domain.DbContexts;
 using SDDB.Domain.Entities;
@@ -49,6 +50,12 @@ namespace SDDB.WebUI.Infrastructure
             if (string.IsNullOrEmpty(userId)) { return false; }
             return dbContext.PersonGroups.Any(x => x.GroupManagers.Select( y => y.Id).Contains(userId));
             
+        }
+
+        //html helper to pass array to the javascipt variable in razor view
+        public static string JsonSerialize(this HtmlHelper html, object value)
+        {
+            return new JavaScriptSerializer().Serialize(value);
         }
         
     }

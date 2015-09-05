@@ -51,24 +51,25 @@ $(document).ready(function () {
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) { showModalNothingSelected(); }
-        else {
-            if (GetActive) { $("#EditFormGroupIsActive").addClass("hide"); }
-            else { $("#EditFormGroupIsActive").removeClass("hide"); }
-
-            $("#EditFormCreateMultiple").addClass("hide");
-
-            showModalWait();
-
-            fillFormForEditGeneric(CurrIds, "POST", "/ComponentSrv/GetByIds", GetActive, "EditForm", "Edit Component", MagicSuggests)
-                .always(hideModalWait)
-                .done(function (currRecords) {
-                    CurrRecords = currRecords;
-                    $("#MainView").addClass("hide");
-                    $("#EditFormView").removeClass("hide");
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
         }
+        if (GetActive) { $("#EditFormGroupIsActive").addClass("hide"); }
+        else { $("#EditFormGroupIsActive").removeClass("hide"); }
+
+        $("#EditFormCreateMultiple").addClass("hide");
+
+        showModalWait();
+
+        fillFormForEditGeneric(CurrIds, "POST", "/ComponentSrv/GetByIds", GetActive, "EditForm", "Edit Component", MagicSuggests)
+            .always(hideModalWait)
+            .done(function (currRecords) {
+                CurrRecords = currRecords;
+                $("#MainView").addClass("hide");
+                $("#EditFormView").removeClass("hide");
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //Wire up BtnDelete 
@@ -97,7 +98,7 @@ $(document).ready(function () {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) showModalSelectOne();
-        else window.open("/ComponentLogEntry?compId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
+        else window.open("/ComponentLogEntry?ComponentId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
     });
 
     //Initialize MagicSuggest MsFilterByType
@@ -244,11 +245,11 @@ $(document).ready(function () {
 
     //--------------------------------------View Initialization------------------------------------//
 
-    if (typeof assyId !== "undefined" && assyId != "") {
+    if (typeof AssemblyId !== "undefined" && AssemblyId != "") {
         showModalWait();
         $.ajax({
             type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 120000,
-            data: { ids: [assyId], getActive: true }, dataType: "json",
+            data: { ids: [AssemblyId], getActive: true }, dataType: "json",
         })
             .always(hideModalWait)
             .done(function (data) {
@@ -256,6 +257,9 @@ $(document).ready(function () {
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }
+    else { refreshMainView(); }
+
+
     $("#InitialView").addClass("hide");
     $("#MainView").removeClass("hide");
 
@@ -299,18 +303,20 @@ function refreshMainView() {
         MsFilterByAssy.getValue().length == 0) {
         $("#ChBoxShowDeleted").bootstrapToggle("disable")
         TableMain.clear().search("").draw();
+        if (typeof ComponentIds !== "undefined" && ComponentIds != null && ComponentIds.length > 0) {
+            refreshTblGenWrp(TableMain, "/ComponentSrv/GetByIds", { ids: ComponentIds, getActive: true }, "POST");
+        }
+        return;
     }
-    else {
-        refreshTblGenWrp(TableMain, "/ComponentSrv/GetByAltIds2",
-            {
-                projectIds: MsFilterByProject.getValue(),
-                typeIds: MsFilterByType.getValue(),
-                assyIds: MsFilterByAssy.getValue(),
-                getActive: GetActive
-            },
-            "POST")
-            .done($("#ChBoxShowDeleted").bootstrapToggle("enable"))
-    }
+    refreshTblGenWrp(TableMain, "/ComponentSrv/GetByAltIds2",
+        {
+            projectIds: MsFilterByProject.getValue(),
+            typeIds: MsFilterByType.getValue(),
+            assyIds: MsFilterByAssy.getValue(),
+            getActive: GetActive
+        },
+        "POST")
+        .done($("#ChBoxShowDeleted").bootstrapToggle("enable"))
 }
 
 

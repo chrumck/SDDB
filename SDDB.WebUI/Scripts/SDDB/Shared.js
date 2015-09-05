@@ -673,20 +673,20 @@ function updateViewsForModelGeneric(table, url, modelId) {
         .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
+//-----------------------------------------------------------------------------
+
 //opens new window by submitting a form - needed to POST version of window.open
-function openNewWindow(verb, url, data, target) {
+function submitFormFromArray(verb, url, target, dataArray, parameterName) {
     var form = document.createElement("form");
-    form.action = url;
     form.method = verb;
+    form.action = url;
     form.target = target || "_self";
-    if (data) {
-        for (var key in data) {
-            var input = document.createElement("textarea");
-            input.name = key;
-            input.value = typeof data[key] === "object" ? JSON.stringify(data[key]) : data[key];
-            form.appendChild(input);
-        }
-    }
+    $.each(dataArray, function (i, arrayElement) {
+        var input = document.createElement("input");
+        input.name = parameterName + "[" + i + "]";
+        input.value = arrayElement;
+        form.appendChild(input);
+    });
     form.style.display = 'none';
     document.body.appendChild(form);
     form.submit();

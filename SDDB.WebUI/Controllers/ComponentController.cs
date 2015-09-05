@@ -13,9 +13,18 @@ namespace SDDB.WebUI.Controllers
 
         // GET: Component
         [Authorize(Roles = "Component_View")]
-        public ActionResult Index(string assyId = null)
+        public ActionResult Index(string AssemblyId = null)
         {
-            ViewBag.assyId = assyId;
+            ViewBag.AssemblyId = AssemblyId;
+            return View();
+        }
+
+        // POST: Component
+        [HttpPost]
+        [Authorize(Roles = "Component_View")]
+        public ActionResult Index(string[] ComponentIds = null)
+        {
+            ViewBag.ComponentIds = ComponentIds;
             return View();
         }
 

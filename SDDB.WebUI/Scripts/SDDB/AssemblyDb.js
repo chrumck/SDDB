@@ -132,7 +132,7 @@ $(document).ready(function () {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) { showModalSelectOne(); }
-        else { window.open("/Component?assyId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
+        else { window.open("/Component?AssemblyId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
 }
     });
 
@@ -141,7 +141,7 @@ $(document).ready(function () {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) { showModalSelectOne(); }
-        else { window.open("/AssemblyLogEntry?assyId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data()) }
+        else { window.open("/AssemblyLogEntry?AssemblyId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data()) }
     });
 
     //Initialize MagicSuggest MsFilterByType
@@ -305,11 +305,11 @@ $(document).ready(function () {
 
     //--------------------------------------View Initialization------------------------------------//
 
-    if (typeof LocId !== "undefined" && LocId != "") {
+    if (typeof LocationId !== "undefined" && LocationId != "") {
         showModalWait();
         $.ajax({
             type: "POST", url: "/LocationSrv/GetByIds", timeout: 120000,
-            data: { ids: [LocId], getActive: true }, dataType: "json",
+            data: { ids: [LocationId], getActive: true }, dataType: "json",
         })
             .always(hideModalWait)
             .done(function (data) {

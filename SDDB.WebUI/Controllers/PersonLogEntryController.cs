@@ -13,9 +13,9 @@ namespace SDDB.WebUI.Controllers
 
         // GET: PersonLogEntry
         [Authorize(Roles = "PersonLogEntry_View")]
-        public ActionResult Index(string personId = null)
+        public ActionResult Index(string PersonId = null)
         {
-            ViewBag.personId = personId;
+            ViewBag.PersonId = PersonId;
             return View();
         }
 

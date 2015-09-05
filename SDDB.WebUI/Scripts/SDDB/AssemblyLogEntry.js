@@ -267,10 +267,10 @@ $(document).ready(function () {
 
     //--------------------------------------View Initialization------------------------------------//
 
-    if (typeof AssyId !== "undefined" && AssyId != "") {
+    if (typeof AssemblyId !== "undefined" && AssemblyId != "") {
         showModalWait();
         $.ajax({
-            type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 120000, data: { ids: [AssyId], getActive: true }, dataType: "json"})
+            type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 120000, data: { ids: [AssemblyId], getActive: true }, dataType: "json"})
             .always(hideModalWait)
             .done(function (data) {
                 MsFilterByAssembly.setSelection([{ id: data[0].Id, name: data[0].AssyName, }]);

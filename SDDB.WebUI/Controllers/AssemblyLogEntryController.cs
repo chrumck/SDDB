@@ -13,9 +13,9 @@ namespace SDDB.WebUI.Controllers
 
         // GET: AssemblyLogEntry
         [Authorize(Roles = "Assembly_View")]
-        public ActionResult Index(string assyId = null)
+        public ActionResult Index(string AssemblyId = null)
         {
-            ViewBag.assyId = assyId;
+            ViewBag.AssemblyId = AssemblyId;
             return View();
         }
 

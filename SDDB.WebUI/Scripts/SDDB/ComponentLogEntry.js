@@ -208,10 +208,10 @@ $(document).ready(function () {
 
     //--------------------------------------View Initialization------------------------------------//
 
-    if (typeof compId !== "undefined" && compId != "") {
+    if (typeof ComponentId !== "undefined" && ComponentId != "") {
         showModalWait();
         $.ajax({
-            type: "POST", url: "/ComponentSrv/GetByIds", timeout: 120000, data: { ids: [compId], getActive: true }, dataType: "json"})
+            type: "POST", url: "/ComponentSrv/GetByIds", timeout: 120000, data: { ids: [ComponentId], getActive: true }, dataType: "json"})
             .always(function () { $("#ModalWait").modal("hide"); })
             .done(function (data) {
                 MsFilterByComponent.setSelection([{ id: data[0].Id, name: data[0].CompName, }]);

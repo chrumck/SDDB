@@ -13,9 +13,9 @@ namespace SDDB.WebUI.Controllers
 
         // GET: ComponentLogEntry
         [Authorize(Roles = "Component_View")]
-        public ActionResult Index(string compId = null)
+        public ActionResult Index(string ComponentId = null)
         {
-            ViewBag.compId = compId;
+            ViewBag.ComponentId = ComponentId;
             return View();
         }
 

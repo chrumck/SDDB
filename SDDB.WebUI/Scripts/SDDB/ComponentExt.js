@@ -107,7 +107,20 @@ $(document).ready(function () {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) showModalSelectOne();
-        else window.open("/ComponentLogEntry?compId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
+        else window.open("/ComponentLogEntry?ComponentId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
+    });
+
+    //wire up dropdownId6
+    $("#dropdownId6").click(function (event) {
+        event.preventDefault();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
+        }
+        var newWindowName = moment().format("YYYYDDMMHHmmss");
+        window.open("about:blank", newWindowName);
+        submitFormFromArray("POST", "/Component", newWindowName, CurrIds, "ComponentIds");
     });
 
     //Initialize MagicSuggest MsFilterByModel
