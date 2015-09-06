@@ -137,9 +137,9 @@ $(document).ready(function () {
     //---------------------------------------EditFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    addToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "CreatedByPerson_Id", "/PersonSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "ClosedByPerson_Id", "/PersonSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "CreatedByPerson_Id", "/PersonSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "ClosedByPerson_Id", "/PersonSrv/Lookup", 1);
 
     //Enable DateTimePicker
     $("[data-val-dbisdatetimeiso]").datetimepicker({ format: "YYYY-MM-DD HH:mm" })

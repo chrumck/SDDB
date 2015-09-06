@@ -58,7 +58,7 @@ $(document).ready(function () {
                 .always(hideModalWait)
                 .done(function (currRecords) {
                     CurrRecords = currRecords;
-                    disableAllMs(MagicSuggests);
+                    msDisableAll(MagicSuggests);
                     $("#MainView").addClass("hide");
                     $("#EditFormView").removeClass("hide");
                 })
@@ -220,9 +220,9 @@ $(document).ready(function () {
     //---------------------------------------EditFormView----------------------------------------//
       
     //Initialize MagicSuggest Array
-    addToMSArray(MagicSuggests, "AssemblyType_Id", "/AssemblyTypeSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup");
-    addToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "AssemblyType_Id", "/AssemblyTypeSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup");
+    msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
   
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
@@ -273,7 +273,7 @@ function refreshMainView() {
                 getActive: GetActive
             },
             "POST")
-            .done(function myfunction() {
+            .done(function () {
                 $("#ChBoxShowDeleted").bootstrapToggle("enable");
                 MsFilterByProject.enable();
                 updateViewsForModelGeneric(TableMain, "/AssemblyModelSrv/GetByIds", MsFilterByModel.getValue());

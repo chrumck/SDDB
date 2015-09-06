@@ -141,7 +141,7 @@ $(document).ready(function () {
     //---------------------------------------EditFormView----------------------------------------//
 
     ///Initialize MagicSuggest Array
-    addToMSArray(MagicSuggests, "Id", "/PersonSrv/PersonsWoDBUser", 1);
+    msAddToMsArray(MagicSuggests, "Id", "/PersonSrv/PersonsWoDBUser", 1);
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {

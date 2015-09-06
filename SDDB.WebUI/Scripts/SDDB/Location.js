@@ -209,9 +209,9 @@ $(document).ready(function () {
     //---------------------------------------EditFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    addToMSArray(MagicSuggests, "LocationType_Id", "/LocationTypeSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "ContactPerson_Id", "/PersonSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "LocationType_Id", "/LocationTypeSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "ContactPerson_Id", "/PersonSrv/Lookup", 1);
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {

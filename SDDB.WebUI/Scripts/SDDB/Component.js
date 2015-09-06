@@ -97,8 +97,26 @@ $(document).ready(function () {
     $("#dropdownId3").click(function (event) {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
-        if (noOfRows != 1) showModalSelectOne();
-        else window.open("/ComponentLogEntry?ComponentId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
+        if (noOfRows != 1) {
+            showModalSelectOne();
+            return;
+        }
+        window.open("/ComponentLogEntry?ComponentId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
+    });
+
+    //wire up dropdownId4
+    $("#dropdownId4").click(function (event) {
+        event.preventDefault();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
+        }
+        var modelIds = TableMain.cells(".ui-selected", "ComponentModel_Id:name", { page: "current" }).data().toArray();
+        if (!modelIdsAreSame(modelIds)) { return; }
+        var newWindowName = moment().format("YYYYDDMMHHmmss");
+        window.open("about:blank", newWindowName);
+        submitFormFromArray("POST", "/ComponentExt", newWindowName, CurrIds, "ComponentIds");
     });
 
     //Initialize MagicSuggest MsFilterByType
@@ -208,11 +226,11 @@ $(document).ready(function () {
     //---------------------------------------EditFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    addToMSArray(MagicSuggests, "ComponentType_Id", "/ComponentTypeSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "ComponentStatus_Id", "/ComponentStatusSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "ComponentModel_Id", "/ComponentModelSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "ComponentType_Id", "/ComponentTypeSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "ComponentStatus_Id", "/ComponentStatusSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "ComponentModel_Id", "/ComponentModelSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
 
     //Enable DateTimePicker
     $("[data-val-dbisdateiso]").datetimepicker({ format: "YYYY-MM-DD" })
@@ -245,21 +263,8 @@ $(document).ready(function () {
 
     //--------------------------------------View Initialization------------------------------------//
 
-    if (typeof AssemblyId !== "undefined" && AssemblyId != "") {
-        showModalWait();
-        $.ajax({
-            type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 120000,
-            data: { ids: [AssemblyId], getActive: true }, dataType: "json",
-        })
-            .always(hideModalWait)
-            .done(function (data) {
-                MsFilterByAssy.setSelection([{ id: data[0].Id, name: data[0].AssyName, }]);
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    }
-    else { refreshMainView(); }
-
-
+    fillFiltersFromRequestParams().done(refreshMainView);
+    
     $("#InitialView").addClass("hide");
     $("#MainView").removeClass("hide");
 
@@ -278,36 +283,18 @@ function DeleteRecords() {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
-    if (MsFilterByType.getValue().length == 0 &&
-            MsFilterByProject.getValue().length == 0 &&
-            MsFilterByLoc.getValue().length == 0) {
-        $("#ChBoxShowDeleted").bootstrapToggle("disable");
-        TableMain.clear().search("").draw();
-    }
-    else {
-        refreshTblGenWrp(TableMain, "/ComponentSrv/GetByAltIds2",
-            {
-                projectIds: MsFilterByProject.getValue(),
-                typeIds: MsFilterByType.getValue(),
-                locIds: MsFilterByLoc.getValue(),
-                getActive: GetActive
-            },
-            "POST")
-            .done($("#ChBoxShowDeleted").bootstrapToggle("enable"))
-    }
-}
+    TableMain.clear().search("").draw();
 
-function refreshMainView() {
     if (MsFilterByType.getValue().length == 0 &&
         MsFilterByProject.getValue().length == 0 &&
-        MsFilterByAssy.getValue().length == 0) {
-        $("#ChBoxShowDeleted").bootstrapToggle("disable")
-        TableMain.clear().search("").draw();
+        MsFilterByAssy.getValue().length == 0)
+    {
         if (typeof ComponentIds !== "undefined" && ComponentIds != null && ComponentIds.length > 0) {
-            refreshTblGenWrp(TableMain, "/ComponentSrv/GetByIds", { ids: ComponentIds, getActive: true }, "POST");
+            refreshTblGenWrp(TableMain, "/ComponentSrv/GetByIds", { ids: ComponentIds, getActive: GetActive }, "POST");
         }
         return;
     }
+
     refreshTblGenWrp(TableMain, "/ComponentSrv/GetByAltIds2",
         {
             projectIds: MsFilterByProject.getValue(),
@@ -315,10 +302,34 @@ function refreshMainView() {
             assyIds: MsFilterByAssy.getValue(),
             getActive: GetActive
         },
-        "POST")
-        .done($("#ChBoxShowDeleted").bootstrapToggle("enable"))
+        "POST");
 }
 
+//fillFiltersFromRequestParams
+function fillFiltersFromRequestParams() { 
+    var deferred0 = $.Deferred();
+    if (typeof AssemblyId !== "undefined" && AssemblyId != "") {
+        showModalWait();
+        $.ajax({
+            type: "POST",
+            url: "/AssemblyDbSrv/GetByIds",
+            timeout: 120000,
+            data: { ids: [AssemblyId], getActive: true },
+            dataType: "json"
+        })
+            .always(hideModalWait)
+            .done(function (data) {
+                msSetSelectionSilent(MsFilterByAssy, [{ id: data[0].Id, name: data[0].AssyName}]);
+                deferred0.resolve();
+            })
+            .fail(function(xhr, status, error) {
+                showModalAJAXFail(xhr, status, error);
+                deferred0.reject(xhr, status, error);
+            });
+    }
+    else { deferred0.resolve(); }
+    return deferred0.promise();
+}
 
 
 //---------------------------------------Helper Methods--------------------------------------//

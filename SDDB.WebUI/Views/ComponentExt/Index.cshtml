@@ -1,4 +1,5 @@
 ﻿@model SDDB.Domain.Entities.ComponentExt
+@using SDDB.WebUI.Infrastructure
 @{
     ViewBag.Title = "Components Extended";
 }
@@ -39,11 +40,11 @@
     </div>
 
     <div class="panel panel-primary" id="PanelTableMain">
-        <div class="panel-heading text-center" style="font-size:130%">
-            <strong>Components Extended</strong>
+        <div class="panel-heading text-center" style="font-size: 130%; font-weight: bold" >
+            <span id="PanelTableMainTitle">Components Extended</span>
             <div class="pull-right">
                 <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="65"
-                        data-onstyle="warning" data-offstyle="primary" data-on="Deleted" data-off="Active" disabled>
+                       data-onstyle="warning" data-offstyle="primary" data-on="Deleted" data-off="Active">
             </div>
         </div>
         <table class="table table-striped" id="TableMain">
@@ -251,6 +252,10 @@
         </form>
     </div>
 </div>
+
+<!------- ScriptVariables ------->
+
+<script>var ComponentIds = @Html.Raw(@Html.JsonSerialize((object)ViewBag.ComponentIds));</script>
 
 @section Scripts {
     @Scripts.Render("~/bundles/DataTables")

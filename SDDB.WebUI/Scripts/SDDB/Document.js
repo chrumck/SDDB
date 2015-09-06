@@ -175,12 +175,12 @@ $(document).ready(function () {
     //---------------------------------------EditFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    addToMSArray(MagicSuggests, "DocumentType_Id", "/DocumentTypeSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "AuthorPerson_Id", "/PersonSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "ReviewerPerson_Id", "/PersonSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "RelatesToAssyType_Id", "/AssemblyTypeSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "RelatesToCompType_Id", "/ComponentTypeSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "DocumentType_Id", "/DocumentTypeSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "AuthorPerson_Id", "/PersonSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "ReviewerPerson_Id", "/PersonSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "RelatesToAssyType_Id", "/AssemblyTypeSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "RelatesToCompType_Id", "/ComponentTypeSrv/Lookup", 1);
     
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
@@ -225,26 +225,6 @@ function DeleteRecords() {
 }
 
 //refresh view after magicsuggest update
-function refreshMainView() {
-    if (MsFilterByType.getValue().length == 0 &&
-            MsFilterByProject.getValue().length == 0 &&
-            MsFilterByLoc.getValue().length == 0) {
-        $("#ChBoxShowDeleted").bootstrapToggle("disable");
-        TableMain.clear().search("").draw();
-    }
-    else {
-        refreshTblGenWrp(TableMain, "/DocumentSrv/GetByAltIds2",
-            {
-                projectIds: MsFilterByProject.getValue(),
-                typeIds: MsFilterByType.getValue(),
-                locIds: MsFilterByLoc.getValue(),
-                getActive: GetActive
-            },
-            "POST")
-            .done($("#ChBoxShowDeleted").bootstrapToggle("enable"))
-    }
-}
-
 function refreshMainView() {
     if (MsFilterByType.getValue().length == 0 &&
         MsFilterByProject.getValue().length == 0) {

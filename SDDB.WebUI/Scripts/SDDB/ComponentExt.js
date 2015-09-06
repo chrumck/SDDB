@@ -54,11 +54,12 @@ $(document).ready(function () {
         else {
             showModalWait();
             var editFormLabel = "Edit " + MsFilterByModel.getSelection()[0].name;
-            fillFormForEditGeneric(CurrIds, "POST", "/ComponentSrv/GetByIds", GetActive, "EditForm", editFormLabel, MagicSuggests)
+            fillFormForEditGeneric(CurrIds, "POST", "/ComponentSrv/GetByIds", GetActive,
+                    "EditForm", editFormLabel, MagicSuggests)
                 .always(hideModalWait)
                 .done(function (currRecords) {
                     CurrRecords = currRecords;
-                    disableAllMs(MagicSuggests);
+                    msDisableAll(MagicSuggests);
                     $("#MainView").addClass("hide");
                     $("#EditFormView").removeClass("hide");
                 })
@@ -106,8 +107,12 @@ $(document).ready(function () {
     $("#dropdownId5").click(function (event) {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
-        if (noOfRows != 1) showModalSelectOne();
-        else window.open("/ComponentLogEntry?ComponentId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
+        if (noOfRows != 1) {
+            showModalSelectOne();
+            return;
+        }
+        window.open("/ComponentLogEntry?ComponentId=" +
+            TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
     });
 
     //wire up dropdownId6
@@ -174,9 +179,15 @@ $(document).ready(function () {
             { data: "CompName", name: "CompName" },//1
             //------------------------------------------------first set of columns
             { data: "CompAltName", name: "CompAltName" },//2
-            { data: "ComponentType_", render: function (data, type, full, meta) { return data.CompTypeName }, name: "ComponentType_" }, //3
-            { data: "ComponentStatus_", render: function (data, type, full, meta) { return data.CompStatusName }, name: "ComponentStatus_" }, //4
-            { data: "AssignedToProject_", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject_" }, //5
+            { data: "ComponentType_", 
+                render: function (data, type, full, meta) { return data.CompTypeName }, 
+                name: "ComponentType_" }, //3
+            { data: "ComponentStatus_",
+                render: function (data, type, full, meta) { return data.CompStatusName }, 
+                name: "ComponentStatus_" }, //4
+            { data: "AssignedToProject_",
+                render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode },
+                name: "AssignedToProject_" }, //5
             //------------------------------------------------second set of columns
             { data: "Attr01", name: "Attr01" },//6
             { data: "Attr02", name: "Attr02" },//7
@@ -199,10 +210,14 @@ $(document).ready(function () {
             { data: "ComponentType_Id", name: "ComponentType_Id" },//21
             { data: "ComponentStatus_Id", name: "ComponentStatus_Id" },//22
             { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//23
+            { data: "ComponentModel_Id", name: "ComponentModel_Id" },//24
+            { data: "ComponentModel_",
+                render: function (data, type, full, meta) { return data.CompModelName },
+                name: "ComponentModel_" }, //25
         ],
         columnDefs: [
-            { targets: [0, 21, 22, 23], visible: false }, // - never show
-            { targets: [0, 21, 22, 23], searchable: false },  //"orderable": false, "visible": false
+            { targets: [0, 21, 22, 23, 24, 25], visible: false }, // - never show
+            { targets: [0, 21, 22, 23, 24, 25], searchable: false },  //"orderable": false, "visible": false
             { targets: [2, 3, 5], className: "hidden-xs hidden-sm" }, // - first set of columns
             { targets: [], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
 
@@ -233,9 +248,9 @@ $(document).ready(function () {
     //---------------------------------------EditFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    addToMSArray(MagicSuggests, "ComponentType_Id", "/ComponentTypeSrv/Lookup", 1);
-    addToMSArray(MagicSuggests, "ComponentStatus_Id", "/ComponentStatusSrv/Lookup");
-    addToMSArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "ComponentType_Id", "/ComponentTypeSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "ComponentStatus_Id", "/ComponentStatusSrv/Lookup");
+    msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
@@ -261,6 +276,8 @@ $(document).ready(function () {
 
     //--------------------------------------View Initialization------------------------------------//
 
+    refreshMainView();
+
     $("#InitialView").addClass("hide");
     $("#MainView").removeClass("hide");
 
@@ -272,28 +289,51 @@ $(document).ready(function () {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
-    if (MsFilterByModel.getValue().length == 0) {
-        $("#ChBoxShowDeleted").bootstrapToggle("disable");
-        TableMain.clear().search("").draw();
-        MsFilterByProject.disable();
-        MsFilterByProject.clear(true);
-    }
-    else {
-        refreshTblGenWrp(TableMain, "/ComponentSrv/GetByAltIds",
-            {
-                projectIds: MsFilterByProject.getValue(),
-                modelIds: MsFilterByModel.getValue(),
-                getActive: GetActive
-            },
-            "POST")
-            .done(function myfunction() {
-                $("#ChBoxShowDeleted").bootstrapToggle("enable");
-                MsFilterByProject.enable();
-                updateViewsForModelGeneric(TableMain, "/ComponentModelSrv/GetByIds", MsFilterByModel.getValue());
-            });
-    }
-}
+    TableMain.clear().search("").draw();
+    $("#PanelTableMainTitle").text("Components Extended");
 
+    if (MsFilterByModel.getValue().length == 0) {
+        MsFilterByProject.clear(true);
+        MsFilterByProject.disable();
+        if (typeof ComponentIds !== "undefined" && ComponentIds != null && ComponentIds.length > 0) {
+            fillMainTableFromComponentIdsHelper();
+        }
+        return;
+    }
+
+    fillMainTableFromAltIdsHelper();
+}
 
 //---------------------------------------Helper Methods--------------------------------------//
 
+//fillMainTableFromAltIdsHelper - used by refreshMainView
+function fillMainTableFromAltIdsHelper() {
+    refreshTblGenWrp(
+        TableMain,
+        "/ComponentSrv/GetByAltIds",
+        {
+            projectIds: MsFilterByProject.getValue(),
+            modelIds: MsFilterByModel.getValue(),
+            getActive: GetActive
+        },
+        "POST")
+        .done(function () {
+            MsFilterByProject.enable();
+            $("#PanelTableMainTitle").text((MsFilterByModel.getSelection())[0].name);
+            updateViewsForModelGeneric(TableMain, "/ComponentModelSrv/GetByIds", MsFilterByModel.getValue());
+        });
+}
+
+//fillMainTableFromComponentIdsHelper - used by refreshMainView
+function fillMainTableFromComponentIdsHelper() {
+    refreshTblGenWrp(TableMain, "/ComponentSrv/GetByIds", { ids: ComponentIds, getActive: GetActive }, "POST")
+        .done(function () {
+            var modelIds = TableMain.column("ComponentModel_Id:name").data().toArray();
+            if (!modelIdsAreSame(modelIds)) {
+                TableMain.clear().search("").draw();
+                return;
+            }
+            $("#PanelTableMainTitle").text(TableMain.cell(0, "ComponentModel_:name").data().CompModelName);
+            updateViewsForModelGeneric(TableMain, "/ComponentModelSrv/GetByIds", modelIds[0]);
+        });
+}

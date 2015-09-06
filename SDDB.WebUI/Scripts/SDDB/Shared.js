@@ -4,6 +4,7 @@
 /// <reference path="../jquery.validate.unobtrusive.js" />
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
+/// <reference path="../MagicSuggest/magicsuggest.js" />
 
 //---------------------------------------Global Settings-------------------------------------//
 
@@ -263,8 +264,8 @@ function clearFormInputs(formId, msArray) {
 function fillFormForCreateGeneric(formId, msArray, labelText, mainViewId) {
     clearFormInputs(formId, msArray);
     $("#" + formId + "Label").text(labelText);
-    $("#" + formId + " [data-val-dbisunique]").prop("disabled", false); disableUniqueMs(msArray, false);
-    $("#" + formId + " .modifiable").data("ismodified", true); setMsAsModified(msArray, true);
+    $("#" + formId + " [data-val-dbisunique]").prop("disabled", false); msDisableUnique(msArray, false);
+    $("#" + formId + " .modifiable").data("ismodified", true); msSetAsModified(msArray, true);
     $("#" + formId + "GroupIsActive").addClass("hide");
     $("#IsActive").prop("checked", true);
     $("#IsActive_bl").prop("checked", true)
@@ -333,11 +334,11 @@ function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
 
             if (dbEntries.length == 1) {
                 $("[data-val-dbisunique]").prop("disabled", false);
-                disableUniqueMs(msArray, false);
+                msDisableUnique(msArray, false);
             }
             else {
                 $("[data-val-dbisunique]").prop("disabled", true);
-                disableUniqueMs(msArray, true);
+                msDisableUnique(msArray, true);
             }
 
             deferred0.resolve(dbEntries);
@@ -497,8 +498,14 @@ function submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
 
 //-----------------------------------------------------------------------------
 
+//msSetSelectionSilent - version of setSelection not triggering events
+function msSetSelectionSilent(ms, itemsArray) {
+    ms.clear(true);
+    ms.addToSelection(itemsArray, true);
+}
+
 //initialize MagicSuggest and add to MagicSuggest array
-function addToMSArray(msArray, id, url, maxSelection, minChars, dataUrlParams, disabled, editable) {
+function msAddToMsArray(msArray, id, url, maxSelection, minChars, dataUrlParams, disabled, editable) {
 
     disabled = (typeof disabled !== "undefined" && disabled == false) ? false : true;
     editable = (typeof editable !== "undefined" && editable == false) ? false : true;
@@ -569,7 +576,7 @@ function msValidate(msArray) {
 }
 
 //enable or disable DbUnique MagicSuggests
-function disableUniqueMs(msArray, disable) {
+function msDisableUnique(msArray, disable) {
     disable = (typeof disable !== "undefined" && disable == false) ? false : true;
     $.each(msArray, function (i, ms) {
         if (disable == true && typeof ms.dataValDbisunique !== "undefined" && ms.dataValDbisunique == "true") { ms.disable(); }
@@ -578,7 +585,7 @@ function disableUniqueMs(msArray, disable) {
 }
 
 //enable or disable DbUnique MagicSuggests
-function disableAllMs(msArray, disable) {
+function msDisableAll(msArray, disable) {
     disable = (typeof disable !== "undefined" && disable == false) ? false : true;
     $.each(msArray, function (i, ms) {
         if (disable == true) { ms.disable(); }
@@ -587,7 +594,7 @@ function disableAllMs(msArray, disable) {
 }
 
 //set MagicSuggests as modified ot not
-function setMsAsModified(msArray, isModified) {
+function msSetAsModified(msArray, isModified) {
     isModified = (typeof isModified !== "undefined" && isModified == false) ? false : true;
     $.each(msArray, function (i, ms) { ms.isModified = isModified; });
 }
@@ -673,6 +680,17 @@ function updateViewsForModelGeneric(table, url, modelId) {
         .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
+//checkAllEqualInArray - checks if all items in array are same
+function modelIdsAreSame(modelIds) {
+    for (var i in modelIds) {
+        if (modelIds[i] == "" || modelIds[i] == null || modelIds[i] != modelIds[0]) {
+            showModalFail("Error", "Selected records have no models or their models are not the same.");
+            return false;
+        }
+    }
+    return true;
+}
+
 //-----------------------------------------------------------------------------
 
 //opens new window by submitting a form - needed to POST version of window.open
@@ -691,3 +709,7 @@ function submitFormFromArray(verb, url, target, dataArray, parameterName) {
     document.body.appendChild(form);
     form.submit();
 };
+
+
+
+

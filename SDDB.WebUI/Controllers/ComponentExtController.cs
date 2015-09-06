@@ -11,10 +11,19 @@ namespace SDDB.WebUI.Controllers
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
-        // GET: Document
+        // GET: ComponentExt
         [Authorize(Roles = "Component_View")]
         public ActionResult Index()
         {
+            return View();
+        }
+
+        // POST: ComponentExt
+        [HttpPost]
+        [Authorize(Roles = "Component_View")]
+        public ActionResult Index(string[] ComponentIds = null)
+        {
+            ViewBag.ComponentIds = ComponentIds;
             return View();
         }
 
