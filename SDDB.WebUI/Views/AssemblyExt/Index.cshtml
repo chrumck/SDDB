@@ -1,4 +1,5 @@
 ﻿@model SDDB.Domain.Entities.AssemblyExt
+@using SDDB.WebUI.Infrastructure
 @{
     ViewBag.Title = "Assemblies Extended";
 }
@@ -24,6 +25,7 @@
                     <li><a href=# id="dropdownId4">Show 4th Columns</a></li>
                     <li class="divider"></li>
                     <li><a href=# id="dropdownId5">Show Assy. Log</a></li>
+                    <li><a href=# id="dropdownId6">Go to Assemblies </a></li>
                 </ul>
             </div>
         </div>
@@ -38,11 +40,11 @@
     </div>
 
     <div class="panel panel-primary" id="PanelTableMain">
-        <div class="panel-heading text-center" style="font-size:130%">
-            <strong>Assemblies Extended</strong>
+        <div class="panel-heading text-center" style="font-size: 130%; font-weight: bold">
+            <span id="PanelTableMainTitle">Assemblies Extended</span>
             <div class="pull-right">
                 <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="65"
-                        data-onstyle="warning" data-offstyle="primary" data-on="Deleted" data-off="Active" disabled>
+                       data-onstyle="warning" data-offstyle="primary" data-on="Deleted" data-off="Active">
             </div>
         </div>
         <table class="table table-striped" id="TableMain">
@@ -250,6 +252,10 @@
         </form>
     </div>
 </div>
+
+<!------- ScriptVariables ------->
+
+<script>var AssemblyIds = @Html.Raw(@Html.JsonSerialize((object)ViewBag.AssemblyIds));</script>
 
 @section Scripts {
     @Scripts.Render("~/bundles/DataTables")

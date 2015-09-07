@@ -53,9 +53,8 @@ $(document).ready(function () {
         if (CurrIds.length == 0) { showModalNothingSelected(); }
         else {
             showModalWait();
-            var editFormLabel = "Edit " + MsFilterByModel.getSelection()[0].name;
             fillFormForEditGeneric(CurrIds, "POST", "/ComponentSrv/GetByIds", GetActive,
-                    "EditForm", editFormLabel, MagicSuggests)
+                    "EditForm", null, MagicSuggests)
                 .always(hideModalWait)
                 .done(function (currRecords) {
                     CurrRecords = currRecords;
@@ -182,10 +181,10 @@ $(document).ready(function () {
             { data: "ComponentType_", 
                 render: function (data, type, full, meta) { return data.CompTypeName }, 
                 name: "ComponentType_" }, //3
-            { data: "ComponentStatus_",
+            { data: "ComponentStatus_", 
                 render: function (data, type, full, meta) { return data.CompStatusName }, 
                 name: "ComponentStatus_" }, //4
-            { data: "AssignedToProject_",
+            { data: "AssignedToProject_", 
                 render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode },
                 name: "AssignedToProject_" }, //5
             //------------------------------------------------second set of columns
@@ -296,7 +295,7 @@ function refreshMainView() {
         MsFilterByProject.clear(true);
         MsFilterByProject.disable();
         if (typeof ComponentIds !== "undefined" && ComponentIds != null && ComponentIds.length > 0) {
-            fillMainTableFromComponentIdsHelper();
+            fillMainTableFromIdsHelper();
         }
         return;
     }
@@ -308,9 +307,7 @@ function refreshMainView() {
 
 //fillMainTableFromAltIdsHelper - used by refreshMainView
 function fillMainTableFromAltIdsHelper() {
-    refreshTblGenWrp(
-        TableMain,
-        "/ComponentSrv/GetByAltIds",
+    refreshTblGenWrp(TableMain, "/ComponentSrv/GetByAltIds",
         {
             projectIds: MsFilterByProject.getValue(),
             modelIds: MsFilterByModel.getValue(),
@@ -319,13 +316,13 @@ function fillMainTableFromAltIdsHelper() {
         "POST")
         .done(function () {
             MsFilterByProject.enable();
-            $("#PanelTableMainTitle").text((MsFilterByModel.getSelection())[0].name);
-            updateViewsForModelGeneric(TableMain, "/ComponentModelSrv/GetByIds", MsFilterByModel.getValue());
+            updateViewsForModelGeneric(TableMain, "/ComponentModelSrv/GetByIds",
+                MsFilterByModel.getValue(), "PanelTableMainTitle", "EditFormLabel");
         });
 }
 
-//fillMainTableFromComponentIdsHelper - used by refreshMainView
-function fillMainTableFromComponentIdsHelper() {
+//fillMainTableFromIdsHelper - used by refreshMainView
+function fillMainTableFromIdsHelper() {
     refreshTblGenWrp(TableMain, "/ComponentSrv/GetByIds", { ids: ComponentIds, getActive: GetActive }, "POST")
         .done(function () {
             var modelIds = TableMain.column("ComponentModel_Id:name").data().toArray();
@@ -333,7 +330,7 @@ function fillMainTableFromComponentIdsHelper() {
                 TableMain.clear().search("").draw();
                 return;
             }
-            $("#PanelTableMainTitle").text(TableMain.cell(0, "ComponentModel_:name").data().CompModelName);
-            updateViewsForModelGeneric(TableMain, "/ComponentModelSrv/GetByIds", modelIds[0]);
+            updateViewsForModelGeneric(TableMain, "/ComponentModelSrv/GetByIds",
+                modelIds[0], "PanelTableMainTitle", "EditFormLabel");
         });
 }

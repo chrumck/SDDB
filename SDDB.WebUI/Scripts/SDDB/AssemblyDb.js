@@ -63,25 +63,27 @@ $(document).ready(function () {
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) { showModalNothingSelected(); }
-        else {
-            if (GetActive) { $("#EditFormGroupIsActive").addClass("hide"); }
-            else { $("#EditFormGroupIsActive").removeClass("hide"); }
-
-            $("#EditFormCreateMultiple").addClass("hide");
-
-            showModalWait();
-
-            fillFormForEditGeneric(CurrIds, "POST", "/AssemblyDbSrv/GetByIds",
-                    GetActive, "EditForm", "Edit Assembly", MagicSuggests)
-                .always(hideModalWait)
-                .done(function (currRecords) {
-                    CurrRecords = currRecords;
-                    $("#MainView").addClass("hide");
-                    $("#EditFormView").removeClass("hide");
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
         }
+        if (GetActive) { $("#EditFormGroupIsActive").addClass("hide"); }
+        else { $("#EditFormGroupIsActive").removeClass("hide"); }
+
+        $("#EditFormCreateMultiple").addClass("hide");
+
+        showModalWait();
+
+        fillFormForEditGeneric(CurrIds, "POST", "/AssemblyDbSrv/GetByIds",
+                GetActive, "EditForm", "Edit Assembly", MagicSuggests)
+            .always(hideModalWait)
+            .done(function (currRecords) {
+                CurrRecords = currRecords;
+                $("#MainView").addClass("hide");
+                $("#EditFormView").removeClass("hide");
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+
     });
 
     //Wire up BtnDelete 
@@ -127,21 +129,43 @@ $(document).ready(function () {
         TableMain.columns([20, 21, 22, 23, 24, 25]).visible(true);
     });
 
-    //wire up dropdownId5
+    //wire up dropdownId5 - Show Assy Components
     $("#dropdownId5").click(function (event) {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
-        if (noOfRows != 1) { showModalSelectOne(); }
-        else { window.open("/Component?AssemblyId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
-}
+        if (noOfRows != 1) {
+            showModalSelectOne();
+            return;
+        }
+        window.open("/Component?AssemblyId="
+            + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
     });
 
-    //wire up dropdownId6
+    //wire up dropdownId6 - Show Assy Log
     $("#dropdownId6").click(function (event) {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
-        if (noOfRows != 1) { showModalSelectOne(); }
-        else { window.open("/AssemblyLogEntry?AssemblyId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data()) }
+        if (noOfRows != 1) {
+            showModalSelectOne();
+            return;
+        }
+        window.open("/AssemblyLogEntry?AssemblyId="
+            + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
+    });
+
+    //wire up dropdownId7 - Go to Extended
+    $("#dropdownId7").click(function (event) {
+        event.preventDefault();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
+        }
+        var modelIds = TableMain.cells(".ui-selected", "AssemblyModel_Id:name", { page: "current" }).data().toArray();
+        if (!modelIdsAreSame(modelIds)) { return; }
+        var newWindowName = moment().format("YYYYDDMMHHmmss");
+        window.open("about:blank", newWindowName);
+        submitFormFromArray("POST", "/AssemblyExt", newWindowName, CurrIds, "AssemblyIds");
     });
 
     //Initialize MagicSuggest MsFilterByType
@@ -282,7 +306,8 @@ $(document).ready(function () {
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
         $("#MainView").removeClass("hide");
-        $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
+        $("#EditFormView").addClass("hide");
+        window.scrollTo(0, 0);
     });
 
     //Wire Up EditFormBtnOk
@@ -305,18 +330,8 @@ $(document).ready(function () {
 
     //--------------------------------------View Initialization------------------------------------//
 
-    if (typeof LocationId !== "undefined" && LocationId != "") {
-        showModalWait();
-        $.ajax({
-            type: "POST", url: "/LocationSrv/GetByIds", timeout: 120000,
-            data: { ids: [LocationId], getActive: true }, dataType: "json",
-        })
-            .always(hideModalWait)
-            .done(function (data) {
-                MsFilterByLoc.setSelection([{ id: data[0].Id, name: data[0].LocName, }]);
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    }
+    fillFiltersFromRequestParams().done(refreshMainView);
+
     $("#InitialView").addClass("hide");
     $("#MainView").removeClass("hide");
 
@@ -335,26 +350,53 @@ function DeleteRecords() {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
+    TableMain.clear().search("").draw();
+
     if (MsFilterByType.getValue().length == 0 &&
-            MsFilterByProject.getValue().length == 0 &&
-            MsFilterByLoc.getValue().length == 0) {
-        $("#ChBoxShowDeleted").bootstrapToggle("disable");
-        TableMain.clear().search("").draw();
+        MsFilterByProject.getValue().length == 0 &&
+        MsFilterByLoc.getValue().length == 0)
+    {
+        if (typeof AssemblyIds !== "undefined" && AssemblyIds != null && AssemblyIds.length > 0) {
+            refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByIds", { ids: AssemblyIds, getActive: GetActive }, "POST");
+        }
+        return;
     }
-    else {
-        refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByAltIds2",
-            {
-                projectIds: MsFilterByProject.getValue(),
-                typeIds: MsFilterByType.getValue(),
-                locIds: MsFilterByLoc.getValue(),
-                getActive: GetActive
-            },
-            "POST")
-            .done($("#ChBoxShowDeleted").bootstrapToggle("enable"))
+
+    refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByAltIds2",
+        {
+            projectIds: MsFilterByProject.getValue(),
+            typeIds: MsFilterByType.getValue(),
+            locIds: MsFilterByLoc.getValue(),
+            getActive: GetActive
+        },
+        "POST")
+}
+
+//fillFiltersFromRequestParams
+function fillFiltersFromRequestParams() {
+    var deferred0 = $.Deferred();
+    if (typeof LocationId !== "undefined" && LocationId != "") {
+        showModalWait();
+        $.ajax({
+            type: "POST",
+            url: "/LocationSrv/GetByIds",
+            timeout: 120000,
+            data: { ids: [LocationId], getActive: true },
+            dataType: "json"
+        })
+            .always(hideModalWait)
+            .done(function (data) {
+                msSetSelectionSilent(MsFilterByLoc, [{ id: data[0].Id, name: data[0].LocName }]);
+                deferred0.resolve();
+            })
+            .fail(function (xhr, status, error) {
+                showModalAJAXFail(xhr, status, error);
+                deferred0.reject(xhr, status, error);
+            });
     }
+    else { deferred0.resolve(); }
+    return deferred0.promise();
 }
 
 
-
 //---------------------------------------Helper Methods--------------------------------------//
-

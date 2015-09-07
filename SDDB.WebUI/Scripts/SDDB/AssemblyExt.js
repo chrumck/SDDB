@@ -53,8 +53,8 @@ $(document).ready(function () {
         if (CurrIds.length == 0) { showModalNothingSelected(); }
         else {
             showModalWait();
-            var editFormLabel = "Edit " + MsFilterByModel.getSelection()[0].name;
-            fillFormForEditGeneric(CurrIds, "POST", "/AssemblyDbSrv/GetByIds", GetActive, "EditForm", editFormLabel, MagicSuggests)
+            fillFormForEditGeneric(CurrIds, "POST", "/AssemblyDbSrv/GetByIds", GetActive,
+	     "EditForm", null, MagicSuggests)
                 .always(hideModalWait)
                 .done(function (currRecords) {
                     CurrRecords = currRecords;
@@ -106,8 +106,25 @@ $(document).ready(function () {
     $("#dropdownId5").click(function (event) {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
-        if (noOfRows != 1) { showModalSelectOne(); }
-        else { window.open("/AssemblyLogEntry?AssemblyId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data()) }
+        if (noOfRows != 1) {
+            showModalSelectOne();
+            return;
+        }
+        window.open("/AssemblyLogEntry?AssemblyId=" +
+            TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
+    });
+
+    //wire up dropdownId6
+    $("#dropdownId6").click(function (event) {
+        event.preventDefault();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
+        }
+        var newWindowName = moment().format("YYYYDDMMHHmmss");
+        window.open("about:blank", newWindowName);
+        submitFormFromArray("POST", "/AssemblyDb", newWindowName, CurrIds, "AssemblyIds");
     });
 
     //Initialize MagicSuggest MsFilterByModel
@@ -161,9 +178,15 @@ $(document).ready(function () {
             { data: "AssyName", name: "AssyName" },//1
             //------------------------------------------------first set of columns
             { data: "AssyAltName", name: "AssyAltName" },//2
-            { data: "AssemblyType_", render: function (data, type, full, meta) { return data.AssyTypeName }, name: "AssemblyType_" }, //3
-            { data: "AssemblyStatus_", render: function (data, type, full, meta) { return data.AssyStatusName }, name: "AssemblyStatus_" }, //4
-            { data: "AssignedToProject_", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject_" }, //5
+            {data: "AssemblyType_",
+                render: function (data, type, full, meta) { return data.AssyTypeName },
+                name: "AssemblyType_"}, //3
+            {data: "AssemblyStatus_",
+                render: function (data, type, full, meta) { return data.AssyStatusName },
+                name: "AssemblyStatus_"}, //4
+            {data: "AssignedToProject_",
+                render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode },
+                name: "AssignedToProject_"}, //5
             //------------------------------------------------second set of columns
             { data: "Attr01", name: "Attr01" },//6
             { data: "Attr02", name: "Attr02" },//7
@@ -186,10 +209,14 @@ $(document).ready(function () {
             { data: "AssemblyType_Id", name: "AssemblyType_Id" },//21
             { data: "AssemblyStatus_Id", name: "AssemblyStatus_Id" },//22
             { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//23
+            { data: "AssemblyModel_Id", name: "AssemblyModel_Id" },//24
+            { data: "AssemblyModel_",
+                render: function (data, type, full, meta) { return data.AssyModelName },
+                name: "AssemblyModel_" }, //25
         ],
         columnDefs: [
-            { targets: [0, 21, 22, 23], visible: false }, // - never show
-            { targets: [0, 21, 22, 23], searchable: false },  //"orderable": false, "visible": false
+            { targets: [0, 21, 22, 23, 24, 25], visible: false }, // - never show
+            { targets: [0, 21, 22, 23, 24, 25], searchable: false },  //"orderable": false, "visible": false
             { targets: [2, 3, 5], className: "hidden-xs hidden-sm" }, // - first set of columns
             { targets: [], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
 
@@ -247,7 +274,9 @@ $(document).ready(function () {
     });
 
     //--------------------------------------View Initialization------------------------------------//
-        
+
+    refreshMainView();
+
     $("#InitialView").addClass("hide");
     $("#MainView").removeClass("hide");
 
@@ -259,28 +288,50 @@ $(document).ready(function () {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
+    TableMain.clear().search("").draw();
+    $("#PanelTableMainTitle").text("Assemblies Extended");
+    
     if (MsFilterByModel.getValue().length == 0) {
-        $("#ChBoxShowDeleted").bootstrapToggle("disable");
-        TableMain.clear().search("").draw();
-        MsFilterByProject.disable();
         MsFilterByProject.clear(true);
+        MsFilterByProject.disable();
+        if (typeof AssemblyIds !== "undefined" && AssemblyIds != null && AssemblyIds.length > 0) {
+            fillMainTableFromIdsHelper();
+        }
+        return;
     }
-    else {
-        refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByAltIds",
-            {
-                projectIds: MsFilterByProject.getValue(),
-                modelIds: MsFilterByModel.getValue(),
-                getActive: GetActive
-            },
-            "POST")
-            .done(function () {
-                $("#ChBoxShowDeleted").bootstrapToggle("enable");
-                MsFilterByProject.enable();
-                updateViewsForModelGeneric(TableMain, "/AssemblyModelSrv/GetByIds", MsFilterByModel.getValue());
-            });
-    }
+
+    fillMainTableFromAltIdsHelper();
 }
 
 
 //---------------------------------------Helper Methods--------------------------------------//
 
+//fillMainTableFromAltIdsHelper - used by refreshMainView
+function fillMainTableFromAltIdsHelper() {
+    refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByAltIds",
+        {
+            projectIds: MsFilterByProject.getValue(),
+            modelIds: MsFilterByModel.getValue(),
+            getActive: GetActive
+        },
+        "POST")
+        .done(function () {
+            MsFilterByProject.enable();
+            updateViewsForModelGeneric(TableMain, "/AssemblyModelSrv/GetByIds",
+                MsFilterByModel.getValue(), "PanelTableMainTitle", "EditFormLabel");
+        });
+}
+
+//fillMainTableFromIdsHelper - used by refreshMainView
+function fillMainTableFromIdsHelper() {
+    refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByIds", { ids: AssemblyIds, getActive: GetActive }, "POST")
+        .done(function () {
+            var modelIds = TableMain.column("AssemblyModel_Id:name").data().toArray();
+            if (!modelIdsAreSame(modelIds)) {
+                TableMain.clear().search("").draw();
+                return;
+            }
+            updateViewsForModelGeneric(TableMain, "/AssemblyModelSrv/GetByIds",
+                modelIds[0], "PanelTableMainTitle", "EditFormLabel");
+        });
+}

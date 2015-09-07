@@ -1,4 +1,5 @@
 ﻿@model SDDB.Domain.Entities.AssemblyDb
+@using SDDB.WebUI.Infrastructure
 @{
     ViewBag.Title = "Assemblies";
 }
@@ -27,6 +28,7 @@
                     <li class="divider"></li>
                     <li><a href=# id="dropdownId5">Show Assy Components</a></li>
                     <li><a href=# id="dropdownId6">Show Assy Log</a></li>
+                    <li><a href=# id="dropdownId7">Go to Extended</a></li>
                 </ul>
             </div>
         </div>
@@ -48,7 +50,7 @@
             <strong>Assemblies</strong>
             <div class="pull-right">
                 <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="65" 
-                       data-onstyle="warning" data-offstyle="primary" data-on="Deleted" data-off="Active" disabled>
+                       data-onstyle="warning" data-offstyle="primary" data-on="Deleted" data-off="Active">
             </div>
         </div>
         <table class="table table-striped" id="TableMain">
@@ -328,6 +330,7 @@
 <!------- ScriptVariables ------->
 
 <script>var LocationId = "@ViewBag.LocationId";</script>
+<script>var AssemblyIds = @Html.Raw(@Html.JsonSerialize((object)ViewBag.AssemblyIds));</script>
 
 @section Scripts {
     @Scripts.Render("~/bundles/DataTables")

@@ -280,7 +280,7 @@ function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
     var deferred0 = $.Deferred();
 
     clearFormInputs(formId, msArray);
-    $("#" + formId + "Label").text(labelText);
+    if (labelText) {$("#" + formId + "Label").text(labelText);}
 
     $.ajax({ type: httpType, url: url, timeout: 120000, data: { ids: ids, getActive: getActive }, dataType: "json" })
         .done(function (dbEntries) {
@@ -602,11 +602,15 @@ function msSetAsModified(msArray, isModified) {
 //-----------------------------------------------------------------------------
 
 //Pulls Model Information and formats edit form and column names
-function updateViewsForModelGeneric(table, url, modelId) {
+function updateViewsForModelGeneric(table, url, modelId, tableTitleId, editFormLabelId) {
     showModalWait();
     $.ajax({ type: "POST", url: url, timeout: 120000, data: { ids: [modelId] }, dataType: "json" })
         .always(hideModalWait)
         .done(function (data) {
+            var modelName = (data[0].CompModelName) ? data[0].CompModelName : data[0].AssyModelName;
+            if (tableTitleId) { $("#" + tableTitleId).text(modelName); }
+            if (editFormLabelId) { $("#" + editFormLabelId).text("Edit " + modelName); }
+
             for (var prop in data[0]) {
                 if (prop.indexOf("Attr") != -1 && prop.indexOf("Desc") != -1) {
 

@@ -62,7 +62,8 @@ $(document).ready(function () {
 
         showModalWait();
 
-        fillFormForEditGeneric(CurrIds, "POST", "/ComponentSrv/GetByIds", GetActive, "EditForm", "Edit Component", MagicSuggests)
+        fillFormForEditGeneric(CurrIds, "POST", "/ComponentSrv/GetByIds",
+                GetActive, "EditForm", "Edit Component", MagicSuggests)
             .always(hideModalWait)
             .done(function (currRecords) {
                 CurrRecords = currRecords;
@@ -93,7 +94,7 @@ $(document).ready(function () {
         TableMain.columns([8, 9, 10, 11, 12, 13]).visible(true);
     });
 
-    //wire up dropdownId3
+    //wire up dropdownId3 - Show Comp. Log
     $("#dropdownId3").click(function (event) {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
@@ -101,10 +102,11 @@ $(document).ready(function () {
             showModalSelectOne();
             return;
         }
-        window.open("/ComponentLogEntry?ComponentId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
+        window.open("/ComponentLogEntry?ComponentId=" +
+            TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
     });
 
-    //wire up dropdownId4
+    //wire up dropdownId4 - Go to Extended
     $("#dropdownId4").click(function (event) {
         event.preventDefault();
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
