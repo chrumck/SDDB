@@ -325,8 +325,10 @@ function fillMainTableFromAltIdsHelper() {
 function fillMainTableFromIdsHelper() {
     refreshTblGenWrp(TableMain, "/ComponentSrv/GetByIds", { ids: ComponentIds, getActive: GetActive }, "POST")
         .done(function () {
+            if (TableMain.rows().data().length == 0) { return; }
             var modelIds = TableMain.column("ComponentModel_Id:name").data().toArray();
-            if (!modelIdsAreSame(modelIds)) {
+            if(!modelIdsAreSame(modelIds)) {
+                showModalFail("Error", "Selected records have no models or their models are not the same.");
                 TableMain.clear().search("").draw();
                 return;
             }

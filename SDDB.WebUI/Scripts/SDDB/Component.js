@@ -115,7 +115,10 @@ $(document).ready(function () {
             return;
         }
         var modelIds = TableMain.cells(".ui-selected", "ComponentModel_Id:name", { page: "current" }).data().toArray();
-        if (!modelIdsAreSame(modelIds)) { return; }
+        if (!modelIdsAreSame(modelIds)) {
+            showModalFail("Error", "Selected records have no models or their models are not the same.");
+            return;
+        }
         var newWindowName = moment().format("YYYYDDMMHHmmss");
         window.open("about:blank", newWindowName);
         submitFormFromArray("POST", "/ComponentExt", newWindowName, CurrIds, "ComponentIds");

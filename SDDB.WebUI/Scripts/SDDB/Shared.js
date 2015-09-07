@@ -686,9 +686,11 @@ function updateViewsForModelGeneric(table, url, modelId, tableTitleId, editFormL
 
 //checkAllEqualInArray - checks if all items in array are same
 function modelIdsAreSame(modelIds) {
+    if (!modelIds || modelIds.length == 0) {
+        return false;
+    }
     for (var i in modelIds) {
         if (modelIds[i] == "" || modelIds[i] == null || modelIds[i] != modelIds[0]) {
-            showModalFail("Error", "Selected records have no models or their models are not the same.");
             return false;
         }
     }

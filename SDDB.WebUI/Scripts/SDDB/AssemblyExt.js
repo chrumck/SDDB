@@ -326,8 +326,10 @@ function fillMainTableFromAltIdsHelper() {
 function fillMainTableFromIdsHelper() {
     refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByIds", { ids: AssemblyIds, getActive: GetActive }, "POST")
         .done(function () {
+            if (TableMain.rows().data().length == 0) { return; }
             var modelIds = TableMain.column("AssemblyModel_Id:name").data().toArray();
             if (!modelIdsAreSame(modelIds)) {
+                showModalFail("Error", "Selected records have no models or their models are not the same.");
                 TableMain.clear().search("").draw();
                 return;
             }
