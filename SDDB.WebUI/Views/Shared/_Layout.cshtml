@@ -22,32 +22,33 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" rel="home" href="@Url.Action("Index","Home",null)" title="SDDB Home">
+                <a class="navbar-brand" rel="home" href="@Url.Action("Index", "Home", null)" title="SDDB Home">
                     <img style="margin-top: -14px;" src="~/Images/SDDB_Home.png" />
                 </a>
             </div>
-
             <div class="navbar-collapse collapse">
+                @*
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="#" title="SDDB Help">
+                            <img src="~/Images/SDDB_help.png" />
+                        </a>
+                    </li>
+                </ul>    
+                *@
 
                 @RenderSection("NavbarCollapse", required: false)
 
-                @*
-                    <ul class="nav navbar-nav">
-                        <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Common Tasks <span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#">Your Activity</a></li>
-                                <li><a href="#">Your Activity</a></li>
-                                <li><a href="#">Your Activity</a></li>
-                            </ul>
-                        </li>
-                        <li><a href="#"></a></li>
-                    </ul>
-                *@
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="@Url.Action("Logout","DBUSer",null)" title="Click to Log Out">
-                        <strong style="color:red">@Html.GetUserFullName()</strong>&nbsp;&nbsp;
-                        <span class="glyphicon glyphicon-log-out"></span></a></li>
+                    <li>
+                        <a href="@Url.Action("Logout","DBUSer",null)" title="Click to Log Out">
+                            <strong style="color:red">@Html.GetUserFullName()</strong>&nbsp;&nbsp;
+                            <span class="glyphicon glyphicon-log-out"></span>
+                        </a>
+                    </li>
+
+                    
+
                 </ul>
             </div>
         </div>
