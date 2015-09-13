@@ -50,9 +50,8 @@ $(document).ready(function () {
         }
 
         showModalWait();
-
         fillFormForEditGeneric(CurrIds, "POST", "/DBUserSrv/GetByIds", null, "EditForm", "Edit SDDB User", MagicSuggests)
-            .always(function () { $("#ModalWait").modal("hide"); })
+            .always(hideModalWait)
             .done(function (currRecords) {
                 CurrRecords = currRecords;
 
@@ -69,8 +68,8 @@ $(document).ready(function () {
                 MagicSuggests[0].disable();
                 //---------------------------------------------------------------
 
-                $("#MainView").addClass("hide");
-                $("#EditFormView").removeClass("hide");
+                $("#MainView").addClass("hidden");
+                $("#EditFormView").removeClass("hidden");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
@@ -99,10 +98,10 @@ $(document).ready(function () {
 
         fillFormForRelatedGeneric(TableDBRolesAdd, TableDBRolesRemove, CurrIds, "GET", "/DBUserSrv/GetUserRoles", { id: CurrIds[0] },
         "GET", "/DBUserSrv/GetUserRolesNot", { id: CurrIds[0] }, "GET", "/DBUserSrv/GetAllRoles", null, 0)
-            .always(function () { $("#ModalWait").modal("hide"); })
+            .always(hideModalWait)
             .done(function () {
-                $("#MainView").addClass("hide");
-                $("#DBRolesView").removeClass("hide");
+                $("#MainView").addClass("hidden");
+                $("#DBRolesView").removeClass("hidden");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 
@@ -145,8 +144,8 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hide");
-        $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
+        $("#MainView").removeClass("hidden");
+        $("#EditFormView").addClass("hidden");
         window.scrollTo(0, 0);
     });
 
@@ -167,11 +166,11 @@ $(document).ready(function () {
             }
            
             submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/DbUserSrv/Edit")
-                .always(function () { $("#ModalWait").modal("hide"); })
+                .always(hideModalWait)
                 .done(function () {
                     refreshMainView();
-                    $("#MainView").removeClass("hide");
-                    $("#EditFormView").addClass("hide");
+                    $("#MainView").removeClass("hidden");
+                    $("#EditFormView").addClass("hidden");
                     window.scrollTo(0, 0);
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
@@ -182,8 +181,8 @@ $(document).ready(function () {
 
     //Wire Up DBRolesViewBtnCancel
     $("#DBRolesViewBtnCancel, #DBRolesViewBtnBack").click(function () {
-        $("#MainView").removeClass("hide");
-        $("#DBRolesView").addClass("hide");
+        $("#MainView").removeClass("hidden");
+        $("#DBRolesView").addClass("hidden");
         window.scrollTo(0, 0);
     });
 
@@ -202,8 +201,8 @@ $(document).ready(function () {
                 "/DBUserSrv/EditRoles")
             .always(hideModalWait)
             .done(function () {
-                $("#MainView").removeClass("hide");
-                $("#DBRolesView").addClass("hide");
+                $("#MainView").removeClass("hidden");
+                $("#DBRolesView").addClass("hidden");
                 window.scrollTo(0, 0);
                 refreshMainView();
             })
@@ -250,8 +249,8 @@ $(document).ready(function () {
     //--------------------------------------View Initialization------------------------------------//
 
     refreshMainView();
-    $("#InitialView").addClass("hide");
-    $("#MainView").removeClass("hide");
+    $("#InitialView").addClass("hidden");
+    $("#MainView").removeClass("hidden");
 
     //--------------------------------End of execution at Start-----------
 });

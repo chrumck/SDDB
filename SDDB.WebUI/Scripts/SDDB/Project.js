@@ -43,8 +43,8 @@ $(document).ready(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) showModalNothingSelected();
         else {
-            if (GetActive) $("#EditFormGroupIsActive").addClass("hide");
-            else $("#EditFormGroupIsActive").removeClass("hide");
+            if (GetActive) $("#EditFormGroupIsActive").addClass("hidden");
+            else $("#EditFormGroupIsActive").removeClass("hidden");
 
             showModalWait();
 
@@ -52,8 +52,8 @@ $(document).ready(function () {
                 .always(hideModalWait)
                 .done(function (currRecords) {
                     CurrRecords = currRecords;
-                    $("#MainView").addClass("hide");
-                    $("#EditFormView").removeClass("hide");
+                    $("#MainView").addClass("hidden");
+                    $("#EditFormView").removeClass("hidden");
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
         }
@@ -85,8 +85,8 @@ $(document).ready(function () {
                 "GET", "/PersonSrv/GetAll", { getActive: true })
                 .always(hideModalWait)
                 .done(function () {
-                    $("#MainView").addClass("hide");
-                    $("#ProjectPersonsView").removeClass("hide");
+                    $("#MainView").addClass("hidden");
+                    $("#ProjectPersonsView").removeClass("hidden");
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
         }
@@ -152,8 +152,8 @@ $(document).ready(function () {
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
         IsCreate = false;
-        $("#MainView").removeClass("hide");
-        $("#EditFormView").addClass("hide");
+        $("#MainView").removeClass("hidden");
+        $("#EditFormView").addClass("hidden");
         window.scrollTo(0, 0);
     });
 
@@ -167,8 +167,8 @@ $(document).ready(function () {
             submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/ProjectSrv/Edit")
                 .always(hideModalWait)
                 .done(function () {
-                    $("#MainView").removeClass("hide");
-                    $("#EditFormView").addClass("hide");
+                    $("#MainView").removeClass("hidden");
+                    $("#EditFormView").addClass("hidden");
                     window.scrollTo(0, 0);
                     refreshMainView();
                 })
@@ -180,8 +180,8 @@ $(document).ready(function () {
 
     //Wire Up ProjectPersonsViewBtnCancel
     $("#ProjectPersonsViewBtnCancel, #ProjectPersonsViewBtnBack").click(function () {
-        $("#MainView").removeClass("hide");
-        $("#ProjectPersonsView").addClass("hide");
+        $("#MainView").removeClass("hidden");
+        $("#ProjectPersonsView").addClass("hidden");
         window.scrollTo(0, 0);
     });
 
@@ -200,8 +200,8 @@ $(document).ready(function () {
                     "/ProjectSrv/EditProjectPersons")
                 .always(hideModalWait)
                 .done(function () {
-                    $("#MainView").removeClass("hide");
-                    $("#ProjectPersonsView").addClass("hide");
+                    $("#MainView").removeClass("hidden");
+                    $("#ProjectPersonsView").addClass("hidden");
                     window.scrollTo(0, 0);
                     refreshMainView();
                 })
@@ -265,8 +265,8 @@ $(document).ready(function () {
 
     refreshMainView();
 
-    $("#InitialView").addClass("hide");
-    $("#MainView").removeClass("hide");
+    $("#InitialView").addClass("hidden");
+    $("#MainView").removeClass("hidden");
 
     //--------------------------------End of execution at Start-----------
 });

@@ -44,8 +44,8 @@ $(document).ready(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) showModalNothingSelected();
         else {
-            if (GetActive) $("#EditFormGroupIsActive").addClass("hide");
-            else $("#EditFormGroupIsActive").removeClass("hide");
+            if (GetActive) $("#EditFormGroupIsActive").addClass("hidden");
+            else $("#EditFormGroupIsActive").removeClass("hidden");
 
             if (CurrIds.length > 1) $("#EditFormBtnOkFiles").addClass("disabled");
             else $("#EditFormBtnOkFiles").removeClass("disabled");
@@ -71,8 +71,8 @@ $(document).ready(function () {
                 })
                 .always(hideModalWait)
                 .done(function () {
-                    $("#MainView").addClass("hide");
-                    $("#EditFormView").removeClass("hide");
+                    $("#MainView").addClass("hidden");
+                    $("#EditFormView").removeClass("hidden");
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
         }
@@ -263,8 +263,8 @@ $(document).ready(function () {
         refreshMainView();
     }
 
-    $("#InitialView").addClass("hide");
-    $("#MainView").removeClass("hide");
+    $("#InitialView").addClass("hidden");
+    $("#MainView").removeClass("hidden");
     
 
     //--------------------------------End of execution at Start-----------

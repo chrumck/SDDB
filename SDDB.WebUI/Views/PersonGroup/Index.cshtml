@@ -8,7 +8,7 @@
 </div>
 
 <!------- MainView ------->
-<div class="container-fluid hide" id="MainView">
+<div class="container-fluid hidden" id="MainView">
 
     <div class="row">
         <div class="col-xs-12">
@@ -50,7 +50,7 @@
 </div>
 
 <!------- EditFormView ------->
-<div class="container-fluid hide" id="EditFormView">
+<div class="container-fluid hidden" id="EditFormView">
     <div class="row">
         <div class="col-xs-6">
             <h3 id="EditFormLabel">Create/Edit Person Group</h3>
@@ -88,7 +88,7 @@
                             @Html.ValidationMessageFor(x => x.Comments)
                         </div>
                     </div>
-                    <div class="form-group hide" id="EditFormGroupIsActive">
+                    <div class="form-group hidden" id="EditFormGroupIsActive">
                         <div class="col-sm-10 col-sm-offset-2">
                             @Html.CheckBoxFor(x => x.IsActive_bl, new { @class = "modifiable" }) &nbsp;&nbsp;
                             @Html.LabelFor(x => x.IsActive_bl, "Is Active") &nbsp;&nbsp; <em>(Marking as 'Active' un-deletes record.)</em>
@@ -112,7 +112,7 @@
 </div>
 
 <!------- GroupPersonsView ------->
-<div class="container-fluid hide" id="GroupPersonsView">
+<div class="container-fluid hidden" id="GroupPersonsView">
     <div class="row">
         <div class="col-xs-12 col-sm-5">
             <h3 id="GroupPersonsViewLabel">Add/Remove Group Persons</h3>
@@ -132,7 +132,7 @@
                 <div class="panel panel-primary">
                     <div class="panel-heading" style="font-weight:bold">Add</div>
                     <table class="table table-striped" id="TableGroupPersonsAdd">
-                        <thead class="hide">
+                        <thead class="hidden">
                             <tr>
                                 <th>ID</th>
                                 <th>Last Name</th>
@@ -148,7 +148,7 @@
                 <div class="panel panel-primary">
                     <div class="panel-heading" style="font-weight:bold">Remove</div>
                     <table class="table table-striped" id="TableGroupPersonsRemove">
-                        <thead class="hide">
+                        <thead class="hidden">
                             <tr>
                                 <th>ID</th>
                                 <th>Last Name</th>
@@ -175,7 +175,7 @@
 </div>
 
 <!------- GroupManagersView ------->
-<div class="container-fluid hide" id="GroupManagersView">
+<div class="container-fluid hidden" id="GroupManagersView">
     <div class="row">
         <div class="col-xs-12 col-sm-5">
             <h3 id="GroupManagersViewLabel">Add/Remove Group Managers</h3>
@@ -195,7 +195,7 @@
                 <div class="panel panel-primary">
                     <div class="panel-heading" style="font-weight:bold">Add</div>
                     <table class="table table-striped" id="TableGroupManagersAdd">
-                        <thead class="hide">
+                        <thead class="hidden">
                             <tr>
                                 <th>ID</th>
                                 <th>Last Name</th>
@@ -211,7 +211,7 @@
                 <div class="panel panel-primary">
                     <div class="panel-heading" style="font-weight:bold">Remove</div>
                     <table class="table table-striped" id="TableGroupManagersRemove">
-                        <thead class="hide">
+                        <thead class="hidden">
                             <tr>
                                 <th>ID</th>
                                 <th>Last Name</th>

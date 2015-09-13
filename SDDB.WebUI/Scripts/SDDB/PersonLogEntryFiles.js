@@ -32,8 +32,8 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#LogEntryFilesViewBtnCancel, #LogEntryFilesViewBtnBack").click(function () {
-        $("#MainView").removeClass("hide");
-        $("#LogEntryFilesView").addClass("hide");
+        $("#MainView").removeClass("hidden");
+        $("#LogEntryFilesView").addClass("hidden");
         window.scrollTo(0, 0);
         if (FilesAreChanged) {
             refreshMainView();
@@ -213,8 +213,8 @@ function fillLogEntryFilesForm(panelText) {
     refreshTableGeneric(TableLogEntryFiles, "/PersonLogEntrySrv/ListFiles", { logEntryId: CurrIds[0] }, "GET")
         .always(hideModalWait)
         .done(function () {
-            $("#MainView").addClass("hide");
-            $("#LogEntryFilesView").removeClass("hide");
+            $("#MainView").addClass("hidden");
+            $("#LogEntryFilesView").removeClass("hidden");
             deferred0.resolve();
         })
         .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); deferred0.reject(); });

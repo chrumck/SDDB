@@ -24,6 +24,10 @@ $(document).ready(function () {
     //Enable modified field detection
     $(".modifiable").change(function () { $(this).data("ismodified", true); });
 
+    //collapse navbar if any menu item with collapsenav class clicked
+    $(".collapsenav").on("click", function () {
+        $(".navbar-collapse").collapse("hide");
+    });
 
 });
 
@@ -57,7 +61,6 @@ $.validator.addMethod("dbisdatetimeiso", function (value, element, valParams) {
     return true;
 });
 
-
 //---------------------------------------Modal Dialogs---------------------------------------//
 
 $(document).ready(function () {
@@ -76,7 +79,6 @@ $(document).ready(function () {
 
 });
 
-
 //------------------------------------Common Main Methods----------------------------------//
 
 //Show Modal Nothing Selected
@@ -84,7 +86,7 @@ function showModalNothingSelected(bodyText) {
     $("#ModalInfoLabel").text("Nothing Selected");
     if (typeof bodyText !== "undefined") { $("#ModalInfoBody").text(bodyText); }
     else { $("#ModalInfoBody").text("Please select one or more rows."); }
-    $("#ModalInfoBodyPre").empty().hide();
+    $("#ModalInfoBodyPre").empty().addClass("hidden");
     $("#ModalInfo").modal("show");
 }
 
@@ -93,7 +95,7 @@ function showModalSelectOne(bodyText) {
     $("#ModalInfoLabel").text("Select One Row");
     if (typeof bodyText !== "undefined") { $("#ModalInfoBody").text(bodyText); }
     else { $("#ModalInfoBody").text("Please select one row."); }
-    $("#ModalInfoBodyPre").empty().hide();
+    $("#ModalInfoBodyPre").empty().addClass("hidden");
     $("#ModalInfo").modal("show");
 }
 
@@ -131,8 +133,8 @@ function showModalFail(label, body, bodyPre) {
   
     $("#ModalInfoLabel").text(label);
     $("#ModalInfoBody").html(body);
-    if (bodyPre != "") { $("#ModalInfoBodyPre").text(bodyPre).show(); }
-    else { $("#ModalInfoBodyPre").hide(); }
+    if (bodyPre != "") { $("#ModalInfoBodyPre").text(bodyPre).removeClass("hidden"); }
+    else { $("#ModalInfoBodyPre").addClass("hidden"); }
     $("#ModalInfo").modal("show");
 }
 
@@ -147,45 +149,22 @@ function showModalAJAXFail(xhr, status, error) {
     if (typeof errMessage == "undefined" || errMessage == "") { errMessage = "No error details available."; }
     $("#ModalInfoLabel").text("Server Error");
     $("#ModalInfoBody").html("Error type: <strong>" + error + "</strong> , Status: <strong>" + status + "</strong>");
-    $("#ModalInfoBodyPre").text(errMessage).show();
+    $("#ModalInfoBodyPre").text(errMessage).removeClass("hidden");
     $("#ModalInfo").modal("show");
 }
 
-//-----------------------------------------------------------------------------
-
-//Refresh  table from AJAX
-function refreshTable(table, url, getActive, httpType, projectIds, modelIds, typeIds,
-    locIds, assyIds, personIds, startDate, endDate) {
-
-    getActive = (typeof getActive !== "undefined" && getActive == false) ? false : true;
-    httpType = (typeof httpType !== "undefined") ? httpType : "GET";
-    projectIds = (typeof projectIds !== "undefined") ? projectIds : [];
-    modelIds = (typeof modelIds !== "undefined") ? modelIds : [];
-    typeIds = (typeof typeIds !== "undefined") ? typeIds : [];
-    locIds = (typeof locIds !== "undefined") ? locIds : [];
-    assyIds = (typeof assyIds !== "undefined") ? assyIds : [];
-    personIds = (typeof personIds !== "undefined") ? personIds : [];
-    startDate = (typeof startDate !== "undefined") ? startDate : {};
-    endDate = (typeof endDate !== "undefined") ? endDate : {};
-
-    table.clear().search("").draw();
-    showModalWait();
-
-    $.ajax({
-        type: httpType, url: url, timeout: 120000,
-        data: {getActive: getActive, projectIds: projectIds, modelIds: modelIds, typeIds: typeIds,
-            locIds: locIds, assyIds: assyIds, personIds: personIds, startDate: startDate, endDate: endDate
-        },
-        dataType: "json",
-    })
-        .always(function () { $("#ModalWait").modal("hide"); })
-        .done(function (data) {
-            table.rows.add(data).order([1, "asc"]).draw();
-        })
-        .fail(function (xhr, status, error) {
-            showModalAJAXFail(xhr, status, error);
-        });
+//switchView 
+function switchView(fromViewId, toViewId, toBtnGroupClass) {
+    if (toBtnGroupClass) {
+        $("[class*='tdo-btngroup']").addClass("hidden");
+        $("[class~='" + toBtnGroupClass + "']").removeClass("hidden");
+    }
+    $("#" +fromViewId).addClass("hidden");
+    $("#" + toViewId).removeClass("hidden");
+    window.scrollTo(0, 0);
 }
+
+//-----------------------------------------------------------------------------
 
 //Refresh  table from AJAX - generic version
 function refreshTableGeneric(table, url, data, httpType) {
@@ -261,21 +240,27 @@ function clearFormInputs(formId, msArray) {
 }
 
 //Prepare Form For Create
-function fillFormForCreateGeneric(formId, msArray, labelText, mainViewId) {
+function fillFormForCreateGeneric(formId, msArray, labelText) {
     clearFormInputs(formId, msArray);
     $("#" + formId + "Label").text(labelText);
     $("#" + formId + " [data-val-dbisunique]").prop("disabled", false); msDisableUnique(msArray, false);
     $("#" + formId + " .modifiable").data("ismodified", true); msSetAsModified(msArray, true);
-    $("#" + formId + "GroupIsActive").addClass("hide");
+    $("#" + formId + "GroupIsActive").addClass("hidden");
     $("#IsActive").prop("checked", true);
     $("#IsActive_bl").prop("checked", true)
-    $("#" + formId + "CreateMultiple").removeClass("hide");
-    $("#" + mainViewId).addClass("hide");
-    $("#" + formId + "View").removeClass("hide");
+    $("#" + formId + "CreateMultiple").removeClass("hidden");
 }
 
 //FillFormForEdit Generic version
 function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText, msArray) {
+
+    if (GetActive) {
+        $("#" + formId + "GroupIsActive").addClass("hidden");
+    }
+    else {
+        $("#" + formId + "GroupIsActive").removeClass("hidden");
+    }
+    $("#" + formId + "CreateMultiple").addClass("hidden");
 
     var deferred0 = $.Deferred();
 
@@ -635,11 +620,11 @@ function updateViewsForModelGeneric(table, url, modelId, tableTitleId, editFormL
                     var picker = $targetEl.data("DateTimePicker");
                     if (typeof picker !== "undefined") { picker.destroy(); }
 
-                    $("#FrmGrp" + attrName).removeClass("hide");
+                    $("#FrmGrp" + attrName).removeClass("hidden");
 
                     switch (data[0][prop]) {
                         case "NotUsed":
-                            $("#FrmGrp" + attrName).addClass("hide");
+                            $("#FrmGrp" + attrName).addClass("hidden");
                             break;
                         case "String":
                             $targetEl.removeAttr(attrsToRemove).attr({

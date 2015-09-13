@@ -56,8 +56,8 @@ $(document).ready(function () {
         CurrIds = [];
         CurrRecords = [];
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
-        $("#EditFormCreateMultiple").removeClass("hide");
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Assembly", "MainView");
+        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
     });
 
     //Wire up BtnEdit
@@ -67,23 +67,15 @@ $(document).ready(function () {
             showModalNothingSelected();
             return;
         }
-        if (GetActive) { $("#EditFormGroupIsActive").addClass("hide"); }
-        else { $("#EditFormGroupIsActive").removeClass("hide"); }
-
-        $("#EditFormCreateMultiple").addClass("hide");
-
         showModalWait();
-
         fillFormForEditGeneric(CurrIds, "POST", "/AssemblyDbSrv/GetByIds",
                 GetActive, "EditForm", "Edit Assembly", MagicSuggests)
             .always(hideModalWait)
             .done(function (currRecords) {
                 CurrRecords = currRecords;
-                $("#MainView").addClass("hide");
-                $("#EditFormView").removeClass("hide");
+                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-
     });
 
     //Wire up BtnDelete 
@@ -92,41 +84,41 @@ $(document).ready(function () {
         if (CurrIds.length == 0) { showModalNothingSelected(); }
         else { showModalDelete(CurrIds.length); }
     });
-
+        
     //wire up dropdownId1
     $("#dropdownId1").click(function (event) {
         event.preventDefault();
-        TableMain.columns([2, 3, 4, 5, 6, 7]).visible(true);
-        TableMain.columns([8, 9, 10, 11, 12, 13]).visible(false);
-        TableMain.columns([14, 15, 16, 17, 18, 19]).visible(false);
-        TableMain.columns([20, 21, 22, 23, 24, 25]).visible(false);
+        TableMain.columns([2, 3, 4, 5, 6, 7, 8]).visible(true);
+        TableMain.columns([9, 10, 11, 12, 13, 14]).visible(false);
+        TableMain.columns([15, 16, 17, 18, 19, 20]).visible(false);
+        TableMain.columns([21, 22, 23, 24, 25]).visible(false);
     });
 
     //wire up dropdownId2
     $("#dropdownId2").click(function (event) {
         event.preventDefault();
-        TableMain.columns([2, 3, 4, 5, 6, 7]).visible(false);
-        TableMain.columns([8, 9, 10, 11, 12, 13]).visible(true);
-        TableMain.columns([14, 15, 16, 17, 18, 19]).visible(false);
-        TableMain.columns([20, 21, 22, 23, 24, 25]).visible(false);
+        TableMain.columns([2, 3, 4, 5, 6, 7, 8]).visible(false);
+        TableMain.columns([9, 10, 11, 12, 13, 14]).visible(true);
+        TableMain.columns([15, 16, 17, 18, 19, 20]).visible(false);
+        TableMain.columns([21, 22, 23, 24, 25]).visible(false);
     });
 
     //wire up dropdownId3
     $("#dropdownId3").click(function (event) {
         event.preventDefault();
-        TableMain.columns([2, 3, 4, 5, 6, 7]).visible(false);
-        TableMain.columns([8, 9, 10, 11, 12, 13]).visible(false);
-        TableMain.columns([14, 15, 16, 17, 18, 19]).visible(true);
-        TableMain.columns([20, 21, 22, 23, 24, 25]).visible(false);
+        TableMain.columns([2, 3, 4, 5, 6, 7, 8]).visible(false);
+        TableMain.columns([9, 10, 11, 12, 13, 14]).visible(false);
+        TableMain.columns([15, 16, 17, 18, 19, 20]).visible(true);
+        TableMain.columns([21, 22, 23, 24, 25]).visible(false);
     });
 
     //wire up dropdownId4
     $("#dropdownId4").click(function (event) {
         event.preventDefault();
-        TableMain.columns([2, 3, 4, 5, 6, 7]).visible(false);
-        TableMain.columns([8, 9, 10, 11, 12, 13]).visible(false);
-        TableMain.columns([14, 15, 16, 17, 18, 19]).visible(false);
-        TableMain.columns([20, 21, 22, 23, 24, 25]).visible(true);
+        TableMain.columns([2, 3, 4, 5, 6, 7, 8]).visible(false);
+        TableMain.columns([9, 10, 11, 12, 13, 14]).visible(false);
+        TableMain.columns([15, 16, 17, 18, 19, 20]).visible(false);
+        TableMain.columns([21, 22, 23, 24, 25]).visible(true);
     });
 
     //wire up dropdownId5 - Show Assy Components
@@ -225,7 +217,7 @@ $(document).ready(function () {
         }
         refreshMainView();
     });
-
+        
     //TableMain AssemblyDbs
     TableMain = $("#TableMain").DataTable({
         columns: [
@@ -238,22 +230,22 @@ $(document).ready(function () {
             { data: "AssemblyStatus_", render: function (data, type, full, meta) { return data.AssyStatusName }, name: "AssemblyStatus_" }, //5
             { data: "AssemblyModel_", render: function (data, type, full, meta) { return data.AssyModelName }, name: "AssemblyModel_" }, //6
             { data: "AssignedToProject_", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject" }, //7
-            //------------------------------------------------second set of columns
             { data: "AssignedToLocation_", render: function (data, type, full, meta) { return data.LocName + " - " + data.LocTypeName }, name: "AssignedToLocation" }, //8
+            //------------------------------------------------second set of columns
             { data: "AssyGlobalX", name: "AssyGlobalX" },//9
             { data: "AssyGlobalY", name: "AssyGlobalY" },//10
             { data: "AssyGlobalZ", name: "AssyGlobalZ" },//11
             { data: "AssyLocalXDesign", name: "AssyLocalXDesign" },//12
             { data: "AssyLocalYDesign", name: "AssyLocalYDesign" },//13
-            //------------------------------------------------third set of columns
             { data: "AssyLocalZDesign", name: "AssyLocalZDesign" },//14
+            //------------------------------------------------third set of columns
             { data: "AssyLocalXAsBuilt", name: "AssyLocalXAsBuilt" },//15
             { data: "AssyLocalYAsBuilt", name: "AssyLocalYAsBuilt" },//16
             { data: "AssyLocalZAsBuilt", name: "AssyLocalZAsBuilt" },//17
             { data: "AssyStationing", name: "AssyStationing" },//18
             { data: "AssyLength", name: "AssyLength" },//19
-            //------------------------------------------------Fourth set of columns
             { data: "AssyReadingIntervalSecs", name: "AssyReadingIntervalSecs" },//20
+            //------------------------------------------------Fourth set of columns
             { data: "IsReference_bl", name: "IsReference_bl" },//21
             { data: "TechnicalDetails", name: "TechnicalDetails" },//22
             { data: "PowerSupplyDetails", name: "PowerSupplyDetails" },//23
@@ -270,20 +262,20 @@ $(document).ready(function () {
         columnDefs: [
             { targets: [0, 26, 27, 28, 29, 30, 31], visible: false }, // - never show
             { targets: [0, 21, 26, 27, 28, 29, 30, 31], searchable: false },  //"orderable": false, "visible": false
-            { targets: [2, 3, 4], className: "hidden-xs hidden-sm" }, // - first set of columns
-            { targets: [6, 7], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
+            { targets: [2, 3, 4, 8], className: "hidden-xs" }, // - first set of columns
+            { targets: [6, 7], className: "hidden-xs hidden-sm" }, // - first set of columns
 
-            { targets: [8, 9, 10, 11, 12, 13], visible: false }, // - second set of columns - to toggle with options
-            { targets: [9, 10], className: "hidden-xs hidden-sm" }, // - second set of columns
-            { targets: [11, 12, 13], className: "hidden-xs hidden-sm hidden-md" }, // - second set of columns
+            { targets: [9, 10, 11, 12, 13, 14], visible: false }, // - second set of columns - to toggle with options
+            { targets: [10, 11], className: "hidden-xs" }, // - second set of columns
+            { targets: [12, 13, 14], className: "hidden-xs hidden-sm" }, // - second set of columns
 
-            { targets: [14, 15, 16, 17, 18, 19], visible: false }, // - third set of columns - to toggle with options
-            { targets: [18, 19], className: "hidden-xs hidden-sm" }, // - third set of columns
-            { targets: [14, 15, 16], className: "hidden-xs hidden-sm hidden-md" }, // - third set of columns
+            { targets: [15, 16, 17, 18, 19, 20], visible: false }, // - third set of columns - to toggle with options
+            { targets: [15, 16, 17, 19], className: "hidden-xs" }, // - third set of columns
+            { targets: [20], className: "hidden-xs hidden-sm " }, // - third set of columns
 
-            { targets: [20, 21, 22, 23, 24, 25], visible: false }, // - fourth set of columns - to toggle with options
-            { targets: [21, 22, 23], className: "hidden-xs hidden-sm" }, // - fourth set of columns
-            { targets: [24, 25], className: "hidden-xs hidden-sm hidden-md" } // - fourth set of columns
+            { targets: [21, 22, 23, 24, 25], visible: false }, // - fourth set of columns - to toggle with options
+            { targets: [21, 22, 23], className: "hidden-xs" }, // - fourth set of columns
+            { targets: [24], className: "hidden-xs hidden-sm" } // - fourth set of columns
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
@@ -307,36 +299,34 @@ $(document).ready(function () {
     msAddToMsArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/Lookup", 1);
 
     //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hide");
-        $("#EditFormView").addClass("hide");
-        window.scrollTo(0, 0);
+    $("#EditFormBtnCancel").click(function () {
+        switchView("EditFormView","MainView", "tdo-btngroup-main");
     });
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
-        if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
-            showModalWait();
-            var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
-            submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/AssemblyDbSrv/Edit", createMultiple)
-                .always(hideModalWait)
-                .done(function () {
-                    refreshMainView();
-                    $("#MainView").removeClass("hide");
-                    $("#EditFormView").addClass("hide");
-                    window.scrollTo(0, 0);
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+            showModalFail("Errors in input", "The form has missing or invalid inputs.\nPlease correct.");
+            return;
         }
+        showModalWait();
+        var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
+        submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/AssemblyDbSrv/Edit", createMultiple)
+            .always(hideModalWait)
+            .done(function () {
+                refreshMainView();
+                switchView("EditFormView", "MainView", "tdo-btngroup-main");
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
     });
 
     //--------------------------------------View Initialization------------------------------------//
 
     fillFiltersFromRequestParams().done(refreshMainView);
 
-    $("#InitialView").addClass("hide");
-    $("#MainView").removeClass("hide");
+    $("#InitialView").addClass("hidden");
+    $("#MainView").removeClass("hidden");
 
     //--------------------------------End of execution at Start-----------
 });

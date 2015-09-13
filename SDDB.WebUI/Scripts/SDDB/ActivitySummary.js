@@ -11,8 +11,6 @@
 
 var MsFilterByPerson;
 
-
-
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
@@ -42,8 +40,8 @@ $(document).ready(function () {
            
     //--------------------------------------View Initialization------------------------------------//
            
-    $("#InitialView").addClass("hide");
-    $("#MainView").removeClass("hide");
+    $("#InitialView").addClass("hidden");
+    $("#MainView").removeClass("hidden");
 
     var weekOffset = 0
     if ($("#thNo6").is(":hidden") && $("#thNo7").is(":hidden")) { weekOffset = 1; }

@@ -46,17 +46,16 @@ $(document).ready(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) showModalNothingSelected();
         else {
-            if (GetActive) $("#EditFormGroupIsActive").addClass("hide");
-            else $("#EditFormGroupIsActive").removeClass("hide");
+            if (GetActive) $("#EditFormGroupIsActive").addClass("hidden");
+            else $("#EditFormGroupIsActive").removeClass("hidden");
 
             showModalWait();
-
             fillFormForEditGeneric(CurrIds, "POST", "/ComponentLogEntrySrv/GetByIds", GetActive, "EditForm", "Edit Log Entry", MagicSuggests)
-                .always(function () { $("#ModalWait").modal("hide"); })
+                .always(hideModalWait)
                 .done(function (currRecords) {
                     CurrRecords = currRecords;
-                    $("#MainView").addClass("hide");
-                    $("#EditFormView").removeClass("hide");
+                    $("#MainView").addClass("hidden");
+                    $("#EditFormView").removeClass("hidden");
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
         }
@@ -186,8 +185,9 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hide");
-        $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
+        $("#MainView").removeClass("hidden");
+        $("#EditFormView").addClass("hidden");
+        window.scrollTo(0, 0);
     });
 
     //Wire Up EditFormBtnOk
@@ -196,11 +196,12 @@ $(document).ready(function () {
         if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
             showModalWait();
             submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/ComponentLogEntrySrv/Edit")
-                .always(function () { $("#ModalWait").modal("hide"); })
+                .always(hideModalWait)
                 .done(function () {
                     refreshMainView();
-                    $("#MainView").removeClass("hide");
-                    $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
+                    $("#MainView").removeClass("hidden");
+                    $("#EditFormView").addClass("hidden");
+                    window.scrollTo(0, 0);
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
         }
@@ -212,7 +213,7 @@ $(document).ready(function () {
         showModalWait();
         $.ajax({
             type: "POST", url: "/ComponentSrv/GetByIds", timeout: 120000, data: { ids: [ComponentId], getActive: true }, dataType: "json"})
-            .always(function () { $("#ModalWait").modal("hide"); })
+            .always(hideModalWait)
             .done(function (data) {
                 MsFilterByComponent.setSelection([{ id: data[0].Id, name: data[0].CompName, }]);
             })
@@ -223,8 +224,8 @@ $(document).ready(function () {
         $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
         refreshMainView();
     }
-    $("#InitialView").addClass("hide");
-    $("#MainView").removeClass("hide");
+    $("#InitialView").addClass("hidden");
+    $("#MainView").removeClass("hidden");
     
     //--------------------------------End of execution at Start-----------
 });

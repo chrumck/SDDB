@@ -44,7 +44,7 @@ $(document).ready(function () {
         CurrIds = [];
         CurrRecords = [];
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
-        $("#EditFormCreateMultiple").removeClass("hide");
+        $("#EditFormCreateMultiple").removeClass("hidden");
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Component", "MainView");
     });
 
@@ -55,10 +55,10 @@ $(document).ready(function () {
             showModalNothingSelected();
             return;
         }
-        if (GetActive) { $("#EditFormGroupIsActive").addClass("hide"); }
-        else { $("#EditFormGroupIsActive").removeClass("hide"); }
+        if (GetActive) { $("#EditFormGroupIsActive").addClass("hidden"); }
+        else { $("#EditFormGroupIsActive").removeClass("hidden"); }
 
-        $("#EditFormCreateMultiple").addClass("hide");
+        $("#EditFormCreateMultiple").addClass("hidden");
 
         showModalWait();
 
@@ -67,8 +67,8 @@ $(document).ready(function () {
             .always(hideModalWait)
             .done(function (currRecords) {
                 CurrRecords = currRecords;
-                $("#MainView").addClass("hide");
-                $("#EditFormView").removeClass("hide");
+                $("#MainView").addClass("hidden");
+                $("#EditFormView").removeClass("hidden");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
@@ -243,8 +243,8 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hide");
-        $("#EditFormView").addClass("hide");
+        $("#MainView").removeClass("hidden");
+        $("#EditFormView").addClass("hidden");
         window.scrollTo(0, 0);
     });
     
@@ -258,8 +258,8 @@ $(document).ready(function () {
                 .always(hideModalWait)
                 .done(function () {
                     refreshMainView();
-                    $("#MainView").removeClass("hide");
-                    $("#EditFormView").addClass("hide");
+                    $("#MainView").removeClass("hidden");
+                    $("#EditFormView").addClass("hidden");
                     window.scrollTo(0, 0);
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
@@ -270,8 +270,8 @@ $(document).ready(function () {
 
     fillFiltersFromRequestParams().done(refreshMainView);
     
-    $("#InitialView").addClass("hide");
-    $("#MainView").removeClass("hide");
+    $("#InitialView").addClass("hidden");
+    $("#MainView").removeClass("hidden");
 
     //--------------------------------End of execution at Start-----------
 });

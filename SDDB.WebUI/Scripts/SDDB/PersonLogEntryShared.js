@@ -52,8 +52,9 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hide");
-        $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
+        $("#MainView").removeClass("hidden");
+        $("#EditFormView").addClass("hidden");
+        window.scrollTo(0, 0);
     });
 
     //Wire Up EditFormBtnOk
@@ -249,8 +250,9 @@ function submitEdits() {
         .always(hideModalWait)
         .done(function () {
             refreshMainView();
-            $("#MainView").removeClass("hide");
-            $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
+            $("#MainView").removeClass("hidden");
+            $("#EditFormView").addClass("hidden");
+            window.scrollTo(0, 0);
             deferred0.resolve();
         })
         .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); deferred0.reject(); });

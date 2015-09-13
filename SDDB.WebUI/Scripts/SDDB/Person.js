@@ -53,8 +53,8 @@ $(document).ready(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) showModalNothingSelected();
         else {
-            if (GetActive) $("#EditFormGroupIsActive").addClass("hide");
-            else $("#EditFormGroupIsActive").removeClass("hide");
+            if (GetActive) $("#EditFormGroupIsActive").addClass("hidden");
+            else $("#EditFormGroupIsActive").removeClass("hidden");
 
             showModalWait();
 
@@ -62,8 +62,8 @@ $(document).ready(function () {
                 .always(hideModalWait)
                 .done(function (currRecords) {
                     CurrRecords = currRecords;
-                    $("#MainView").addClass("hide");
-                    $("#EditFormView").removeClass("hide");
+                    $("#MainView").addClass("hidden");
+                    $("#EditFormView").removeClass("hidden");
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
         }
@@ -91,8 +91,8 @@ $(document).ready(function () {
             "GET", "/PersonSrv/GetPersonProjectsNot", { id: CurrIds[0] }, "GET", "/ProjectSrv/Get", { getActive: true })
                 .always(hideModalWait)
                 .done(function () {
-                    $("#MainView").addClass("hide");
-                    $("#PrsProjView").removeClass("hide");
+                    $("#MainView").addClass("hidden");
+                    $("#PrsProjView").removeClass("hidden");
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
         }
@@ -113,8 +113,8 @@ $(document).ready(function () {
             "GET", "/PersonSrv/GetPersonGroupsNot", { id: CurrIds[0] }, "GET", "/PersonGroupSrv/Get", { getActive: true })
                 .always(hideModalWait)
                 .done(function () {
-                    $("#MainView").addClass("hide");
-                    $("#PersonGroupsView").removeClass("hide");
+                    $("#MainView").addClass("hidden");
+                    $("#PersonGroupsView").removeClass("hidden");
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
         }
@@ -135,8 +135,8 @@ $(document).ready(function () {
             "GET", "/PersonSrv/GetManagedGroupsNot", { id: CurrIds[0] }, "GET", "/PersonGroupSrv/Get", { getActive: true })
                 .always(hideModalWait)
                 .done(function () {
-                    $("#MainView").addClass("hide");
-                    $("#ManagedGroupsView").removeClass("hide");
+                    $("#MainView").addClass("hidden");
+                    $("#ManagedGroupsView").removeClass("hidden");
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
         }
@@ -230,8 +230,8 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hide");
-        $("#EditFormView").addClass("hide");
+        $("#MainView").removeClass("hidden");
+        $("#EditFormView").addClass("hidden");
         window.scrollTo(0, 0);
     });
 
@@ -245,8 +245,8 @@ $(document).ready(function () {
             submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonSrv/Edit")
                 .always(hideModalWait)
                 .done(function () {
-                    $("#MainView").removeClass("hide");
-                    $("#EditFormView").addClass("hide");
+                    $("#MainView").removeClass("hidden");
+                    $("#EditFormView").addClass("hidden");
                     window.scrollTo(0, 0);
                     refreshMainView();
                 })
@@ -258,8 +258,8 @@ $(document).ready(function () {
 
     //Wire Up PrsProjViewBtnCancel
     $("#PrsProjViewBtnCancel, #PrsProjViewBtnBack").click(function () {
-        $("#MainView").removeClass("hide");
-        $("#PrsProjView").addClass("hide");
+        $("#MainView").removeClass("hidden");
+        $("#PrsProjView").addClass("hidden");
         window.scrollTo(0, 0);
     });
 
@@ -279,8 +279,8 @@ $(document).ready(function () {
                     "/PersonSrv/EditPersonProjects")
                 .always(hideModalWait)
                 .done(function () {
-                    $("#MainView").removeClass("hide");
-                    $("#PrsProjView").addClass("hide");
+                    $("#MainView").removeClass("hidden");
+                    $("#PrsProjView").addClass("hidden");
                     window.scrollTo(0, 0);
                     refreshMainView();
                 })
@@ -342,8 +342,8 @@ $(document).ready(function () {
 
     //Wire Up PersonGroupsViewBtnCancel
     $("#PersonGroupsViewBtnCancel, #PersonGroupsViewBtnBack").click(function () {
-        $("#MainView").removeClass("hide");
-        $("#PersonGroupsView").addClass("hide");
+        $("#MainView").removeClass("hidden");
+        $("#PersonGroupsView").addClass("hidden");
         window.scrollTo(0, 0);
     });
 
@@ -362,8 +362,8 @@ $(document).ready(function () {
                     "/PersonSrv/EditPersonGroups")
                 .always(hideModalWait)
                 .done(function () {
-                    $("#MainView").removeClass("hide");
-                    $("#PersonGroupsView").addClass("hide");
+                    $("#MainView").removeClass("hidden");
+                    $("#PersonGroupsView").addClass("hidden");
                     window.scrollTo(0, 0);
                     refreshMainView();
                 })
@@ -425,8 +425,8 @@ $(document).ready(function () {
 
     //Wire Up ManagedGroupsViewBtnCancel
     $("#ManagedGroupsViewBtnCancel, #ManagedGroupsViewBtnBack").click(function () {
-        $("#MainView").removeClass("hide");
-        $("#ManagedGroupsView").addClass("hide");
+        $("#MainView").removeClass("hidden");
+        $("#ManagedGroupsView").addClass("hidden");
         window.scrollTo(0, 0);
     });
 
@@ -446,8 +446,8 @@ $(document).ready(function () {
                     "/PersonSrv/EditManagedGroups")
                 .always(hideModalWait)
                 .done(function () {
-                    $("#MainView").removeClass("hide");
-                    $("#ManagedGroupsView").addClass("hide");
+                    $("#MainView").removeClass("hidden");
+                    $("#ManagedGroupsView").addClass("hidden");
                     window.scrollTo(0, 0);
                     refreshMainView();
                 })
@@ -510,8 +510,8 @@ $(document).ready(function () {
 
     refreshMainView();
 
-    $("#InitialView").addClass("hide");
-    $("#MainView").removeClass("hide");
+    $("#InitialView").addClass("hidden");
+    $("#MainView").removeClass("hidden");
 
     //--------------------------------End of execution at Start-----------
 });

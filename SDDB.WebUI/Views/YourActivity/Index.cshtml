@@ -9,7 +9,7 @@
 </div>
 
 <!------- MainView ------->
-<div class="container-fluid hide" id="MainView">
+<div class="container-fluid hidden" id="MainView">
 
     <div class="row">
         <div class="col-xs-12">
@@ -59,7 +59,7 @@
 </div>
 
 <!------- EditFormView ------->
-<div class="container-fluid hide" id="EditFormView">
+<div class="container-fluid hidden" id="EditFormView">
     <div class="row">
         <div class="col-xs-8">
             <h3 id="EditFormLabel">Create/Edit Activity</h3>
@@ -102,7 +102,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    <div class="form-group hide">
+                    <div class="form-group hidden">
                         @Html.LabelFor(x => x.EnteredByPerson_Id, "Entered By", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.EnteredByPerson_Id, new { @class = "form-control modifiable", placeholder = "Entered By Person" })
@@ -145,7 +145,7 @@
                             @Html.ValidationMessageFor(x => x.Comments)
                         </div>
                     </div>
-                    <div class="form-group hide" id="EditFormGroupIsActive">
+                    <div class="form-group hidden" id="EditFormGroupIsActive">
                         <div class="col-sm-10 col-sm-offset-2">
                             @Html.CheckBoxFor(x => x.IsActive_bl, new { @class = "modifiable" }) &nbsp;&nbsp;
                             @Html.LabelFor(x => x.IsActive_bl, "Is Active") &nbsp;&nbsp; <em>(Marking as 'Active' un-deletes record.)</em>
@@ -173,7 +173,7 @@
                         </div>
                     </div>
                     <table class="table table-striped" id="TableLogEntryAssysAdd">
-                        <thead class="hide">
+                        <thead class="hidden">
                             <tr>
                                 <th>ID</th>
                                 <th>Name</th>
@@ -187,7 +187,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading"><strong>Remove Assemblies </strong><small><em> Choose Location first</em></small></div>
                     <table class="table table-striped" id="TableLogEntryAssysRemove">
-                        <thead class="hide">
+                        <thead class="hidden">
                             <tr>
                                 <th>ID</th>
                                 <th>Name</th>
@@ -211,12 +211,12 @@
                     <div class="small"><em> Adding others adds hours to their records!</em></div>
                 </div>
             </div>
-            <div class="row hide" id="LogEntryPersonsView">
+            <div class="row hidden" id="LogEntryPersonsView">
                 <div class="col-xs-12 col-sm-6">
                     <div class="panel panel-tdo-info">
                         <div class="panel-heading" style="font-weight:bold">Add People</div>
                         <table class="table table-striped" id="TableLogEntryPersonsAdd">
-                            <thead class="hide">
+                            <thead class="hidden">
                                 <tr>
                                     <th>ID</th>
                                     <th>Last Name</th>
@@ -232,7 +232,7 @@
                     <div class="panel panel-tdo-info">
                         <div class="panel-heading" style="font-weight:bold">Remove People</div>
                         <table class="table table-striped" id="TableLogEntryPersonsRemove">
-                            <thead class="hide">
+                            <thead class="hidden">
                                 <tr>
                                     <th>ID</th>
                                     <th>Last Name</th>

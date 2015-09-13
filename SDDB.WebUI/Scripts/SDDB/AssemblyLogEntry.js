@@ -56,8 +56,8 @@ $(document).ready(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length == 0) showModalNothingSelected();
         else {
-            if (GetActive) $("#EditFormGroupIsActive").addClass("hide");
-            else $("#EditFormGroupIsActive").removeClass("hide");
+            if (GetActive) $("#EditFormGroupIsActive").addClass("hidden");
+            else $("#EditFormGroupIsActive").removeClass("hidden");
 
             showModalWait();
 
@@ -65,8 +65,8 @@ $(document).ready(function () {
                 .always(hideModalWait)
                 .done(function (currRecords) {
                     CurrRecords = currRecords;
-                    $("#MainView").addClass("hide");
-                    $("#EditFormView").removeClass("hide");
+                    $("#MainView").addClass("hidden");
+                    $("#EditFormView").removeClass("hidden");
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
         }
@@ -244,8 +244,9 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hide");
-        $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
+        $("#MainView").removeClass("hidden");
+        $("#EditFormView").addClass("hidden");
+        window.scrollTo(0, 0);
     });
 
     //Wire Up EditFormBtnOk
@@ -257,8 +258,8 @@ $(document).ready(function () {
                 .always(hideModalWait)
                 .done(function () {
                     refreshMainView();
-                    $("#MainView").removeClass("hide");
-                    $("#EditFormView").addClass("hide");
+                    $("#MainView").removeClass("hidden");
+                    $("#EditFormView").addClass("hidden");
                     window.scrollTo(0, 0);
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
@@ -283,8 +284,8 @@ $(document).ready(function () {
         refreshMainView();
     }
 
-    $("#InitialView").addClass("hide");
-    $("#MainView").removeClass("hide");
+    $("#InitialView").addClass("hidden");
+    $("#MainView").removeClass("hidden");
     
     //--------------------------------End of execution at Start-----------
 });

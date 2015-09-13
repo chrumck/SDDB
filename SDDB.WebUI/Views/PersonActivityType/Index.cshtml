@@ -8,7 +8,7 @@
 </div>
 
 <!------- MainView ------->
-<div class="container-fluid hide" id="MainView">
+<div class="container-fluid hidden" id="MainView">
 
     <div class="row">
         <div class="col-xs-12">
@@ -44,7 +44,7 @@
 </div>
 
 <!------- EditFormView ------->
-<div class="container-fluid hide" id="EditFormView">
+<div class="container-fluid hidden" id="EditFormView">
     <div class="row">
         <div class="col-xs-6">
             <h3 id="EditFormLabel">Create/Edit Person Activity Type</h3>
@@ -84,7 +84,7 @@
                             @Html.ValidationMessageFor(x => x.Comments)
                         </div>
                     </div>
-                    <div class="form-group hide" id="EditFormGroupIsActive">
+                    <div class="form-group hidden" id="EditFormGroupIsActive">
                         <div class="col-sm-10 col-sm-offset-2">
                             @Html.CheckBoxFor(x => x.IsActive_bl, new { @class = "modifiable" }) &nbsp;&nbsp;
                             @Html.LabelFor(x => x.IsActive_bl, "Is Active") &nbsp;&nbsp; <em>(Marking as 'Active' un-deletes record.)</em>

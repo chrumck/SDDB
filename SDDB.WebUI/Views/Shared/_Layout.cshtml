@@ -17,25 +17,21 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container-fluid">
             <div class="navbar-header">
+
+                @RenderSection("Navbar", required: false)
+
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
+                
                 <a class="navbar-brand" rel="home" href="@Url.Action("Index", "Home", null)" title="SDDB Home">
                     <img style="margin-top: -14px;" src="~/Images/SDDB_Home.png" />
                 </a>
             </div>
+
             <div class="navbar-collapse collapse">
-                @*
-                <ul class="nav navbar-nav">
-                    <li>
-                        <a href="#" title="SDDB Help">
-                            <img src="~/Images/SDDB_help.png" />
-                        </a>
-                    </li>
-                </ul>    
-                *@
 
                 @RenderSection("NavbarCollapse", required: false)
 
@@ -46,9 +42,12 @@
                             <span class="glyphicon glyphicon-log-out"></span>
                         </a>
                     </li>
-
-                    
-
+                    <li>
+                        <a href="#" title="SDDB Help">
+                            <img style="margin-top: -2px;" src="~/Images/SDDB_help.png" />
+                            <span class="hidden-sm hidden-md hidden-lg collapsenav"> SDDB Help</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>

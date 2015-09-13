@@ -50,20 +50,22 @@ $(document).ready(function () {
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) { showModalNothingSelected(); }
-        else {
-            showModalWait();
-            fillFormForEditGeneric(CurrIds, "POST", "/AssemblyDbSrv/GetByIds", GetActive,
-	     "EditForm", null, MagicSuggests)
-                .always(hideModalWait)
-                .done(function (currRecords) {
-                    CurrRecords = currRecords;
-                    msDisableAll(MagicSuggests);
-                    $("#MainView").addClass("hide");
-                    $("#EditFormView").removeClass("hide");
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
         }
+        showModalWait();
+        fillFormForEditGeneric(CurrIds, "POST", "/AssemblyDbSrv/GetByIds", GetActive,
+                "EditForm", null, MagicSuggests)
+            .always(hideModalWait)
+            .done(function (currRecords) {
+                CurrRecords = currRecords;
+                msDisableAll(MagicSuggests);
+                $("#MainView").addClass("hidden");
+                $("#EditFormView").removeClass("hidden");
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+
     });
     
     //wire up dropdownId1
@@ -253,8 +255,9 @@ $(document).ready(function () {
   
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hide");
-        $("#EditFormView").addClass("hide"); window.scrollTo(0, 0);
+        $("#MainView").removeClass("hidden");
+        $("#EditFormView").addClass("hidden");
+        window.scrollTo(0, 0);
     });
 
     //Wire Up EditFormBtnOk
@@ -265,8 +268,8 @@ $(document).ready(function () {
                 .always(hideModalWait)
                 .done(function () {
                     refreshMainView();
-                    $("#MainView").removeClass("hide");
-                    $("#EditFormView").addClass("hide");
+                    $("#MainView").removeClass("hidden");
+                    $("#EditFormView").addClass("hidden");
                     window.scrollTo(0, 0);
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
@@ -277,8 +280,8 @@ $(document).ready(function () {
 
     refreshMainView();
 
-    $("#InitialView").addClass("hide");
-    $("#MainView").removeClass("hide");
+    $("#InitialView").addClass("hidden");
+    $("#MainView").removeClass("hidden");
 
     //--------------------------------End of execution at Start-----------
 });

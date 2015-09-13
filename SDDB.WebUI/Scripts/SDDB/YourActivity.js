@@ -26,7 +26,7 @@ $(document).ready(function () {
         TableLogEntryAssysRemove.clear().search("").draw();
         TableLogEntryPersonsAdd.clear().search("").draw();
         TableLogEntryPersonsRemove.clear().search("").draw();
-        $("#LogEntryPersonsView").addClass("hide");
+        $("#LogEntryPersonsView").addClass("hidden");
         MagicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
         $("#LogEntryDateTime").val(moment($("#FilterDateStart").val()).hour(moment().hour()).format("YYYY-MM-DD HH:mm"));
         $("#LogEntryTime").data('DateTimePicker').date(moment($("#LogEntryDateTime").val()));
@@ -42,11 +42,11 @@ $(document).ready(function () {
             showModalSelectOne();
             return;
         }
-        if (GetActive) { $("#EditFormGroupIsActive").addClass("hide"); }
-        else { $("#EditFormGroupIsActive").removeClass("hide"); }
+        if (GetActive) { $("#EditFormGroupIsActive").addClass("hidden"); }
+        else { $("#EditFormGroupIsActive").removeClass("hidden"); }
         TableLogEntryPersonsAdd.clear().search("").draw();
         TableLogEntryPersonsRemove.clear().search("").draw();
-        $("#LogEntryPersonsView").addClass("hide");
+        $("#LogEntryPersonsView").addClass("hidden");
 
         showModalWait();
 
@@ -73,8 +73,8 @@ $(document).ready(function () {
                 $("#LogEntryDateTime").data("ismodified", false);
                 $("#HoursWorkedPicker").data('DateTimePicker').date(moment($("#ManHours").val(), "HH"));
                 $("#ManHours").data("ismodified", false);
-                $("#MainView").addClass("hide");
-                $("#EditFormView").removeClass("hide");
+                $("#MainView").addClass("hidden");
+                $("#EditFormView").removeClass("hidden");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
@@ -83,8 +83,13 @@ $(document).ready(function () {
 
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
-        if (!$(this).prop("checked")) { GetActive = true; $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-tdo-success"); }
-        else { GetActive = false; $("#PanelTableMain").removeClass("panel-tdo-success").addClass("panel-tdo-danger"); }
+        if (!$(this).prop("checked")) {
+            GetActive = true;
+            $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-tdo-success");
+        } else {
+            GetActive = false;
+            $("#PanelTableMain").removeClass("panel-tdo-success").addClass("panel-tdo-danger");
+        }
         refreshMainView();
     });
 
@@ -213,7 +218,7 @@ $(document).ready(function () {
         TableLogEntryPersonsAdd.clear().search("").draw();
         TableLogEntryPersonsRemove.clear().search("").draw();
 
-        if ($("#LogEntryPersonsView").hasClass("hide")) {
+        if ($("#LogEntryPersonsView").hasClass("hidden")) {
             showModalWait();
             fillFormForRelatedGeneric(TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
                 "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { logEntryId: CurrIds[0] },
@@ -221,12 +226,12 @@ $(document).ready(function () {
                 "GET", "/PersonSrv/Get", { getActive: true } )
                 .always(hideModalWait)
                 .done(function () {
-                    $("#LogEntryPersonsView").removeClass("hide");
+                    $("#LogEntryPersonsView").removeClass("hidden");
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
         }
         else {
-            $("#LogEntryPersonsView").addClass("hide");
+            $("#LogEntryPersonsView").addClass("hidden");
         }
     });
            
@@ -234,8 +239,8 @@ $(document).ready(function () {
 
     $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
     refreshMainView();
-    $("#InitialView").addClass("hide");
-    $("#MainView").removeClass("hide");
+    $("#InitialView").addClass("hidden");
+    $("#MainView").removeClass("hidden");
   
 
     //--------------------------------End of execution at Start-----------
