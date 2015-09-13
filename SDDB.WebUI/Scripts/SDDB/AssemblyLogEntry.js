@@ -49,27 +49,27 @@ $(document).ready(function () {
         CurrRecords = [];
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Log Entry", "MainView");
+        saveWindowYPos();
+        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) showModalNothingSelected();
-        else {
-            if (GetActive) $("#EditFormGroupIsActive").addClass("hidden");
-            else $("#EditFormGroupIsActive").removeClass("hidden");
-
-            showModalWait();
-
-            fillFormForEditGeneric(CurrIds, "POST", "/AssemblyLogEntrySrv/GetByIds", GetActive, "EditForm", "Edit Log Entry", MagicSuggests)
-                .always(hideModalWait)
-                .done(function (currRecords) {
-                    CurrRecords = currRecords;
-                    $("#MainView").addClass("hidden");
-                    $("#EditFormView").removeClass("hidden");
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
         }
+        showModalWait();
+        fillFormForEditGeneric(CurrIds, "POST", "/AssemblyLogEntrySrv/GetByIds",
+                GetActive, "EditForm", "Edit Log Entry", MagicSuggests)
+            .always(hideModalWait)
+            .done(function (currRecords) {
+                CurrRecords = currRecords;
+                saveWindowYPos();
+                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //Wire up BtnDelete 

@@ -70,7 +70,7 @@ $(document).ready(function () {
         msValidate(MagicSuggests);
         if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
             var entryFilesPanelText = $("#LogEntryDateTime").val() + " " + MagicSuggests[0].getSelection()[0].name;
-            submitEdits().done(function () { setTimeout(fillLogEntryFilesForm(entryFilesPanelText), 200); });
+            submitEdits().done(function () { setTimeout(function () { fillLogEntryFilesForm(entryFilesPanelText); }, 200); });
         }
     });
 

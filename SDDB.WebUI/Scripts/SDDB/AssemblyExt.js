@@ -61,8 +61,8 @@ $(document).ready(function () {
             .done(function (currRecords) {
                 CurrRecords = currRecords;
                 msDisableAll(MagicSuggests);
-                $("#MainView").addClass("hidden");
-                $("#EditFormView").removeClass("hidden");
+                saveWindowYPos();
+                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 
@@ -254,26 +254,26 @@ $(document).ready(function () {
     msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
   
     //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hidden");
-        $("#EditFormView").addClass("hidden");
-        window.scrollTo(0, 0);
+    $("#EditFormBtnCancel").click(function () {
+        switchView("EditFormView", "MainView", "tdo-btngroup-main", true);
     });
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
-        if (formIsValid("EditForm", false)) {
-            showModalWait();
-            submitEditsGeneric("EditForm", [], CurrRecords, "POST", "/AssemblyDbSrv/EditExt")
-                .always(hideModalWait)
-                .done(function () {
-                    refreshMainView();
-                    $("#MainView").removeClass("hidden");
-                    $("#EditFormView").addClass("hidden");
-                    window.scrollTo(0, 0);
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+        if (!formIsValid("EditForm", false)) {
+            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
+            return;
         }
+        showModalWait();
+        submitEditsGeneric("EditForm", [], CurrRecords, "POST", "/AssemblyDbSrv/EditExt")
+            .always(hideModalWait)
+            .done(function () {
+                refreshMainView()
+                    .done(function () {
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true);
+                    });
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
     });
 
     //--------------------------------------View Initialization------------------------------------//
@@ -291,52 +291,76 @@ $(document).ready(function () {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
+    var deferred0 = $.Deferred();
+
     TableMain.clear().search("").draw();
     $("#PanelTableMainTitle").text("Assemblies Extended");
     
     if (MsFilterByModel.getValue().length == 0) {
-        MsFilterByProject.clear(true);
-        MsFilterByProject.disable();
-        if (typeof AssemblyIds !== "undefined" && AssemblyIds != null && AssemblyIds.length > 0) {
-            fillMainTableFromIdsHelper();
-        }
-        return;
+        refreshMainViewForNoModelSelectedHelper().done(deferred0.resolve);
+        return deferred0.promise();
     }
 
-    fillMainTableFromAltIdsHelper();
+    fillMainTableFromAltIdsHelper().done(deferred0.resolve);
+    return deferred0.promise();
 }
 
 
 //---------------------------------------Helper Methods--------------------------------------//
 
+//refreshMainViewNoModelSelectedHelper
+function refreshMainViewForNoModelSelectedHelper() {
+    var deferred0 = $.Deferred();
+
+    MsFilterByProject.clear(true);
+    MsFilterByProject.disable();
+
+    if (typeof AssemblyIds === "undefined" || AssemblyIds == null || AssemblyIds.length == 0) {
+        return deferred0.resolve();
+    }
+    fillMainTableFromIdsHelper().done(deferred0.resolve);
+    return deferred0.promise();
+}
+
 //fillMainTableFromAltIdsHelper - used by refreshMainView
 function fillMainTableFromAltIdsHelper() {
+    var deferred0 = $.Deferred();
+
+    MsFilterByProject.enable();
+
     refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByAltIds",
-        {
-            projectIds: MsFilterByProject.getValue(),
-            modelIds: MsFilterByModel.getValue(),
-            getActive: GetActive
-        },
-        "POST")
+            {
+                projectIds: MsFilterByProject.getValue(),
+                modelIds: MsFilterByModel.getValue(),
+                getActive: GetActive
+            },
+            "POST")
         .done(function () {
-            MsFilterByProject.enable();
             updateViewsForModelGeneric(TableMain, "/AssemblyModelSrv/GetByIds",
-                MsFilterByModel.getValue(), "PanelTableMainTitle", "EditFormLabel");
+                    MsFilterByModel.getValue(), "PanelTableMainTitle", "EditFormLabel")
+                .done(deferred0.resolve);
         });
+    return deferred0.promise();
 }
 
 //fillMainTableFromIdsHelper - used by refreshMainView
 function fillMainTableFromIdsHelper() {
+    var deferred0 = $.Deferred();
+
     refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByIds", { ids: AssemblyIds, getActive: GetActive }, "POST")
         .done(function () {
-            if (TableMain.rows().data().length == 0) { return; }
+            if (TableMain.rows().data().length == 0) { return deferred0.resolve(); }
+
             var modelIds = TableMain.column("AssemblyModel_Id:name").data().toArray();
             if (!modelIdsAreSame(modelIds)) {
                 showModalFail("Error", "Selected records have no models or their models are not the same.");
                 TableMain.clear().search("").draw();
-                return;
+                return deferred0.resolve();
             }
+
             updateViewsForModelGeneric(TableMain, "/AssemblyModelSrv/GetByIds",
-                modelIds[0], "PanelTableMainTitle", "EditFormLabel");
+                    modelIds[0], "PanelTableMainTitle", "EditFormLabel")
+                .done(deferred0.resolve);
         });
+    return deferred0.promise();
 }

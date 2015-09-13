@@ -57,6 +57,7 @@ $(document).ready(function () {
         CurrRecords = [];
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Assembly", "MainView");
+        saveWindowYPos();
         switchView("MainView", "EditFormView", "tdo-btngroup-edit");
     });
 
@@ -73,6 +74,7 @@ $(document).ready(function () {
             .always(hideModalWait)
             .done(function (currRecords) {
                 CurrRecords = currRecords;
+                saveWindowYPos();
                 switchView("MainView", "EditFormView", "tdo-btngroup-edit");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -300,14 +302,14 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel").click(function () {
-        switchView("EditFormView","MainView", "tdo-btngroup-main");
+        switchView("EditFormView","MainView", "tdo-btngroup-main", true);
     });
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
         if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
-            showModalFail("Errors in input", "The form has missing or invalid inputs.\nPlease correct.");
+            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
             return;
         }
         showModalWait();
@@ -315,8 +317,10 @@ $(document).ready(function () {
         submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/AssemblyDbSrv/Edit", createMultiple)
             .always(hideModalWait)
             .done(function () {
-                refreshMainView();
-                switchView("EditFormView", "MainView", "tdo-btngroup-main");
+                refreshMainView()
+                    .done(function () {
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true);
+                    });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
     });
@@ -343,6 +347,8 @@ function DeleteRecords() {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
+    var deferred0 = $.Deferred();
+
     TableMain.clear().search("").draw();
 
     if (MsFilterByType.getValue().length == 0 &&
@@ -350,9 +356,10 @@ function refreshMainView() {
         MsFilterByLoc.getValue().length == 0)
     {
         if (typeof AssemblyIds !== "undefined" && AssemblyIds != null && AssemblyIds.length > 0) {
-            refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByIds", { ids: AssemblyIds, getActive: GetActive }, "POST");
+            refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByIds", { ids: AssemblyIds, getActive: GetActive }, "POST")
+                .done(deferred0.resolve);
         }
-        return;
+        return deferred0.promise();
     }
 
     refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByAltIds2",
@@ -363,6 +370,9 @@ function refreshMainView() {
             getActive: GetActive
         },
         "POST")
+        .done(deferred0.resolve);
+
+    return deferred0.promise();
 }
 
 //fillFiltersFromRequestParams

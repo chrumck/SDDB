@@ -6,6 +6,10 @@
 /// <reference path="../bootstrap.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 
+//--------------------------------------Global Properties------------------------------------//
+
+var windowYpos = 0;
+
 //---------------------------------------Global Settings-------------------------------------//
 
 $(document).ready(function () {
@@ -140,28 +144,29 @@ function showModalFail(label, body, bodyPre) {
 
 //showModalAJAXFail
 function showModalAJAXFail(xhr, status, error) {
-    if (typeof xhr.responseJSON !== "undefined") {
-        var errMessage = xhr.responseJSON.responseText.substr(0, 512);
-    }
-    else if (typeof xhr.responseText !== "undefined") {
-        var errMessage = xhr.responseText.substr(0, 512);
-    }
-    if (typeof errMessage == "undefined" || errMessage == "") { errMessage = "No error details available."; }
+    var errMessage = "No error details available.";
+    if (typeof xhr.responseJSON !== "undefined") { errMessage = xhr.responseJSON.responseText.substr(0, 512); }
+    else if (typeof xhr.responseText !== "undefined") { errMessage = xhr.responseText.substr(0, 512); }
     $("#ModalInfoLabel").text("Server Error");
     $("#ModalInfoBody").html("Error type: <strong>" + error + "</strong> , Status: <strong>" + status + "</strong>");
     $("#ModalInfoBodyPre").text(errMessage).removeClass("hidden");
-    $("#ModalInfo").modal("show");
+    setTimeout(function () { $("#ModalInfo").modal("show"); }, 10);
 }
 
 //switchView 
-function switchView(fromViewId, toViewId, toBtnGroupClass) {
+function switchView(fromViewId, toViewId, toBtnGroupClass, scrollToWindowYpos) {
     if (toBtnGroupClass) {
         $("[class*='tdo-btngroup']").addClass("hidden");
         $("[class~='" + toBtnGroupClass + "']").removeClass("hidden");
     }
-    $("#" +fromViewId).addClass("hidden");
+    $("#" + fromViewId).addClass("hidden");
     $("#" + toViewId).removeClass("hidden");
-    window.scrollTo(0, 0);
+    if (scrollToWindowYpos) { window.scrollTo(0, windowYpos); } else { window.scrollTo(0, 0); }
+}
+
+//saveWindowPos
+function saveWindowYPos() {
+    windowYpos = window.pageYOffset || document.documentElement.scrollTop;
 }
 
 //-----------------------------------------------------------------------------
@@ -220,10 +225,16 @@ function deleteRecordsGeneric(ids, url, callback) {
 function formIsValid(id, isCreate) {
     if ($("#" + id).valid()) { return true; }
     if (isCreate) { return false; }
+    var isValid = true;
     $("#" + id + " input").each(function (index) {
-        if ($(this).data("ismodified") && $(this).hasClass("input-validation-error")) { return false; }
+        if ($(this).data("ismodified") && $(this).hasClass("input-validation-error")) {
+            isValid = false;
+            return true;
+        }
+        $(this).removeClass("input-validation-error");
+        $("[data-valmsg-for='" + this.id + "']").empty();
     });
-    return true;
+    return isValid;
 }
 
 //Clear inputs from forms and reset .ismodified to false
@@ -243,8 +254,10 @@ function clearFormInputs(formId, msArray) {
 function fillFormForCreateGeneric(formId, msArray, labelText) {
     clearFormInputs(formId, msArray);
     $("#" + formId + "Label").text(labelText);
-    $("#" + formId + " [data-val-dbisunique]").prop("disabled", false); msDisableUnique(msArray, false);
-    $("#" + formId + " .modifiable").data("ismodified", true); msSetAsModified(msArray, true);
+    $("#" + formId + " [data-val-dbisunique]").prop("disabled", false);
+    msDisableUnique(msArray, false);
+    $("#" + formId + " .modifiable").data("ismodified", true);
+    msSetAsModified(msArray, true);
     $("#" + formId + "GroupIsActive").addClass("hidden");
     $("#IsActive").prop("checked", true);
     $("#IsActive_bl").prop("checked", true)
@@ -254,12 +267,8 @@ function fillFormForCreateGeneric(formId, msArray, labelText) {
 //FillFormForEdit Generic version
 function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText, msArray) {
 
-    if (GetActive) {
-        $("#" + formId + "GroupIsActive").addClass("hidden");
-    }
-    else {
-        $("#" + formId + "GroupIsActive").removeClass("hidden");
-    }
+    if (GetActive) { $("#" + formId + "GroupIsActive").addClass("hidden"); }
+    else { $("#" + formId + "GroupIsActive").removeClass("hidden"); }
     $("#" + formId + "CreateMultiple").addClass("hidden");
 
     var deferred0 = $.Deferred();
@@ -588,6 +597,7 @@ function msSetAsModified(msArray, isModified) {
 
 //Pulls Model Information and formats edit form and column names
 function updateViewsForModelGeneric(table, url, modelId, tableTitleId, editFormLabelId) {
+    var deferred0 = $.Deferred();
     showModalWait();
     $.ajax({ type: "POST", url: url, timeout: 120000, data: { ids: [modelId] }, dataType: "json" })
         .always(hideModalWait)
@@ -665,8 +675,13 @@ function updateViewsForModelGeneric(table, url, modelId, tableTitleId, editFormL
             $("#EditForm").removeData("validator");
             $("#EditForm").removeData('unobtrusiveValidation');
             $.validator.unobtrusive.parse("#EditForm")
+            deferred0.resolve();
         })
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject(xhr, status, error);
+        });
+    return deferred0.promise();
 }
 
 //checkAllEqualInArray - checks if all items in array are same
