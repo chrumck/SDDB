@@ -42,27 +42,27 @@ $(document).ready(function () {
         CurrRecords = [];
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Document", "MainView");
+        saveViewSettings(TableMain);
+        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) { showModalNothingSelected(); }
-        else {
-            if (GetActive) { $("#EditFormGroupIsActive").addClass("hidden"); }
-            else { $("#EditFormGroupIsActive").removeClass("hidden"); }
-
-            showModalWait();
-
-            fillFormForEditGeneric(CurrIds, "POST", "/DocumentSrv/GetByIds", GetActive, "EditForm", "Edit Document", MagicSuggests)
-                .always(hideModalWait)
-                .done(function (currRecords) {
-                    CurrRecords = currRecords;
-                    $("#MainView").addClass("hidden");
-                    $("#EditFormView").removeClass("hidden");
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
         }
+        showModalWait();
+	fillFormForEditGeneric(CurrIds, "POST", "/DocumentSrv/GetByIds", 
+		GetActive, "EditForm", "Edit Document", MagicSuggests)
+            .always(hideModalWait)
+            .done(function (currRecords) {
+                CurrRecords = currRecords;
+                saveViewSettings(TableMain);
+                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //Wire up BtnDelete 
@@ -183,27 +183,27 @@ $(document).ready(function () {
     msAddToMsArray(MagicSuggests, "RelatesToCompType_Id", "/ComponentTypeSrv/Lookup", 1);
     
     //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hidden");
-        $("#EditFormView").addClass("hidden");
-        window.scrollTo(0, 0);
+    $("#EditFormBtnCancel").click(function () {
+        switchView("EditFormView","MainView", "tdo-btngroup-main", true);
     });
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
-        if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
-            showModalWait();
-            submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/DocumentSrv/Edit")
-                .always(hideModalWait)
-                .done(function () {
-                    refreshMainView();
-                    $("#MainView").removeClass("hidden");
-                    $("#EditFormView").addClass("hidden");
-                    window.scrollTo(0, 0);
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
+            return;
         }
+        showModalWait();
+        submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/DocumentSrv/Edit")
+            .always(hideModalWait)
+            .done(function () {
+                refreshMainView()
+                    .done(function () {
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
+                    });
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
     });
 
     //--------------------------------------View Initialization------------------------------------//
@@ -226,23 +226,24 @@ function DeleteRecords() {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
-    if (MsFilterByType.getValue().length == 0 &&
-        MsFilterByProject.getValue().length == 0) {
-        $("#ChBoxShowDeleted").bootstrapToggle("disable")
-        TableMain.clear().search("").draw();
-    }
-    else {
-        refreshTblGenWrp(TableMain, "/DocumentSrv/GetByAltIds",
-            {
-                projectIds: MsFilterByProject.getValue(),
-                typeIds: MsFilterByType.getValue(),
-                getActive: GetActive
-            },
-            "POST")
-            .done($("#ChBoxShowDeleted").bootstrapToggle("enable"))
-    }
-}
+    var deferred0 = $.Deferred();
 
+    TableMain.clear().search("").draw();
+
+    if (MsFilterByType.getValue().length == 0 && MsFilterByProject.getValue().length == 0) {
+        return deferred0.resolve();
+    }
+    refreshTblGenWrp(TableMain, "/DocumentSrv/GetByAltIds",
+        {
+            projectIds: MsFilterByProject.getValue(),
+            typeIds: MsFilterByType.getValue(),
+            getActive: GetActive
+        },
+        "POST")
+        .done(deferred0.resolve);
+
+    return deferred0.promise();
+}
 
 
 //---------------------------------------Helper Methods--------------------------------------//

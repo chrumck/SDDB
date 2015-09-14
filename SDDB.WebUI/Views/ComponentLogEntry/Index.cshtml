@@ -7,18 +7,28 @@
     <h4>Please wait, page loading...</h4>
 </div>
 
+<!----- Navbar Section ----->
+@section Navbar{
+    <div class="btn-group navbar-btn tdo-btngroup-main">
+        <button type="button" class="btn btn-default" id="BtnCreate">New</button>
+        <button type="button" class="btn btn-tdo-nav" id="BtnEdit">&nbsp;&nbsp;Edit&nbsp;&nbsp;</button>
+        <button type="button" class="btn btn-danger" id="BtnDelete">&nbsp;&nbsp;Del&nbsp;&nbsp;</button>
+    </div>
+
+    <div class="btn-group navbar-btn tdo-btngroup-edit hidden">
+        <button type="button" class="btn btn-default" id="EditFormBtnCancel">Cancel</button>
+        <button type="button" class="btn btn-tdo-nav disabled">&nbsp;&nbsp;&nbsp;&nbsp;</button>
+        <button type="button" class="btn btn-success" id="EditFormBtnOk">
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        </button>
+    </div>
+}
+
 <!------- MainView ------->
 <div class="container-fluid hidden" id="MainView">
 
     <div class="row">
-        <div class="col-md-12 col-lg-3">
-            <div class="btn-group margin-bottom-2px">
-                <button class="btn btn-default" id="BtnCreate">Create</button>
-                <button class="btn btn-primary" id="BtnEdit">Edit</button>
-                <button class="btn btn-danger" id="BtnDelete">Delete</button>
-            </div>
-        </div>
-        <div class="col-md-12 col-lg-4">
+        <div class="col-md-12 col-lg-6">
             <div class="btn-group margin-bottom-2px">
                 <input class="form-control input-tdo-warning" data-val="true" data-val-dbisdateiso="The field must have YYYY-MM-DD format."
                        id="FilterDateStart" placeholder="Start Date" type="text" value="">
@@ -28,7 +38,7 @@
                        id="FilterDateEnd" placeholder="End Date" type="text" value="">
             </div>            
         </div>
-        <div class="col-md-12 col-lg-5">
+        <div class="col-md-12 col-lg-6">
             <div class="btn-group margin-bottom-2px">
                 <div id="MsFilterByProject" placeholder="Select Project"></div>
             </div>
@@ -46,7 +56,7 @@
             <strong>Component Log Entries</strong>
             <div class="pull-right">
                 <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="65"
-                        data-onstyle="warning" data-offstyle="primary" data-on="Deleted" data-off="Active" disabled>
+                        data-onstyle="warning" data-offstyle="primary" data-on="Deleted" data-off="Active">
             </div>
         </div>
         <table class="table table-striped" id="TableMain">
@@ -77,11 +87,8 @@
 <!------- EditFormView ------->
 <div class="container-fluid hidden" id="EditFormView">
     <div class="row">
-        <div class="col-xs-6">
+        <div class="col-xs-12">
             <h3 id="EditFormLabel">Create/Edit Log Entry</h3>
-        </div>
-        <div class="col-xs-6">
-            <h3><button class="btn btn-default pull-right" type="button" id="EditFormBtnBack">Cancel</button></h3>
         </div>
     </div>
     <div class="well well-tdo">
@@ -150,17 +157,6 @@
                     </div>
                 </div>
 
-            </div>
-
-            <div class="form-group">
-                <div class="col-xs-6">
-                    <button class="btn btn-default" type="button" id="EditFormBtnCancel">Cancel</button>
-                </div>
-                <div class="col-xs-6">
-                    <button class="btn btn-success pull-right" type="button" id="EditFormBtnOk">
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
-                    </button>
-                </div>
             </div>
         </form>
     </div>

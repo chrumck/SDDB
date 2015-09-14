@@ -44,8 +44,9 @@ $(document).ready(function () {
         CurrIds = [];
         CurrRecords = [];
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
-        $("#EditFormCreateMultiple").removeClass("hidden");
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Component", "MainView");
+        saveViewSettings(TableMain);
+        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
     });
 
     //Wire up BtnEdit
@@ -55,20 +56,14 @@ $(document).ready(function () {
             showModalNothingSelected();
             return;
         }
-        if (GetActive) { $("#EditFormGroupIsActive").addClass("hidden"); }
-        else { $("#EditFormGroupIsActive").removeClass("hidden"); }
-
-        $("#EditFormCreateMultiple").addClass("hidden");
-
         showModalWait();
-
         fillFormForEditGeneric(CurrIds, "POST", "/ComponentSrv/GetByIds",
                 GetActive, "EditForm", "Edit Component", MagicSuggests)
             .always(hideModalWait)
             .done(function (currRecords) {
                 CurrRecords = currRecords;
-                $("#MainView").addClass("hidden");
-                $("#EditFormView").removeClass("hidden");
+                saveViewSettings(TableMain);
+                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
@@ -242,28 +237,28 @@ $(document).ready(function () {
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
 
     //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hidden");
-        $("#EditFormView").addClass("hidden");
-        window.scrollTo(0, 0);
+    $("#EditFormBtnCancel").click(function () {
+        switchView("EditFormView","MainView", "tdo-btngroup-main", true);
     });
     
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
-        if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
-            showModalWait();
-            var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
-            submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/ComponentSrv/Edit", createMultiple)
-                .always(hideModalWait)
-                .done(function () {
-                    refreshMainView();
-                    $("#MainView").removeClass("hidden");
-                    $("#EditFormView").addClass("hidden");
-                    window.scrollTo(0, 0);
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
+            return;
         }
+        showModalWait();
+        var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
+        submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/ComponentSrv/Edit", createMultiple)
+            .always(hideModalWait)
+            .done(function () {
+                refreshMainView()
+                    .done(function () {
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
+                    });
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
     });
 
     //--------------------------------------View Initialization------------------------------------//
@@ -288,6 +283,8 @@ function DeleteRecords() {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
+    var deferred0 = $.Deferred();
+
     TableMain.clear().search("").draw();
 
     if (MsFilterByType.getValue().length == 0 &&
@@ -295,9 +292,10 @@ function refreshMainView() {
         MsFilterByAssy.getValue().length == 0)
     {
         if (typeof ComponentIds !== "undefined" && ComponentIds != null && ComponentIds.length > 0) {
-            refreshTblGenWrp(TableMain, "/ComponentSrv/GetByIds", { ids: ComponentIds, getActive: GetActive }, "POST");
+            refreshTblGenWrp(TableMain, "/ComponentSrv/GetByIds", { ids: ComponentIds, getActive: GetActive }, "POST")
+                .done(deferred0.resolve);
         }
-        return;
+        return deferred0.promise();
     }
 
     refreshTblGenWrp(TableMain, "/ComponentSrv/GetByAltIds2",
@@ -307,7 +305,10 @@ function refreshMainView() {
             assyIds: MsFilterByAssy.getValue(),
             getActive: GetActive
         },
-        "POST");
+        "POST")
+        .done(deferred0.resolve);
+
+    return deferred0.promise();
 }
 
 //fillFiltersFromRequestParams

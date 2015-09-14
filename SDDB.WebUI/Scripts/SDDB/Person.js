@@ -46,100 +46,106 @@ $(document).ready(function () {
         CurrRecords = [];
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Person", "MainView");
+        saveViewSettings(TableMain);
+        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) showModalNothingSelected();
-        else {
-            if (GetActive) $("#EditFormGroupIsActive").addClass("hidden");
-            else $("#EditFormGroupIsActive").removeClass("hidden");
-
-            showModalWait();
-
-            fillFormForEditGeneric(CurrIds, "POST", "/PersonSrv/GetAllByIds", GetActive, "EditForm", "Edit Person", MagicSuggests)
-                .always(hideModalWait)
-                .done(function (currRecords) {
-                    CurrRecords = currRecords;
-                    $("#MainView").addClass("hidden");
-                    $("#EditFormView").removeClass("hidden");
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
         }
+        showModalWait();
+        fillFormForEditGeneric(CurrIds, "POST", "/PersonSrv/GetAllByIds", 
+	    	GetActive, "EditForm", "Edit Person", MagicSuggests)
+            .always(hideModalWait)
+            .done(function (currRecords) {
+                CurrRecords = currRecords;
+                saveViewSettings(TableMain);
+                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) showModalNothingSelected();
-        else showModalDelete(CurrIds.length);
+        if (CurrIds.length == 0) { showModalNothingSelected(); }
+        else { showModalDelete(CurrIds.length); }
     });
 
     //Wire Up BtnEditPrsProj 
     $("#BtnEditPrsProj").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) showModalNothingSelected();
-        else {
-            var selectedRecord = TableMain.row(".ui-selected", { page: "current"}).data()
-            if (CurrIds.length == 1) $("#PrsProjViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
-            else $("#PrsProjViewPanel").text("_MULTIPLE_");
-
-            showModalWait();
-
-            fillFormForRelatedGeneric(TableProjectsAdd, TableProjectsRemove, CurrIds, "GET", "/PersonSrv/GetPersonProjects", { id: CurrIds[0] },
-            "GET", "/PersonSrv/GetPersonProjectsNot", { id: CurrIds[0] }, "GET", "/ProjectSrv/Get", { getActive: true })
-                .always(hideModalWait)
-                .done(function () {
-                    $("#MainView").addClass("hidden");
-                    $("#PrsProjView").removeClass("hidden");
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
         }
+        if (CurrIds.length == 1) {
+            var selectedRecord = TableMain.row(".ui-selected", { page: "current" }).data()
+            $("#PrsProjViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
+        }
+        else $("#PrsProjViewPanel").text("_MULTIPLE_");
+        
+        showModalWait();
+        fillFormForRelatedGeneric(TableProjectsAdd, TableProjectsRemove, CurrIds, "GET", "/PersonSrv/GetPersonProjects", { id: CurrIds[0] },
+        "GET", "/PersonSrv/GetPersonProjectsNot", { id: CurrIds[0] }, "GET", "/ProjectSrv/Get", { getActive: true })
+            .always(hideModalWait)
+            .done(function () {
+                saveViewSettings(TableMain);
+                switchView("MainView", "PrsProjView", "tdo-btngroup-prsproj");
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //Wire Up BtnEditPersonGroups 
     $("#BtnEditPersonGroups").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) showModalNothingSelected();
-        else {
-            var selectedRecord = TableMain.row(".ui-selected", { page: "current"}).data()
-            if (CurrIds.length == 1) $("#PersonGroupsViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
-            else $("#PersonGroupsViewPanel").text("_MULTIPLE_");
-
-            showModalWait();
-
-            fillFormForRelatedGeneric(TablePersonGroupsAdd, TablePersonGroupsRemove, CurrIds, "GET", "/PersonSrv/GetPersonGroups", { id: CurrIds[0] },
-            "GET", "/PersonSrv/GetPersonGroupsNot", { id: CurrIds[0] }, "GET", "/PersonGroupSrv/Get", { getActive: true })
-                .always(hideModalWait)
-                .done(function () {
-                    $("#MainView").addClass("hidden");
-                    $("#PersonGroupsView").removeClass("hidden");
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
         }
+        if (CurrIds.length == 1) {
+            var selectedRecord = TableMain.row(".ui-selected", { page: "current" }).data()
+            $("#PersonGroupsViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
+        }
+        else $("#PersonGroupsViewPanel").text("_MULTIPLE_");
+        
+        showModalWait();
+        fillFormForRelatedGeneric(TablePersonGroupsAdd, TablePersonGroupsRemove, CurrIds, "GET", "/PersonSrv/GetPersonGroups", { id: CurrIds[0] },
+        "GET", "/PersonSrv/GetPersonGroupsNot", { id: CurrIds[0] }, "GET", "/PersonGroupSrv/Get", { getActive: true })
+            .always(hideModalWait)
+            .done(function () {
+                saveViewSettings(TableMain);
+                switchView("MainView", "PersonGroupsView", "tdo-btngroup-prsgroups");
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //Wire Up BtnEditManagedGroups 
     $("#BtnEditManagedGroups").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) showModalNothingSelected();
-        else {
-            var selectedRecord = TableMain.row(".ui-selected", { page: "current"}).data()
-            if (CurrIds.length == 1) $("#ManagedGroupsViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
-            else $("#ManagedGroupsViewPanel").text("_MULTIPLE_");
-
-            showModalWait();
-
-            fillFormForRelatedGeneric(TableManagedGroupsAdd, TableManagedGroupsRemove, CurrIds, "GET", "/PersonSrv/GetManagedGroups", { id: CurrIds[0] },
-            "GET", "/PersonSrv/GetManagedGroupsNot", { id: CurrIds[0] }, "GET", "/PersonGroupSrv/Get", { getActive: true })
-                .always(hideModalWait)
-                .done(function () {
-                    $("#MainView").addClass("hidden");
-                    $("#ManagedGroupsView").removeClass("hidden");
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
         }
+        if (CurrIds.length == 1) {
+            var selectedRecord = TableMain.row(".ui-selected", { page: "current" }).data()
+            $("#ManagedGroupsViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
+        }
+        else $("#ManagedGroupsViewPanel").text("_MULTIPLE_");
+
+        showModalWait();
+        fillFormForRelatedGeneric(TableManagedGroupsAdd, TableManagedGroupsRemove, CurrIds, "GET", "/PersonSrv/GetManagedGroups", { id: CurrIds[0] },
+        "GET", "/PersonSrv/GetManagedGroupsNot", { id: CurrIds[0] }, "GET", "/PersonGroupSrv/Get", { getActive: true })
+            .always(hideModalWait)
+            .done(function () {
+                saveViewSettings(TableMain);
+                switchView("MainView", "ManagedGroupsView", "tdo-btngroup-managedgroups");
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //wire up dropdownId1
@@ -229,38 +235,35 @@ $(document).ready(function () {
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
 
     //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hidden");
-        $("#EditFormView").addClass("hidden");
-        window.scrollTo(0, 0);
+    $("#EditFormBtnCancel").click(function () {
+        switchView("EditFormView","MainView", "tdo-btngroup-main", true);
     });
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
-        if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
-
-            showModalWait();
-
-            submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonSrv/Edit")
-                .always(hideModalWait)
-                .done(function () {
-                    $("#MainView").removeClass("hidden");
-                    $("#EditFormView").addClass("hidden");
-                    window.scrollTo(0, 0);
-                    refreshMainView();
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
+            return;
         }
+        showModalWait();
+        var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
+        submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonSrv/Edit", createMultiple)
+            .always(hideModalWait)
+            .done(function () {
+                refreshMainView()
+                    .done(function () {
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
+                    });
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
     });
 
     //----------------------------------------PrsProjView----------------------------------------//
 
     //Wire Up PrsProjViewBtnCancel
-    $("#PrsProjViewBtnCancel, #PrsProjViewBtnBack").click(function () {
-        $("#MainView").removeClass("hidden");
-        $("#PrsProjView").addClass("hidden");
-        window.scrollTo(0, 0);
+    $("#PrsProjViewBtnCancel").click(function () {
+        switchView("PrsProjView", "MainView", "tdo-btngroup-main", true);
     });
 
     //Wire Up PrsProjViewBtnOk
@@ -268,24 +271,23 @@ $(document).ready(function () {
         if (TableProjectsAdd.rows(".ui-selected", { page: "current" }).data().length +
             TableProjectsRemove.rows(".ui-selected", { page: "current" }).data().length == 0) {
             showModalNothingSelected();
+	        return;
         }
-        else {
-            showModalWait();
+        showModalWait();
+        submitEditsForRelatedGeneric(
+                CurrIds,
+                TableProjectsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                TableProjectsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                "/PersonSrv/EditPersonProjects")
+            .always(hideModalWait)
+            .done(function () {
+                refreshMainView()
+                    .done(function () {
+                        switchView("PrsProjView", "MainView", "tdo-btngroup-main", true, TableMain);
+                    });
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 
-            submitEditsForRelatedGeneric(
-                    CurrIds,
-                    TableProjectsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-                    TableProjectsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-                    "/PersonSrv/EditPersonProjects")
-                .always(hideModalWait)
-                .done(function () {
-                    $("#MainView").removeClass("hidden");
-                    $("#PrsProjView").addClass("hidden");
-                    window.scrollTo(0, 0);
-                    refreshMainView();
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-        }
     });
 
     //---------------------------------------DataTables------------
@@ -341,10 +343,8 @@ $(document).ready(function () {
     //----------------------------------------PersonGroupsView----------------------------------------//
 
     //Wire Up PersonGroupsViewBtnCancel
-    $("#PersonGroupsViewBtnCancel, #PersonGroupsViewBtnBack").click(function () {
-        $("#MainView").removeClass("hidden");
-        $("#PersonGroupsView").addClass("hidden");
-        window.scrollTo(0, 0);
+    $("#PersonGroupsViewBtnCancel").click(function () {
+        switchView("PersonGroupsView", "MainView", "tdo-btngroup-main", true);
     });
 
     //Wire Up PersonGroupsViewBtnOk
@@ -352,23 +352,22 @@ $(document).ready(function () {
         if (TablePersonGroupsAdd.rows(".ui-selected", { page: "current" }).data().length +
             TablePersonGroupsRemove.rows(".ui-selected", { page: "current" }).data().length == 0) {
             showModalNothingSelected();
+            return;
         }
-        else {
-            showModalWait();
-
-            submitEditsForRelatedGeneric(CurrIds,
-                    TablePersonGroupsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-                    TablePersonGroupsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-                    "/PersonSrv/EditPersonGroups")
-                .always(hideModalWait)
-                .done(function () {
-                    $("#MainView").removeClass("hidden");
-                    $("#PersonGroupsView").addClass("hidden");
-                    window.scrollTo(0, 0);
-                    refreshMainView();
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-        }
+        showModalWait();
+        submitEditsForRelatedGeneric(
+                CurrIds,
+                TablePersonGroupsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                TablePersonGroupsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                "/PersonSrv/EditPersonGroups")
+            .always(hideModalWait)
+            .done(function () {
+                refreshMainView()
+                    .done(function () {
+                        switchView("PersonGroupsView", "MainView", "tdo-btngroup-main", true, TableMain);
+                    });
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
     
     //---------------------------------------DataTables------------
@@ -424,10 +423,8 @@ $(document).ready(function () {
     //----------------------------------------ManagedGroupsView----------------------------------------//
 
     //Wire Up ManagedGroupsViewBtnCancel
-    $("#ManagedGroupsViewBtnCancel, #ManagedGroupsViewBtnBack").click(function () {
-        $("#MainView").removeClass("hidden");
-        $("#ManagedGroupsView").addClass("hidden");
-        window.scrollTo(0, 0);
+    $("#ManagedGroupsViewBtnCancel").click(function () {
+        switchView("ManagedGroupsView", "MainView", "tdo-btngroup-main", true);
     });
 
     //Wire Up ManagedGroupsViewBtnOk
@@ -435,24 +432,22 @@ $(document).ready(function () {
         if (TableManagedGroupsAdd.rows(".ui-selected", { page: "current" }).data().length +
             TableManagedGroupsRemove.rows(".ui-selected", { page: "current" }).data().length == 0) {
             showModalNothingSelected();
+            return;
         }
-        else {
-            showModalWait();
-
-            submitEditsForRelatedGeneric(
-                    CurrIds,
-                    TableManagedGroupsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-                    TableManagedGroupsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-                    "/PersonSrv/EditManagedGroups")
-                .always(hideModalWait)
-                .done(function () {
-                    $("#MainView").removeClass("hidden");
-                    $("#ManagedGroupsView").addClass("hidden");
-                    window.scrollTo(0, 0);
-                    refreshMainView();
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-        }
+        showModalWait();
+        submitEditsForRelatedGeneric(
+                CurrIds,
+                TableManagedGroupsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                TableManagedGroupsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                "/PersonSrv/EditManagedGroups")
+            .always(hideModalWait)
+            .done(function () {
+                refreshMainView()
+                    .done(function () {
+                        switchView("ManagedGroupsView", "MainView", "tdo-btngroup-main", true, TableMain);
+                    });
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //---------------------------------------DataTables------------
@@ -525,8 +520,11 @@ function DeleteRecords() {
     deleteRecordsGeneric(CurrIds, "/PersonSrv/Delete", refreshMainView);
 }
 
+//refresh Main view 
 function refreshMainView() {
-    refreshTblGenWrp(TableMain, "/PersonSrv/GetAll", { getActive: GetActive });
+    var deferred0 = $.Deferred();
+    refreshTblGenWrp(TableMain, "/PersonSrv/GetAll", { getActive: GetActive }).done(deferred0.resolve);
+    return deferred0.promise();
 }
 
 

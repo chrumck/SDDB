@@ -39,33 +39,34 @@ $(document).ready(function () {
         CurrRecords = [];
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Log Entry", "MainView");
+        saveViewSettings(TableMain);
+        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) showModalNothingSelected();
-        else {
-            if (GetActive) $("#EditFormGroupIsActive").addClass("hidden");
-            else $("#EditFormGroupIsActive").removeClass("hidden");
-
-            showModalWait();
-            fillFormForEditGeneric(CurrIds, "POST", "/ComponentLogEntrySrv/GetByIds", GetActive, "EditForm", "Edit Log Entry", MagicSuggests)
-                .always(hideModalWait)
-                .done(function (currRecords) {
-                    CurrRecords = currRecords;
-                    $("#MainView").addClass("hidden");
-                    $("#EditFormView").removeClass("hidden");
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
         }
+        showModalWait();
+        fillFormForEditGeneric(CurrIds, "POST", "/ComponentLogEntrySrv/GetByIds",
+	        GetActive, "EditForm", "Edit Log Entry", MagicSuggests)
+            .always(hideModalWait)
+            .done(function (currRecords) {
+                CurrRecords = currRecords;
+                saveViewSettings(TableMain);
+                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) showModalNothingSelected();
-        else showModalDelete(CurrIds.length);
+        if (CurrIds.length == 0) { showModalNothingSelected(); }
+        else { showModalDelete(CurrIds.length); }
     });
 
     //Initialize DateTimePicker FilterDateStart
@@ -184,46 +185,33 @@ $(document).ready(function () {
     msAddToMsArray(MagicSuggests, "AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
 
     //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hidden");
-        $("#EditFormView").addClass("hidden");
-        window.scrollTo(0, 0);
+    $("#EditFormBtnCancel").click(function () {
+        switchView("EditFormView", "MainView", "tdo-btngroup-main", true);
     });
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
-        if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
-            showModalWait();
-            submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/ComponentLogEntrySrv/Edit")
-                .always(hideModalWait)
-                .done(function () {
-                    refreshMainView();
-                    $("#MainView").removeClass("hidden");
-                    $("#EditFormView").addClass("hidden");
-                    window.scrollTo(0, 0);
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
+            return;
         }
+        showModalWait();
+        submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/ComponentLogEntrySrv/Edit")
+            .always(hideModalWait)
+            .done(function () {
+                refreshMainView()
+                    .done(function () {
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
+                    });
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
     });
 
     //--------------------------------------View Initialization------------------------------------//
 
-    if (typeof ComponentId !== "undefined" && ComponentId != "") {
-        showModalWait();
-        $.ajax({
-            type: "POST", url: "/ComponentSrv/GetByIds", timeout: 120000, data: { ids: [ComponentId], getActive: true }, dataType: "json"})
-            .always(hideModalWait)
-            .done(function (data) {
-                MsFilterByComponent.setSelection([{ id: data[0].Id, name: data[0].CompName, }]);
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    }
-    else {
-        $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
-        $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
-        refreshMainView();
-    }
+    fillFiltersFromRequestParams().done(refreshMainView);
+
     $("#InitialView").addClass("hidden");
     $("#MainView").removeClass("hidden");
     
@@ -239,27 +227,63 @@ function DeleteRecords() {
     deleteRecordsGeneric(CurrIds, "/ComponentLogEntrySrv/Delete", refreshMainView);
 }
 
-//refresh view after magicsuggest update
+//refresh Main view 
 function refreshMainView() {
+    var deferred0 = $.Deferred();
 
-    if ( ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "") &&
-        (MsFilterByProject.getValue().length == 0 && MsFilterByComponent.getValue().length == 0 &&
-                MsFilterByPerson.getValue().length == 0) ) {
-        $("#ChBoxShowDeleted").bootstrapToggle("disable")
-        TableMain.clear().search("").draw();
-    }
-    else {
-        var endDate = ($("#FilterDateEnd").val() == "") ? "" : moment($("#FilterDateEnd").val())
-            .hour(23).minute(59).format("YYYY-MM-DD HH:mm");
+    TableMain.clear().search("").draw();
 
-        refreshTblGenWrp(TableMain, "/ComponentLogEntrySrv/GetByAltIds",
-            {projectIds: MsFilterByProject.getValue(), componentIds: MsFilterByComponent.getValue(),
-            personIds: MsFilterByPerson.getValue(), startDate: $("#FilterDateStart").val(), endDate: endDate,
-            getActive: GetActive }, "POST")
-            .done(function () { $("#ChBoxShowDeleted").bootstrapToggle("enable"); })
-    }
+    if (($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "") &&
+         (MsFilterByProject.getValue().length == 0 && MsFilterByComponent.getValue().length == 0 &&
+                MsFilterByPerson.getValue().length == 0)
+        ) { return deferred0.resolve(); }
+
+    var endDate = ($("#FilterDateEnd").val() == "") ? "" : moment($("#FilterDateEnd").val())
+        .hour(23).minute(59).format("YYYY-MM-DD HH:mm");
+
+    refreshTblGenWrp(TableMain, "/ComponentLogEntrySrv/GetByAltIds",
+        {
+            projectIds: MsFilterByProject.getValue(),
+            componentIds: MsFilterByComponent.getValue(),
+            personIds: MsFilterByPerson.getValue(),
+            startDate: $("#FilterDateStart").val(),
+            endDate: endDate,
+            getActive: GetActive
+        },
+        "POST")
+        .done(deferred0.resolve);
+
+    return deferred0.promise();
 }
 
+//fillFiltersFromRequestParams
+function fillFiltersFromRequestParams() {
+    var deferred0 = $.Deferred();
+
+    if (typeof ComponentId !== "undefined" && ComponentId != "") {
+        showModalWait();
+        $.ajax({
+            type: "POST", url: "/ComponentSrv/GetByIds",
+            timeout: 120000, data: { ids: [ComponentId], getActive: true }, dataType: "json"
+        })
+            .always(hideModalWait)
+            .done(function (data) {
+                msSetSelectionSilent(MsFilterByComponent, [{ id: data[0].Id, name: data[0].CompName, }]);
+                deferred0.resolve();
+            })
+            .fail(function (xhr, status, error) {
+                showModalAJAXFail(xhr, status, error); 
+                deferred0.reject(xhr, status, error);
+            });
+    }
+    else {
+        $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
+        $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
+        deferred0.resolve();
+    }
+
+    return deferred0.promise();
+}
 
 //---------------------------------------Helper Methods--------------------------------------//
 

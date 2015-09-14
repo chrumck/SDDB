@@ -7,28 +7,42 @@
     <h4>Please wait, page loading...</h4>
 </div>
 
+<!----- Navbar Section ----->
+@section Navbar{
+    <div class="btn-group navbar-btn tdo-btngroup-main">
+        <button type="button" class="btn btn-default" id="BtnCreate">New</button>
+        <button type="button" class="btn btn-tdo-nav" id="BtnEdit">&nbsp;&nbsp;Edit&nbsp;&nbsp;</button>
+        <button type="button" class="btn btn-danger" id="BtnDelete">&nbsp;&nbsp;Del&nbsp;&nbsp;</button>
+    </div>
+
+    <div class="btn-group navbar-btn tdo-btngroup-edit hidden">
+        <button type="button" class="btn btn-default" id="EditFormBtnCancel">Cancel</button>
+        <button type="button" class="btn btn-tdo-nav disabled">&nbsp;&nbsp;&nbsp;&nbsp;</button>
+        <button type="button" class="btn btn-success" id="EditFormBtnOk">
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        </button>
+    </div>
+}
+@section NavbarCollapse{
+    <ul class="nav navbar-nav tdo-btngroup-main">
+        <li class="dropdown margin-left-5px">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">More<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li><a class="collapsenav" href=# id="dropdownId1">Show 1st Columns</a></li>
+                <li><a class="collapsenav" href=# id="dropdownId2">Show 2nd Columns</a></li>
+                <li><a class="collapsenav" href=# id="dropdownId3">Show 3rd Columns</a></li>
+                <li class="divider"></li>
+                <li><a class="collapsenav" href=# id="dropdownId4">Show Loc Assemblies</a></li>
+            </ul>
+        </li>
+    </ul>
+}
+
 <!------- MainView ------->
 <div class="container-fluid hidden" id="MainView">
 
     <div class="row">
-        <div class="col-sm-12 col-md-4">
-            <div class="btn-group margin-bottom-2px">
-                <button class="btn btn-default" id="BtnCreate">Create</button>
-                <button class="btn btn-primary" id="BtnEdit">Edit</button>
-                <button class="btn btn-danger" id="BtnDelete">Delete</button>
-            </div>
-            <div class="btn-group margin-bottom-2px">
-                <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown">More...</button>
-                <ul class="dropdown-menu dropdown-menu-left">
-                    <li><a href=# id="dropdownId1">Show 1st Columns</a></li>
-                    <li><a href=# id="dropdownId2">Show 2nd Columns</a></li>
-                    <li><a href=# id="dropdownId3">Show 3rd Columns</a></li>
-                    <li class="divider"></li>
-                    <li><a href=# id="dropdownId4">Show Loc Assemblies</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="col-sm-12 col-md-8">
+        <div class="col-xs-12">
             <div class="btn-group margin-bottom-2px">
                 <div id="MsFilterByType" placeholder="Select Type"></div>
             </div>
@@ -43,7 +57,7 @@
             <strong>Locations</strong>
             <div class="pull-right">
                 <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="65"
-                        data-onstyle="warning" data-offstyle="primary" data-on="Deleted" data-off="Active" disabled>
+                        data-onstyle="warning" data-offstyle="primary" data-on="Deleted" data-off="Active">
             </div>
         </div>
         <table class="table table-striped" id="TableMain">
@@ -79,11 +93,8 @@
 <!------- EditFormView ------->
 <div class="container-fluid hidden" id="EditFormView">
     <div class="row">
-        <div class="col-xs-6">
+        <div class="col-xs-12">
             <h3 id="EditFormLabel">Create/Edit Location</h3>
-        </div>
-        <div class="col-xs-6">
-            <h3><button class="btn btn-default pull-right" type="button" id="EditFormBtnBack">Cancel</button></h3>
         </div>
     </div>
     <div class="well well-tdo">
@@ -221,17 +232,6 @@
                     </div>
                 </div>
 
-            </div>
-
-            <div class="form-group">
-                <div class="col-xs-6">
-                    <button class="btn btn-default" type="button" id="EditFormBtnCancel">Cancel</button>
-                </div>
-                <div class="col-xs-6">
-                    <button class="btn btn-success pull-right" type="button" id="EditFormBtnOk">
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
-                    </button>
-                </div>
             </div>
         </form>
     </div>

@@ -57,7 +57,7 @@ $(document).ready(function () {
         CurrRecords = [];
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Assembly", "MainView");
-        saveWindowYPos();
+        saveViewSettings(TableMain);
         switchView("MainView", "EditFormView", "tdo-btngroup-edit");
     });
 
@@ -74,7 +74,7 @@ $(document).ready(function () {
             .always(hideModalWait)
             .done(function (currRecords) {
                 CurrRecords = currRecords;
-                saveWindowYPos();
+                saveViewSettings(TableMain);
                 switchView("MainView", "EditFormView", "tdo-btngroup-edit");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -178,7 +178,7 @@ $(document).ready(function () {
     //Wire up on change event for MsFilterByType
     $(MsFilterByType).on('selectionchange', function (e, m) { refreshMainView(); });
 
-    //Initialize MagicSuggest msFilterByProject
+    //Initialize MagicSuggest MsFilterByProject
     MsFilterByProject = $("#MsFilterByProject").magicSuggest({
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
@@ -319,7 +319,7 @@ $(document).ready(function () {
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true);
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });

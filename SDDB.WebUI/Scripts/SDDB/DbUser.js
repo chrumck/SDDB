@@ -39,6 +39,8 @@ $(document).ready(function () {
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
         MagicSuggests[0].enable();
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create SDDB User", "MainView");
+        saveViewSettings(TableMain);
+        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
     });
 
     //Wire up BtnEdit
@@ -68,8 +70,8 @@ $(document).ready(function () {
                 MagicSuggests[0].disable();
                 //---------------------------------------------------------------
 
-                $("#MainView").addClass("hidden");
-                $("#EditFormView").removeClass("hidden");
+                saveViewSettings(TableMain);
+                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
@@ -95,16 +97,14 @@ $(document).ready(function () {
         else { $("#DBRolesViewPanel").text("_MULTIPLE_"); }
 
         showModalWait();
-
         fillFormForRelatedGeneric(TableDBRolesAdd, TableDBRolesRemove, CurrIds, "GET", "/DBUserSrv/GetUserRoles", { id: CurrIds[0] },
         "GET", "/DBUserSrv/GetUserRolesNot", { id: CurrIds[0] }, "GET", "/DBUserSrv/GetAllRoles", null, 0)
             .always(hideModalWait)
             .done(function () {
-                $("#MainView").addClass("hidden");
-                $("#DBRolesView").removeClass("hidden");
+                saveViewSettings(TableMain);
+                switchView("MainView", "DBRolesView", "tdo-btngroup-dbroles");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-
     });
 
     
@@ -143,47 +143,45 @@ $(document).ready(function () {
     msAddToMsArray(MagicSuggests, "Id", "/PersonSrv/PersonsWoDBUser", 1);
 
     //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hidden");
-        $("#EditFormView").addClass("hidden");
-        window.scrollTo(0, 0);
+    $("#EditFormBtnCancel").click(function () {
+        switchView("EditFormView","MainView", "tdo-btngroup-main", true);
     });
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
-        if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
-
-            showModalWait();
-
-            //Id not handled by submitEditsGeneric, has to be set
-            if (CurrRecords.length == 1) { CurrRecords[0].Id = MagicSuggests[0].getValue()[0]; }
-
-            //Password and PasswordConf not returned in CurrentRecords by server, needs to be added manually
-            for (var i = 0; i < CurrRecords.length; i++) {
-                CurrRecords[i].Password = "";
-                CurrRecords[i].PasswordConf = "";
-            }
-           
-            submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/DbUserSrv/Edit")
-                .always(hideModalWait)
-                .done(function () {
-                    refreshMainView();
-                    $("#MainView").removeClass("hidden");
-                    $("#EditFormView").addClass("hidden");
-                    window.scrollTo(0, 0);
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
+            return;
         }
+
+        //Id not handled by submitEditsGeneric, has to be set
+        if (CurrRecords.length == 1) { CurrRecords[0].Id = MagicSuggests[0].getValue()[0]; }
+
+        //Password and PasswordConf not returned in CurrentRecords by server, needs to be added manually
+        for (var i = 0; i < CurrRecords.length; i++) {
+            CurrRecords[i].Password = "";
+            CurrRecords[i].PasswordConf = "";
+        }
+
+        showModalWait();
+        submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/DbUserSrv/Edit")
+            .always(hideModalWait)
+            .done(function () {
+                refreshMainView()
+                    .done(function () {
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
+                    });
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+
     });
     
     //----------------------------------------DBRolesView----------------------------------------//
 
     //Wire Up DBRolesViewBtnCancel
-    $("#DBRolesViewBtnCancel, #DBRolesViewBtnBack").click(function () {
-        $("#MainView").removeClass("hidden");
-        $("#DBRolesView").addClass("hidden");
-        window.scrollTo(0, 0);
+    $("#DBRolesViewBtnCancel").click(function () {
+        switchView("DBRolesView", "MainView", "tdo-btngroup-main", true);
     });
 
     //Wire Up DBRolesViewBtnOk
@@ -194,17 +192,17 @@ $(document).ready(function () {
             return;
         }
         showModalWait();
-
-        submitEditsForRelatedGeneric(CurrIds, 
+        submitEditsForRelatedGeneric(
+		CurrIds, 
                 TableDBRolesAdd.cells(".ui-selected", "Name:name", { page: "current"}).data().toArray(),
                 TableDBRolesRemove.cells(".ui-selected", "Name:name", { page: "current"}).data().toArray(),
                 "/DBUserSrv/EditRoles")
             .always(hideModalWait)
             .done(function () {
-                $("#MainView").removeClass("hidden");
-                $("#DBRolesView").addClass("hidden");
-                window.scrollTo(0, 0);
-                refreshMainView();
+                refreshMainView()
+                    .done(function () {
+                        switchView("DBRolesView", "MainView", "tdo-btngroup-main", true, TableMain);
+                    });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 
@@ -266,7 +264,9 @@ function DeleteRecords() {
 
 //refresh Main view 
 function refreshMainView() {
-    refreshTblGenWrp(TableMain, "/DbUserSrv/Get");
+    var deferred0 = $.Deferred();
+    refreshTblGenWrp(TableMain, "/DbUserSrv/Get").done(deferred0.resolve);
+    return deferred0.promise();
 }
 
 

@@ -50,22 +50,24 @@ $(document).ready(function () {
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) { showModalNothingSelected(); }
-        else {
-            showModalWait();
-            fillFormForEditGeneric(CurrIds, "POST", "/ComponentSrv/GetByIds", GetActive,
-                    "EditForm", null, MagicSuggests)
-                .always(hideModalWait)
-                .done(function (currRecords) {
-                    CurrRecords = currRecords;
-                    msDisableAll(MagicSuggests);
-                    $("#MainView").addClass("hidden");
-                    $("#EditFormView").removeClass("hidden");
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
         }
-    });
+        showModalWait();
+        fillFormForEditGeneric(CurrIds, "POST", "/ComponentSrv/GetByIds", GetActive,
+                "EditForm", null, MagicSuggests)
+            .always(hideModalWait)
+            .done(function (currRecords) {
+                CurrRecords = currRecords;
+                msDisableAll(MagicSuggests);
+                saveViewSettings(TableMain);
+                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 
+    });
+    
     //wire up dropdownId1
     $("#dropdownId1").click(function (event) {
         event.preventDefault();
@@ -252,26 +254,27 @@ $(document).ready(function () {
     msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
 
     //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hidden");
-        $("#EditFormView").addClass("hidden");
-        window.scrollTo(0, 0);
+    $("#EditFormBtnCancel").click(function () {
+        switchView("EditFormView", "MainView", "tdo-btngroup-main", true);
     });
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
-        if (formIsValid("EditForm", false)) {
-            showModalWait();
-            submitEditsGeneric("EditForm", [], CurrRecords, "POST", "/ComponentSrv/EditExt")
-                .always(hideModalWait)
-                .done(function () {
-                    refreshMainView();
-                    $("#MainView").removeClass("hidden");
-                    $("#EditFormView").addClass("hidden");
-                    window.scrollTo(0, 0);
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+        msValidate(MagicSuggests);
+        if (!formIsValid("EditForm", false)) {
+            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
+            return;
         }
+        showModalWait();
+        submitEditsGeneric("EditForm", [], CurrRecords, "POST", "/ComponentSrv/EditExt")
+            .always(hideModalWait)
+            .done(function () {
+                refreshMainView()
+                    .done(function () {
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
+                    });
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
     });
 
     //--------------------------------------View Initialization------------------------------------//
@@ -289,25 +292,43 @@ $(document).ready(function () {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
+    var deferred0 = $.Deferred();
+
     TableMain.clear().search("").draw();
     $("#PanelTableMainTitle").text("Components Extended");
 
-    if (MsFilterByModel.getValue().length == 0) {
-        MsFilterByProject.clear(true);
-        MsFilterByProject.disable();
-        if (typeof ComponentIds !== "undefined" && ComponentIds != null && ComponentIds.length > 0) {
-            fillMainTableFromIdsHelper();
-        }
-        return;
+if (MsFilterByModel.getValue().length == 0) {
+        refreshMainViewForNoModelSelectedHelper().done(deferred0.resolve);
+        return deferred0.promise();
     }
 
-    fillMainTableFromAltIdsHelper();
+    fillMainTableFromAltIdsHelper().done(deferred0.resolve);
+    return deferred0.promise();
 }
+
 
 //---------------------------------------Helper Methods--------------------------------------//
 
+//refreshMainViewNoModelSelectedHelper
+function refreshMainViewForNoModelSelectedHelper() {
+    var deferred0 = $.Deferred();
+
+    MsFilterByProject.clear(true);
+    MsFilterByProject.disable();
+
+    if (typeof ComponentIds === "undefined" || ComponentIds == null || ComponentIds.length == 0) {
+        return deferred0.resolve();
+    }
+    fillMainTableFromIdsHelper().done(deferred0.resolve);
+    return deferred0.promise();
+}
+
 //fillMainTableFromAltIdsHelper - used by refreshMainView
 function fillMainTableFromAltIdsHelper() {
+    var deferred0 = $.Deferred();
+
+    MsFilterByProject.enable();
+    
     refreshTblGenWrp(TableMain, "/ComponentSrv/GetByAltIds",
         {
             projectIds: MsFilterByProject.getValue(),
@@ -316,24 +337,30 @@ function fillMainTableFromAltIdsHelper() {
         },
         "POST")
         .done(function () {
-            MsFilterByProject.enable();
             updateViewsForModelGeneric(TableMain, "/ComponentModelSrv/GetByIds",
-                MsFilterByModel.getValue(), "PanelTableMainTitle", "EditFormLabel");
+	    	    MsFilterByModel.getValue(), "PanelTableMainTitle", "EditFormLabel")
+		.done(deferred0.resolve);
         });
+    return deferred0.promise();
 }
 
 //fillMainTableFromIdsHelper - used by refreshMainView
 function fillMainTableFromIdsHelper() {
+    var deferred0 = $.Deferred();
+
     refreshTblGenWrp(TableMain, "/ComponentSrv/GetByIds", { ids: ComponentIds, getActive: GetActive }, "POST")
         .done(function () {
-            if (TableMain.rows().data().length == 0) { return; }
+            if (TableMain.rows().data().length == 0) { return deferred0.resolve(); }
+
             var modelIds = TableMain.column("ComponentModel_Id:name").data().toArray();
             if(!modelIdsAreSame(modelIds)) {
                 showModalFail("Error", "Selected records have no models or their models are not the same.");
                 TableMain.clear().search("").draw();
-                return;
+                return deferred0.resolve();
             }
             updateViewsForModelGeneric(TableMain, "/ComponentModelSrv/GetByIds",
-                modelIds[0], "PanelTableMainTitle", "EditFormLabel");
+                    modelIds[0], "PanelTableMainTitle", "EditFormLabel")
+                .done(deferred0.resolve);
         });
+    return deferred0.promise();
 }

@@ -9,6 +9,10 @@
 //--------------------------------------Global Properties------------------------------------//
 
 var windowYpos = 0;
+var tablePage = 0;
+var tableOrder;
+var tableSearch;
+var tableSelectedIds;
 
 //---------------------------------------Global Settings-------------------------------------//
 
@@ -154,19 +158,32 @@ function showModalAJAXFail(xhr, status, error) {
 }
 
 //switchView 
-function switchView(fromViewId, toViewId, toBtnGroupClass, scrollToWindowYpos) {
+function switchView(fromViewId, toViewId, toBtnGroupClass, scrollToWindowYpos, dataTable) {
     if (toBtnGroupClass) {
         $("[class*='tdo-btngroup']").addClass("hidden");
         $("[class~='" + toBtnGroupClass + "']").removeClass("hidden");
     }
     $("#" + fromViewId).addClass("hidden");
     $("#" + toViewId).removeClass("hidden");
+    if (dataTable) {
+        dataTable.order(tableOrder).search(tableSearch).page(tablePage).draw(false);
+        var indexesToSelect = dataTable.rows(function (idx, data, node) {
+            return $.inArray(data.Id, tableSelectedIds) != -1;
+        }).eq(0).toArray();
+        dataTable.rows(indexesToSelect).nodes().to$().addClass("ui-selected");
+    }
     if (scrollToWindowYpos) { window.scrollTo(0, windowYpos); } else { window.scrollTo(0, 0); }
 }
 
-//saveWindowPos
-function saveWindowYPos() {
+//saveViewSettings
+function saveViewSettings(dataTable) {
     windowYpos = window.pageYOffset || document.documentElement.scrollTop;
+    if (dataTable) {
+        tablePage = dataTable.page();
+        tableOrder = dataTable.order();
+        tableSearch = dataTable.search();
+        tableSelectedIds = dataTable.cells(".ui-selected", "Id:name").data().toArray();
+    }
 }
 
 //-----------------------------------------------------------------------------

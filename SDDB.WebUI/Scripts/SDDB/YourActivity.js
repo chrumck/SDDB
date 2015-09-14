@@ -20,6 +20,7 @@ $(document).ready(function () {
         CurrRecords = [];
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
         fillFormForCreateGeneric("EditForm", MagicSuggests, "New Activity for " + $("#FilterDateStart").val(), "MainView");
+
         MagicSuggests[3].disable();
         MagicSuggests[4].disable();
         TableLogEntryAssysAdd.clear().search("").draw();

@@ -61,7 +61,7 @@ $(document).ready(function () {
             .done(function (currRecords) {
                 CurrRecords = currRecords;
                 msDisableAll(MagicSuggests);
-                saveWindowYPos();
+                saveViewSettings(TableMain);
                 switchView("MainView", "EditFormView", "tdo-btngroup-edit");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -260,6 +260,7 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
+        msValidate(MagicSuggests);
         if (!formIsValid("EditForm", false)) {
             showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
             return;
@@ -270,7 +271,7 @@ $(document).ready(function () {
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true);
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });

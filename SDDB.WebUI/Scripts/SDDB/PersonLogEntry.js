@@ -250,7 +250,7 @@ $(document).ready(function () {
             .always(hideModalWait)
             .done(function (data) {
                 if (typeof data[0].Id !== undefined) {
-                    MsFilterByPerson.setSelection([{
+                    msSetSelectionSilent(MsFilterByPerson, [{
                         id: data[0].Id,
                         name: data[0].FirstName + " " + data[0].LastName + " " + data[0].Initials
                     }]);
@@ -259,9 +259,7 @@ $(document).ready(function () {
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     }
-    else {
-        refreshMainView();
-    }
+    refreshMainView();
 
     $("#InitialView").addClass("hidden");
     $("#MainView").removeClass("hidden");

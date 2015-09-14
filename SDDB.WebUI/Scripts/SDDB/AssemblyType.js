@@ -32,27 +32,27 @@ $(document).ready(function () {
         CurrRecords = [];
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Assembly Type", "MainView");
+        saveViewSettings(TableMain);
+        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) { showModalNothingSelected(); }
-        else {
-            if (GetActive) { $("#EditFormGroupIsActive").addClass("hidden"); }
-            else { $("#EditFormGroupIsActive").removeClass("hidden"); }
-
-            showModalWait();
-
-            fillFormForEditGeneric(CurrIds, "POST", "/AssemblyTypeSrv/GetByIds", GetActive, "EditForm", "Edit Assembly Type", MagicSuggests)
-                .always(hideModalWait)
-                .done(function (currRecords) {
-                    CurrRecords = currRecords;
-                    $("#MainView").addClass("hidden");
-                    $("#EditFormView").removeClass("hidden");
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
         }
+        showModalWait();
+        fillFormForEditGeneric(CurrIds, "POST", "/AssemblyTypeSrv/GetByIds",
+	 	GetActive, "EditForm", "Edit Assembly Type", MagicSuggests)
+            .always(hideModalWait)
+            .done(function (currRecords) {
+                CurrRecords = currRecords;
+                saveViewSettings(TableMain);
+                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //Wire up BtnDelete 
@@ -106,27 +106,27 @@ $(document).ready(function () {
     //---------------------------------------EditFormView----------------------------------------//
 
     //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hidden");
-        $("#EditFormView").addClass("hidden");
-        window.scrollTo(0, 0);
+    $("#EditFormBtnCancel").click(function () {
+        switchView("EditFormView", "MainView", "tdo-btngroup-main", true);
     });
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
-        if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
-            showModalWait();
-            submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/AssemblyTypeSrv/Edit")
-                .always(hideModalWait)
-                .done(function () {
-                    refreshMainView();
-                    $("#MainView").removeClass("hidden");
-                    $("#EditFormView").addClass("hidden");
-                    window.scrollTo(0, 0);
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
+            return;
         }
+        showModalWait();
+        submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/AssemblyTypeSrv/Edit")
+            .always(hideModalWait)
+            .done(function () {
+                refreshMainView()
+                    .done(function () {
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
+                    });
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
     });
 
     //--------------------------------------View Initialization------------------------------------//
@@ -148,9 +148,11 @@ function DeleteRecords() {
     deleteRecordsGeneric(CurrIds, "/AssemblyTypeSrv/Delete", refreshMainView);
 }
 
-//refresh view after magicsuggest update
+//refresh Main view 
 function refreshMainView() {
-    refreshTblGenWrp(TableMain, "/AssemblyTypeSrv/Get", { getActive: GetActive });
+    var deferred0 = $.Deferred();
+    refreshTblGenWrp(TableMain, "/AssemblyTypeSrv/Get", { getActive: GetActive }).done(deferred0.resolve);
+    return deferred0.promise();
 }
 
 
