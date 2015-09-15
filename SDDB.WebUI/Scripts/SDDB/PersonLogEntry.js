@@ -30,52 +30,58 @@ $(document).ready(function () {
         TableLogEntryAssysRemove.clear().search("").draw();
         $("#EditFormBtnOkFiles").removeClass("disabled");
 
+        saveViewSettings(TableMain);
         showModalWait();
-        fillFormForRelatedGeneric(TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
-            "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", {  },
-            "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", {  },
-            "GET", "/PersonSrv/Get", { getActive: true })
+        fillFormForRelatedGeneric(
+                TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
+                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", {  },
+                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", {  },
+                "GET", "/PersonSrv/Get", { getActive: true })
             .always(hideModalWait)
+            .done(function () {
+                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
+            })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) showModalNothingSelected();
-        else {
-            if (GetActive) $("#EditFormGroupIsActive").addClass("hidden");
-            else $("#EditFormGroupIsActive").removeClass("hidden");
-
-            if (CurrIds.length > 1) $("#EditFormBtnOkFiles").addClass("disabled");
-            else $("#EditFormBtnOkFiles").removeClass("disabled");
-
-            showModalWait();
-
-            $.when(
-                fillFormForEditGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
-                    GetActive, "EditForm", "Edit Person Activity", MagicSuggests),
-
-                fillFormForRelatedGeneric(TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
-                    "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { logEntryId: CurrIds[0] },
-                    "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { logEntryId: CurrIds[0] },
-                    "GET", "/PersonSrv/Get", { getActive: true })
-                )
-                .then(function (currRecords) {
-                    CurrRecords = currRecords;
-                    return fillFormForRelatedGeneric(TableLogEntryAssysAdd, TableLogEntryAssysRemove, CurrIds,
-                        "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys", { logEntryId: CurrIds[0] },
-                        "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot", { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] },
-                        "GET", "AssemblyDbSrv/LookupByLocDTables", { getActive: true });
-
-                })
-                .always(hideModalWait)
-                .done(function () {
-                    $("#MainView").addClass("hidden");
-                    $("#EditFormView").removeClass("hidden");
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
         }
+
+        if (CurrIds.length > 1) $("#EditFormBtnOkFiles").addClass("disabled");
+        else $("#EditFormBtnOkFiles").removeClass("disabled");
+
+        saveViewSettings(TableMain);
+        showModalWait();
+        $.when(
+            fillFormForEditGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
+                GetActive, "EditForm", "Edit Person Activity", MagicSuggests),
+
+            fillFormForRelatedGeneric(TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
+                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { logEntryId: CurrIds[0] },
+                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { logEntryId: CurrIds[0] },
+                "GET", "/PersonSrv/Get", { getActive: true })
+            )
+            .then(function (currRecords) {
+                CurrRecords = currRecords;
+                return fillFormForRelatedGeneric(
+                    TableLogEntryAssysAdd, TableLogEntryAssysRemove, CurrIds,
+                    "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys",
+                    { logEntryId: CurrIds[0] },
+                    "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
+                    { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] },
+                    "GET", "AssemblyDbSrv/LookupByLocDTables",
+                    { getActive: true });
+            })
+            .always(hideModalWait)
+            .done(function () {
+                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //Initialize DateTimePicker FilterDateEnd
@@ -140,8 +146,13 @@ $(document).ready(function () {
     
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
-        if (!$(this).prop("checked")) { GetActive = true; $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary"); }
-        else { GetActive = false; $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger"); }
+        if (!$(this).prop("checked")) {
+            GetActive = true;
+            $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
+        } else {
+            GetActive = false;
+            $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
+        }
         refreshMainView();
     });
 
@@ -238,28 +249,7 @@ $(document).ready(function () {
 
     //--------------------------------------View Initialization------------------------------------//
 
-    $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
-    $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
-
-    if (typeof PersonId !== "undefined" && PersonId != "") {
-        showModalWait();
-        $.ajax({
-            type: "POST", url: "/PersonSrv/GetAllByIds", timeout: 120000,
-            data: { ids: [PersonId], getActive: true }, dataType: "json"
-        })
-            .always(hideModalWait)
-            .done(function (data) {
-                if (typeof data[0].Id !== undefined) {
-                    msSetSelectionSilent(MsFilterByPerson, [{
-                        id: data[0].Id,
-                        name: data[0].FirstName + " " + data[0].LastName + " " + data[0].Initials
-                    }]);
-                }
-                
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    }
-    refreshMainView();
+    fillFiltersFromRequestParams().done(refreshMainView);
 
     $("#InitialView").addClass("hidden");
     $("#MainView").removeClass("hidden");
@@ -273,7 +263,11 @@ $(document).ready(function () {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
-    if ( ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "") ||
+    var deferred0 = $.Deferred();
+
+    TableMain.clear().search("").draw();
+
+    if (($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "") ||
             (
                 $("#FilterDateStart").val() == "" ||
                 $("#FilterDateEnd").val() == "" &&
@@ -282,27 +276,60 @@ function refreshMainView() {
                 MsFilterByPerson.getValue().length == 0 &&
                 MsFilterByAssy.getValue().length == 0
             )
-        ) {
-        $("#ChBoxShowDeleted").bootstrapToggle("disable")
-        TableMain.clear().search("").draw();
-    }
-    else {
-        var endDate = moment($("#FilterDateEnd").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
+        ) { return deferred0.resolve(); }
 
-        refreshTblGenWrp(TableMain, "/PersonLogEntrySrv/GetByAltIds",
-            {
-                personIds: MsFilterByPerson.getValue(),
-                typeIds: MsFilterByType.getValue(),
-                projectIds: MsFilterByProject.getValue(),
-                assyIds: MsFilterByAssy.getValue(),
-                startDate: $("#FilterDateStart").val(),
-                endDate: endDate,
-                getActive: GetActive,
-                filterForPLEView: true
-            },
-            "POST")
-            .done(function () { $("#ChBoxShowDeleted").bootstrapToggle("enable"); })
+    var endDate = moment($("#FilterDateEnd").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
+    refreshTblGenWrp(TableMain, "/PersonLogEntrySrv/GetByAltIds",
+        {
+            personIds: MsFilterByPerson.getValue(),
+            typeIds: MsFilterByType.getValue(),
+            projectIds: MsFilterByProject.getValue(),
+            assyIds: MsFilterByAssy.getValue(),
+            startDate: $("#FilterDateStart").val(),
+            endDate: endDate,
+            getActive: GetActive,
+            filterForPLEView: true
+        },
+        "POST")
+        .done(deferred0.resolve);
+
+    return deferred0.promise();
+}
+
+//fillFiltersFromRequestParams
+function fillFiltersFromRequestParams() {
+    var deferred0 = $.Deferred();
+
+    $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
+    $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
+
+    if (typeof PersonId !== "undefined" && PersonId != "") {
+        showModalWait();
+        $.ajax({
+            type: "POST",
+            url: "/PersonSrv/GetAllByIds",
+            timeout: 120000,
+            data: { ids: [PersonId], getActive: true },
+            dataType: "json"
+        })
+            .always(hideModalWait)
+            .done(function (data) {
+                if (typeof data[0].Id !== undefined) {
+                    msSetSelectionSilent(MsFilterByPerson, [{
+                        id: data[0].Id,
+                        name: data[0].FirstName + " " + data[0].LastName + " " + data[0].Initials
+                    }]);
+                }
+                deferred0.resolve();
+            })
+            .fail(function (xhr, status, error) {
+                showModalAJAXFail(xhr, status, error);
+                deferred0.reject(xhr, status, error);
+            });
     }
+    else { deferred0.resolve(); }
+
+    return deferred0.promise();
 }
 
 //---------------------------------------Helper Methods--------------------------------------//

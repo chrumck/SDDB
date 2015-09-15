@@ -7,30 +7,44 @@
     <h4>Please wait, page loading...</h4>
 </div>
 
+<!----- Navbar Section ----->
+@section Navbar{
+<div class="btn-group navbar-btn tdo-btngroup-main">
+    <button type="button" class="btn btn-default" id="BtnCreate">New</button>
+    <button type="button" class="btn btn-tdo-nav" id="BtnEdit">&nbsp;&nbsp;Edit&nbsp;&nbsp;</button>
+    <button type="button" class="btn btn-danger" id="BtnDelete">&nbsp;&nbsp;Del&nbsp;&nbsp;</button>
+</div>
+
+<div class="btn-group navbar-btn tdo-btngroup-edit hidden">
+    <button type="button" class="btn btn-default" id="EditFormBtnCancel">Cancel</button>
+    <button type="button" class="btn btn-tdo-nav disabled">&nbsp;&nbsp;&nbsp;&nbsp;</button>
+    <button type="button" class="btn btn-success" id="EditFormBtnOk">
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+    </button>
+</div>
+
+<div class="btn-group navbar-btn tdo-btngroup-projectpersons hidden">
+    <button type="button" class="btn btn-default" id="ProjectPersonsViewBtnCancel">Cancel</button>
+    <button type="button" class="btn btn-tdo-nav disabled">&nbsp;&nbsp;&nbsp;&nbsp;</button>
+    <button type="button" class="btn btn-success" id="ProjectPersonsViewBtnOk">
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+    </button>
+</div>
+}
+@section NavbarCollapse{
+<ul class="nav navbar-nav tdo-btngroup-main">
+    <li><a class="margin-left-5px collapsenav" href="#" id="BtnEditProjectPersons">Persons</a></li>
+    <li class="dropdown margin-left-5px">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#">More<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a class="collapsenav" href=# id="dropdownId1">Show Proj. Locations</a></li>
+        </ul>
+    </li>
+</ul>
+}
+
 <!------- MainView ------->
 <div class="container-fluid hidden" id="MainView">
-
-    <div class="row">
-        <div class="col-xs-12">
-            <div class="btn-group margin-bottom-2px">
-                <button class="btn btn-default" id="BtnCreate">Create</button>
-                <button class="btn btn-primary" id="BtnEdit">Edit</button>
-                <button class="btn btn-danger" id="BtnDelete">Delete</button>
-            </div>
-            <div class="btn-group margin-bottom-2px">
-                <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown">More...</button>
-                <ul class="dropdown-menu dropdown-menu-left">
-                    <li><a href=# id="dropdownId1">Show Proj. Locations</a></li>
-                </ul>
-            </div>
-            &nbsp;&nbsp;
-            <div class="btn-group margin-bottom-2px">
-                <button class="btn btn-warning" id="BtnEditProjectPersons">Proj. Persons</button>
-            </div>
-        </div>
-    </div>
-
-
 
     <div class="panel panel-primary" id="PanelTableMain">
         <div class="panel-heading text-center" style="font-size:130%">
@@ -61,11 +75,8 @@
 <!------- EditFormView ------->
 <div class="container-fluid hidden" id="EditFormView">
     <div class="row">
-        <div class="col-xs-6">
+        <div class="col-xs-12">
             <h3 id="EditFormLabel">Create/Edit Project</h3>
-        </div>
-        <div class="col-xs-6">
-            <h3><button class="btn btn-default pull-right" type="button" id="EditFormBtnBack">Cancel</button></h3>
         </div>
     </div>
     <div class="well well-tdo">
@@ -120,17 +131,6 @@
                 </div>
 
             </div>
-
-            <div class="form-group">
-                <div class="col-xs-6">
-                    <button class="btn btn-default" type="button" id="EditFormBtnCancel">Cancel</button>
-                </div>
-                <div class="col-xs-6">
-                    <button class="btn btn-success pull-right" type="button" id="EditFormBtnOk">
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
-                    </button>
-                </div>
-            </div>
         </form>
     </div>
 </div>
@@ -138,16 +138,13 @@
 <!------- ProjectPersonsView ------->
 <div class="container-fluid hidden" id="ProjectPersonsView">
     <div class="row">
-        <div class="col-xs-12 col-sm-5">
+        <div class="col-xs-12 col-sm-6">
             <h3 id="ProjectPersonsViewLabel">Add/Remove Person Projects</h3>
         </div>
-        <div class="col-xs-9 col-sm-4">
+        <div class="col-xs-12 col-sm-6">
             <div class="panel panel-warning margin-top-10px">
                 <div class="panel-heading text-center" style="font-weight:bold" id="ProjectPersonsViewPanel"> </div>
             </div>
-        </div>
-        <div class="col-xs-3">
-            <h3><button class="btn btn-default pull-right" type="button" id="ProjectPersonsViewBtnBack">Cancel</button></h3>
         </div>
     </div>
     <div class="well well-tdo">
@@ -183,16 +180,6 @@
                         <tbody class="selectable"></tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-6">
-                <button class="btn btn-default" type="button" id="ProjectPersonsViewBtnCancel">Cancel</button>
-            </div>
-            <div class="col-xs-6">
-                <button class="btn btn-success pull-right" type="button" id="ProjectPersonsViewBtnOk">
-                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
-                </button>
             </div>
         </div>
     </div>

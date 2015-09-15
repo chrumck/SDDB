@@ -96,12 +96,16 @@ $(document).ready(function () {
         }
         else { $("#DBRolesViewPanel").text("_MULTIPLE_"); }
 
+        saveViewSettings(TableMain);
         showModalWait();
-        fillFormForRelatedGeneric(TableDBRolesAdd, TableDBRolesRemove, CurrIds, "GET", "/DBUserSrv/GetUserRoles", { id: CurrIds[0] },
-        "GET", "/DBUserSrv/GetUserRolesNot", { id: CurrIds[0] }, "GET", "/DBUserSrv/GetAllRoles", null, 0)
+        fillFormForRelatedGeneric(
+                TableDBRolesAdd, TableDBRolesRemove, CurrIds,
+                "GET", "/DBUserSrv/GetUserRoles", { id: CurrIds[0] },
+                "GET", "/DBUserSrv/GetUserRolesNot", { id: CurrIds[0] },
+                "GET", "/DBUserSrv/GetAllRoles",
+                null, 0)
             .always(hideModalWait)
             .done(function () {
-                saveViewSettings(TableMain);
                 switchView("MainView", "DBRolesView", "tdo-btngroup-dbroles");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });

@@ -34,6 +34,8 @@ $(document).ready(function () {
         $("#ManHours").val(0);
         $("#HoursWorkedPicker").data("DateTimePicker").date("00:00");
 
+        saveViewSettings(TableMain);
+        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
     });
 
     //Wire up BtnEdit
@@ -43,14 +45,12 @@ $(document).ready(function () {
             showModalSelectOne();
             return;
         }
-        if (GetActive) { $("#EditFormGroupIsActive").addClass("hidden"); }
-        else { $("#EditFormGroupIsActive").removeClass("hidden"); }
         TableLogEntryPersonsAdd.clear().search("").draw();
         TableLogEntryPersonsRemove.clear().search("").draw();
         $("#LogEntryPersonsView").addClass("hidden");
 
+        saveViewSettings(TableMain);
         showModalWait();
-
         $.when(
             fillFormForEditGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
                 GetActive, "EditForm", "Edit Activity", MagicSuggests)
@@ -74,8 +74,8 @@ $(document).ready(function () {
                 $("#LogEntryDateTime").data("ismodified", false);
                 $("#HoursWorkedPicker").data('DateTimePicker').date(moment($("#ManHours").val(), "HH"));
                 $("#ManHours").data("ismodified", false);
-                $("#MainView").addClass("hidden");
-                $("#EditFormView").removeClass("hidden");
+
+                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
@@ -252,24 +252,26 @@ $(document).ready(function () {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
-    if ($("#FilterDateStart").val() == "") {
-        $("#ChBoxShowDeleted").bootstrapToggle("disable")
-        TableMain.clear().search("").draw();
-    }
-    else {
-        var endDate = moment($("#FilterDateStart").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
+    var deferred0 = $.Deferred();
 
-        refreshTblGenWrp(TableMain, "/PersonLogEntrySrv/GetByAltIds",
-            {
-                personIds: [UserId],
-                startDate: $("#FilterDateStart").val(),
-                endDate: endDate,
-                getActive: GetActive,
-                filterForPLEView: false
-            },
-            "POST")
-            .done(function () { $("#ChBoxShowDeleted").bootstrapToggle("enable"); })
-    }
+    TableMain.clear().search("").draw();
+
+    if ($("#FilterDateStart").val() == "") { return deferred0.resolve(); }
+
+    var endDate = moment($("#FilterDateStart").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
+
+    refreshTblGenWrp(TableMain, "/PersonLogEntrySrv/GetByAltIds",
+        {
+            personIds: [UserId],
+            startDate: $("#FilterDateStart").val(),
+            endDate: endDate,
+            getActive: GetActive,
+            filterForPLEView: false
+        },
+        "POST")
+        .done(deferred0.resolve);
+
+    return deferred0.promise();
 }
 
 //---------------------------------------Helper Methods--------------------------------------//

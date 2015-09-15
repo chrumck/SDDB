@@ -84,17 +84,20 @@ $(document).ready(function () {
             return;
         }
         if (CurrIds.length == 1) {
-            var selectedRecord = TableMain.row(".ui-selected", { page: "current" }).data()
+            var selectedRecord = TableMain.row(".ui-selected", { page: "current" }).data();
             $("#PrsProjViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
         }
         else $("#PrsProjViewPanel").text("_MULTIPLE_");
-        
+
+        saveViewSettings(TableMain);
         showModalWait();
-        fillFormForRelatedGeneric(TableProjectsAdd, TableProjectsRemove, CurrIds, "GET", "/PersonSrv/GetPersonProjects", { id: CurrIds[0] },
-        "GET", "/PersonSrv/GetPersonProjectsNot", { id: CurrIds[0] }, "GET", "/ProjectSrv/Get", { getActive: true })
+        fillFormForRelatedGeneric(
+                TableProjectsAdd, TableProjectsRemove, CurrIds,
+                "GET", "/PersonSrv/GetPersonProjects", { id: CurrIds[0] },
+                "GET", "/PersonSrv/GetPersonProjectsNot", { id: CurrIds[0] },
+                "GET", "/ProjectSrv/Get", { getActive: true })
             .always(hideModalWait)
             .done(function () {
-                saveViewSettings(TableMain);
                 switchView("MainView", "PrsProjView", "tdo-btngroup-prsproj");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -112,13 +115,16 @@ $(document).ready(function () {
             $("#PersonGroupsViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
         }
         else $("#PersonGroupsViewPanel").text("_MULTIPLE_");
-        
+
+        saveViewSettings(TableMain);
         showModalWait();
-        fillFormForRelatedGeneric(TablePersonGroupsAdd, TablePersonGroupsRemove, CurrIds, "GET", "/PersonSrv/GetPersonGroups", { id: CurrIds[0] },
-        "GET", "/PersonSrv/GetPersonGroupsNot", { id: CurrIds[0] }, "GET", "/PersonGroupSrv/Get", { getActive: true })
+        fillFormForRelatedGeneric(
+                TablePersonGroupsAdd, TablePersonGroupsRemove, CurrIds,
+                "GET", "/PersonSrv/GetPersonGroups", { id: CurrIds[0] },
+                "GET", "/PersonSrv/GetPersonGroupsNot", { id: CurrIds[0] },
+                "GET", "/PersonGroupSrv/Get", { getActive: true })
             .always(hideModalWait)
             .done(function () {
-                saveViewSettings(TableMain);
                 switchView("MainView", "PersonGroupsView", "tdo-btngroup-prsgroups");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -137,12 +143,15 @@ $(document).ready(function () {
         }
         else $("#ManagedGroupsViewPanel").text("_MULTIPLE_");
 
+        saveViewSettings(TableMain);
         showModalWait();
-        fillFormForRelatedGeneric(TableManagedGroupsAdd, TableManagedGroupsRemove, CurrIds, "GET", "/PersonSrv/GetManagedGroups", { id: CurrIds[0] },
-        "GET", "/PersonSrv/GetManagedGroupsNot", { id: CurrIds[0] }, "GET", "/PersonGroupSrv/Get", { getActive: true })
+        fillFormForRelatedGeneric(
+                TableManagedGroupsAdd, TableManagedGroupsRemove, CurrIds,
+                "GET", "/PersonSrv/GetManagedGroups", { id: CurrIds[0] },
+                "GET", "/PersonSrv/GetManagedGroupsNot", { id: CurrIds[0] },
+                "GET", "/PersonGroupSrv/Get", { getActive: true })
             .always(hideModalWait)
             .done(function () {
-                saveViewSettings(TableMain);
                 switchView("MainView", "ManagedGroupsView", "tdo-btngroup-managedgroups");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
