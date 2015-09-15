@@ -51,27 +51,38 @@ $(document).ready(function () {
     //---------------------------------------EditFormView----------------------------------------//
 
     //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hidden");
-        $("#EditFormView").addClass("hidden");
-        window.scrollTo(0, 0);
+    $("#EditFormBtnCancel").click(function () {
+        switchView("EditFormView", "MainView", "tdo-btngroup-main", true);
     });
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
-        if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
-            submitEdits();
+        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
+            return;
         }
+        submitEdits().done(function () {
+            refreshMainView().done(function() {
+                switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
+            });
+        });
     });
 
     //Wire Up EditFormBtnOkFiles
     $("#EditFormBtnOkFiles").click(function () {
         msValidate(MagicSuggests);
-        if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
-            var entryFilesPanelText = $("#LogEntryDateTime").val() + " " + MagicSuggests[0].getSelection()[0].name;
-            submitEdits().done(function () { setTimeout(function () { fillLogEntryFilesForm(entryFilesPanelText); }, 200); });
+        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
+            return;
         }
+        var entryFilesPanelText = $("#LogEntryDateTime").val() + " " + MagicSuggests[0].getSelection()[0].name;
+        submitEdits().done(function () {
+            setTimeout(function () {
+                fillLogEntryFilesForm(entryFilesPanelText)
+                    .done(function () { switchView("EditFormView", "LogEntryFilesView", "tdo-btngroup-logentryfiles"); });
+            }, 200);
+        });
     });
 
     //Wire Up EditFormBtnChngSts
@@ -79,8 +90,9 @@ $(document).ready(function () {
         ChngStsAssyIds = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (ChngStsAssyIds.length == 0) {
             showModalNothingSelected("Please select one or more rows from 'Add Assemblies' table.");
+            return;
         }
-        else { showModalChngSts(); }
+        showModalChngSts();
     });
 
     //------------------------------------DataTables - Log Entry Assemblies ---
@@ -226,7 +238,6 @@ function submitEdits() {
     var deferred0 = $.Deferred();
 
     showModalWait();
-
     submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonLogEntrySrv/Edit")
         .then(function (data) {
 
@@ -248,15 +259,11 @@ function submitEdits() {
             return deferred1.promise();
         })
         .always(hideModalWait)
-        .done(function () {
-            refreshMainView();
-            $("#MainView").removeClass("hidden");
-            $("#EditFormView").addClass("hidden");
-            window.scrollTo(0, 0);
-            deferred0.resolve();
-        })
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); deferred0.reject(); });
-
+        .done(function () { deferred0.resolve(); })
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject();
+        });
     return deferred0.promise();
 }
 

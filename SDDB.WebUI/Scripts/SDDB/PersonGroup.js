@@ -38,27 +38,27 @@ $(document).ready(function () {
         CurrRecords = [];
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Person Group", "MainView");
+        saveViewSettings(TableMain);
+        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
     });
 
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) { showModalNothingSelected(); }
-        else {
-            if (GetActive) { $("#EditFormGroupIsActive").addClass("hidden"); }
-            else { $("#EditFormGroupIsActive").removeClass("hidden"); }
-
-            showModalWait();
-
-            fillFormForEditGeneric(CurrIds, "POST", "/PersonGroupSrv/GetByIds", GetActive, "EditForm", "Edit Person Group", MagicSuggests)
-                .always(hideModalWait)
-                .done(function (currRecords) {
-                    CurrRecords = currRecords;
-                    $("#MainView").addClass("hidden");
-                    $("#EditFormView").removeClass("hidden");
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
         }
+        showModalWait();
+	    fillFormForEditGeneric(CurrIds, "POST", "/PersonGroupSrv/GetByIds",
+		        GetActive, "EditForm", "Edit Person Group", MagicSuggests)
+            .always(hideModalWait)
+            .done(function (currRecords) {
+                CurrRecords = currRecords;
+                saveViewSettings(TableMain);
+                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
     
     //Wire up BtnDelete 
@@ -81,13 +81,17 @@ $(document).ready(function () {
         }
         else { $("#GroupPersonsViewPanel").text("_MULTIPLE_") }
 
+        saveViewSettings(TableMain);
         showModalWait();
-        fillFormForRelatedGeneric(TableGroupPersonsAdd, TableGroupPersonsRemove, CurrIds, "GET", "/PersonGroupSrv/GetGroupPersons", { id: CurrIds[0] },
-        "GET", "/PersonGroupSrv/GetGroupPersonsNot", { id: CurrIds[0] }, "GET", "/PersonSrv/GetAll", { getActive: true }, 1)
+        fillFormForRelatedGeneric(
+                TableGroupPersonsAdd, TableGroupPersonsRemove, CurrIds,
+                "GET", "/PersonGroupSrv/GetGroupPersons", { id: CurrIds[0]},
+                "GET", "/PersonGroupSrv/GetGroupPersonsNot", { id: CurrIds[0]},
+                "GET", "/PersonSrv/GetAll",
+                {getActive: true }, 1)
             .always(hideModalWait)
             .done(function () {
-                $("#MainView").addClass("hidden");
-                $("#GroupPersonsView").removeClass("hidden");
+                switchView("MainView", "GroupPersonsView", "tdo-btngroup-grouppersons");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 
@@ -106,13 +110,16 @@ $(document).ready(function () {
         }
         else { $("#GroupManagersViewPanel").text("_MULTIPLE_") }
 
+        saveViewSettings(TableMain);
         showModalWait();
-        fillFormForRelatedGeneric(TableGroupManagersAdd, TableGroupManagersRemove, CurrIds, "GET", "/PersonGroupSrv/GetGroupManagers", { id: CurrIds[0] },
-        "GET", "/PersonGroupSrv/GetGroupManagersNot", { id: CurrIds[0] }, "GET", "/PersonSrv/GetAll", { getActive: true }, 1)
+        fillFormForRelatedGeneric(
+                TableGroupManagersAdd, TableGroupManagersRemove, CurrIds,
+                "GET", "/PersonGroupSrv/GetGroupManagers", { id: CurrIds[0] },
+                "GET", "/PersonGroupSrv/GetGroupManagersNot", { id: CurrIds[0] },
+                "GET", "/PersonSrv/GetAll", { getActive: true }, 1)
             .always(hideModalWait)
             .done(function () {
-                $("#MainView").addClass("hidden");
-                $("#GroupManagersView").removeClass("hidden");
+                switchView("MainView", "GroupManagersView", "tdo-btngroup-groupmanagers");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 
@@ -162,36 +169,35 @@ $(document).ready(function () {
     //---------------------------------------EditFormView----------------------------------------//
 
     //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel, #EditFormBtnBack").click(function () {
-        $("#MainView").removeClass("hidden");
-        $("#EditFormView").addClass("hidden");
-        window.scrollTo(0, 0);
+    $("#EditFormBtnCancel").click(function () {
+        switchView("EditFormView","MainView", "tdo-btngroup-main", true);
     });
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
-        if (formIsValid("EditForm", CurrIds.length == 0) && msIsValid(MagicSuggests)) {
-            showModalWait();
-            submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonGroupSrv/Edit")
-                .always(hideModalWait)
-                .done(function () {
-                    refreshMainView();
-                    $("#MainView").removeClass("hidden");
-                    $("#EditFormView").addClass("hidden");
-                    window.scrollTo(0, 0);
-                })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
+            return;
         }
+        showModalWait();
+        var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
+    	submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonGroupSrv/Edit", createMultiple)
+            .always(hideModalWait)
+            .done(function () {
+                refreshMainView()
+                    .done(function () {
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
+                    });
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
     });
 
     //----------------------------------------GroupPersonsView----------------------------------------//
 
     //Wire Up GroupPersonsViewBtnCancel
-    $("#GroupPersonsViewBtnCancel, #GroupPersonsViewBtnBack").click(function () {
-        $("#MainView").removeClass("hidden");
-        $("#GroupPersonsView").addClass("hidden");
-        window.scrollTo(0, 0);
+    $("#GroupPersonsViewBtnCancel").click(function () {
+        switchView("GroupPersonsView", "MainView", "tdo-btngroup-main", true);
     });
 
     //Wire Up GroupPersonsViewBtnOk
@@ -209,10 +215,10 @@ $(document).ready(function () {
                 "/PersonGroupSrv/EditGroupPersons")
             .always(hideModalWait)
             .done(function () {
-                $("#MainView").removeClass("hidden");
-                $("#GroupPersonsView").addClass("hidden");
-                window.scrollTo(0, 0);
-                refreshMainView();
+                refreshMainView()
+                    .done(function () {
+                        switchView("GroupPersonsView", "MainView", "tdo-btngroup-main", true, TableMain);
+                    });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 
@@ -273,10 +279,8 @@ $(document).ready(function () {
     //----------------------------------------GroupManagersView----------------------------------------//
 
     //Wire Up GroupManagersViewBtnCancel
-    $("#GroupManagersViewBtnCancel, #GroupManagersViewBtnBack").click(function () {
-        $("#MainView").removeClass("hidden");
-        $("#GroupManagersView").addClass("hidden");
-        window.scrollTo(0, 0);
+    $("#GroupManagersViewBtnCancel").click(function () {
+        switchView("GroupManagersView", "MainView", "tdo-btngroup-main", true);
     });
 
     //Wire Up GroupManagersViewBtnOk
@@ -294,10 +298,10 @@ $(document).ready(function () {
                 "/PersonGroupSrv/EditGroupManagers")
             .always(hideModalWait)
             .done(function () {
-                $("#MainView").removeClass("hidden");
-                $("#GroupManagersView").addClass("hidden");
-                window.scrollTo(0, 0);
-                refreshMainView();
+                refreshMainView()
+                    .done(function () {
+                        switchView("GroupManagersView", "MainView", "tdo-btngroup-main", true, TableMain);
+                    });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 
@@ -376,7 +380,9 @@ function DeleteRecords() {
 
 //refresh Main view 
 function refreshMainView() {
-    refreshTblGenWrp(TableMain, "/PersonGroupSrv/Get", { getActive: GetActive });
+    var deferred0 = $.Deferred();
+    refreshTblGenWrp(TableMain, "/PersonGroupSrv/Get", { getActive: GetActive }).done(deferred0.resolve);
+    return deferred0.promise();
 }
 
 

@@ -10,7 +10,6 @@
 //--------------------------------------Global Properties------------------------------------//
 var TableLogEntryFiles = {};
 var FileCurrIds = [];
-var FilesAreChanged = false;
 var DlToken;
 var DlTimer;
 var DlAttempts;
@@ -24,21 +23,25 @@ $(document).ready(function () {
     //Wire up BtnEditLogEntryFiles 
     $("#BtnEditLogEntryFiles").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length != 1) showModalSelectOne();
-        else { fillLogEntryFilesForm(); }
+        if (CurrIds.length != 1) {
+            showModalSelectOne();
+            return;
+        }
+        saveViewSettings(TableMain);
+        fillLogEntryFilesForm()
+            .done(function () {
+                switchView("MainView", "LogEntryFilesView", "tdo-btngroup-logentryfiles");
+            });
     });
 
     //--------------------------------------LogEntryFilesView---------------------------------------//
 
     //Wire Up EditFormBtnCancel
-    $("#LogEntryFilesViewBtnCancel, #LogEntryFilesViewBtnBack").click(function () {
-        $("#MainView").removeClass("hidden");
-        $("#LogEntryFilesView").addClass("hidden");
-        window.scrollTo(0, 0);
-        if (FilesAreChanged) {
-            refreshMainView();
-            FilesAreChanged = false;
-        }
+    $("#LogEntryFilesViewBtnBack").click(function() {
+        refreshMainView()
+            .done(function () {
+                switchView("LogEntryFilesView", "MainView", "tdo-btngroup-main", true, TableMain);
+            });
     });
 
     //Wire Up LogEntryFilesBtnDload
@@ -112,7 +115,6 @@ $(document).ready(function () {
                 })
                     .always(function () { $("#ModalUpload").modal("hide"); })
                     .done(function () {
-                        FilesAreChanged = true;
                         setTimeout(fillLogEntryFilesForm, 200);
                     })
                     .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -151,7 +153,6 @@ $(document).ready(function () {
         })
             .always(hideModalWait)
             .done(function () {
-                FilesAreChanged = true;
                 setTimeout(fillLogEntryFilesForm, 200);
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -198,26 +199,23 @@ $(document).ready(function () {
 function fillLogEntryFilesForm(panelText) {
     var deferred0 = $.Deferred();
 
-    var selectedRecord = TableMain.row(".ui-selected", { page: "current"}).data();
-    if (typeof panelText !== "undefined") { $("#LogEntryFilesViewPanel").text(panelText); }
-    else if (typeof selectedRecord !== "undefined") {
-        $("#LogEntryFilesViewPanel").text(selectedRecord.EnteredByPerson_.FirstName + " " +
-            selectedRecord.EnteredByPerson_.LastName + " - " + selectedRecord.LogEntryDateTime);
-    }
+    $("#LogEntryFilesViewPanel").text("New Log Entry");
+    if (panelText) { $("#LogEntryFilesViewPanel").text(panelText); }
     else {
-        $("#LogEntryFilesViewPanel").text("New Log Entry");
+        var selectedRecord = TableMain.row(".ui-selected", { page: "current"}).data();
+        if (selectedRecord) {
+            $("#LogEntryFilesViewPanel").text(selectedRecord.EnteredByPerson_.FirstName + " " +
+                selectedRecord.EnteredByPerson_.LastName + " - " + selectedRecord.LogEntryDateTime);
+        }
     }
-
     showModalWait();
-
     refreshTableGeneric(TableLogEntryFiles, "/PersonLogEntrySrv/ListFiles", { logEntryId: CurrIds[0] }, "GET")
         .always(hideModalWait)
-        .done(function () {
-            $("#MainView").addClass("hidden");
-            $("#LogEntryFilesView").removeClass("hidden");
-            deferred0.resolve();
-        })
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); deferred0.reject(); });
+        .done(function () { deferred0.resolve(); })
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject();
+        });
 
     return deferred0.promise();
 }
