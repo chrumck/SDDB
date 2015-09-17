@@ -1,4 +1,5 @@
-﻿@{
+﻿@using SDDB.WebUI.Infrastructure
+@{
     Layout = null;
 }
 
@@ -10,7 +11,7 @@
     <title>Server Error</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
-    <link href="~/Content/SDDB/Site.css" rel="stylesheet" />
+    <link href="~/Content/SDDB/Site.css?v=@Html.GetAppVersion()" rel="stylesheet" />
 </head>
 
 <body>
