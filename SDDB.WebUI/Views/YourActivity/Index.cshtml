@@ -278,9 +278,9 @@
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
     @Scripts.Render("~/bundles/bootstrap-datetimepicker")
-    <script src="~/Scripts/SDDB/YourActivity.js"></script>
-    <script src="~/Scripts/SDDB/PersonLogEntryShared.js"></script>
-    <script src="~/Scripts/SDDB/PersonLogEntryFiles.js"></script>
+    <script src="~/Scripts/SDDB/YourActivity.js?@Html.GetAppVersion()"></script>
+    <script src="~/Scripts/SDDB/PersonLogEntryShared.js?@Html.GetAppVersion()"></script>
+    <script src="~/Scripts/SDDB/PersonLogEntryFiles.js?@Html.GetAppVersion()"></script>
 }
 
 @section CSS {

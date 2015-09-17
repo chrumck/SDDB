@@ -1,5 +1,5 @@
 ﻿@model SDDB.Domain.Entities.AssemblyModel
-
+@using SDDB.WebUI.Infrastructure
 @{
     ViewBag.Title = "Assembly Models";
 }
@@ -343,7 +343,7 @@
     @Scripts.Render("~/bundles/DataTables")
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
-    <script src="~/Scripts/SDDB/AssemblyModel.js"></script>
+    <script src="~/Scripts/SDDB/AssemblyModel.js?@Html.GetAppVersion()"></script>
 }
 
 @section CSS {

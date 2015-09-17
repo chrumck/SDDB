@@ -1,4 +1,5 @@
 ﻿@model SDDB.Domain.Entities.Location
+@using SDDB.WebUI.Infrastructure
 @{
     ViewBag.Title = "Locations";
 }
@@ -245,7 +246,7 @@
     @Scripts.Render("~/bundles/DataTables")
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
-    <script src="~/Scripts/SDDB/Location.js"></script>
+    <script src="~/Scripts/SDDB/Location.js?@Html.GetAppVersion()"></script>
 }
 
 @section CSS {

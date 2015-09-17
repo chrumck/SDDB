@@ -1,4 +1,5 @@
 ﻿@model SDDB.Domain.Entities.ComponentLogEntry
+@using SDDB.WebUI.Infrastructure
 @{
     ViewBag.Title = "Component Log Entries";
 }
@@ -170,7 +171,7 @@
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
     @Scripts.Render("~/bundles/bootstrap-datetimepicker")
-    <script src="~/Scripts/SDDB/ComponentLogEntry.js"></script>
+    <script src="~/Scripts/SDDB/ComponentLogEntry.js?@Html.GetAppVersion()"></script>
 }
 
 @section CSS {

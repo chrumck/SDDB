@@ -1,4 +1,5 @@
 ﻿@model SDDB.Domain.Entities.Project
+@using SDDB.WebUI.Infrastructure
 @{
     ViewBag.Title = "Projects";
 }
@@ -190,7 +191,7 @@
     @Scripts.Render("~/bundles/DataTables")
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
-    <script src="~/Scripts/SDDB/Project.js"></script>
+    <script src="~/Scripts/SDDB/Project.js?@Html.GetAppVersion()"></script>
 }
 
 @section CSS {

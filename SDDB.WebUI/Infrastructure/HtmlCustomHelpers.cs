@@ -1,14 +1,11 @@
 ﻿using System;
+using System.Configuration;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Web;
+using System.Security.Claims;
 using System.Web.Mvc;
-using System.Web.Mvc.Html;
 using System.Web.Script.Serialization;
 
 using SDDB.Domain.DbContexts;
-using SDDB.Domain.Entities;
-using System.Security.Claims;
 
 namespace SDDB.WebUI.Infrastructure
 {
@@ -35,10 +32,7 @@ namespace SDDB.WebUI.Infrastructure
             {
                 return person.FirstName + " " + person.LastName;
             }
-            else
-            {
-                return "";
-            }
+            return String.Empty;
         }
 
         //Checks if person is a group manager
@@ -56,6 +50,13 @@ namespace SDDB.WebUI.Infrastructure
         public static string JsonSerialize(this HtmlHelper html, object value)
         {
             return new JavaScriptSerializer().Serialize(value);
+        }
+
+        //get current application version from web.config
+        public static MvcHtmlString GetAppVersion(this HtmlHelper html)
+        {
+            string appVersion = ConfigurationManager.AppSettings["appVersion"] ?? String.Empty;
+            return MvcHtmlString.Create(appVersion);
         }
         
     }

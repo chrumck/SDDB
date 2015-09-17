@@ -40,6 +40,9 @@ namespace SDDB.WebUI
             //bootstrap-datetimepicker
             bundles.Add(new ScriptBundle("~/bundles/bootstrap-datetimepicker").Include("~/Scripts/bootstrap-datetimepicker.js"));
             bundles.Add(new StyleBundle("~/bundles/bootstrap-datetimepicker-CSS").Include("~/Content/bootstrap-datetimepicker.css"));
+
+            //SDDB script bundles
+            bundles.Add(new ScriptBundle("~/bundles/sddb").Include("~/Scripts/SDDB/Shared.js"));
         }
     }
 }

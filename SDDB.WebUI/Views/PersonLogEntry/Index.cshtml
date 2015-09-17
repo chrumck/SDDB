@@ -1,4 +1,5 @@
 ﻿@model SDDB.Domain.Entities.PersonLogEntry
+@using SDDB.WebUI.Infrastructure
 @{
     ViewBag.Title = "Person Log Entries";
 }
@@ -271,9 +272,9 @@
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
     @Scripts.Render("~/bundles/bootstrap-datetimepicker")
-    <script src="~/Scripts/SDDB/PersonLogEntry.js"></script>
-    <script src="~/Scripts/SDDB/PersonLogEntryShared.js"></script>
-    <script src="~/Scripts/SDDB/PersonLogEntryFiles.js"></script>
+    <script src="~/Scripts/SDDB/PersonLogEntry.js?@Html.GetAppVersion()"></script>
+    <script src="~/Scripts/SDDB/PersonLogEntryShared.js?@Html.GetAppVersion()"></script>
+    <script src="~/Scripts/SDDB/PersonLogEntryFiles.js?@Html.GetAppVersion()"></script>
 }
 
 @section CSS {

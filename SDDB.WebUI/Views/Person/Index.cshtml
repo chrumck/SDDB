@@ -1,4 +1,5 @@
 ﻿@model SDDB.Domain.Entities.Person
+@using SDDB.WebUI.Infrastructure
 @{
     ViewBag.Title = "Persons";
 }
@@ -372,7 +373,7 @@
     @Scripts.Render("~/bundles/DataTables")
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/bootstrap-datetimepicker")
-    <script src="~/Scripts/SDDB/Person.js"></script>
+    <script src="~/Scripts/SDDB/Person.js?@Html.GetAppVersion()"></script>
 }
 
 @section CSS {

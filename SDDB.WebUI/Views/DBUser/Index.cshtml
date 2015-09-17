@@ -1,4 +1,5 @@
 ﻿@model SDDB.Domain.Entities.DBUser
+@using SDDB.WebUI.Infrastructure
 @{
     ViewBag.Title = "SDDB Users";
 }
@@ -160,7 +161,7 @@
 @section Scripts {
     @Scripts.Render("~/bundles/DataTables")
     @Scripts.Render("~/bundles/magicsuggest")
-    <script src="~/Scripts/SDDB/DbUser.js"></script>
+    <script src="~/Scripts/SDDB/DbUser.js?@Html.GetAppVersion()"></script>
 }
 
 @section CSS {

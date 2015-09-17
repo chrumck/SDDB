@@ -116,7 +116,7 @@
     <footer class="footer">
         <div class="container-fluid">
             <hr />
-            <p class="text-muted text-center"> V1.05 2015-09-13 &nbsp;<span class="glyphicon glyphicon-th"></span>&nbsp; Design By TDO</p>
+            <p class="text-muted text-center"> Version @Html.GetAppVersion() &nbsp;<span class="glyphicon glyphicon-th"></span>&nbsp; Design By TDO</p>
         </div>
     </footer>
 
@@ -126,7 +126,7 @@
     @Scripts.Render("~/bundles/jqueryval")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/moment")
-    <script src="/Scripts/SDDB/Shared.js"></script>
+    @Scripts.Render("~/bundles/sddb")
 
     @Styles.Render("~/bundles/jquery-ui-CSS")
 

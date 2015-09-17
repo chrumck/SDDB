@@ -1,4 +1,5 @@
 ﻿@model SDDB.Domain.Entities.AssemblyLogEntry
+@using SDDB.WebUI.Infrastructure
 @{
     ViewBag.Title = "Assembly Log Entries";
 }
@@ -262,7 +263,7 @@
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
     @Scripts.Render("~/bundles/bootstrap-datetimepicker")
-    <script src="~/Scripts/SDDB/AssemblyLogEntry.js"></script>
+    <script src="~/Scripts/SDDB/AssemblyLogEntry.js?@Html.GetAppVersion()"></script>
 }
 
 @section CSS {

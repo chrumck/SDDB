@@ -1,4 +1,5 @@
 ﻿@model SDDB.Domain.Entities.ComponentModel
+@using SDDB.WebUI.Infrastructure
 @{
     ViewBag.Title = "Component Models";
 }
@@ -357,7 +358,7 @@
     @Scripts.Render("~/bundles/DataTables")
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
-    <script src="~/Scripts/SDDB/ComponentModel.js"></script>
+    <script src="~/Scripts/SDDB/ComponentModel.js?@Html.GetAppVersion()"></script>
 }
 
 @section CSS {
