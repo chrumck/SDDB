@@ -215,6 +215,7 @@ namespace SDDB.Domain.Services
 
         //Add (or Remove  when set isAdd to false) Assemblies to Person Log Entry 
         //use generic version AddRemoveRelated from BaseDbService to replace EditPrsLogEntryAssysAsync
+        // see overriden checkBeforeAddRemoveHelperAsync
 
         //-----------------------------------------------------------------------------------------------------------------------
         
@@ -293,6 +294,36 @@ namespace SDDB.Domain.Services
                 { throw new DbBadRequestException("Log Entry and Location do not belong to the same project.\n Entry(ies) not saved."); }
         }
 
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        //checkBeforeAddRemoveHelperAsync - overriden from BaseDbService
+        protected override async Task checkBeforeAddRemoveHelperAsync<TAddRem>(EFDbContext dbContext,
+            string[] ids, string[] idsAddRem, bool isAdd)
+        {
+            if (!isAdd || typeof(TAddRem) != typeof(AssemblyDb)) { return; }
+
+            var AddProjectIds = await dbContext.AssemblyDbs
+                .Where(x => idsAddRem.Contains(x.Id))
+                .Select(x => x.AssignedToLocation.AssignedToProject_Id)
+                .ToListAsync().ConfigureAwait(false);
+
+            if (AddProjectIds.Any(x => x != AddProjectIds[0]))
+            { throw new DbBadRequestException(
+                    "Assemblies do not belong to the same Project.\n Assemblies not added to Log Entry."); }
+
+            var dbEntries = await dbContext.PersonLogEntrys
+                .Where(x => ids.Contains(x.Id))
+                .Include(x => x.AssignedToLocation)
+                .ToListAsync().ConfigureAwait(false);
+
+            foreach (var dbEntry in dbEntries)
+            {
+                if (dbEntry.AssignedToLocation.AssignedToProject_Id != AddProjectIds[0])
+                { throw new DbBadRequestException(
+                    "Assembly(ies) and Person Log Entry do not belong to the same Project.\n" + 
+                    "Assembly(ies) not added to Log Entry."); }
+            }
+        }
         
         #endregion
     }

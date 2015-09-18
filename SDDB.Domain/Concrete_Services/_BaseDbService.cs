@@ -94,6 +94,8 @@ namespace SDDB.Domain.Services
 
             await dbScopeHelperAsync(async dbContext => 
             {
+                await checkBeforeAddRemoveHelperAsync<TAddRem>(dbContext, ids, idsAddRem, isAdd);
+
                 var dbEntries = await getEntriesFromContextHelperAsync<T>(dbContext, ids, relatedCollectionName)
                     .ConfigureAwait(false);
                 if (dbEntries.Count != ids.Length)
@@ -109,7 +111,7 @@ namespace SDDB.Domain.Services
                     throw new DbBadRequestException(
                         String.Format("Add/Remove to {0} failed, related entry(ies) not found", relatedCollectionName)); 
                 }
-
+                
                 await addRemoveRelatedHelper(dbEntries, dbEntriesAddRem, relatedCollectionName, isAdd).ConfigureAwait(false);
 
                 return default(int);
@@ -222,6 +224,14 @@ namespace SDDB.Domain.Services
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
+
+        //checkBeforeAddRemoveHelperAsync
+        //stub method for derived classes to implement
+        protected virtual Task checkBeforeAddRemoveHelperAsync<TAddRem>(EFDbContext dbContext,
+            string[] ids, string[] idsAddRem, bool isAdd)
+        {
+            return Task.FromResult(default(int));
+        }
 
         //helper - Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T 
         //taking taking single T and TAddRem
