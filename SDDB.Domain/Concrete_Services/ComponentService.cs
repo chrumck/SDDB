@@ -24,7 +24,7 @@ namespace SDDB.Domain.Services
         public ComponentService(IDbContextScopeFactory contextScopeFac, string userId) : base(contextScopeFac, userId) 
         {
             loggedProperties = new List<string> { "ComponentStatus_Id", "AssignedToProject_Id","AssignedToAssemblyDb_Id",
-                "LastCalibrationDate" };
+                "LastCalibrationDate", "Comments" };
         }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
@@ -40,13 +40,15 @@ namespace SDDB.Domain.Services
                 
                 var records = await dbContext.Components
                     .Where(x =>
-                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
+                        (x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) ||
+                            (x.AssignedToAssemblyDb_Id != null &&
+                                 x.AssignedToAssemblyDb.AssignedToLocation
+                                    .AssignedToProject.ProjectPersons.Any(y => y.Id == userId))) &&
                         ids.Contains(x.Id) &&
                         x.IsActive_bl == getActive
                         )
                     .Include(x => x.ComponentType)
                     .Include(x => x.ComponentStatus)
-                    .Include(x => x.ComponentModel)
                     .Include(x => x.AssignedToProject)
                     .Include(x => x.AssignedToAssemblyDb)
                     .Include(x => x.ComponentExt)
@@ -57,36 +59,6 @@ namespace SDDB.Domain.Services
             }
         }
                 
-        //get by projectIds and modelIds
-        public virtual async Task<List<Component>> GetByAltIdsAsync(string[] projectIds, string[] modelIds, bool getActive = true)
-        {
-            projectIds = projectIds ?? new string[] { };
-            modelIds = modelIds ?? new string[] { }; 
-
-            using (var dbContextScope = contextScopeFac.CreateReadOnly())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-
-                var records = await dbContext.Components
-                    .Where(x =>
-                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
-                        (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
-                        (modelIds.Count() == 0 || modelIds.Contains(x.ComponentModel_Id)) &&
-                        x.IsActive_bl == getActive
-                        )
-                    .Include(x => x.ComponentType)
-                    .Include(x => x.ComponentStatus)
-                    .Include(x => x.ComponentModel)
-                    .Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToAssemblyDb)
-                    .Include(x => x.ComponentExt)
-                    .ToListAsync().ConfigureAwait(false);
-
-                records.FillRelatedIfNull();
-                return records;
-            }
-        }
-
         //get by projectIds, typeIds and assyIds
         public virtual async Task<List<Component>> GetByAltIdsAsync(string[] projectIds, string[] typeIds, string[] assyIds,
             bool getActive = true)
@@ -101,15 +73,19 @@ namespace SDDB.Domain.Services
 
                 var records = await dbContext.Components
                    .Where(x =>
-                       x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
-                       (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
+                        (x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) ||
+                            (x.AssignedToAssemblyDb_Id != null &&
+                                x.AssignedToAssemblyDb.AssignedToLocation
+                                    .AssignedToProject.ProjectPersons.Any(y => y.Id == userId))) &&
+                       (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id) ||
+                            (x.AssignedToAssemblyDb_Id != null && 
+                                projectIds.Contains(x.AssignedToAssemblyDb.AssignedToLocation.AssignedToProject_Id))) &&
                        (typeIds.Count() == 0 || typeIds.Contains(x.ComponentType_Id)) &&
                        (assyIds.Count() == 0 || assyIds.Contains(x.AssignedToAssemblyDb_Id)) &&
                        x.IsActive_bl == getActive
                        )
                    .Include(x => x.ComponentType)
                    .Include(x => x.ComponentStatus)
-                   .Include(x => x.ComponentModel)
                    .Include(x => x.AssignedToProject)
                    .Include(x => x.AssignedToAssemblyDb)
                    .Include(x => x.ComponentExt)
@@ -129,7 +105,10 @@ namespace SDDB.Domain.Services
 
                 var records = await dbContext.Components
                     .Where(x =>
-                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
+                        (x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) ||
+                            (x.AssignedToAssemblyDb_Id != null &&
+                                 x.AssignedToAssemblyDb.AssignedToLocation
+                                    .AssignedToProject.ProjectPersons.Any(y => y.Id == userId))) &&
                         (x.CompName.Contains(query) || x.AssignedToProject.ProjectName.Contains(query)) &&
                         x.IsActive_bl == getActive
                         )
@@ -152,8 +131,13 @@ namespace SDDB.Domain.Services
 
                 var records = await dbContext.Components
                     .Where(x =>
-                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
-                        (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
+                        (x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) ||
+                            (x.AssignedToAssemblyDb_Id != null &&
+                                 x.AssignedToAssemblyDb.AssignedToLocation
+                                    .AssignedToProject.ProjectPersons.Any(y => y.Id == userId))) &&
+                        (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id) ||
+                            (x.AssignedToAssemblyDb_Id != null &&
+                                projectIds.Contains(x.AssignedToAssemblyDb.AssignedToLocation.AssignedToProject_Id))) &&
                         (x.CompName.Contains(query) || x.AssignedToProject.ProjectName.Contains(query)) &&
                         x.IsActive_bl == getActive
                         )

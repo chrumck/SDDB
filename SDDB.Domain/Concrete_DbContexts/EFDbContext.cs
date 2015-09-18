@@ -39,14 +39,12 @@ namespace SDDB.Domain.DbContexts
         public virtual DbSet<AssemblyDb> AssemblyDbs { get; set; }
         public virtual DbSet<AssemblyExt> AssemblyExts { get; set; }
         public virtual DbSet<AssemblyType> AssemblyTypes { get; set; }
-        public virtual DbSet<AssemblyModel> AssemblyModels { get; set; }
         public virtual DbSet<AssemblyStatus> AssemblyStatuss { get; set; }
         public virtual DbSet<AssemblyLogEntry> AssemblyLogEntrys { get; set; }
 
         public virtual DbSet<Component> Components { get; set; }
         public virtual DbSet<ComponentExt> ComponentExts { get; set; }
         public virtual DbSet<ComponentType> ComponentTypes { get; set; }
-        public virtual DbSet<ComponentModel> ComponentModels { get; set; }
         public virtual DbSet<ComponentStatus> ComponentStatuss { get; set; }
         public virtual DbSet<ComponentLogEntry> ComponentLogEntrys { get; set; }
 

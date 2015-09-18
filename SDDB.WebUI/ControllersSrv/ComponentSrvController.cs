@@ -36,16 +36,6 @@ namespace SDDB.WebUI.ControllersSrv
             return DbJsonDate(filterForJsonFull(records));
         }
 
-        // POST: /ComponentSrv/GetByAltIds
-        [HttpPost]
-        [DBSrvAuth("Component_View")]
-        public async Task<ActionResult> GetByAltIds(string[] projectIds, string[] modelIds, bool getActive = true)
-        {
-            ViewBag.ServiceName = "ComponentService.GetByAltIdsAsync";
-            var records = await componentService.GetByAltIdsAsync(projectIds, modelIds, getActive).ConfigureAwait(false);
-            return DbJsonDate(filterForJsonFull(records));
-        }
-
         // POST: /ComponentSrv/GetByAltIds2
         [HttpPost]
         [DBSrvAuth("Component_View")]
@@ -130,10 +120,6 @@ namespace SDDB.WebUI.ControllersSrv
                 {
                     x.ComponentStatus.CompStatusName
                 },
-                ComponentModel_ = new
-                {
-                    x.ComponentModel.CompModelName
-                },
                 AssignedToProject_ = new
                 {
                     x.AssignedToProject.ProjectCode,
@@ -167,7 +153,6 @@ namespace SDDB.WebUI.ControllersSrv
                 x.ComponentExt.Attr15,
                 x.ComponentType_Id,
                 x.ComponentStatus_Id,
-                x.ComponentModel_Id,
                 x.AssignedToProject_Id,
                 x.AssignedToAssemblyDb_Id
             })

@@ -36,17 +36,7 @@ namespace SDDB.WebUI.ControllersSrv
             return DbJson( filterForJsonFull(records) );
         }
 
-        // POST: /AssemblyDbSrv/GetByAltIds
-        [HttpPost]
-        [DBSrvAuth("Assembly_View")]
-        public async Task<ActionResult> GetByAltIds(string[] projectIds, string[] modelIds, bool getActive = true)
-        {
-            ViewBag.ServiceName = "AssemblyDbService.GetByAltIdsAsync";
-            var records = await assemblyService.GetByAltIdsAsync(projectIds, modelIds, getActive).ConfigureAwait(false);
-            return DbJson(filterForJsonFull(records));
-        }
-
-        // POST: /AssemblyDbSrv/GetByAltIds
+        // POST: /AssemblyDbSrv/GetByAltIds2
         [HttpPost]
         [DBSrvAuth("Assembly_View")]
         public async Task<ActionResult> GetByAltIds2(string[] projectIds, string[] typeIds, string[] locIds, bool getActive = true)
@@ -54,16 +44,6 @@ namespace SDDB.WebUI.ControllersSrv
             ViewBag.ServiceName = "AssemblyDbService.GetByAltIdsAsync";
             var records = await assemblyService.GetByAltIdsAsync(projectIds, typeIds, locIds, getActive).ConfigureAwait(false);
             return DbJson(filterForJsonFull(records));
-        }
-
-        // POST: /AssemblyDbSrv/CountByAltIds2
-        [HttpPost]
-        [DBSrvAuth("Assembly_View")]
-        public async Task<ActionResult> CountByAltIds2(string[] projectIds, string[] typeIds, string[] locIds, bool getActive = true)
-        {
-            ViewBag.ServiceName = "AssemblyDbService.CountByAltIdsAsync";
-            var count = await assemblyService.CountByAltIdsAsync(projectIds, typeIds, locIds, getActive).ConfigureAwait(false);
-            return DbJson(count);
         }
         
         // GET: /AssemblyDbSrv/Lookup
@@ -163,16 +143,10 @@ namespace SDDB.WebUI.ControllersSrv
                 AssemblyStatus_ = new {
                     x.AssemblyStatus.AssyStatusName
                 },
-                AssemblyModel_ = new {
-                    x.AssemblyModel.AssyModelName
-                },
-                AssignedToProject_ = new {
-                    x.AssignedToProject.ProjectCode,
-                    x.AssignedToProject.ProjectName
-                },
                 AssignedToLocation_ = new {
                     x.AssignedToLocation.LocName,
-                    x.AssignedToLocation.LocationType.LocTypeName
+                    x.AssignedToLocation.LocationType.LocTypeName,
+                    x.AssignedToLocation.AssignedToProject.ProjectName,
                 },
                 x.AssyGlobalX,
                 x.AssyGlobalY,
@@ -209,8 +183,6 @@ namespace SDDB.WebUI.ControllersSrv
                 x.AssemblyExt.Attr15,
                 x.AssemblyType_Id,
                 x.AssemblyStatus_Id,
-                x.AssemblyModel_Id,
-                x.AssignedToProject_Id,
                 x.AssignedToLocation_Id
             })
             .ToList();
@@ -225,7 +197,7 @@ namespace SDDB.WebUI.ControllersSrv
                 .Select(x => new
                 {
                     id = x.Id,
-                    name = x.AssyName + " - " + x.AssignedToProject.ProjectName
+                    name = x.AssyName + " - " + x.AssignedToLocation.AssignedToProject.ProjectName
                 })
                 .ToList();
         }

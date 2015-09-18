@@ -2,7 +2,7 @@
 namespace SDDB.Domain.Entities
 {
     //Enumeration for Ext Attributes-------------------------------------------------------------------------------------------//
-    public enum MAttrTypes : byte
+    public enum ExtAttrTypes : byte
     {
         NotUsed,
         String,

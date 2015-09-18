@@ -34,12 +34,14 @@ namespace SDDB.UnitTests
             var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
+            var location1 = new Location { Id = "dummyLocId1", LocName = "Loc1", AssignedToProject_Id = project1.Id, AssignedToProject = project1 };
+            
             var dbEntry1 = new AssemblyDb { Id = "dummyEntryId1", AssyName = "Assy1", AssyAltName = "AssyAlt1", IsActive_bl = false, 
-                TechnicalDetails = "DummyInfo1" , AssignedToProject = project1 };
+                TechnicalDetails = "DummyInfo1" , AssignedToLocation = location1};
             var dbEntry2 = new AssemblyDb { Id = "dummyEntryId2", AssyName = "Assy2", AssyAltName = "AssyAlt2", IsActive_bl = true,
-                TechnicalDetails = "DummyInfo2" , AssignedToProject = project1 };
+                TechnicalDetails = "DummyInfo2" , AssignedToLocation = location1 };
             var dbEntry3 = new AssemblyDb { Id = "dummyEntryId3", AssyName = "Assy3", AssyAltName = "AssyAlt3", IsActive_bl = true, 
-                TechnicalDetails = "DummyInfo3" , AssignedToProject = project1 };
+                TechnicalDetails = "DummyInfo3" , AssignedToLocation = location1 };
             var dbEntries = (new List<AssemblyDb> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<AssemblyDb>>();
@@ -78,12 +80,14 @@ namespace SDDB.UnitTests
             var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
+            var location1 = new Location { Id = "dummyLocId1", LocName = "Loc1", AssignedToProject_Id = project1.Id, AssignedToProject = project1 };
+
             var dbEntry1 = new AssemblyDb { Id = "dummyEntryId1", AssyName = "Assy1", AssyAltName = "AssyAlt1", IsActive_bl = false, 
-                TechnicalDetails = "DummyInfo1" , AssignedToProject = project1 };
+                TechnicalDetails = "DummyInfo1" , AssignedToLocation = location1 };
             var dbEntry2 = new AssemblyDb { Id = "dummyEntryId2", AssyName = "Assy2", AssyAltName = "AssyAlt2", IsActive_bl = true,
-                TechnicalDetails = "DummyInfo2" , AssignedToProject = project1 };
+                TechnicalDetails = "DummyInfo2" , AssignedToLocation = location1 };
             var dbEntry3 = new AssemblyDb { Id = "dummyEntryId3", AssyName = "Assy3", AssyAltName = "AssyAlt3", IsActive_bl = false, 
-                TechnicalDetails = "DummyInfo3" , AssignedToProject = project1 };
+                TechnicalDetails = "DummyInfo3" , AssignedToLocation = location1 };
             var dbEntries = (new List<AssemblyDb> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<AssemblyDb>>();
@@ -122,12 +126,14 @@ namespace SDDB.UnitTests
             var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
+            var location1 = new Location { Id = "dummyLocId1", LocName = "Loc1", AssignedToProject_Id = project1.Id, AssignedToProject = project1 };
+
             var dbEntry1 = new AssemblyDb { Id = "dummyEntryId1", AssyName = "Assy1", AssyAltName = "AssyAlt1", IsActive_bl = true, 
-                TechnicalDetails = "DummyInfo1" , AssignedToProject = project1 };
+                TechnicalDetails = "DummyInfo1" , AssignedToLocation = location1 };
             var dbEntry2 = new AssemblyDb { Id = "dummyEntryId2", AssyName = "Assy2", AssyAltName = "AssyAlt2", IsActive_bl = true,
-                TechnicalDetails = "DummyInfo2" , AssignedToProject = project1 };
+                TechnicalDetails = "DummyInfo2" , AssignedToLocation = location1 };
             var dbEntry3 = new AssemblyDb { Id = "dummyEntryId3", AssyName = "Assy3", AssyAltName = "AssyAlt3", IsActive_bl = false, 
-                TechnicalDetails = "DummyInfo3" , AssignedToProject = project1 };
+                TechnicalDetails = "DummyInfo3" , AssignedToLocation = location1 };
             var dbEntries = (new List<AssemblyDb> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<AssemblyDb>>();
@@ -163,13 +169,15 @@ namespace SDDB.UnitTests
 
             var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
+            
+            var location1 = new Location { Id = "dummyLocId1", LocName = "Loc1", AssignedToProject_Id = project1.Id, AssignedToProject = project1 };
 
             var dbEntry1 = new AssemblyDb { Id = "dummyEntryId1", AssyName = "Assy1", AssyAltName = "AssyAlt1", AssyAltName2 = "AssyAlt1", IsActive_bl = true, 
-                TechnicalDetails = "DummyInfo1" , AssignedToProject = project1 };
+                TechnicalDetails = "DummyInfo1" , AssignedToLocation = location1 };
             var dbEntry2 = new AssemblyDb { Id = "dummyEntryId2", AssyName = "Assy2", AssyAltName = "AssyAlt2", AssyAltName2 = "AssyAlt2", IsActive_bl = true,
-                TechnicalDetails = "DummyInfo2" , AssignedToProject = project1 };
+                TechnicalDetails = "DummyInfo2" , AssignedToLocation = location1 };
             var dbEntry3 = new AssemblyDb { Id = "dummyEntryId3", AssyName = "Assy3", AssyAltName = "AssyAlt3", AssyAltName2 = "AssyAlt3", IsActive_bl = false, 
-                TechnicalDetails = "DummyInfo3" , AssignedToProject = project1 };
+                TechnicalDetails = "DummyInfo3" , AssignedToLocation = location1 };
             var dbEntries = (new List<AssemblyDb> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<AssemblyDb>>();
@@ -206,12 +214,14 @@ namespace SDDB.UnitTests
             var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
+            var location1 = new Location { Id = "dummyLocId1", LocName = "Loc1", AssignedToProject_Id = project1.Id, AssignedToProject = project1 };
+
             var dbEntry1 = new AssemblyDb { Id = "dummyEntryId1", AssyName = "Assy1", AssyAltName = "AssyAlt1", AssyAltName2 = "AssyAlt1", IsActive_bl = true, 
-                TechnicalDetails = "DummyInfo1" , AssignedToProject = project1 };
+                TechnicalDetails = "DummyInfo1" , AssignedToLocation = location1 };
             var dbEntry2 = new AssemblyDb { Id = "dummyEntryId2", AssyName = "Assy2", AssyAltName = "AssyAlt2", AssyAltName2 = "AssyAlt2", IsActive_bl = true,
-                TechnicalDetails = "DummyInfo2" , AssignedToProject = project1 };
+                TechnicalDetails = "DummyInfo2" , AssignedToLocation = location1 };
             var dbEntry3 = new AssemblyDb { Id = "dummyEntryId3", AssyName = "Assy3", AssyAltName = "AssyAlt3", AssyAltName2 = "AssyAlt3", IsActive_bl = false, 
-                TechnicalDetails = "DummyInfo3" , AssignedToProject = project1 };
+                TechnicalDetails = "DummyInfo3" , AssignedToLocation = location1 };
             var dbEntries = (new List<AssemblyDb> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
             var mockDbSet = new Mock<DbSet<AssemblyDb>>();
@@ -400,12 +410,14 @@ namespace SDDB.UnitTests
             var project1 = new Project { Id = "dummyId1", ProjectName = "Project1", ProjectAltName = "ProjectAlt1", IsActive_bl = true, ProjectCode = "CODE1", 
                 ProjectPersons = new List<Person> { projectPerson1 } };
 
+            var location1 = new Location { Id = "dummyLocId1", LocName = "Loc1", AssignedToProject_Id = project1.Id, AssignedToProject = project1 };
+
             var dbEntry1 = new AssemblyDb { Id = "dummyEntryId1", AssyName = "Assy1", AssyAltName = "AssyAlt1", IsActive_bl = true, 
-                TechnicalDetails = "DummyInfo1" , AssignedToProject = project1 };
+                TechnicalDetails = "DummyInfo1" , AssignedToLocation = location1 };
             var dbEntry2 = new AssemblyDb { Id = "dummyEntryId2", AssyName = "Assy2", AssyAltName = "AssyAlt2", IsActive_bl = true,
-                TechnicalDetails = "DummyInfo2" , AssignedToProject = project1, AssemblyStatus_Id = statusId };
+                TechnicalDetails = "DummyInfo2" , AssignedToLocation = location1, AssemblyStatus_Id = statusId };
             var dbEntry3 = new AssemblyDb { Id = "dummyEntryId3", AssyName = "Assy3", AssyAltName = "AssyAlt3", IsActive_bl = true, 
-                TechnicalDetails = "DummyInfo3" , AssignedToProject = project1 };
+                TechnicalDetails = "DummyInfo3" , AssignedToLocation = location1 };
             var dbEntries = (new List<AssemblyDb> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
             
             var mockDbSet = new Mock<DbSet<AssemblyDb>>();

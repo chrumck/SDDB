@@ -451,8 +451,6 @@
     <Compile Include="ControllersSrv\ComponentLogEntrySrvController.cs" />
     <Compile Include="ControllersSrv\PersonLogEntrySrvController.cs" />
     <Compile Include="ControllersSrv\ComponentSrvController.cs" />
-    <Compile Include="ControllersSrv\ComponentModelSrvController.cs" />
-    <Compile Include="ControllersSrv\AssemblyModelSrvController.cs" />
     <Compile Include="ControllersSrv\AssemblyDbSrvController.cs" />
     <Compile Include="ControllersSrv\ProjectEventSrvController.cs" />
     <Compile Include="ControllersSrv\PersonActivityTypeSrvController.cs" />
@@ -478,8 +476,6 @@
     <Compile Include="Controllers\ComponentExtController.cs" />
     <Compile Include="Controllers\ComponentController.cs" />
     <Compile Include="Controllers\AssemblyExtController.cs" />
-    <Compile Include="Controllers\ComponentModelController.cs" />
-    <Compile Include="Controllers\AssemblyModelController.cs" />
     <Compile Include="Controllers\AssemblyDbController.cs" />
     <Compile Include="Controllers\ActivitySummaryController.cs" />
     <Compile Include="Controllers\YourActivityController.cs" />

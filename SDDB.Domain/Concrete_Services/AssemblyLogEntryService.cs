@@ -36,14 +36,14 @@ namespace SDDB.Domain.Services
                 
                 var records = await dbContext.AssemblyLogEntrys
                     .Where(x =>
-                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
+                        x.AssignedToLocation.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
                         ids.Contains(x.Id) &&
                         x.IsActive_bl == getActive
                         )
                     .Include(x => x.AssemblyDb)
                     .Include(x => x.LastSavedByPerson)
                     .Include(x => x.AssemblyStatus)
-                    .Include(x => x.AssignedToProject)
+                    .Include(x => x.AssignedToLocation.AssignedToProject)
                     .Include(x => x.AssignedToLocation)
                     .ToListAsync().ConfigureAwait(false);
 
@@ -66,8 +66,8 @@ namespace SDDB.Domain.Services
 
                 var records = await dbContext.AssemblyLogEntrys
                     .Where(x =>
-                        x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
-                        (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
+                        x.AssignedToLocation.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
+                        (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToLocation.AssignedToProject_Id)) &&
                         (assemblyIds.Count() == 0 || assemblyIds.Contains(x.AssemblyDb_Id)) &&
                         (personIds.Count() == 0 || personIds.Contains(x.LastSavedByPerson_Id)) &&
                         (startDate == null || x.LogEntryDateTime >= startDate) &&
@@ -77,7 +77,7 @@ namespace SDDB.Domain.Services
                     .Include(x => x.AssemblyDb)
                     .Include(x => x.LastSavedByPerson)
                     .Include(x => x.AssemblyStatus)
-                    .Include(x => x.AssignedToProject)
+                    .Include(x => x.AssignedToLocation.AssignedToProject)
                     .Include(x => x.AssignedToLocation)
                     .ToListAsync().ConfigureAwait(false);
 
