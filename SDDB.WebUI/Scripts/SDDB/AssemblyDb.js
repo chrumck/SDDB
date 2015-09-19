@@ -5,15 +5,13 @@
 /// <reference path="../jquery-2.1.4.js" />
 /// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
-/// <reference path="Shared.js" />
+/// <reference path="Shared_Views.js" />
 
 //--------------------------------------Global Properties------------------------------------//
 
-var TableMain;
 var MsFilterByProject = {};
 var MsFilterByType = {};
 var MsFilterByLoc = {};
-var MagicSuggests = [];
 var RecordTemplate = {
     Id: "RecordTemplateId",
     AssyName: null,
@@ -39,88 +37,39 @@ var RecordTemplate = {
     IsActive_bl: null,
     AssemblyType_Id: null,
     AssemblyStatus_Id: null,
-    AssemblyModel_Id: null,
-    AssignedToProject_Id: null,
     AssignedToLocation_Id: null
 };
-var CurrRecords = [];
-var CurrIds = [];
-var GetActive = true;
+
+var LabelTextCreate = "Create Assembly";
+var LabelTextEdit = "Edit Assembly";
+var UrlEdit = "/AssemblyDbSrv/GetByIds";
 
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
-
-    //Wire up BtnCreate
-    $("#BtnCreate").click(function () {
-        CurrIds = [];
-        CurrRecords = [];
-        CurrRecords[0] = $.extend(true, {}, RecordTemplate);
-        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Assembly", "MainView");
-        saveViewSettings(TableMain);
-        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
-    });
-
-    //Wire up BtnEdit
-    $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) {
-            showModalNothingSelected();
-            return;
-        }
-        showModalWait();
-        fillFormForEditGeneric(CurrIds, "POST", "/AssemblyDbSrv/GetByIds",
-                GetActive, "EditForm", "Edit Assembly", MagicSuggests)
-            .always(hideModalWait)
-            .done(function (currRecords) {
-                CurrRecords = currRecords;
-                saveViewSettings(TableMain);
-                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    });
-
-    //Wire up BtnDelete 
-    $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) { showModalNothingSelected(); }
-        else { showModalDelete(CurrIds.length); }
-    });
-        
+            
     //wire up dropdownId1
     $("#dropdownId1").click(function (event) {
         event.preventDefault();
-        TableMain.columns([2, 3, 4, 5, 6, 7, 8]).visible(true);
-        TableMain.columns([9, 10, 11, 12, 13, 14]).visible(false);
-        TableMain.columns([15, 16, 17, 18, 19, 20]).visible(false);
-        TableMain.columns([21, 22, 23, 24, 25]).visible(false);
+        showColumnSet(TableMainColumnSets, 1);
     });
 
     //wire up dropdownId2
     $("#dropdownId2").click(function (event) {
         event.preventDefault();
-        TableMain.columns([2, 3, 4, 5, 6, 7, 8]).visible(false);
-        TableMain.columns([9, 10, 11, 12, 13, 14]).visible(true);
-        TableMain.columns([15, 16, 17, 18, 19, 20]).visible(false);
-        TableMain.columns([21, 22, 23, 24, 25]).visible(false);
+        showColumnSet(TableMainColumnSets, 2);
     });
 
     //wire up dropdownId3
     $("#dropdownId3").click(function (event) {
         event.preventDefault();
-        TableMain.columns([2, 3, 4, 5, 6, 7, 8]).visible(false);
-        TableMain.columns([9, 10, 11, 12, 13, 14]).visible(false);
-        TableMain.columns([15, 16, 17, 18, 19, 20]).visible(true);
-        TableMain.columns([21, 22, 23, 24, 25]).visible(false);
+        showColumnSet(TableMainColumnSets, 3);
     });
 
     //wire up dropdownId4
     $("#dropdownId4").click(function (event) {
         event.preventDefault();
-        TableMain.columns([2, 3, 4, 5, 6, 7, 8]).visible(false);
-        TableMain.columns([9, 10, 11, 12, 13, 14]).visible(false);
-        TableMain.columns([15, 16, 17, 18, 19, 20]).visible(false);
-        TableMain.columns([21, 22, 23, 24, 25]).visible(true);
+        showColumnSet(TableMainColumnSets, 4);
     });
 
     //wire up dropdownId5 - Show Assy Components
@@ -145,24 +94,6 @@ $(document).ready(function () {
         }
         window.open("/AssemblyLogEntry?AssemblyId="
             + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
-    });
-
-    //wire up dropdownId7 - Go to Extended
-    $("#dropdownId7").click(function (event) {
-        event.preventDefault();
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) {
-            showModalNothingSelected();
-            return;
-        }
-        var modelIds = TableMain.cells(".ui-selected", "AssemblyModel_Id:name", { page: "current" }).data().toArray();
-        if (!modelIdsAreSame(modelIds)) {
-            showModalFail("Error", "Selected records have no models or their models are not the same.");
-            return;
-        }
-        var newWindowName = moment().format("YYYYDDMMHHmmss");
-        window.open("about:blank", newWindowName);
-        submitFormFromArray("POST", "/AssemblyExt", newWindowName, CurrIds, "AssemblyIds");
     });
 
     //Initialize MagicSuggest MsFilterByType
@@ -208,17 +139,14 @@ $(document).ready(function () {
 
     //---------------------------------------DataTables------------
 
-    //Wire up ChBoxShowDeleted
-    $("#ChBoxShowDeleted").change(function (event) {
-        if (!$(this).prop("checked")) {
-            GetActive = true;
-            $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
-        } else {
-            GetActive = false;
-            $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
-        }
-        refreshMainView();
-    });
+    //TableMainColumnSets
+    TableMainColumnSets = [
+        [1],
+        [2, 3, 4, 5, 6],
+        [7, 8, 9, 10, 11, 12],
+        [13, 14, 15, 16, 17, 18],
+        [19, 20, 21, 22, 23]
+    ];
         
     //TableMain AssemblyDbs
     TableMain = $("#TableMain").DataTable({
@@ -230,54 +158,47 @@ $(document).ready(function () {
             { data: "AssyAltName2", name: "AssyAltName2" },//3
             { data: "AssemblyType_", render: function (data, type, full, meta) { return data.AssyTypeName }, name: "AssemblyType_" }, //4
             { data: "AssemblyStatus_", render: function (data, type, full, meta) { return data.AssyStatusName }, name: "AssemblyStatus_" }, //5
-            { data: "AssemblyModel_", render: function (data, type, full, meta) { return data.AssyModelName }, name: "AssemblyModel_" }, //6
-            { data: "AssignedToProject_", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject" }, //7
-            { data: "AssignedToLocation_", render: function (data, type, full, meta) { return data.LocName + " - " + data.LocTypeName }, name: "AssignedToLocation" }, //8
+            { data: "AssignedToLocation_", render: function (data, type, full, meta) { return data.LocName + " - " + data.ProjectCode }, name: "AssignedToLocation" }, //6
             //------------------------------------------------second set of columns
-            { data: "AssyGlobalX", name: "AssyGlobalX" },//9
-            { data: "AssyGlobalY", name: "AssyGlobalY" },//10
-            { data: "AssyGlobalZ", name: "AssyGlobalZ" },//11
-            { data: "AssyLocalXDesign", name: "AssyLocalXDesign" },//12
-            { data: "AssyLocalYDesign", name: "AssyLocalYDesign" },//13
-            { data: "AssyLocalZDesign", name: "AssyLocalZDesign" },//14
+            { data: "AssyGlobalX", name: "AssyGlobalX" },//7
+            { data: "AssyGlobalY", name: "AssyGlobalY" },//8
+            { data: "AssyGlobalZ", name: "AssyGlobalZ" },//9
+            { data: "AssyLocalXDesign", name: "AssyLocalXDesign" },//10
+            { data: "AssyLocalYDesign", name: "AssyLocalYDesign" },//11
+            { data: "AssyLocalZDesign", name: "AssyLocalZDesign" },//12
             //------------------------------------------------third set of columns
-            { data: "AssyLocalXAsBuilt", name: "AssyLocalXAsBuilt" },//15
-            { data: "AssyLocalYAsBuilt", name: "AssyLocalYAsBuilt" },//16
-            { data: "AssyLocalZAsBuilt", name: "AssyLocalZAsBuilt" },//17
-            { data: "AssyStationing", name: "AssyStationing" },//18
-            { data: "AssyLength", name: "AssyLength" },//19
-            { data: "AssyReadingIntervalSecs", name: "AssyReadingIntervalSecs" },//20
+            { data: "AssyLocalXAsBuilt", name: "AssyLocalXAsBuilt" },//13
+            { data: "AssyLocalYAsBuilt", name: "AssyLocalYAsBuilt" },//14
+            { data: "AssyLocalZAsBuilt", name: "AssyLocalZAsBuilt" },//15
+            { data: "AssyStationing", name: "AssyStationing" },//16
+            { data: "AssyLength", name: "AssyLength" },//17
+            { data: "AssyReadingIntervalSecs", name: "AssyReadingIntervalSecs" },//18
             //------------------------------------------------Fourth set of columns
-            { data: "IsReference_bl", name: "IsReference_bl" },//21
-            { data: "TechnicalDetails", name: "TechnicalDetails" },//22
-            { data: "PowerSupplyDetails", name: "PowerSupplyDetails" },//23
-            { data: "HSEDetails", name: "HSEDetails" },//24
-            { data: "Comments", name: "Comments" },//25
+            { data: "IsReference_bl", name: "IsReference_bl" },//19
+            { data: "TechnicalDetails", name: "TechnicalDetails" },//20
+            { data: "PowerSupplyDetails", name: "PowerSupplyDetails" },//21
+            { data: "HSEDetails", name: "HSEDetails" },//22
+            { data: "Comments", name: "Comments" },//23
             //------------------------------------------------never visible
-            { data: "IsActive_bl", name: "IsActive_bl" },//26
-            { data: "AssemblyType_Id", name: "AssemblyType_Id" },//27
-            { data: "AssemblyStatus_Id", name: "AssemblyStatus_Id" },//28
-            { data: "AssemblyModel_Id", name: "AssemblyModel_Id" },//29
-            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//30
-            { data: "AssignedToLocation_Id", name: "AssignedToLocation_Id" }//31
+            { data: "IsActive_bl", name: "IsActive_bl" },//24
+            { data: "AssemblyType_Id", name: "AssemblyType_Id" },//25
+            { data: "AssemblyStatus_Id", name: "AssemblyStatus_Id" },//26
+            { data: "AssignedToLocation_Id", name: "AssignedToLocation_Id" }//27
         ],
         columnDefs: [
-            { targets: [0, 26, 27, 28, 29, 30, 31], visible: false }, // - never show
-            { targets: [0, 21, 26, 27, 28, 29, 30, 31], searchable: false },  //"orderable": false, "visible": false
-            { targets: [2, 3, 4, 8], className: "hidden-xs" }, // - first set of columns
-            { targets: [6, 7], className: "hidden-xs hidden-sm" }, // - first set of columns
-
-            { targets: [9, 10, 11, 12, 13, 14], visible: false }, // - second set of columns - to toggle with options
-            { targets: [10, 11], className: "hidden-xs" }, // - second set of columns
-            { targets: [12, 13, 14], className: "hidden-xs hidden-sm" }, // - second set of columns
-
-            { targets: [15, 16, 17, 18, 19, 20], visible: false }, // - third set of columns - to toggle with options
-            { targets: [15, 16, 17, 19], className: "hidden-xs" }, // - third set of columns
-            { targets: [20], className: "hidden-xs hidden-sm " }, // - third set of columns
-
-            { targets: [21, 22, 23, 24, 25], visible: false }, // - fourth set of columns - to toggle with options
-            { targets: [21, 22, 23], className: "hidden-xs" }, // - fourth set of columns
-            { targets: [24], className: "hidden-xs hidden-sm" } // - fourth set of columns
+            { targets: [0, 19, 24, 25, 26, 27], searchable: false },  //"orderable": false, "visible": false
+            //first set of columns - responsive
+            { targets: [2, 3], className: "hidden-xs" },
+            { targets: [4, 6], className: "hidden-xs hidden-sm" }, 
+            //second set of columns - responsive
+            { targets: [8, 9], className: "hidden-xs" }, 
+            { targets: [10, 11, 12], className: "hidden-xs hidden-sm" }, 
+            //third set of columns - responsive
+            { targets: [13, 14, 15, 17], className: "hidden-xs" }, 
+            { targets: [18], className: "hidden-xs hidden-sm " }, 
+            //fourth set of columns - responsive
+            { targets: [19, 20, 21], className: "hidden-xs" },
+            { targets: [22], className: "hidden-xs hidden-sm" } 
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
@@ -290,14 +211,14 @@ $(document).ready(function () {
             paginate: { previous: "", next: "" }
         }
     });
+    //showing the first Set of columns on startup;
+    showColumnSet(TableMainColumnSets, 1);
 
     //---------------------------------------EditFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
     msAddToMsArray(MagicSuggests, "AssemblyType_Id", "/AssemblyTypeSrv/Lookup", 1);
     msAddToMsArray(MagicSuggests, "AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "AssemblyModel_Id", "/AssemblyModelSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
     msAddToMsArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/Lookup", 1);
 
     //Wire Up EditFormBtnCancel

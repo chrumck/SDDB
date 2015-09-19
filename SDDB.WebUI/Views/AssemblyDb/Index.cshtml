@@ -36,7 +36,6 @@
             <li class="divider"></li>
             <li><a class="collapsenav" href=# id="dropdownId5">Show Assy Components</a></li>
             <li><a class="collapsenav" href=# id="dropdownId6">Show Assy Log</a></li>
-            <li><a class="collapsenav" href=# id="dropdownId7">Go to Extended</a></li>
         </ul>
     </li>
 </ul> 
@@ -76,8 +75,6 @@
                     <th>2Alt. Name</th>
                     <th>Type</th>
                     <th>Status</th>
-                    <th>Model</th>
-                    <th>Project</th>
                     <th>Location</th>
                     <th>Global X</th>
                     <th>Global Y</th>
@@ -99,8 +96,6 @@
                     <th>Is Active</th>
                     <th>AssemblyType_Id</th>
                     <th>AssemblyStatus_Id</th>
-                    <th>AssemblyModel_Id</th>
-                    <th>AssignedToProject_Id</th>
                     <th>AssignedToLocation_Id</th>
                 </tr>
             </thead>
@@ -170,20 +165,6 @@
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.AssemblyStatus_Id, new { @class = "form-control modifiable", placeholder = "Assembly Status" })
                             @Html.ValidationMessageFor(x => x.AssemblyStatus_Id)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.AssemblyModel_Id, "Model", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.AssemblyModel_Id, new { @class = "form-control modifiable", placeholder = "Assembly Model" })
-                            @Html.ValidationMessageFor(x => x.AssemblyModel_Id)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.AssignedToProject_Id, "Project", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.AssignedToProject_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Project" })
-                            @Html.ValidationMessageFor(x => x.AssignedToProject_Id)
                         </div>
                     </div>
                     <div class="form-group">
@@ -337,6 +318,7 @@
     @Scripts.Render("~/bundles/DataTables")
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
+    @Scripts.Render("~/bundles/sddb/shared_views")
     <script src="~/Scripts/SDDB/AssemblyDb.js?v=@Html.GetAppVersion()"></script>
 }
 
