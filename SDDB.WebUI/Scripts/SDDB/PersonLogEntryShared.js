@@ -228,7 +228,7 @@ $(document).ready(function () {
 //--------------------------------------Main Methods---------------------------------------//
 
 //Delete Records from DB
-function DeleteRecords() {
+function deleteRecords() {
     var ids = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
     deleteRecordsGeneric(CurrIds, "/PersonLogEntrySrv/Delete", refreshMainView);
 }

@@ -116,7 +116,7 @@ function showModalDelete(noOfRows) {
 //Wire Up ModalDeleteBtnOk
 $("#ModalDeleteBtnOk").click(function () {
     $("#ModalDelete").modal("hide");
-    DeleteRecords();
+    deleteRecords();
 });
 
 //showModalWait

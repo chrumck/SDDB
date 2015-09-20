@@ -10,7 +10,9 @@
 
 <!----- Navbar Section ----->
 @section Navbar{
-<div class="btn-group navbar-btn tdo-btngroup-main">
+<div class="btn-group navbar-btn tdo-btngroup-initial"></div>
+
+<div class="btn-group navbar-btn tdo-btngroup-main hidden">
     <button type="button" class="btn btn-default" id="BtnCreate">New</button>
     <button type="button" class="btn btn-tdo-nav" id="BtnEdit">&nbsp;&nbsp;Edit&nbsp;&nbsp;</button>
     <button type="button" class="btn btn-danger" id="BtnDelete">&nbsp;&nbsp;Del&nbsp;&nbsp;</button>
@@ -25,7 +27,9 @@
 </div>
 }
 @section NavbarCollapse{
-<ul class="nav navbar-nav tdo-btngroup-main">
+<ul class="nav navbar-nav tdo-btngroup-initial"></ul>
+
+<ul class="nav navbar-nav tdo-btngroup-main hidden">
     <li class="dropdown margin-left-5px">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">More<span class="caret"></span></a>
         <ul class="dropdown-menu">

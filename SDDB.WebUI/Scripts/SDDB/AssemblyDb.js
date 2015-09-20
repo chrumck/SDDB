@@ -9,9 +9,6 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var MsFilterByProject = {};
-var MsFilterByType = {};
-var MsFilterByLoc = {};
 var RecordTemplate = {
     Id: "RecordTemplateId",
     AssyName: null,
@@ -39,10 +36,15 @@ var RecordTemplate = {
     AssemblyStatus_Id: null,
     AssignedToLocation_Id: null
 };
+var MsFilterByProject = {};
+var MsFilterByType = {};
+var MsFilterByLoc = {};
 
-var LabelTextCreate = "Create Assembly";
-var LabelTextEdit = "Edit Assembly";
-var UrlEdit = "/AssemblyDbSrv/GetByIds";
+LabelTextCreate = "Create Assembly";
+LabelTextEdit = "Edit Assembly";
+UrlFillForEdit = "/AssemblyDbSrv/GetByIds";
+UrlEdit = "/AssemblyDbSrv/Edit";
+UrlDelete = "/AssemblyDbSrv/Delete";
 
 $(document).ready(function () {
 
@@ -220,51 +222,17 @@ $(document).ready(function () {
     msAddToMsArray(MagicSuggests, "AssemblyType_Id", "/AssemblyTypeSrv/Lookup", 1);
     msAddToMsArray(MagicSuggests, "AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup", 1);
     msAddToMsArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/Lookup", 1);
-
-    //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel").click(function () {
-        switchView("EditFormView","MainView", "tdo-btngroup-main", true);
-    });
-
-    //Wire Up EditFormBtnOk
-    $("#EditFormBtnOk").click(function () {
-        msValidate(MagicSuggests);
-        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
-            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
-            return;
-        }
-        showModalWait();
-        var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
-        submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/AssemblyDbSrv/Edit", createMultiple)
-            .always(hideModalWait)
-            .done(function () {
-                refreshMainView()
-                    .done(function () {
-                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
-                    });
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
-    });
-
+        
     //--------------------------------------View Initialization------------------------------------//
 
     fillFiltersFromRequestParams().done(refreshMainView);
-
-    $("#InitialView").addClass("hidden");
-    $("#MainView").removeClass("hidden");
+    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });
 
 
 //--------------------------------------Main Methods---------------------------------------//
-
-
-//Delete Records from DB
-function DeleteRecords() {
-    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-    deleteRecordsGeneric(CurrIds, "/AssemblyDbSrv/Delete", refreshMainView);
-}
 
 //refresh view after magicsuggest update
 function refreshMainView() {

@@ -16,18 +16,26 @@ var CurrRecords = [];
 var CurrIds = [];
 var GetActive = true;
 
-var MainViewId = "MainView";
+var InitialViewId = "InitialView";
 
-var FormId = "EditForm";
-var FormViewId = "EditFormView"
-var FormBtnGroupCreateClass = "tdo-btngroup-edit";
-var FormBtnGroupEditClass = "tdo-btngroup-edit";
+var MainViewId = "MainView";
+var MainViewBtnGroupClass = "tdo-btngroup-main";
+
+var EditFormId = "EditForm";
+var EditFormViewId = "EditFormView"
+var EditFormBtnGroupCreateClass = "tdo-btngroup-edit";
+var EditFormBtnGroupEditClass = "tdo-btngroup-edit";
 var LabelTextCreate = "Create Record";
 var LabelTextEdit = "Edit Record";
-var HttpTypeEdit = "POST";
-var UrlEdit = "";
 var CallBackBeforeCreate;
 var CallBackBeforeEdit;
+
+var HttpTypeFillForEdit = "POST";
+var UrlFillForEdit = "";
+var HttpTypeEdit = "POST";
+var UrlEdit = "";
+
+var UrlDelete = "";
 
 //-------------------------------------------------------------------------------------------//
 
@@ -40,10 +48,10 @@ $(document).ready(function () {
         CurrIds = [];
         CurrRecords = [];
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
-        fillFormForCreateGeneric(FormId, MagicSuggests, LabelTextCreate, MainViewId);
+        fillFormForCreateGeneric(EditFormId, MagicSuggests, LabelTextCreate, MainViewId);
         if (CallBackBeforeCreate) { CallBackBeforeCreate(); }
         saveViewSettings(TableMain);
-        switchView(MainViewId, FormViewId, FormBtnGroupCreateClass);
+        switchView(MainViewId, EditFormViewId, EditFormBtnGroupCreateClass);
     });
 
     //Wire up BtnEdit
@@ -54,13 +62,13 @@ $(document).ready(function () {
             return;
         }
         showModalWait();
-        fillFormForEditGeneric(CurrIds, HttpTypeEdit, UrlEdit, GetActive, FormId, LabelTextEdit, MagicSuggests)
+        fillFormForEditGeneric(CurrIds, HttpTypeFillForEdit, UrlFillForEdit, GetActive, EditFormId, LabelTextEdit, MagicSuggests)
             .always(hideModalWait)
             .done(function (currRecords) {
                 CurrRecords = currRecords;
                 if (CallBackBeforeEdit) { CallBackBeforeEdit(); }
                 saveViewSettings(TableMain);
-                switchView(MainViewId, FormViewId, FormBtnGroupEditClass);
+                switchView(MainViewId, EditFormViewId, EditFormBtnGroupEditClass);
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
@@ -90,8 +98,41 @@ $(document).ready(function () {
 
 });
 
-//------------------------------------Common Main Methods----------------------------------//
+//---------------------------------------EditFormView----------------------------------------//
 
+//Wire Up EditFormBtnCancel
+$("#" + EditFormId + "BtnCancel").click(function () {
+    switchView(EditFormViewId, MainViewId, MainViewBtnGroupClass, true);
+});
+
+//Wire Up EditFormBtnOk
+$("#EditFormBtnOk").click(function () {
+    msValidate(MagicSuggests);
+    if (!formIsValid(EditFormId, CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+        showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
+        return;
+    }
+    showModalWait();
+    var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
+    submitEditsGeneric(EditFormId, MagicSuggests, CurrRecords, HttpTypeEdit, UrlEdit, createMultiple)
+        .always(hideModalWait)
+        .done(function () {
+            refreshMainView()
+                .done(function () {
+                    switchView(EditFormViewId, MainViewId, MainViewBtnGroupClass, true, TableMain);
+                });
+        })
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+});
+
+
+//--------------------------------------- Main Methods---------------------------------------//
+
+//Delete Records from DB
+function deleteRecords() {
+    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+    deleteRecordsGeneric(CurrIds, UrlDelete, refreshMainView);
+}
 
 //---------------------------------------Helper Methods--------------------------------------//
 
