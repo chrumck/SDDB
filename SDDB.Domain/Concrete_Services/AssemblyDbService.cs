@@ -218,7 +218,8 @@ namespace SDDB.Domain.Services
         }
 
         //lookup by location
-        public virtual async Task<List<AssemblyDb>> LookupByLocAsync(string locId = "", bool getActive = true)
+        public virtual async Task<List<AssemblyDb>> LookupByLocAsync(string locId = "", bool getActive = true,
+            bool returnAll = false)
         {
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
@@ -231,8 +232,10 @@ namespace SDDB.Domain.Services
                         x.IsActive_bl == getActive
                         )
                     .Include(x => x.AssignedToProject)
-                    .Take(maxRecordsFromLookup)
                     .ToListAsync().ConfigureAwait(false);
+
+                if (!returnAll) { records = records.Take(maxRecordsFromLookup).ToList(); }
+
                 return records;
             }
         }
