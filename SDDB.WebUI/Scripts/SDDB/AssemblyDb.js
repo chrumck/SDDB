@@ -48,6 +48,12 @@ UrlFillForEdit = "/AssemblyDbSrv/GetByIds";
 UrlEdit = "/AssemblyDbSrv/Edit";
 UrlDelete = "/AssemblyDbSrv/Delete";
 
+
+var CallBackBeforeCreate = function () { return $.Deferred().resolve(); }
+var CallBackBeforeEdit = function () { return $.Deferred().resolve(); }
+
+//-------------------------------------------------------------------------------------------//
+
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//

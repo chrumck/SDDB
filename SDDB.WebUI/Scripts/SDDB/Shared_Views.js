@@ -27,15 +27,15 @@ var EditFormBtnGroupCreateClass = "tdo-btngroup-edit";
 var EditFormBtnGroupEditClass = "tdo-btngroup-edit";
 var LabelTextCreate = "Create Record";
 var LabelTextEdit = "Edit Record";
-var CallBackBeforeCreate = function () { return $.Deferred().resolve(); }
-var CallBackBeforeEdit = function () { return $.Deferred().resolve(); }
 
 var HttpTypeFillForEdit = "POST";
 var UrlFillForEdit = "";
 var HttpTypeEdit = "POST";
 var UrlEdit = "";
-
 var UrlDelete = "";
+
+var CallBackBeforeCreate = function () { return $.Deferred().resolve(); }
+var CallBackBeforeEdit = function () { return $.Deferred().resolve(); }
 
 //-------------------------------------------------------------------------------------------//
 
