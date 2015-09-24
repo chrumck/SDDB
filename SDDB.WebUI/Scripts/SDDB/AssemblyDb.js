@@ -51,51 +51,9 @@ UrlDelete = "/AssemblyDbSrv/Delete";
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
-            
-    //wire up dropdownId1
+    
+    //wire up dropdownId1 - Show Assy Components
     $("#dropdownId1").click(function (event) {
-        event.preventDefault();
-        showColumnSet(TableMainColumnSets, 1);
-    });
-
-    //wire up dropdownId2
-    $("#dropdownId2").click(function (event) {
-        event.preventDefault();
-        showColumnSet(TableMainColumnSets, 2);
-    });
-
-    //wire up dropdownId3
-    $("#dropdownId3").click(function (event) {
-        event.preventDefault();
-        showColumnSet(TableMainColumnSets, 3);
-    });
-
-    //wire up dropdownId4
-    $("#dropdownId4").click(function (event) {
-        event.preventDefault();
-        showColumnSet(TableMainColumnSets, 4);
-    });
-
-    //wire up dropdownId5
-    $("#dropdownId5").click(function(event) {
-        event.preventDefault();
-        showColumnSet(TableMainColumnSets, 5);
-    });
-
-    //wire up dropdownId6
-    $("#dropdownId6").click(function (event) {
-        event.preventDefault();
-        showColumnSet(TableMainColumnSets, 6);
-    });
-
-    //wire up dropdownId7
-    $("#dropdownId7").click(function(event) {
-        event.preventDefault();
-        showColumnSet(TableMainColumnSets, 7);
-    });
-
-    //wire up dropdownId8 - Show Assy Components
-    $("#dropdownId8").click(function (event) {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) {
@@ -106,8 +64,8 @@ $(document).ready(function () {
             + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
     });
 
-    //wire up dropdownId9 - Show Assy Log
-    $("#dropdownId9").click(function (event) {
+    //wire up dropdownId2 - Show Assy Log
+    $("#dropdownId2").click(function (event) {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) {
@@ -181,9 +139,18 @@ $(document).ready(function () {
             //------------------------------------------------1st set of columns
             { data: "AssyAltName", name: "AssyAltName" },//2
             { data: "AssyAltName2", name: "AssyAltName2" },//3
-            { data: "AssemblyType_", render: function (data, type, full, meta) { return data.AssyTypeName }, name: "AssemblyType_" }, //4
-            { data: "AssemblyStatus_", render: function (data, type, full, meta) { return data.AssyStatusName }, name: "AssemblyStatus_" }, //5
-            { data: "AssignedToLocation_", render: function (data, type, full, meta) { return data.LocName + " - " + data.ProjectCode }, name: "AssignedToLocation" }, //6
+            {
+                data: "AssemblyType_", name: "AssemblyType_",
+                render: function (data, type, full, meta) { return data.AssyTypeName },
+            }, //4
+            {
+                data: "AssemblyStatus_", name: "AssemblyStatus_",
+                render: function (data, type, full, meta) { return data.AssyStatusName },
+            }, //5
+            {
+                data: "AssignedToLocation_", name: "AssignedToLocation",
+                render: function (data, type, full, meta) { return data.LocName + " - " + data.ProjectName },
+            }, //6
             //------------------------------------------------2nd set of columns
             { data: "AssyGlobalX", name: "AssyGlobalX" },//7
             { data: "AssyGlobalY", name: "AssyGlobalY" },//8

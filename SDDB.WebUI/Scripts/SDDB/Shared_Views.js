@@ -81,6 +81,53 @@ $(document).ready(function () {
         else { showModalDelete(CurrIds.length); }
     });
 
+    //wire up columnsSelectId1
+    $("#columnsSelectId1").click(function (event) {
+        event.preventDefault();
+        showColumnSet(TableMainColumnSets, 1);
+    });
+
+    //wire up columnsSelectId2
+    $("#columnsSelectId2").click(function (event) {
+        event.preventDefault();
+        showColumnSet(TableMainColumnSets, 2);
+    });
+
+    //wire up columnsSelectId3
+    $("#columnsSelectId3").click(function (event) {
+        event.preventDefault();
+        showColumnSet(TableMainColumnSets, 3);
+    });
+
+    //wire up columnsSelectId4
+    $("#columnsSelectId4").click(function (event) {
+        event.preventDefault();
+        showColumnSet(TableMainColumnSets, 4);
+    });
+
+    //wire up columnsSelectId5
+    $("#columnsSelectId5").click(function(event) {
+        event.preventDefault();
+        showColumnSet(TableMainColumnSets, 5);
+    });
+
+    //wire up columnsSelectId6
+    $("#columnsSelectId6").click(function (event) {
+        event.preventDefault();
+        showColumnSet(TableMainColumnSets, 6);
+    });
+
+    //wire up columnsSelectId7
+    $("#columnsSelectId7").click(function(event) {
+        event.preventDefault();
+        showColumnSet(TableMainColumnSets, 7);
+    });
+
+    //wire up columnsSelectId8
+    $("#columnsSelectId8").click(function(event) {
+        event.preventDefault();
+        showColumnSet(TableMainColumnSets, 8);
+    });
 
     //---------------------------------------DataTables------------
 
