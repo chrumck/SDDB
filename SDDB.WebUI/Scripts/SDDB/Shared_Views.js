@@ -27,8 +27,8 @@ var EditFormBtnGroupCreateClass = "tdo-btngroup-edit";
 var EditFormBtnGroupEditClass = "tdo-btngroup-edit";
 var LabelTextCreate = "Create Record";
 var LabelTextEdit = "Edit Record";
-var CallBackBeforeCreate;
-var CallBackBeforeEdit;
+var CallBackBeforeCreate = function () { return $.Deferred().resolve(); }
+var CallBackBeforeEdit = function () { return $.Deferred().resolve(); }
 
 var HttpTypeFillForEdit = "POST";
 var UrlFillForEdit = "";
@@ -49,9 +49,11 @@ $(document).ready(function () {
         CurrRecords = [];
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
         fillFormForCreateGeneric(EditFormId, MagicSuggests, LabelTextCreate, MainViewId);
-        if (CallBackBeforeCreate) { CallBackBeforeCreate(); }
-        saveViewSettings(TableMain);
-        switchView(MainViewId, EditFormViewId, EditFormBtnGroupCreateClass);
+        CallBackBeforeCreate()
+            .done(function () {
+                saveViewSettings(TableMain);
+                switchView(MainViewId, EditFormViewId, EditFormBtnGroupCreateClass);
+            });
     });
 
     //Wire up BtnEdit
@@ -61,16 +63,15 @@ $(document).ready(function () {
             showModalNothingSelected();
             return;
         }
-        showModalWait();
-        fillFormForEditGeneric(CurrIds, HttpTypeFillForEdit, UrlFillForEdit, GetActive, EditFormId, LabelTextEdit, MagicSuggests)
-            .always(hideModalWait)
+        fillFormForEditGenericWrp(CurrIds, HttpTypeFillForEdit, UrlFillForEdit, GetActive, EditFormId, LabelTextEdit, MagicSuggests)
             .done(function (currRecords) {
                 CurrRecords = currRecords;
-                if (CallBackBeforeEdit) { CallBackBeforeEdit(); }
-                saveViewSettings(TableMain);
-                switchView(MainViewId, EditFormViewId, EditFormBtnGroupEditClass);
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+                CallBackBeforeEdit()
+                    .done(function () {
+                        saveViewSettings(TableMain);
+                        switchView(MainViewId, EditFormViewId, EditFormBtnGroupEditClass);
+                    });
+            });
     });
 
     //Wire up BtnDelete 
@@ -112,17 +113,14 @@ $("#EditFormBtnOk").click(function () {
         showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
         return;
     }
-    showModalWait();
     var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
-    submitEditsGeneric(EditFormId, MagicSuggests, CurrRecords, HttpTypeEdit, UrlEdit, createMultiple)
-        .always(hideModalWait)
+    submitEditsGenericWrp(EditFormId, MagicSuggests, CurrRecords, HttpTypeEdit, UrlEdit, createMultiple)
         .done(function () {
             refreshMainView()
                 .done(function () {
                     switchView(EditFormViewId, MainViewId, MainViewBtnGroupClass, true, TableMain);
                 });
-        })
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+        });
 });
 
 

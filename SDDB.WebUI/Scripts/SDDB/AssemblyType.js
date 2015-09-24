@@ -55,6 +55,7 @@ UrlDelete = "/AssemblyTypeSrv/Delete";
 
 CallBackBeforeCreate = function () {
     $("#EditForm select").find("option:first").prop('selected', 'selected');
+    return $.Deferred().resolve();
 };
 
 $(document).ready(function () {

@@ -40,6 +40,8 @@ var MsFilterByProject = {};
 var MsFilterByType = {};
 var MsFilterByLoc = {};
 
+var DatePickers = [];
+
 LabelTextCreate = "Create Assembly";
 LabelTextEdit = "Edit Assembly";
 UrlFillForEdit = "/AssemblyDbSrv/GetByIds";
@@ -74,8 +76,26 @@ $(document).ready(function () {
         showColumnSet(TableMainColumnSets, 4);
     });
 
-    //wire up dropdownId5 - Show Assy Components
-    $("#dropdownId5").click(function (event) {
+    //wire up dropdownId5
+    $("#dropdownId5").click(function(event) {
+        event.preventDefault();
+        showColumnSet(TableMainColumnSets, 5);
+    });
+
+    //wire up dropdownId6
+    $("#dropdownId6").click(function (event) {
+        event.preventDefault();
+        showColumnSet(TableMainColumnSets, 6);
+    });
+
+    //wire up dropdownId7
+    $("#dropdownId7").click(function(event) {
+        event.preventDefault();
+        showColumnSet(TableMainColumnSets, 7);
+    });
+
+    //wire up dropdownId8 - Show Assy Components
+    $("#dropdownId8").click(function (event) {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) {
@@ -86,8 +106,8 @@ $(document).ready(function () {
             + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
     });
 
-    //wire up dropdownId6 - Show Assy Log
-    $("#dropdownId6").click(function (event) {
+    //wire up dropdownId9 - Show Assy Log
+    $("#dropdownId9").click(function (event) {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) {
@@ -147,7 +167,10 @@ $(document).ready(function () {
         [2, 3, 4, 5, 6],
         [7, 8, 9, 10, 11, 12],
         [13, 14, 15, 16, 17, 18],
-        [19, 20, 21, 22, 23]
+        [19, 20, 21, 22, 23],
+        [24, 25, 26, 27, 28],
+        [29, 30, 31, 32, 33],
+        [34, 35, 36, 37, 38]
     ];
         
     //TableMain AssemblyDbs
@@ -155,52 +178,79 @@ $(document).ready(function () {
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "AssyName", name: "AssyName" },//1
-            //------------------------------------------------first set of columns
+            //------------------------------------------------1st set of columns
             { data: "AssyAltName", name: "AssyAltName" },//2
             { data: "AssyAltName2", name: "AssyAltName2" },//3
             { data: "AssemblyType_", render: function (data, type, full, meta) { return data.AssyTypeName }, name: "AssemblyType_" }, //4
             { data: "AssemblyStatus_", render: function (data, type, full, meta) { return data.AssyStatusName }, name: "AssemblyStatus_" }, //5
             { data: "AssignedToLocation_", render: function (data, type, full, meta) { return data.LocName + " - " + data.ProjectCode }, name: "AssignedToLocation" }, //6
-            //------------------------------------------------second set of columns
+            //------------------------------------------------2nd set of columns
             { data: "AssyGlobalX", name: "AssyGlobalX" },//7
             { data: "AssyGlobalY", name: "AssyGlobalY" },//8
             { data: "AssyGlobalZ", name: "AssyGlobalZ" },//9
             { data: "AssyLocalXDesign", name: "AssyLocalXDesign" },//10
             { data: "AssyLocalYDesign", name: "AssyLocalYDesign" },//11
             { data: "AssyLocalZDesign", name: "AssyLocalZDesign" },//12
-            //------------------------------------------------third set of columns
+            //------------------------------------------------3rd set of columns
             { data: "AssyLocalXAsBuilt", name: "AssyLocalXAsBuilt" },//13
             { data: "AssyLocalYAsBuilt", name: "AssyLocalYAsBuilt" },//14
             { data: "AssyLocalZAsBuilt", name: "AssyLocalZAsBuilt" },//15
             { data: "AssyStationing", name: "AssyStationing" },//16
             { data: "AssyLength", name: "AssyLength" },//17
             { data: "AssyReadingIntervalSecs", name: "AssyReadingIntervalSecs" },//18
-            //------------------------------------------------Fourth set of columns
+            //------------------------------------------------4th set of columns
             { data: "IsReference_bl", name: "IsReference_bl" },//19
             { data: "TechnicalDetails", name: "TechnicalDetails" },//20
             { data: "PowerSupplyDetails", name: "PowerSupplyDetails" },//21
             { data: "HSEDetails", name: "HSEDetails" },//22
             { data: "Comments", name: "Comments" },//23
+            //------------------------------------------------5th set of columns
+            { data: "Attr01", name: "Attr01" },//24
+            { data: "Attr02", name: "Attr02" },//25
+            { data: "Attr03", name: "Attr03" },//26
+            { data: "Attr04", name: "Attr04" },//27
+            { data: "Attr05", name: "Attr05" },//28
+            //------------------------------------------------6th set of columns
+            { data: "Attr06", name: "Attr06" },//29
+            { data: "Attr07", name: "Attr07" },//30
+            { data: "Attr08", name: "Attr08" },//31
+            { data: "Attr09", name: "Attr09" },//32
+            { data: "Attr10", name: "Attr10" },//33
+            //------------------------------------------------7th set of columns
+            { data: "Attr11", name: "Attr11" },//34
+            { data: "Attr12", name: "Attr12" },//35
+            { data: "Attr13", name: "Attr13" },//36
+            { data: "Attr14", name: "Attr14" },//37
+            { data: "Attr15", name: "Attr15" },//38
             //------------------------------------------------never visible
-            { data: "IsActive_bl", name: "IsActive_bl" },//24
-            { data: "AssemblyType_Id", name: "AssemblyType_Id" },//25
-            { data: "AssemblyStatus_Id", name: "AssemblyStatus_Id" },//26
-            { data: "AssignedToLocation_Id", name: "AssignedToLocation_Id" }//27
+            { data: "IsActive_bl", name: "IsActive_bl" },//39
+            { data: "AssemblyType_Id", name: "AssemblyType_Id" },//40
+            { data: "AssemblyStatus_Id", name: "AssemblyStatus_Id" },//41
+            { data: "AssignedToLocation_Id", name: "AssignedToLocation_Id" }//42
         ],
         columnDefs: [
-            { targets: [0, 19, 24, 25, 26, 27], searchable: false },  //"orderable": false, "visible": false
-            //first set of columns - responsive
+            { targets: [0, 19, 39, 40, 41, 42], searchable: false },  //"orderable": false, "visible": false
+            //1st set of columns - responsive
             { targets: [2, 3], className: "hidden-xs" },
             { targets: [4, 6], className: "hidden-xs hidden-sm" }, 
-            //second set of columns - responsive
+            //2nd set of columns - responsive
             { targets: [8, 9], className: "hidden-xs" }, 
             { targets: [10, 11, 12], className: "hidden-xs hidden-sm" }, 
-            //third set of columns - responsive
+            //3rd set of columns - responsive
             { targets: [13, 14, 15, 17], className: "hidden-xs" }, 
             { targets: [18], className: "hidden-xs hidden-sm " }, 
-            //fourth set of columns - responsive
+            //4th set of columns - responsive
             { targets: [19, 20, 21], className: "hidden-xs" },
-            { targets: [22], className: "hidden-xs hidden-sm" } 
+            { targets: [22], className: "hidden-xs hidden-sm" },
+            //5th set of columns - responsive
+            { targets: [25, 26], className: "hidden-xs" },
+            { targets: [27, 28], className: "hidden-xs hidden-sm" },
+            //6th set of columns - responsive
+            { targets: [30, 31], className: "hidden-xs" },
+            { targets: [32, 33], className: "hidden-xs hidden-sm" },
+            //7th set of columns - responsive
+            { targets: [35, 36], className: "hidden-xs" },
+            { targets: [37, 38], className: "hidden-xs hidden-sm" }
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,

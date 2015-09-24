@@ -262,8 +262,7 @@ function clearFormInputs(formId, msArray) {
     $("#" + formId + " .input-validation-error").removeClass("input-validation-error");
     $("#" + formId + " .modifiable").data("ismodified", false);
 
-    if (typeof msArray !== "undefined") {
-        $.each(msArray, function (i, ms) { ms.clear(true); ms.isModified = false; });
+    if (msArray) { $.each(msArray, function (i, ms) { ms.clear(true); ms.isModified = false; });
     }
 }
 
@@ -359,6 +358,20 @@ function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
     return deferred0.promise();
 }
 
+//wraps FormForEditGeneric in modalWait and shows modalAJAXFail if failed
+function fillFormForEditGenericWrp(ids, httpType, url, getActive, formId, labelText, msArray) {
+    var deferred0 = $.Deferred();
+    showModalWait();
+    fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText, msArray)
+        .always(hideModalWait)
+        .done(function (currRecords) { deferred0.resolve(currRecords); })
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject(xhr, status, error);
+        });
+    return deferred0.promise();
+}
+
 //SubmitEdits to DB - generic version
 function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNewRecords) {
 
@@ -374,6 +387,7 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
     $.each(msArray, function (i, ms) {
         if (ms.isModified == true) modifiedProperties.push(ms.id);
     });
+    if (modifiedProperties.length == 0) { deferred0.resolve([]); }
 
     $.each(currRecords, function (i, currRecord) {
         for (var property in currRecord) {
@@ -413,6 +427,20 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
         .done(function (newEntryIds) { deferred0.resolve(newEntryIds); })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 
+    return deferred0.promise();
+}
+
+//wraps submitEditsGeneric in modalWait and shows modalAJAXFail if failed
+function submitEditsGenericWrp(formId, msArray, currRecords, httpType, url, noOfNewRecords) {
+    var deferred0 = $.Deferred();
+    showModalWait();
+    submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNewRecords)
+        .always(hideModalWait)
+        .done(function (newEntryIds) { deferred0.resolve(newEntryIds); })
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject(xhr, status, error);
+            });
     return deferred0.promise();
 }
 
@@ -586,7 +614,7 @@ function msValidate(msArray) {
     });
 }
 
-//enable or disable DbUnique MagicSuggests
+//enable or disable DbUnique MagicSuggests in ms array
 function msDisableUnique(msArray, disable) {
     disable = (typeof disable !== "undefined" && disable == false) ? false : true;
     $.each(msArray, function (i, ms) {
@@ -595,7 +623,7 @@ function msDisableUnique(msArray, disable) {
     });
 }
 
-//enable or disable DbUnique MagicSuggests
+//enable or disable All MagicSuggests in ms array
 function msDisableAll(msArray, disable) {
     disable = (typeof disable !== "undefined" && disable == false) ? false : true;
     $.each(msArray, function (i, ms) {
