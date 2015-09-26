@@ -38,9 +38,9 @@
             <li><a class="collapsenav" href=# id="columnsSelectId3">Show 3rd Columns</a></li>
             <li><a class="collapsenav" href=# id="columnsSelectId4">Show 4th Columns</a></li>
             <li class="divider"></li>
-            <li><a class="collapsenav" href=# id="columnsSelectId5">Show 1st Extended</a></li>
-            <li><a class="collapsenav" href=# id="columnsSelectId6">Show 2nd Extended</a></li>
-            <li><a class="collapsenav" href=# id="columnsSelectId7">Show 3rd Extended</a></li>
+            <li class="extColumnSelect"><a class="collapsenav" href=# id="columnsSelectId5">Show 1st Extended</a></li>
+            <li class="extColumnSelect"><a class="collapsenav" href=# id="columnsSelectId6">Show 2nd Extended</a></li>
+            <li class="extColumnSelect"><a class="collapsenav" href=# id="columnsSelectId7">Show 3rd Extended</a></li>
             <li class="divider"></li>
             <li><a class="collapsenav" href=# id="dropdownId1">Show Assy Components</a></li>
             <li><a class="collapsenav" href=# id="dropdownId2">Show Assy Log</a></li>
@@ -329,7 +329,7 @@
         </form>
     </div>
     <!------- EditFormExtended ------->
-    <div class="well well-tdo" id="EditFormExtendedSubView">
+    <div class="well well-tdo hidden" id="EditFormExtendedSubView">
         <form class="form-horizontal" role="form" id="EditFormExtended">
             <div class="row">
 
@@ -458,6 +458,7 @@
     @Scripts.Render("~/bundles/DataTables")
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
+    @Scripts.Render("~/bundles/bootstrap-datetimepicker")
     @Scripts.Render("~/bundles/sddb/shared_views")
     <script src="~/Scripts/SDDB/AssemblyDb.js?v=@Html.GetAppVersion()"></script>
 }
@@ -466,4 +467,5 @@
     @Styles.Render("~/bundles/DataTables-CSS")
     @Styles.Render("~/bundles/bootstrap-toggle-CSS")
     @Styles.Render("~/bundles/magicsuggest-css")
+    @Styles.Render("~/bundles/bootstrap-datetimepicker-CSS")
 }

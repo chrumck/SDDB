@@ -211,9 +211,7 @@ function refreshTableGeneric(table, url, data, httpType) {
 //Refresh  table from AJAX - generic version - showing wait dialogs
 function refreshTblGenWrp(table, url, data, httpType) {
     var deferred0 = $.Deferred();
-
     showModalWait();
-
     refreshTableGeneric(table, url, data, httpType)
         .always(hideModalWait)
         .done(deferred0.resolve)
@@ -221,7 +219,6 @@ function refreshTblGenWrp(table, url, data, httpType) {
             showModalAJAXFail(xhr, status, error);
             deferred0.reject(xhr, status, error);
         });
-
     return deferred0.promise();
 }
 
@@ -640,88 +637,36 @@ function msSetAsModified(msArray, isModified) {
 
 //-----------------------------------------------------------------------------
 
-//Pulls Model Information and formats edit form and column names
-function updateViewsForModelGeneric(table, url, modelId, tableTitleId, editFormLabelId) {
+//Pulls type information and formats edit form and column names
+function updateViewsForTypeGeneric(httpType, url, data, table, formId) {
+    var deferred0 = $.Deferred();
+    $.ajax({ type: httpType, url: url, data: data, timeout: 120000, dataType: "json" })
+        .done(function (data) {
+            var typeHasAttrs = false;
+            var entityType = data[0];
+
+            for (var prop in entityType) {
+                if (prop.indexOf("Attr") == -1) { continue; }
+                if (prop.indexOf("Type") != -1 && entityType[prop] != "NotUsed") { typeHasAttrs = true; }
+                changeDescriptionHelper(table, formId, entityType, prop);
+                changeValidationHelper(table, formId, entityType, prop);
+            }
+            $("#" + formId).removeData("validator");
+            $("#" + formId).removeData('unobtrusiveValidation');
+            $.validator.unobtrusive.parse("#" + formId)
+            deferred0.resolve(typeHasAttrs);
+        })
+        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
+    return deferred0.promise();
+}
+
+//updateViewsForTypeGenericWrp
+function updateViewsForTypeGenericWrp(httpType, url, data, table, formId) {
     var deferred0 = $.Deferred();
     showModalWait();
-    $.ajax({ type: "POST", url: url, timeout: 120000, data: { ids: [modelId] }, dataType: "json" })
+    updateViewsForTypeGeneric(httpType, url, data, table, formId)
         .always(hideModalWait)
-        .done(function (data) {
-            var modelName = (data[0].CompModelName) ? data[0].CompModelName : data[0].AssyModelName;
-            if (tableTitleId) { $("#" + tableTitleId).text(modelName); }
-            if (editFormLabelId) { $("#" + editFormLabelId).text("Edit " + modelName); }
-
-            for (var prop in data[0]) {
-                if (prop.indexOf("Attr") != -1 && prop.indexOf("Desc") != -1) {
-
-                    var attrName = prop.slice(prop.indexOf("Attr"), 6);
-
-                    $(table.column(attrName + ":name").header()).text(data[0][prop]);
-                    $("label[for=" + attrName + "]").text(data[0][prop]);
-                    $("#" + attrName).prop("placeholder", data[0][prop]);
-                }
-                if (prop.indexOf("Attr") != -1 && prop.indexOf("Type") != -1) {
-
-                    var attrName = prop.slice(prop.indexOf("Attr"), 6);
-                    var $targetEl = $("#" + attrName);
-                    var attrsToRemove = "";
-
-                    $.each($targetEl[0].attributes, function (i, attrib) {
-                        if (typeof attrib !== "undefined" && attrib.name.indexOf("data-val") == 0) {
-                            attrsToRemove += (attrsToRemove == "") ? attrib.name : " " + attrib.name;
-                        }
-                    });
-
-                    var picker = $targetEl.data("DateTimePicker");
-                    if (typeof picker !== "undefined") { picker.destroy(); }
-
-                    $("#FrmGrp" + attrName).removeClass("hidden");
-
-                    switch (data[0][prop]) {
-                        case "NotUsed":
-                            $("#FrmGrp" + attrName).addClass("hidden");
-                            break;
-                        case "String":
-                            $targetEl.removeAttr(attrsToRemove).attr({
-                                "data-val": "true",
-                                "data-val-length": "The field must be a string with a maximum length of 255.",
-                                "data-val-length-max": "255"
-                            });
-                            break;
-                        case "Int":
-                            $targetEl.removeAttr(attrsToRemove).attr({
-                                "data-val": "true",
-                                "data-val-dbisinteger": "The field must be an integer."
-                            });
-                            break;
-                        case "Decimal":
-                            $targetEl.removeAttr(attrsToRemove).attr({
-                                "data-val": "true",
-                                "data-val-number": "The field must be a number."
-                            });
-                            break;
-                        case "DateTime":
-                            $targetEl.removeAttr(attrsToRemove).attr({
-                                "data-val": "true",
-                                "data-val-dbisdatetimeiso": "The field must have YYYY-MM-DD HH:mm format."
-                            });
-                            $targetEl.datetimepicker({ format: "YYYY-MM-DD HH:mm" })
-                                .on("dp.change", function (e) { $(this).data("ismodified", true); });
-                            break;
-                        case "Bool":
-                            $targetEl.removeAttr(attrsToRemove).attr({
-                                "data-val": "true",
-                                "data-val-dbisbool": "The field must be 'true' or 'false'."
-                            });
-                            break;
-                    }
-                }
-            }
-            $("#EditForm").removeData("validator");
-            $("#EditForm").removeData('unobtrusiveValidation');
-            $.validator.unobtrusive.parse("#EditForm")
-            deferred0.resolve();
-        })
+        .done(deferred0.resolve)
         .fail(function (xhr, status, error) {
             showModalAJAXFail(xhr, status, error);
             deferred0.reject(xhr, status, error);
@@ -729,17 +674,71 @@ function updateViewsForModelGeneric(table, url, modelId, tableTitleId, editFormL
     return deferred0.promise();
 }
 
-//checkAllEqualInArray - checks if all items in array are same
-function modelIdsAreSame(modelIds) {
-    if (!modelIds || modelIds.length == 0) {
-        return false;
+//changeDescriptionHelper
+function changeDescriptionHelper(table, formId, entityType, prop) {
+    if (prop.indexOf("Desc") != -1) {
+        var attrName = prop.slice(prop.indexOf("Attr"), 6);
+        $(table.column(attrName + ":name").header()).text(entityType[prop]);
+        $("#" + formId + " label[for=" + attrName + "]").text(entityType[prop]);
+        $("#" + formId + " #" + attrName).prop("placeholder", entityType[prop]);
     }
-    for (var i in modelIds) {
-        if (modelIds[i] == "" || modelIds[i] == null || modelIds[i] != modelIds[0]) {
-            return false;
+}
+
+//changeValidationHelper
+function changeValidationHelper(table, formId, entityType, prop) {
+    if (prop.indexOf("Type") != -1) {
+        var attrName = prop.slice(prop.indexOf("Attr"), 6);
+        var $targetEl = $("#" + formId + " #" + attrName);
+
+        var attrsToRemove = "";
+        $.each($targetEl[0].attributes, function (i, attrib) {
+            if (typeof attrib !== "undefined" && attrib.name.indexOf("data-val") == 0) {
+                attrsToRemove += (attrsToRemove == "") ? attrib.name : " " + attrib.name;
+            }
+        });
+        $targetEl.removeAttr(attrsToRemove);
+
+        if ($targetEl.data("DateTimePicker")) { $targetEl.data("DateTimePicker").destroy(); }
+
+        $("#" + formId + " #FrmGrp" + attrName).removeClass("hidden");
+
+        if (entityType[prop] == "NotUsed") {
+            $("#" + formId + " #FrmGrp" + attrName).addClass("hidden");
+        }
+        if (entityType[prop] == "String") {
+            $targetEl.attr({
+                "data-val": "true",
+                "data-val-length": "The field must be a string with a maximum length of 255.",
+                "data-val-length-max": "255"
+            });
+        }
+        if (entityType[prop] == "Int") {
+            $targetEl.attr({
+                "data-val": "true",
+                "data-val-dbisinteger": "The field must be an integer."
+            });
+        }
+        if (entityType[prop] == "Decimal") {
+            $targetEl.attr({
+                "data-val": "true",
+                "data-val-number": "The field must be a number."
+            });
+        }
+        if (entityType[prop] == "DateTime") {
+            $targetEl.attr({
+                "data-val": "true",
+                "data-val-dbisdatetimeiso": "The field must have YYYY-MM-DD HH:mm format."
+            });
+            $targetEl.datetimepicker({ format: "YYYY-MM-DD HH:mm" })
+                .on("dp.change", function (e) { $(this).data("ismodified", true); });
+        }
+        if (entityType[prop] == "Bool") {
+            $targetEl.attr({
+                "data-val": "true",
+                "data-val-dbisbool": "The field must be 'true' or 'false'."
+            });
         }
     }
-    return true;
 }
 
 //-----------------------------------------------------------------------------

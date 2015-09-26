@@ -15,6 +15,7 @@ var MagicSuggests = [];
 var CurrRecords = [];
 var CurrIds = [];
 var GetActive = true;
+var SelectedColumnSet = 1;
 
 var InitialViewId = "InitialView";
 
@@ -84,48 +85,56 @@ $(document).ready(function () {
     //wire up columnsSelectId1
     $("#columnsSelectId1").click(function (event) {
         event.preventDefault();
+        if ($(this).parent().hasClass("disabled")) { return; }
         showColumnSet(TableMainColumnSets, 1);
     });
 
     //wire up columnsSelectId2
     $("#columnsSelectId2").click(function (event) {
         event.preventDefault();
+        if ($(this).parent().hasClass("disabled")) { return; }
         showColumnSet(TableMainColumnSets, 2);
     });
 
     //wire up columnsSelectId3
     $("#columnsSelectId3").click(function (event) {
         event.preventDefault();
+        if ($(this).parent().hasClass("disabled")) { return; }
         showColumnSet(TableMainColumnSets, 3);
     });
 
     //wire up columnsSelectId4
     $("#columnsSelectId4").click(function (event) {
         event.preventDefault();
+        if ($(this).parent().hasClass("disabled")) { return; }
         showColumnSet(TableMainColumnSets, 4);
     });
 
     //wire up columnsSelectId5
     $("#columnsSelectId5").click(function(event) {
         event.preventDefault();
+        if ($(this).parent().hasClass("disabled")) { return; }
         showColumnSet(TableMainColumnSets, 5);
     });
 
     //wire up columnsSelectId6
     $("#columnsSelectId6").click(function (event) {
         event.preventDefault();
+        if ($(this).parent().hasClass("disabled")) { return; }
         showColumnSet(TableMainColumnSets, 6);
     });
 
     //wire up columnsSelectId7
     $("#columnsSelectId7").click(function(event) {
         event.preventDefault();
+        if ($(this).parent().hasClass("disabled")) { return; }
         showColumnSet(TableMainColumnSets, 7);
     });
 
     //wire up columnsSelectId8
     $("#columnsSelectId8").click(function(event) {
         event.preventDefault();
+        if ($(this).parent().hasClass("disabled")) { return; }
         showColumnSet(TableMainColumnSets, 8);
     });
 
@@ -186,6 +195,7 @@ function showColumnSet(columnSetArray, columnSetIdx) {
     TableMain.columns().visible(false);
     TableMain.columns(columnSetArray[0]).visible(true);
     TableMain.columns(columnSetArray[columnSetIdx]).visible(true);
+    SelectedColumnSet = columnSetIdx;
 }
 
 

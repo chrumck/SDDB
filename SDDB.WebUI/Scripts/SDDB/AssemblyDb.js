@@ -49,6 +49,11 @@ UrlEdit = "/AssemblyDbSrv/Edit";
 UrlDelete = "/AssemblyDbSrv/Delete";
 
 
+var ExtFormId = "EditFormExtended";
+var ExtFormViewId = "EditFormExtendedSubView";
+var ExtColumnSelectClass = ".extColumnSelect";
+var ExtColumnSetNos = [5, 6, 7];
+
 var CallBackBeforeCreate = function () { return $.Deferred().resolve(); }
 var CallBackBeforeEdit = function () { return $.Deferred().resolve(); }
 
@@ -263,26 +268,29 @@ function refreshMainView() {
 
     TableMain.clear().search("").draw();
 
-    if (MsFilterByType.getValue().length == 0 &&
-        MsFilterByProject.getValue().length == 0 &&
-        MsFilterByLoc.getValue().length == 0)
-    {
-        if (typeof AssemblyIds !== "undefined" && AssemblyIds != null && AssemblyIds.length > 0) {
-            refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByIds", { ids: AssemblyIds, getActive: GetActive }, "POST")
-                .done(deferred0.resolve);
-        }
-        return deferred0.promise();
-    }
+    updateViewForSelectedType()
+        .done(function () {
+            if (MsFilterByType.getValue().length == 0 &&
+                MsFilterByProject.getValue().length == 0 &&
+                MsFilterByLoc.getValue().length == 0)
+            {
+                if (typeof AssemblyIds !== "undefined" && AssemblyIds != null && AssemblyIds.length > 0) {
+                    refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByIds", { ids: AssemblyIds, getActive: GetActive }, "POST")
+                        .done(deferred0.resolve);
+                }
+                return deferred0.promise();
+            }
 
-    refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByAltIds2",
-        {
-            projectIds: MsFilterByProject.getValue(),
-            typeIds: MsFilterByType.getValue(),
-            locIds: MsFilterByLoc.getValue(),
-            getActive: GetActive
-        },
-        "POST")
-        .done(deferred0.resolve);
+            refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByAltIds2",
+                {
+                    projectIds: MsFilterByProject.getValue(),
+                    typeIds: MsFilterByType.getValue(),
+                    locIds: MsFilterByLoc.getValue(),
+                    getActive: GetActive
+                },
+                "POST")
+                .done(deferred0.resolve);
+        });
 
     return deferred0.promise();
 }
@@ -313,5 +321,35 @@ function fillFiltersFromRequestParams() {
     return deferred0.promise();
 }
 
+//updateViewForSelectedType
+function updateViewForSelectedType() {
+    var deferred0 = $.Deferred();
+
+    if (MsFilterByType.getValue().length != 1) {
+        switchViewsForExtendedHelper(false);
+        return deferred0.resolve();
+    }
+    updateViewsForTypeGenericWrp(
+            "POST", "/AssemblyTypeSrv/GetByIds",
+            { ids: MsFilterByType.getValue()[0] },
+            TableMain, ExtFormId, ExtFormViewId)
+        .done(function (typeHasAttrs) {
+            switchViewsForExtendedHelper(typeHasAttrs);
+            deferred0.resolve();
+        });
+    return deferred0.promise();
+}
 
 //---------------------------------------Helper Methods--------------------------------------//
+
+//switchViewsForExtendedHelper
+function switchViewsForExtendedHelper(switchOn) {
+    if (switchOn) {
+        $(ExtColumnSelectClass).removeClass("disabled");
+        $("#" + ExtFormViewId).removeClass("hidden");
+        return;
+    }
+    if ($.inArray(SelectedColumnSet, ExtColumnSetNos) != -1) { showColumnSet(TableMainColumnSets, 1); }
+    $(ExtColumnSelectClass).addClass("disabled");
+    $("#" + ExtFormViewId).addClass("hidden");
+}
