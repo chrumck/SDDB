@@ -48,7 +48,6 @@ UrlFillForEdit = "/AssemblyDbSrv/GetByIds";
 UrlEdit = "/AssemblyDbSrv/Edit";
 UrlDelete = "/AssemblyDbSrv/Delete";
 
-
 var ExtFormId = "EditFormExtended";
 var ExtColumnSelectClass = ".extColumnSelect";
 var ExtColumnSetNos = [5, 6, 7];
@@ -56,12 +55,12 @@ var ExtUrl = "/AssemblyTypeSrv/GetByIds";
 var ExtHttpType = "POST";
 
 var CallBackBeforeCreate = function () {
-    $(MagicSuggests[0]).trigger("selectionchange");
+    updateFormForSelectedType();
     return $.Deferred().resolve();
 }
 
 var CallBackBeforeEdit = function () {
-    $(MagicSuggests[0]).trigger("selectionchange");
+    updateFormForSelectedType();
     return $.Deferred().resolve();
 }
 
@@ -260,14 +259,7 @@ $(document).ready(function () {
     msAddToMsArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/Lookup", 1);
 
     //Initialize MagicSuggest Array Event - AssemblyType_Id
-    $(MagicSuggests[0]).on("selectionchange", function (e, m) {
-        if (this.getValue().length == 1 && this.getValue()[0] != "_VARIES_") {
-            updateFormForExtendedWrp(ExtHttpType, ExtUrl, { ids: this.getValue()[0] }, ExtFormId);
-            return;
-        }
-        clearFormInputs(ExtFormId);
-        $("#" + ExtFormId).addClass("hidden");
-    });
+    $(MagicSuggests[0]).on("selectionchange", function (e, m) { updateFormForSelectedType(); });
 
         
     //--------------------------------------View Initialization------------------------------------//
@@ -354,6 +346,15 @@ function updateMainViewForSelectedType() {
             deferred0.resolve();
         });
     return deferred0.promise();
+}
+
+function updateFormForSelectedType() {
+    if (MagicSuggests[0].getValue().length == 1 && MagicSuggests[0].getValue()[0] != "_VARIES_") {
+        updateFormForExtendedWrp(ExtHttpType, ExtUrl, { ids: MagicSuggests[0].getValue()[0] }, ExtFormId);
+        return;
+    }
+    clearFormInputs(ExtFormId);
+    $("#" + ExtFormId).addClass("hidden");
 }
 
 //---------------------------------------Helper Methods--------------------------------------//

@@ -681,7 +681,6 @@ function updateFormForExtended(httpType, url, data, formId) {
             for (var prop in entityType) {
                 if (prop.indexOf("Attr") == -1) { continue; }
                 if (prop.indexOf("Type") != -1 && entityType[prop] != "NotUsed") { typeHasAttrs = true; }
-
                 changeFormFieldDescriptionHelper(formId, entityType, prop);
                 changeFormFieldValidationHelper(formId, entityType, prop);
             }
