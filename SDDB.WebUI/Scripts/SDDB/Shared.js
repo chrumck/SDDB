@@ -325,7 +325,7 @@ function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText
                     $.each(msArray, function (i, ms) {
                         if (ms.id == property) {
                             if (formInput[property] != null) {
-                                ms.addToSelection([{ id: formInput[property], name: formInput[property.slice(0, -2)] }], true);
+                                msSetSelectionSilent(ms, [{id: formInput[property], name: formInput[property.slice(0, -2)]}]);
                             }
                             return false;
                         }
@@ -637,34 +637,29 @@ function msSetAsModified(msArray, isModified) {
 
 //-----------------------------------------------------------------------------
 
-//Pulls type information and formats edit form and column names
-function updateViewsForTypeGeneric(httpType, url, data, table, formId) {
+//Pulls type information and formats table column names
+function updateTableForExtended(httpType, url, data, table) {
     var deferred0 = $.Deferred();
     $.ajax({ type: httpType, url: url, data: data, timeout: 120000, dataType: "json" })
         .done(function (data) {
             var typeHasAttrs = false;
             var entityType = data[0];
-
             for (var prop in entityType) {
-                if (prop.indexOf("Attr") == -1) { continue; }
-                if (prop.indexOf("Type") != -1 && entityType[prop] != "NotUsed") { typeHasAttrs = true; }
-                changeDescriptionHelper(table, formId, entityType, prop);
-                changeValidationHelper(table, formId, entityType, prop);
+                if (prop.indexOf("Attr") == -1 || prop.indexOf("Desc") == -1) { continue; }
+                if (entityType[prop] != null && entityType[prop] != "") { typeHasAttrs = true; }
+                $(table.column(prop.slice(prop.indexOf("Attr"), 6) + ":name").header()).text(entityType[prop]);
             }
-            $("#" + formId).removeData("validator");
-            $("#" + formId).removeData('unobtrusiveValidation');
-            $.validator.unobtrusive.parse("#" + formId)
             deferred0.resolve(typeHasAttrs);
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
     return deferred0.promise();
 }
 
-//updateViewsForTypeGenericWrp
-function updateViewsForTypeGenericWrp(httpType, url, data, table, formId) {
+//updateTableForExtendedWrp
+function updateTableForExtendedWrp(httpType, url, data, table) {
     var deferred0 = $.Deferred();
     showModalWait();
-    updateViewsForTypeGeneric(httpType, url, data, table, formId)
+    updateTableForExtended(httpType, url, data, table)
         .always(hideModalWait)
         .done(deferred0.resolve)
         .fail(function (xhr, status, error) {
@@ -674,32 +669,63 @@ function updateViewsForTypeGenericWrp(httpType, url, data, table, formId) {
     return deferred0.promise();
 }
 
-//changeDescriptionHelper
-function changeDescriptionHelper(table, formId, entityType, prop) {
+//pulls type information and formats form fields including validation reset
+function updateFormForExtended(httpType, url, data, formId) {
+    var deferred0 = $.Deferred();
+    $.ajax({ type: httpType, url: url, data: data, timeout: 120000, dataType: "json" })
+        .done(function (data) {
+            $("#" + formId).removeClass("hidden");
+            var typeHasAttrs = false;
+            var entityType = data[0];
+
+            for (var prop in entityType) {
+                if (prop.indexOf("Attr") == -1) { continue; }
+                if (prop.indexOf("Type") != -1 && entityType[prop] != "NotUsed") { typeHasAttrs = true; }
+
+                changeFormFieldDescriptionHelper(formId, entityType, prop);
+                changeFormFieldValidationHelper(formId, entityType, prop);
+            }
+            $("#" + formId).removeData("validator");
+            $("#" + formId).removeData('unobtrusiveValidation');
+            $.validator.unobtrusive.parse("#" + formId)
+            if (!typeHasAttrs) { $("#" + formId).addClass("hidden"); }
+            deferred0.resolve(typeHasAttrs);
+        })
+        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
+    return deferred0.promise();
+}
+
+//updateFormForExtendedWrp
+function updateFormForExtendedWrp(httpType, url, data, formId) {
+    var deferred0 = $.Deferred();
+    showModalWait();
+    updateFormForExtended(httpType, url, data, formId)
+        .always(hideModalWait)
+        .done(deferred0.resolve)
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject(xhr, status, error);
+        });
+    return deferred0.promise();
+}
+
+//changeFormFieldDescriptionHelper
+function changeFormFieldDescriptionHelper(formId, entityType, prop) {
     if (prop.indexOf("Desc") != -1) {
         var attrName = prop.slice(prop.indexOf("Attr"), 6);
-        $(table.column(attrName + ":name").header()).text(entityType[prop]);
         $("#" + formId + " label[for=" + attrName + "]").text(entityType[prop]);
         $("#" + formId + " #" + attrName).prop("placeholder", entityType[prop]);
     }
 }
 
-//changeValidationHelper
-function changeValidationHelper(table, formId, entityType, prop) {
+//changeFormFieldValidationHelper
+function changeFormFieldValidationHelper(formId, entityType, prop) {
     if (prop.indexOf("Type") != -1) {
         var attrName = prop.slice(prop.indexOf("Attr"), 6);
         var $targetEl = $("#" + formId + " #" + attrName);
 
-        var attrsToRemove = "";
-        $.each($targetEl[0].attributes, function (i, attrib) {
-            if (typeof attrib !== "undefined" && attrib.name.indexOf("data-val") == 0) {
-                attrsToRemove += (attrsToRemove == "") ? attrib.name : " " + attrib.name;
-            }
-        });
-        $targetEl.removeAttr(attrsToRemove);
-
+        removeValidationAttributesHelper($targetEl);
         if ($targetEl.data("DateTimePicker")) { $targetEl.data("DateTimePicker").destroy(); }
-
         $("#" + formId + " #FrmGrp" + attrName).removeClass("hidden");
 
         if (entityType[prop] == "NotUsed") {
@@ -740,6 +766,18 @@ function changeValidationHelper(table, formId, entityType, prop) {
         }
     }
 }
+
+//removeValidationAttributesHelper
+function removeValidationAttributesHelper($element) {
+    var attrsToRemove = "";
+    $.each($element[0].attributes, function (i, attrib) {
+        if (typeof attrib !== "undefined" && attrib.name.indexOf("data-val") == 0) {
+            attrsToRemove += (attrsToRemove == "") ? attrib.name : " " + attrib.name;
+        }
+    });
+    $element.removeAttr(attrsToRemove);
+}
+
 
 //-----------------------------------------------------------------------------
 

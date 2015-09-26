@@ -50,12 +50,20 @@ UrlDelete = "/AssemblyDbSrv/Delete";
 
 
 var ExtFormId = "EditFormExtended";
-var ExtFormViewId = "EditFormExtendedSubView";
 var ExtColumnSelectClass = ".extColumnSelect";
 var ExtColumnSetNos = [5, 6, 7];
+var ExtUrl = "/AssemblyTypeSrv/GetByIds";
+var ExtHttpType = "POST";
 
-var CallBackBeforeCreate = function () { return $.Deferred().resolve(); }
-var CallBackBeforeEdit = function () { return $.Deferred().resolve(); }
+var CallBackBeforeCreate = function () {
+    $(MagicSuggests[0]).trigger("selectionchange");
+    return $.Deferred().resolve();
+}
+
+var CallBackBeforeEdit = function () {
+    $(MagicSuggests[0]).trigger("selectionchange");
+    return $.Deferred().resolve();
+}
 
 //-------------------------------------------------------------------------------------------//
 
@@ -250,6 +258,17 @@ $(document).ready(function () {
     msAddToMsArray(MagicSuggests, "AssemblyType_Id", "/AssemblyTypeSrv/Lookup", 1);
     msAddToMsArray(MagicSuggests, "AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup", 1);
     msAddToMsArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/Lookup", 1);
+
+    //Initialize MagicSuggest Array Event - AssemblyType_Id
+    $(MagicSuggests[0]).on("selectionchange", function (e, m) {
+        if (this.getValue().length == 1 && this.getValue()[0] != "_VARIES_") {
+            updateFormForExtendedWrp(ExtHttpType, ExtUrl, { ids: this.getValue()[0] }, ExtFormId);
+            return;
+        }
+        clearFormInputs(ExtFormId);
+        $("#" + ExtFormId).addClass("hidden");
+    });
+
         
     //--------------------------------------View Initialization------------------------------------//
 
@@ -268,7 +287,7 @@ function refreshMainView() {
 
     TableMain.clear().search("").draw();
 
-    updateViewForSelectedType()
+    updateMainViewForSelectedType()
         .done(function () {
             if (MsFilterByType.getValue().length == 0 &&
                 MsFilterByProject.getValue().length == 0 &&
@@ -321,20 +340,17 @@ function fillFiltersFromRequestParams() {
     return deferred0.promise();
 }
 
-//updateViewForSelectedType
-function updateViewForSelectedType() {
+//updateMainViewForSelectedType
+function updateMainViewForSelectedType() {
     var deferred0 = $.Deferred();
 
     if (MsFilterByType.getValue().length != 1) {
-        switchViewsForExtendedHelper(false);
+        switchMainViewForExtendedHelper(false);
         return deferred0.resolve();
     }
-    updateViewsForTypeGenericWrp(
-            "POST", "/AssemblyTypeSrv/GetByIds",
-            { ids: MsFilterByType.getValue()[0] },
-            TableMain, ExtFormId, ExtFormViewId)
+    updateTableForExtended(ExtHttpType, ExtUrl, { ids: MsFilterByType.getValue()[0] }, TableMain)
         .done(function (typeHasAttrs) {
-            switchViewsForExtendedHelper(typeHasAttrs);
+            switchMainViewForExtendedHelper(typeHasAttrs);
             deferred0.resolve();
         });
     return deferred0.promise();
@@ -342,14 +358,13 @@ function updateViewForSelectedType() {
 
 //---------------------------------------Helper Methods--------------------------------------//
 
-//switchViewsForExtendedHelper
-function switchViewsForExtendedHelper(switchOn) {
+//switchMainViewForExtendedHelper
+function switchMainViewForExtendedHelper(switchOn) {
     if (switchOn) {
         $(ExtColumnSelectClass).removeClass("disabled");
-        $("#" + ExtFormViewId).removeClass("hidden");
         return;
     }
     if ($.inArray(SelectedColumnSet, ExtColumnSetNos) != -1) { showColumnSet(TableMainColumnSets, 1); }
     $(ExtColumnSelectClass).addClass("disabled");
-    $("#" + ExtFormViewId).addClass("hidden");
 }
+
