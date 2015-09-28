@@ -36,7 +36,7 @@ var UrlEdit = "";
 var UrlDelete = "";
 
 var CallBackBeforeCreate = function () { return $.Deferred().resolve(); }
-var CallBackBeforeEdit = function () { return $.Deferred().resolve(); }
+var CallBackBeforeEdit = function (currRecords) { return $.Deferred().resolve(); }
 
 //-------------------------------------------------------------------------------------------//
 
@@ -67,7 +67,7 @@ $(document).ready(function () {
         fillFormForEditGenericWrp(CurrIds, HttpTypeFillForEdit, UrlFillForEdit, GetActive, EditFormId, LabelTextEdit, MagicSuggests)
             .done(function (currRecords) {
                 CurrRecords = currRecords;
-                CallBackBeforeEdit()
+                CallBackBeforeEdit(currRecords)
                     .done(function () {
                         saveViewSettings(TableMain);
                         switchView(MainViewId, EditFormViewId, EditFormBtnGroupEditClass);

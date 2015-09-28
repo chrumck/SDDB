@@ -56,10 +56,12 @@ var ExtHttpType = "POST";
 
 var CallBackBeforeCreate = function () {
     updateFormForSelectedType();
+    clearFormInputs(ExtFormId);
     return $.Deferred().resolve();
 }
 
-var CallBackBeforeEdit = function () {
+var CallBackBeforeEdit = function (currRecords) {
+    fillFormForEditFromDbEntries(GetActive, currRecords, ExtFormId);
     updateFormForSelectedType();
     return $.Deferred().resolve();
 }
@@ -353,7 +355,6 @@ function updateFormForSelectedType() {
         updateFormForExtendedWrp(ExtHttpType, ExtUrl, { ids: MagicSuggests[0].getValue()[0] }, ExtFormId);
         return;
     }
-    clearFormInputs(ExtFormId);
     $("#" + ExtFormId).addClass("hidden");
 }
 

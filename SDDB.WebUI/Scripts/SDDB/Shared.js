@@ -157,6 +157,8 @@ function showModalAJAXFail(xhr, status, error) {
     setTimeout(function () { $("#ModalInfo").modal("show"); }, 10);
 }
 
+//-----------------------------------------------------------------------------
+
 //switchView 
 function switchView(fromViewId, toViewId, toBtnGroupClass, scrollToWindowYpos, dataTable) {
     if (toBtnGroupClass) {
@@ -266,7 +268,7 @@ function clearFormInputs(formId, msArray) {
 //Prepare Form For Create
 function fillFormForCreateGeneric(formId, msArray, labelText) {
     clearFormInputs(formId, msArray);
-    $("#" + formId + "Label").text(labelText);
+    if (labelText) { $("#" + formId + "Label").text(labelText); } 
     $("#" + formId + " [data-val-dbisunique]").prop("disabled", false);
     msDisableUnique(msArray, false);
     $("#" + formId + " .modifiable").data("ismodified", true);
@@ -277,77 +279,19 @@ function fillFormForCreateGeneric(formId, msArray, labelText) {
     $("#" + formId + "CreateMultiple").removeClass("hidden");
 }
 
+//-----------------------------------------------------------------------------
+
 //FillFormForEdit Generic version
 function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText, msArray) {
-
-    if (GetActive) { $("#" + formId + "GroupIsActive").addClass("hidden"); }
-    else { $("#" + formId + "GroupIsActive").removeClass("hidden"); }
-    $("#" + formId + "CreateMultiple").addClass("hidden");
-
     var deferred0 = $.Deferred();
 
-    clearFormInputs(formId, msArray);
-    if (labelText) {$("#" + formId + "Label").text(labelText);}
+    setFormforEditHelper(getActive, formId, labelText, msArray);
 
     $.ajax({ type: httpType, url: url, timeout: 120000, data: { ids: ids, getActive: getActive }, dataType: "json" })
         .done(function (dbEntries) {
-            var formInput = $.extend(true, {}, dbEntries[0]);
-            $.each(dbEntries, function (i, dbEntry) {
-                for (var property in dbEntry) {
-                    if (!dbEntry.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") {
-                        continue;
-                    }
-                    if (property.slice(-3) == "_Id") {
-                        if (formInput[property] != dbEntry[property]) {
-                            formInput[property] = "_VARIES_";
-                            formInput[property.slice(0, -2)] = "_VARIES_";
-                        }
-                        else {
-                            formInput[property.slice(0, -2)] = "";
-                            for (var subProp in dbEntry[property.slice(0, -2)]) {
-                                if (dbEntry[property.slice(0, -2)][subProp] != null) {
-                                    if (formInput[property.slice(0, -2)] != "") { formInput[property.slice(0, -2)] += " "; }
-                                    formInput[property.slice(0, -2)] += dbEntry[property.slice(0, -2)][subProp];
-                                }
-                            }
-                        }
-                        continue;
-                    }
-                    if (formInput[property] != dbEntry[property]) { formInput[property] = "_VARIES_"; }
-                }
-            });
-
-            for (var property in formInput) {
-                if (!formInput.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") {
-                    continue;
-                }
-                if (property.slice(-3) == "_Id") {
-                    $.each(msArray, function (i, ms) {
-                        if (ms.id == property) {
-                            if (formInput[property] != null) {
-                                msSetSelectionSilent(ms, [{id: formInput[property], name: formInput[property.slice(0, -2)]}]);
-                            }
-                            return false;
-                        }
-                    });
-                    continue;
-                }
-                if (property.slice(-3) == "_bl") {
-                    if (formInput[property] == true) { $("#" + formId + " #" + property).prop("checked", true); }
-                    continue;
-                }
-                $("#" + formId + " #" + property).val(formInput[property]);
-            }
-
-            if (dbEntries.length == 1) {
-                $("[data-val-dbisunique]").prop("disabled", false);
-                msDisableUnique(msArray, false);
-            }
-            else {
-                $("[data-val-dbisunique]").prop("disabled", true);
-                msDisableUnique(msArray, true);
-            }
-
+            var formInput = getFormInputFromDbEntriesHelper(dbEntries);
+            setFormFromFormInputHelper(formInput, formId, msArray);
+            setFormForUniqueFieldsHelper(dbEntries, formId, msArray);
             deferred0.resolve(dbEntries);
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
@@ -368,6 +312,89 @@ function fillFormForEditGenericWrp(ids, httpType, url, getActive, formId, labelT
         });
     return deferred0.promise();
 }
+
+//fillFormForEditFromDbEntries - takes dbEntries instead of executing AJAX request
+function fillFormForEditFromDbEntries(getActive, dbEntries, formId, labelText, msArray) {
+    setFormforEditHelper(getActive, formId, labelText, msArray);
+    var formInput = getFormInputFromDbEntriesHelper(dbEntries);
+    setFormFromFormInputHelper(formInput, formId, msArray);
+    setFormForUniqueFieldsHelper(dbEntries, formId, msArray);
+    return $.Deferred().resolve(dbEntries);
+}
+
+//setFormforEditHelper
+function setFormforEditHelper(getActive, formId, labelText, msArray) {
+    if (getActive) { $("#" + formId + "GroupIsActive").addClass("hidden"); }
+    else { $("#" + formId + "GroupIsActive").removeClass("hidden"); }
+    $("#" + formId + "CreateMultiple").addClass("hidden");
+    clearFormInputs(formId, msArray);
+    if (labelText) { $("#" + formId + "Label").text(labelText); }
+}
+
+//setFormForUniqueFieldsHelper
+function setFormForUniqueFieldsHelper(dbEntries, formId, msArray) {
+    if (dbEntries.length == 1) {
+        $("#" + formId + " [data-val-dbisunique]").prop("disabled", false);
+        msDisableUnique(msArray, false);
+    }
+    else {
+        $("#" + formId + " [data-val-dbisunique]").prop("disabled", true);
+        msDisableUnique(msArray, true);
+    }
+}
+
+//getFormInputFromDbEntriesHelper
+function getFormInputFromDbEntriesHelper(dbEntries) {
+    var formInput = $.extend(true, {}, dbEntries[0]);
+    $.each(dbEntries, function (i, dbEntry) {
+        for (var property in dbEntry) {
+            if (!dbEntry.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") { continue; }
+            if (property.slice(-3) == "_Id") {
+                var msNameProperty = property.slice(0, -2);
+                if (formInput[property] != dbEntry[property]) {
+                    formInput[property] = "_VARIES_";
+                    formInput[msNameProperty] = "_VARIES_";
+                    continue;
+                }
+                formInput[msNameProperty] = "";
+                for (var subProp in dbEntry[msNameProperty]) {
+                    if (dbEntry[msNameProperty][subProp] != null) {
+                        if (formInput[msNameProperty] != "") { formInput[msNameProperty] += " "; }
+                        formInput[msNameProperty] += dbEntry[msNameProperty][subProp];
+                    }
+                }
+                continue;
+            }
+            if (formInput[property] != dbEntry[property]) { formInput[property] = "_VARIES_"; }
+        }
+    });
+    return formInput;
+}
+
+//setFormFromFormInputHelper
+function setFormFromFormInputHelper(formInput, formId, msArray) {
+    for (var property in formInput) {
+        if (!formInput.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") { continue; }
+        if (property.slice(-3) == "_Id" && msArray) {
+            $.each(msArray, function (i, ms) {
+                if (ms.id == property) {
+                    if (formInput[property] != null) {
+                        msSetSelectionSilent(ms, [{ id: formInput[property], name: formInput[property.slice(0, -2)] }]);
+                    }
+                    return false;
+                }
+            });
+            continue;
+        }
+        if (property.slice(-3) == "_bl") {
+            if (formInput[property] == true) { $("#" + formId + " #" + property).prop("checked", true); }
+            continue;
+        }
+        $("#" + formId + " #" + property).val(formInput[property]);
+    }
+}
+
+//-----------------------------------------------------------------------------
 
 //SubmitEdits to DB - generic version
 function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNewRecords) {
@@ -417,7 +444,7 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
     });
 
     if (currRecords.length == 1 && noOfNewRecords > 1) {
-        multiplyRecordsAndModifyUniqueProps(formId, currRecords, noOfNewRecords);
+        multiplyRecordsAndModifyUniquePropsHelper(formId, currRecords, noOfNewRecords);
     }
 
     $.ajax({ type: httpType, url: url, timeout: 120000, data: { records: currRecords }, dataType: "json" })
@@ -442,7 +469,7 @@ function submitEditsGenericWrp(formId, msArray, currRecords, httpType, url, noOf
 }
 
 //look up if the input field has dbisunique class and modify record prop to be unique
-function multiplyRecordsAndModifyUniqueProps(formId, currRecords, noOfNewRecords) {
+function multiplyRecordsAndModifyUniquePropsHelper(formId, currRecords, noOfNewRecords) {
 
     for (var i = 1; i < noOfNewRecords; i++) {
         currRecords[i] = $.extend(true, {}, currRecords[0]);
@@ -534,12 +561,6 @@ function submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
 
 //-----------------------------------------------------------------------------
 
-//msSetSelectionSilent - version of setSelection not triggering events
-function msSetSelectionSilent(ms, itemsArray) {
-    ms.clear(true);
-    ms.addToSelection(itemsArray, true);
-}
-
 //initialize MagicSuggest and add to MagicSuggest array
 function msAddToMsArray(msArray, id, url, maxSelection, minChars, dataUrlParams, disabled, editable) {
 
@@ -593,6 +614,7 @@ function msAddToMsArray(msArray, id, url, maxSelection, minChars, dataUrlParams,
 
 //check if MagicSuggests in MagicSugest Array are valid
 function msIsValid(msArray) {
+    if (!msArray) { return; }
     var msCheck = true;
     $.each(msArray, function (i, ms) {
         if (!ms.isValid()) msCheck = false;
@@ -602,6 +624,7 @@ function msIsValid(msArray) {
 
 //change formatting of invalid MagicSugest's
 function msValidate(msArray) {
+    if (!msArray) { return; }
     $.each(msArray, function (i, ms) {
         if (!ms.isValid()) {
             $("#" + ms.id).addClass("input-validation-error");
@@ -613,6 +636,7 @@ function msValidate(msArray) {
 
 //enable or disable DbUnique MagicSuggests in ms array
 function msDisableUnique(msArray, disable) {
+    if (!msArray) { return; }
     disable = (typeof disable !== "undefined" && disable == false) ? false : true;
     $.each(msArray, function (i, ms) {
         if (disable == true && typeof ms.dataValDbisunique !== "undefined" && ms.dataValDbisunique == "true") { ms.disable(); }
@@ -622,6 +646,7 @@ function msDisableUnique(msArray, disable) {
 
 //enable or disable All MagicSuggests in ms array
 function msDisableAll(msArray, disable) {
+    if (!msArray) { return; }
     disable = (typeof disable !== "undefined" && disable == false) ? false : true;
     $.each(msArray, function (i, ms) {
         if (disable == true) { ms.disable(); }
@@ -631,8 +656,15 @@ function msDisableAll(msArray, disable) {
 
 //set MagicSuggests as modified ot not
 function msSetAsModified(msArray, isModified) {
+    if (!msArray) { return; }
     isModified = (typeof isModified !== "undefined" && isModified == false) ? false : true;
     $.each(msArray, function (i, ms) { ms.isModified = isModified; });
+}
+
+//msSetSelectionSilent - version of setSelection not triggering events
+function msSetSelectionSilent(ms, itemsArray) {
+    ms.clear(true);
+    ms.addToSelection(itemsArray, true);
 }
 
 //-----------------------------------------------------------------------------
