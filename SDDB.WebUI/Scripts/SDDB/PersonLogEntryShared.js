@@ -6,6 +6,7 @@
 /// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
+/// <reference path="PersonLogEntryFiles.js" />
 
 //--------------------------------------Global Properties------------------------------------//
 var TableMain;
