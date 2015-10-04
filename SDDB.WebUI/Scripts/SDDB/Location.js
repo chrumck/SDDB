@@ -292,14 +292,14 @@ function fillFiltersFromRequestParams() {
             .done(function (data) {
                 msSetSelectionSilent(MsFilterByProject, 
                     [{ id: data[0].Id, name: data[0].ProjectName + " - " + data[0].ProjectCode }]);
-                deferred0.resolve();
+                return deferred0.resolve();
             })
             .fail(function (xhr, status, error) {
                 showModalAJAXFail(xhr, status, error);
                 deferred0.reject(xhr, status, error);
             });
     }
-    else { deferred0.resolve(); }
+    else { return deferred0.resolve(); }
     return deferred0.promise();
 }
 

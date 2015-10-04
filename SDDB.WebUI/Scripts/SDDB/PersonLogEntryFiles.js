@@ -211,7 +211,7 @@ function fillLogEntryFilesForm(panelText) {
     showModalWait();
     refreshTableGeneric(TableLogEntryFiles, "/PersonLogEntrySrv/ListFiles", { logEntryId: CurrIds[0] }, "GET")
         .always(hideModalWait)
-        .done(function () { deferred0.resolve(); })
+        .done(function () { return deferred0.resolve(); })
         .fail(function (xhr, status, error) {
             showModalAJAXFail(xhr, status, error);
             deferred0.reject();

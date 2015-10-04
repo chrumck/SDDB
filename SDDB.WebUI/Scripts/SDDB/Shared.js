@@ -203,7 +203,7 @@ function refreshTableGeneric(table, url, data, httpType) {
     $.ajax({ type: httpType, url: url, timeout: 120000, data: data, dataType: "json", })
         .done(function (dbEntries) {
             table.rows.add(dbEntries).order([1, "asc"]).draw();
-            deferred0.resolve();
+            return deferred0.resolve();
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 
@@ -284,18 +284,12 @@ function fillFormForCreateGeneric(formId, msArray, labelText) {
 //FillFormForEdit Generic version
 function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText, msArray) {
     var deferred0 = $.Deferred();
-
-    setFormforEditHelper(getActive, formId, labelText, msArray);
-
     $.ajax({ type: httpType, url: url, timeout: 120000, data: { ids: ids, getActive: getActive }, dataType: "json" })
         .done(function (dbEntries) {
-            var formInput = getFormInputFromDbEntriesHelper(dbEntries);
-            setFormFromFormInputHelper(formInput, formId, msArray);
-            setFormForUniqueFieldsHelper(dbEntries, formId, msArray);
-            deferred0.resolve(dbEntries);
+            fillFormForEditFromDbEntries(getActive, dbEntries, formId, labelText, msArray)
+                .done(function () { deferred0.resolve(dbEntries); });
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
-
     return deferred0.promise();
 }
 
@@ -305,7 +299,7 @@ function fillFormForEditGenericWrp(ids, httpType, url, getActive, formId, labelT
     showModalWait();
     fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText, msArray)
         .always(hideModalWait)
-        .done(function (currRecords) { deferred0.resolve(currRecords); })
+        .done(function (dbEntries) { deferred0.resolve(dbEntries); })
         .fail(function (xhr, status, error) {
             showModalAJAXFail(xhr, status, error);
             deferred0.reject(xhr, status, error);
@@ -315,83 +309,92 @@ function fillFormForEditGenericWrp(ids, httpType, url, getActive, formId, labelT
 
 //fillFormForEditFromDbEntries - takes dbEntries instead of executing AJAX request
 function fillFormForEditFromDbEntries(getActive, dbEntries, formId, labelText, msArray) {
-    setFormforEditHelper(getActive, formId, labelText, msArray);
-    var formInput = getFormInputFromDbEntriesHelper(dbEntries);
-    setFormFromFormInputHelper(formInput, formId, msArray);
-    setFormForUniqueFieldsHelper(dbEntries, formId, msArray);
-    return $.Deferred().resolve(dbEntries);
-}
 
-//setFormforEditHelper
-function setFormforEditHelper(getActive, formId, labelText, msArray) {
-    if (getActive) { $("#" + formId + "GroupIsActive").addClass("hidden"); }
-    else { $("#" + formId + "GroupIsActive").removeClass("hidden"); }
-    $("#" + formId + "CreateMultiple").addClass("hidden");
-    clearFormInputs(formId, msArray);
-    if (labelText) { $("#" + formId + "Label").text(labelText); }
-}
-
-//setFormForUniqueFieldsHelper
-function setFormForUniqueFieldsHelper(dbEntries, formId, msArray) {
-    if (dbEntries.length == 1) {
-        $("#" + formId + " [data-val-dbisunique]").prop("disabled", false);
-        msDisableUnique(msArray, false);
-    }
-    else {
-        $("#" + formId + " [data-val-dbisunique]").prop("disabled", true);
-        msDisableUnique(msArray, true);
-    }
-}
-
-//getFormInputFromDbEntriesHelper
-function getFormInputFromDbEntriesHelper(dbEntries) {
-    var formInput = $.extend(true, {}, dbEntries[0]);
-    $.each(dbEntries, function (i, dbEntry) {
-        for (var property in dbEntry) {
-            if (!dbEntry.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") { continue; }
-            if (property.slice(-3) == "_Id") {
-                var msNameProperty = property.slice(0, -2);
-                if (formInput[property] != dbEntry[property]) {
-                    formInput[property] = "_VARIES_";
-                    formInput[msNameProperty] = "_VARIES_";
+    //getFormInputFromDbEntriesHelper
+    var getFormInputFromDbEntriesHelper = function () {
+        var formInput = $.extend(true, {}, dbEntries[0]);
+        $.each(dbEntries, function (i, dbEntry) {
+            for (var property in dbEntry) {
+                if (!dbEntry.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") {
                     continue;
                 }
-                formInput[msNameProperty] = "";
-                for (var subProp in dbEntry[msNameProperty]) {
-                    if (dbEntry[msNameProperty][subProp] != null) {
-                        if (formInput[msNameProperty] != "") { formInput[msNameProperty] += " "; }
-                        formInput[msNameProperty] += dbEntry[msNameProperty][subProp];
+                if (property.slice(-3) == "_Id") {
+                    var msNameProperty = property.slice(0, -2);
+                    if (formInput[property] != dbEntry[property]) {
+                        formInput[property] = "_VARIES_";
+                        formInput[msNameProperty] = "_VARIES_";
+                    }
+                    else {
+                        formInput[msNameProperty] = "";
+                        for (var subProp in dbEntry[msNameProperty]) {
+                            if (dbEntry[msNameProperty][subProp] != null) {
+                                if (formInput[msNameProperty] != "") {
+                                    formInput[msNameProperty] += " ";
+                                }
+                                formInput[msNameProperty] += dbEntry[msNameProperty][subProp];
+                            }
+                        }
                     }
                 }
+                else {
+                    if (formInput[property] != dbEntry[property]) {
+                        formInput[property] = "_VARIES_";
+                    }
+                }
+            }
+        });
+        return formInput;
+    }
+
+    //setFormForUniqueFieldsHelper
+    var setFormForUniqueFieldsHelper = function () {
+        if (dbEntries.length == 1) {
+            $("#" + formId + " [data-val-dbisunique]").prop("disabled", false);
+            msDisableUnique(msArray, false);
+        }
+        else {
+            $("#" + formId + " [data-val-dbisunique]").prop("disabled", true);
+            msDisableUnique(msArray, true);
+        }
+    }
+
+    //setFormFromFormInputHelper
+    var setFormFromFormInputHelper = function (formInput) {
+        for (var property in formInput) {
+            if (!formInput.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") { continue; }
+            if (property.slice(-3) == "_Id" && msArray) {
+                $.each(msArray, function (i, ms) {
+                    if (ms.id == property) {
+                        if (formInput[property] != null) {
+                            msSetSelectionSilent(ms, [{ id: formInput[property], name: formInput[property.slice(0, -2)] }]);
+                        }
+                        return false;
+                    }
+                });
                 continue;
             }
-            if (formInput[property] != dbEntry[property]) { formInput[property] = "_VARIES_"; }
+            if (property.slice(-3) == "_bl") {
+                if (formInput[property] == true) { $("#" + formId + " #" + property).prop("checked", true); }
+                continue;
+            }
+            $("#" + formId + " #" + property).val(formInput[property]);
         }
-    });
-    return formInput;
-}
-
-//setFormFromFormInputHelper
-function setFormFromFormInputHelper(formInput, formId, msArray) {
-    for (var property in formInput) {
-        if (!formInput.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") { continue; }
-        if (property.slice(-3) == "_Id" && msArray) {
-            $.each(msArray, function (i, ms) {
-                if (ms.id == property) {
-                    if (formInput[property] != null) {
-                        msSetSelectionSilent(ms, [{ id: formInput[property], name: formInput[property.slice(0, -2)] }]);
-                    }
-                    return false;
-                }
-            });
-            continue;
-        }
-        if (property.slice(-3) == "_bl") {
-            if (formInput[property] == true) { $("#" + formId + " #" + property).prop("checked", true); }
-            continue;
-        }
-        $("#" + formId + " #" + property).val(formInput[property]);
     }
+
+    //setFormforEditHelper
+    var setFormforEditHelper = function () {
+        if (getActive) { $("#" + formId + "GroupIsActive").addClass("hidden"); }
+        else { $("#" + formId + "GroupIsActive").removeClass("hidden"); }
+        $("#" + formId + "CreateMultiple").addClass("hidden");
+        clearFormInputs(formId, msArray);
+        if (labelText) { $("#" + formId + "Label").text(labelText); }
+    }
+
+    //main execution
+    setFormforEditHelper();
+    setFormFromFormInputHelper(getFormInputFromDbEntriesHelper());
+    setFormForUniqueFieldsHelper();
+    return $.Deferred().resolve(dbEntries);
 }
 
 //-----------------------------------------------------------------------------
@@ -399,12 +402,36 @@ function setFormFromFormInputHelper(formInput, formId, msArray) {
 //SubmitEdits to DB - generic version
 function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNewRecords) {
 
-    noOfNewRecords = (typeof noOfNewRecords !== "undefined" && noOfNewRecords >= 1 && noOfNewRecords <= 100) ? noOfNewRecords : 1;
+    //multiplyRecordsAndModifyUniquePropsHelper
+    var multiplyRecordsAndModifyUniquePropsHelper = function (formId, currRecords, noOfNewRecords) {
+
+        for (var i = 1; i < noOfNewRecords; i++) {
+            currRecords[i] = $.extend(true, {}, currRecords[0]);
+        }
+
+        $.each(currRecords, function (i, currRecord) {
+            for (var property in currRecord) {
+                if (!currRecord.hasOwnProperty(property) ||
+                property == "Id" ||
+                property.slice(-3) == "_Id" ||
+                property.slice(-1) == "_") {
+                    continue;
+                }
+                if ($("#" + formId + " #" + property).data("valDbisunique") == true) {
+                    var j = i + 1;
+                    currRecord[property] = currRecord[property] + "_" + ("00" + j).slice(-3);
+                }
+            }
+        });
+    }
+
+    //variable declaration
+    noOfNewRecords = (noOfNewRecords && noOfNewRecords >= 1 && noOfNewRecords <= 100) ? noOfNewRecords : 1;
     currRecords = $.extend(true, [], currRecords);
-
     var deferred0 = $.Deferred();
-
     var modifiedProperties = [];
+
+    //main execution
     $("#" + formId + " .modifiable").each(function (index) {
         if ($(this).data("ismodified")) modifiedProperties.push($(this).prop("id"));
     });
@@ -448,7 +475,7 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
     }
 
     $.ajax({ type: httpType, url: url, timeout: 120000, data: { records: currRecords }, dataType: "json" })
-        .done(function (newEntryIds) { deferred0.resolve(newEntryIds); })
+        .done(function (data) { deferred0.resolve(data); })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 
     return deferred0.promise();
@@ -460,35 +487,12 @@ function submitEditsGenericWrp(formId, msArray, currRecords, httpType, url, noOf
     showModalWait();
     submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNewRecords)
         .always(hideModalWait)
-        .done(function (newEntryIds) { deferred0.resolve(newEntryIds); })
+        .done(function (data) { deferred0.resolve(data); })
         .fail(function (xhr, status, error) {
             showModalAJAXFail(xhr, status, error);
             deferred0.reject(xhr, status, error);
             });
     return deferred0.promise();
-}
-
-//look up if the input field has dbisunique class and modify record prop to be unique
-function multiplyRecordsAndModifyUniquePropsHelper(formId, currRecords, noOfNewRecords) {
-
-    for (var i = 1; i < noOfNewRecords; i++) {
-        currRecords[i] = $.extend(true, {}, currRecords[0]);
-    }
-
-    $.each(currRecords, function (i, currRecord) {
-        for (var property in currRecord) {
-            if (!currRecord.hasOwnProperty(property) ||
-            property == "Id" ||
-            property.slice(-3) == "_Id" ||
-            property.slice(-1) == "_") {
-                continue;
-            }
-            if ($("#" + formId + " #" + property).data("valDbisunique") == true) {
-                var j = i + 1;
-                currRecord[property] = currRecord[property] + "_" + ("00" + j).slice(-3);
-            }
-        }
-    });
 }
 
 //-----------------------------------------------------------------------------
@@ -512,7 +516,7 @@ function fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
         .done(function (done1, done2) {
             tableAdd.rows.add(done1[0]).order([sortColumn, "asc"]).draw();
             tableRemove.rows.add(done2[0]).order([sortColumn, "asc"]).draw();
-            deferred0.resolve();
+            return deferred0.resolve();
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
     }
@@ -521,11 +525,28 @@ function fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
             .done(function (data) {
                 tableAdd.rows.add(data).order([sortColumn, "asc"]).draw();
                 if (ids.length != 0) tableRemove.rows.add(data).order([sortColumn, "asc"]).draw();
-                deferred0.resolve();
+                return deferred0.resolve();
             })
             .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
     }
+    return deferred0.promise();
+}
 
+//wraps fillFormForRelatedGeneric in modalWait and shows modalAJAXFail if failed
+function fillFormForRelatedGenericWrp(tableAdd, tableRemove, ids,
+        httpType, url, data, httpTypeNot, urlNot, dataNot, httpTypeMany, urlMany, dataMany, sortColumn) {
+    var deferred0 = $.Deferred();
+    showModalWait();
+    fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
+        httpType, url, data, httpTypeNot, urlNot, dataNot, httpTypeMany, urlMany, dataMany, sortColumn)
+        .always(hideModalWait)
+        .done(function () {
+            return deferred0.resolve();
+        })
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject(xhr, status, error);
+        });
     return deferred0.promise();
 }
 
@@ -536,14 +557,14 @@ function submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
     var deferred1 = $.Deferred();
     var deferred2 = $.Deferred();
 
-    if (idsAdd.length == 0) deferred1.resolve();
+    if (idsAdd.length == 0) { deferred1.resolve(); }
     else {
-        $.ajax({type: "POST", url: url, timeout: 120000, data: { ids: ids, idsAddRem: idsAdd, isAdd: true }, dataType: "json" })
+        $.ajax({ type: "POST", url: url, timeout: 120000, data: { ids: ids, idsAddRem: idsAdd, isAdd: true }, dataType: "json" })
             .done(function () { deferred1.resolve(); })
             .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
     }
 
-    if (idsRemove.length == 0) deferred2.resolve();
+    if (idsRemove.length == 0) { deferred2.resolve(); }
     else {
         setTimeout(function () {
             $.ajax({ type: "POST", url: url, timeout: 120000, data: { ids: ids, idsAddRem: idsRemove, isAdd: false }, dataType: "json" })
@@ -553,9 +574,25 @@ function submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
     }
 
     $.when(deferred1, deferred2)
-        .done(function () { deferred0.resolve(); })
+        .done(function () { return deferred0.resolve(); })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 
+    return deferred0.promise();
+}
+
+//wraps submitEditsForRelatedGeneric in modalWait and shows modalAJAXFail if failed
+function submitEditsForRelatedGenericWrp(ids, idsAdd, idsRemove, url) {
+    var deferred0 = $.Deferred();
+    showModalWait();
+    submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url)
+        .always(hideModalWait)
+        .done(function () {
+            return deferred0.resolve();
+        })
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject(xhr, status, error);
+        });
     return deferred0.promise();
 }
 

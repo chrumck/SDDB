@@ -269,7 +269,7 @@ function fillFiltersFromRequestParams() {
             .always(hideModalWait)
             .done(function (data) {
                 msSetSelectionSilent(MsFilterByComponent, [{ id: data[0].Id, name: data[0].CompName, }]);
-                deferred0.resolve();
+                return deferred0.resolve();
             })
             .fail(function (xhr, status, error) {
                 showModalAJAXFail(xhr, status, error); 
@@ -279,7 +279,7 @@ function fillFiltersFromRequestParams() {
     else {
         $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
         $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
-        deferred0.resolve();
+        return deferred0.resolve();
     }
 
     return deferred0.promise();

@@ -86,11 +86,27 @@ $(document).ready(function () {
         });
     });
 
+    //Wire Up EditFormBtnAddRemoveAssys
+    $("#EditFormBtnAddRemoveAssys").click(function () {
+        if (TableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().length +
+            TableLogEntryAssysRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().length == 0) {
+            showModalNothingSelected();
+            return;
+        }
+        msValidate(MagicSuggests);
+        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct before adding/removing assemblies.");
+            return;
+        }
+        addRemoveAssembliesNow();
+    });
+
     //Wire Up EditFormBtnChngSts
     $("#EditFormBtnChngSts").click(function () {
-        ChngStsAssyIds = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        ChngStsAssyIds = $.merge(TableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+            TableLogEntryAssysRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray() );
         if (ChngStsAssyIds.length == 0) {
-            showModalNothingSelected("Please select one or more rows from 'Add Assemblies' table.");
+            showModalNothingSelected("Please select one or more assemblies.");
             return;
         }
         showModalChngSts();
@@ -260,10 +276,52 @@ function submitEdits() {
             return deferred1.promise();
         })
         .always(hideModalWait)
-        .done(function () { deferred0.resolve(); })
+        .done(function () { return deferred0.resolve(); })
         .fail(function (xhr, status, error) {
             showModalAJAXFail(xhr, status, error);
             deferred0.reject();
+        });
+    return deferred0.promise();
+}
+
+//addRemoveAssembliesNow
+function addRemoveAssembliesNow() {
+
+    //updateCurrIdsHelper
+    var updateCurrIdsHelper = function () {
+        var deferred0 = $.Deferred();
+
+        if (CurrIds.length != 0) {
+            return deferred0.resolve();
+        }
+        submitEditsGenericWrp("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonLogEntrySrv/Edit")
+            .done(function (data) {
+                CurrIds = data.newEntryIds;
+                return deferred0.resolve();
+            });
+        return deferred0.promise();
+    }
+
+    //variable declaration
+    var deferred0 = $.Deferred();
+
+    //main execution
+    updateCurrIdsHelper()
+        .then(function () {
+            var idsAssysAdd = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+            var idsAssysRemove = TableLogEntryAssysRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+            return submitEditsForRelatedGenericWrp(CurrIds, idsAssysAdd, idsAssysRemove, "/PersonLogEntrySrv/EditPrsLogEntryAssys");
+        })
+        .done(function () {
+            fillFormForRelatedGenericWrp(
+                TableLogEntryAssysAdd, TableLogEntryAssysRemove, CurrIds,
+                "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys",
+                { logEntryId: CurrIds[0] },
+                "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
+                { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] },
+                "GET", "AssemblyDbSrv/LookupByLocDTables",
+                { getActive: true });
+            return deferred0.resolve();
         });
     return deferred0.promise();
 }
@@ -278,6 +336,8 @@ function showModalChngSts() {
 //change status of selected assemblies
 function changeAssyStatus() {
     if (ModalChngStsMs.getValue().length == 1) {
+        TableLogEntryAssysAdd.rows(".ui-selected", { page: "current" }).nodes().to$().removeClass("ui-selected");
+        TableLogEntryAssysRemove.rows(".ui-selected", { page: "current" }).nodes().to$().removeClass("ui-selected");
         showModalWait();
         $.ajax({
             type: "POST", url: "/AssemblyDbSrv/EditStatus",

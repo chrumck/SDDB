@@ -323,14 +323,14 @@ function fillFiltersFromRequestParams() {
             .always(hideModalWait)
             .done(function (data) {
                 msSetSelectionSilent(MsFilterByLoc, [{ id: data[0].Id, name: data[0].LocName }]);
-                deferred0.resolve();
+                return deferred0.resolve();
             })
             .fail(function (xhr, status, error) {
                 showModalAJAXFail(xhr, status, error);
                 deferred0.reject(xhr, status, error);
             });
     }
-    else { deferred0.resolve(); }
+    else { return deferred0.resolve(); }
     return deferred0.promise();
 }
 
@@ -345,7 +345,7 @@ function updateMainViewForSelectedType() {
     updateTableForExtended(ExtHttpType, ExtUrl, { ids: MsFilterByType.getValue()[0] }, TableMain)
         .done(function (typeHasAttrs) {
             switchMainViewForExtendedHelper(typeHasAttrs);
-            deferred0.resolve();
+            return deferred0.resolve();
         });
     return deferred0.promise();
 }

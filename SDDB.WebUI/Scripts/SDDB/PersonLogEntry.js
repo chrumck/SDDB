@@ -320,14 +320,14 @@ function fillFiltersFromRequestParams() {
                         name: data[0].FirstName + " " + data[0].LastName + " " + data[0].Initials
                     }]);
                 }
-                deferred0.resolve();
+                return deferred0.resolve();
             })
             .fail(function (xhr, status, error) {
                 showModalAJAXFail(xhr, status, error);
                 deferred0.reject(xhr, status, error);
             });
     }
-    else { deferred0.resolve(); }
+    else { return deferred0.resolve(); }
 
     return deferred0.promise();
 }
