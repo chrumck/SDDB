@@ -439,6 +439,21 @@ function multiplyRecordsAndModifyUniqueProps(formId, currRecords, noOfNewRecords
     });
 }
 
+//wraps submitEditsGeneric in modalWait and shows modalAJAXFail if failed
+function submitEditsGenericWrp(formId, msArray, currRecords, httpType, url, noOfNewRecords) {
+    var deferred0 = $.Deferred();
+    showModalWait();
+    submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNewRecords)
+        .always(hideModalWait)
+        .done(function (data) { deferred0.resolve(data); })
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject(xhr, status, error);
+        });
+    return deferred0.promise();
+}
+
+
 //-----------------------------------------------------------------------------
 
 //Fill Form for Edit from n:n related table - generic version
@@ -477,6 +492,24 @@ function fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
     return deferred0.promise();
 }
 
+//wraps fillFormForRelatedGeneric in modalWait and shows modalAJAXFail if failed
+function fillFormForRelatedGenericWrp(tableAdd, tableRemove, ids,
+        httpType, url, data, httpTypeNot, urlNot, dataNot, httpTypeMany, urlMany, dataMany, sortColumn) {
+    var deferred0 = $.Deferred();
+    showModalWait();
+    fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
+        httpType, url, data, httpTypeNot, urlNot, dataNot, httpTypeMany, urlMany, dataMany, sortColumn)
+        .always(hideModalWait)
+        .done(function () {
+            return deferred0.resolve();
+        })
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject(xhr, status, error);
+        });
+    return deferred0.promise();
+}
+
 //Submit Edits for n:n related table - generic version
 function submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
 
@@ -504,6 +537,22 @@ function submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
         .done(function () { deferred0.resolve(); })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 
+    return deferred0.promise();
+}
+
+//wraps submitEditsForRelatedGeneric in modalWait and shows modalAJAXFail if failed
+function submitEditsForRelatedGenericWrp(ids, idsAdd, idsRemove, url) {
+    var deferred0 = $.Deferred();
+    showModalWait();
+    submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url)
+        .always(hideModalWait)
+        .done(function () {
+            return deferred0.resolve();
+        })
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject(xhr, status, error);
+        });
     return deferred0.promise();
 }
 
