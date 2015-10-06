@@ -336,6 +336,8 @@ function showModalChngSts() {
 //change status of selected assemblies
 function changeAssyStatus() {
     if (ModalChngStsMs.getValue().length == 1) {
+        TableLogEntryAssysAdd.rows(".ui-selected", { page: "current" }).nodes().to$().removeClass("ui-selected");
+        TableLogEntryAssysRemove.rows(".ui-selected", { page: "current" }).nodes().to$().removeClass("ui-selected");
         showModalWait();
         $.ajax({
             type: "POST", url: "/AssemblyDbSrv/EditStatus",
