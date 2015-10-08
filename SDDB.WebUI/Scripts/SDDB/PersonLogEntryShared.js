@@ -307,7 +307,7 @@ function addRemoveAssembliesNow() {
             })
             .done(function (dbEntries) {
                 CurrRecords = dbEntries;
-                return deferred0.resolve
+                return deferred0.resolve();
             });
         return deferred0.promise();
     }
