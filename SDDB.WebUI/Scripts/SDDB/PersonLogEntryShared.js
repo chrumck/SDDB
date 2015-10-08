@@ -295,9 +295,19 @@ function addRemoveAssembliesNow() {
             return deferred0.resolve();
         }
         submitEditsGenericWrp("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonLogEntrySrv/Edit")
-            .done(function (data) {
+            .then(function (data) {
                 CurrIds = data.newEntryIds;
-                return deferred0.resolve();
+                return $.ajax({
+                    type: "POST",
+                    url: "/PersonLogEntrySrv/GetByIds",
+                    timeout: 120000,
+                    data: { ids: CurrIds, getActive: GetActive },
+                    dataType: "json"
+                });
+            })
+            .done(function (dbEntries) {
+                CurrRecords = dbEntries;
+                return deferred0.resolve
             });
         return deferred0.promise();
     }
