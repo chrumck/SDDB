@@ -5,6 +5,8 @@
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
+/// <reference path="../FileSaver.js" />
+
 
 //--------------------------------------Global Properties------------------------------------//
 
@@ -223,6 +225,42 @@ function refreshTblGenWrp(table, url, data, httpType) {
         });
 
     return deferred0.promise();
+}
+
+//exportTableToTxt - exports table data to a txt tab separated file
+function exportTableToTxt(table) {
+    var tableData = table.rows({search:"applied"}).data().toArray();
+    var txtOutput = convertObjectToStringHelper(tableData[0], true);
+    txtOutput.slice(-1);
+    txtOutput += "\n";
+    $.each(tableData, function (index, tableRow) {
+        txtOutput += convertObjectToStringHelper(tableRow);
+        txtOutput.slice(-1);
+        txtOutput += "\n";
+    });
+    var fileData = new Blob([txtOutput], { type: "text/plain;charset=utf-8" });
+    saveAs(fileData, "SDDBdataExport_" + moment().format("YYYYMMDD_HHmmss") + ".txt");
+
+    //convertObjectToStringHelper
+    function convertObjectToStringHelper(dataObject, retrievePropNames) {
+        var outputString = "";
+        for (var property in dataObject) {
+            if (!dataObject.hasOwnProperty(property)) {
+                continue;
+            }
+            if (typeof dataObject[property] === "object" && dataObject[property] !== null) { 
+                outputString += convertObjectToStringHelper(dataObject[property], retrievePropNames);
+                continue;
+            }
+            if (retrievePropNames) {
+                outputString += property + "\t";
+                continue;
+            }
+            outputString += dataObject[property] !== null ? dataObject[property] + "\t" : "\t";
+        }
+        outputString = outputString.replace(/\n/g, " ");
+        return outputString;
+    }
 }
 
 //-----------------------------------------------------------------------------

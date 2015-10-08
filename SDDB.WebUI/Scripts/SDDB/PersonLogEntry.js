@@ -144,6 +144,11 @@ $(document).ready(function () {
         
     //---------------------------------------DataTables------------
     
+    //wire up BtnTableMainExport
+    $("#BtnTableMainExport").click(function (event) {
+        exportTableToTxt(TableMain);
+    });
+
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
         if (!$(this).prop("checked")) {
