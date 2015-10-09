@@ -160,6 +160,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Images\SDDB_help.png" />
+    <Content Include="Scripts\FileSaver.js" />
+    <Content Include="Scripts\FileSaver.min.js" />
     <Content Include="Scripts\SDDB\ActivitySummary.js" />
     <Content Include="Scripts\SDDB\Shared_Views.js" />
     <Content Include="Scripts\SDDB\_temp.js" />
@@ -419,11 +421,7 @@
     <Content Include="Scripts\SDDB\PersonLogEntryShared.js" />
     <Content Include="Scripts\SDDB\YourActivity.js" />
     <Content Include="Scripts\SDDB\PersonLogEntry.js" />
-    <Content Include="Scripts\SDDB\ComponentExt.js" />
     <Content Include="Scripts\SDDB\Component.js" />
-    <Content Include="Scripts\SDDB\AssemblyExt.js" />
-    <Content Include="Scripts\SDDB\ComponentModel.js" />
-    <Content Include="Scripts\SDDB\AssemblyModel.js" />
     <Content Include="Scripts\SDDB\AssemblyDb.js" />
     <Content Include="Scripts\SDDB\ProjectEvent.js" />
     <Content Include="Scripts\SDDB\PersonActivityType.js" />
@@ -475,9 +473,7 @@
     </Compile>
     <Compile Include="Controllers\AssemblyLogEntryController.cs" />
     <Compile Include="Controllers\ComponentLogEntryController.cs" />
-    <Compile Include="Controllers\ComponentExtController.cs" />
     <Compile Include="Controllers\ComponentController.cs" />
-    <Compile Include="Controllers\AssemblyExtController.cs" />
     <Compile Include="Controllers\AssemblyDbController.cs" />
     <Compile Include="Controllers\ActivitySummaryController.cs" />
     <Compile Include="Controllers\YourActivityController.cs" />
@@ -526,15 +522,11 @@
     <Content Include="Views\ComponentType\Index.cshtml" />
     <Content Include="Views\AssemblyStatus\Index.cshtml" />
     <Content Include="Views\ComponentStatus\Index.cshtml" />
-    <Content Include="Views\AssemblyModel\Index.cshtml" />
     <Content Include="Views\LocationType\Index.cshtml" />
     <Content Include="Views\PersonGroup\Index.cshtml" />
     <Content Include="Views\Location\Index.cshtml" />
     <Content Include="Views\AssemblyDb\Index.cshtml" />
-    <Content Include="Views\AssemblyExt\Index.cshtml" />
-    <Content Include="Views\ComponentModel\Index.cshtml" />
     <Content Include="Views\Component\Index.cshtml" />
-    <Content Include="Views\ComponentExt\Index.cshtml" />
     <Content Include="Views\PersonActivityType\Index.cshtml" />
     <Content Include="Views\ProjectEvent\Index.cshtml" />
     <Content Include="Views\PersonLogEntry\Index.cshtml" />

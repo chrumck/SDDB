@@ -114,6 +114,11 @@ $(document).ready(function () {
     
     //---------------------------------------DataTables------------
 
+    //wire up BtnTableMainExport
+    $("#BtnTableMainExport").click(function (event) {
+        exportTableToTxt(TableMain);
+    });
+
     //TableMain DBUsers
     TableMain = $("#TableMain").DataTable({
         columns: [

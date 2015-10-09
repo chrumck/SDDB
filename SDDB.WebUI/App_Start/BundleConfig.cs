@@ -41,6 +41,9 @@ namespace SDDB.WebUI
             bundles.Add(new ScriptBundle("~/bundles/bootstrap-datetimepicker").Include("~/Scripts/bootstrap-datetimepicker.js"));
             bundles.Add(new StyleBundle("~/bundles/bootstrap-datetimepicker-CSS").Include("~/Content/bootstrap-datetimepicker.css"));
 
+            //FileSaver
+            bundles.Add(new ScriptBundle("~/bundles/filesaver").Include("~/Scripts/FileSaver.js"));
+
             //SDDB script bundles
             bundles.Add(new ScriptBundle("~/bundles/sddb/shared").Include("~/Scripts/SDDB/Shared.js"));
             bundles.Add(new ScriptBundle("~/bundles/sddb/shared_views").Include("~/Scripts/SDDB/Shared_Views.js"));

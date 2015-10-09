@@ -297,6 +297,10 @@ function addRemoveAssembliesNow() {
         submitEditsGenericWrp("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonLogEntrySrv/Edit")
             .done(function (data) {
                 CurrIds = data.newEntryIds;
+                for (var i = 0; i < CurrIds.length; i++) {
+                    CurrRecords[i] = $.extend(true, {}, RecordTemplate);
+                    CurrRecords[i].Id = CurrIds[i];
+                }
                 return deferred0.resolve();
             });
         return deferred0.promise();

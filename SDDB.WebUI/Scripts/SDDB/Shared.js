@@ -224,6 +224,43 @@ function refreshTblGenWrp(table, url, data, httpType) {
     return deferred0.promise();
 }
 
+//exportTableToTxt - exports table data to a txt tab separated file
+function exportTableToTxt(table) {
+    var tableData = table.rows({ search: "applied" }).data().toArray();
+    var txtOutput = convertObjectToStringHelper(tableData[0], true);
+    txtOutput.slice(-1);
+    txtOutput += "\n";
+    $.each(tableData, function (index, tableRow) {
+        txtOutput += convertObjectToStringHelper(tableRow);
+        txtOutput.slice(-1);
+        txtOutput += "\n";
+    });
+    var fileData = new Blob([txtOutput], { type: "text/plain;charset=utf-8" });
+    saveAs(fileData, "SDDBdataExport_" + moment().format("YYYYMMDD_HHmmss") + ".txt");
+
+    //convertObjectToStringHelper
+    function convertObjectToStringHelper(dataObject, retrievePropNames) {
+        var outputString = "";
+        for (var property in dataObject) {
+            if (!dataObject.hasOwnProperty(property)) {
+                continue;
+            }
+            if (typeof dataObject[property] === "object" && dataObject[property] !== null) {
+                outputString += convertObjectToStringHelper(dataObject[property], retrievePropNames);
+                continue;
+            }
+            if (retrievePropNames) {
+                outputString += property + "\t";
+                continue;
+            }
+            outputString += dataObject[property] !== null ? dataObject[property] + "\t" : "\t";
+        }
+        outputString = outputString.replace(/\n/g, " ");
+        return outputString;
+    }
+}
+
+
 //-----------------------------------------------------------------------------
 
 //Delete Records from DB - generic version
@@ -310,8 +347,13 @@ function fillFormForEditGenericWrp(ids, httpType, url, getActive, formId, labelT
 //fillFormForEditFromDbEntries - takes dbEntries instead of executing AJAX request
 function fillFormForEditFromDbEntries(getActive, dbEntries, formId, labelText, msArray) {
 
+    setFormforEditHelper();
+    setFormFromFormInputHelper(getFormInputFromDbEntriesHelper());
+    setFormForUniqueFieldsHelper();
+    return $.Deferred().resolve(dbEntries);
+
     //getFormInputFromDbEntriesHelper
-    var getFormInputFromDbEntriesHelper = function () {
+    function getFormInputFromDbEntriesHelper() {
         var formInput = $.extend(true, {}, dbEntries[0]);
         $.each(dbEntries, function (i, dbEntry) {
             for (var property in dbEntry) {
@@ -346,8 +388,9 @@ function fillFormForEditFromDbEntries(getActive, dbEntries, formId, labelText, m
         return formInput;
     }
 
+
     //setFormForUniqueFieldsHelper
-    var setFormForUniqueFieldsHelper = function () {
+    function setFormForUniqueFieldsHelper() {
         if (dbEntries.length == 1) {
             $("#" + formId + " [data-val-dbisunique]").prop("disabled", false);
             msDisableUnique(msArray, false);
@@ -359,7 +402,7 @@ function fillFormForEditFromDbEntries(getActive, dbEntries, formId, labelText, m
     }
 
     //setFormFromFormInputHelper
-    var setFormFromFormInputHelper = function (formInput) {
+    function setFormFromFormInputHelper(formInput) {
         for (var property in formInput) {
             if (!formInput.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") { continue; }
             if (property.slice(-3) == "_Id" && msArray) {
@@ -382,56 +425,24 @@ function fillFormForEditFromDbEntries(getActive, dbEntries, formId, labelText, m
     }
 
     //setFormforEditHelper
-    var setFormforEditHelper = function () {
+    function setFormforEditHelper() {
         if (getActive) { $("#" + formId + "GroupIsActive").addClass("hidden"); }
         else { $("#" + formId + "GroupIsActive").removeClass("hidden"); }
         $("#" + formId + "CreateMultiple").addClass("hidden");
         clearFormInputs(formId, msArray);
         if (labelText) { $("#" + formId + "Label").text(labelText); }
     }
-
-    //main execution
-    setFormforEditHelper();
-    setFormFromFormInputHelper(getFormInputFromDbEntriesHelper());
-    setFormForUniqueFieldsHelper();
-    return $.Deferred().resolve(dbEntries);
 }
 
 //-----------------------------------------------------------------------------
 
 //SubmitEdits to DB - generic version
 function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNewRecords) {
-
-    //multiplyRecordsAndModifyUniquePropsHelper
-    var multiplyRecordsAndModifyUniquePropsHelper = function (formId, currRecords, noOfNewRecords) {
-
-        for (var i = 1; i < noOfNewRecords; i++) {
-            currRecords[i] = $.extend(true, {}, currRecords[0]);
-        }
-
-        $.each(currRecords, function (i, currRecord) {
-            for (var property in currRecord) {
-                if (!currRecord.hasOwnProperty(property) ||
-                property == "Id" ||
-                property.slice(-3) == "_Id" ||
-                property.slice(-1) == "_") {
-                    continue;
-                }
-                if ($("#" + formId + " #" + property).data("valDbisunique") == true) {
-                    var j = i + 1;
-                    currRecord[property] = currRecord[property] + "_" + ("00" + j).slice(-3);
-                }
-            }
-        });
-    }
-
-    //variable declaration
     noOfNewRecords = (noOfNewRecords && noOfNewRecords >= 1 && noOfNewRecords <= 100) ? noOfNewRecords : 1;
-    currRecords = $.extend(true, [], currRecords);
+    currRecordsClone = $.extend(true, [], currRecords);
     var deferred0 = $.Deferred();
     var modifiedProperties = [];
 
-    //main execution
     $("#" + formId + " .modifiable").each(function (index) {
         if ($(this).data("ismodified")) modifiedProperties.push($(this).prop("id"));
     });
@@ -440,7 +451,7 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
     });
     if (modifiedProperties.length == 0) { deferred0.resolve([]); }
 
-    $.each(currRecords, function (i, currRecord) {
+    $.each(currRecordsClone, function (i, currRecord) {
         for (var property in currRecord) {
             if (!currRecord.hasOwnProperty(property) || property == "Id") {
                 continue;
@@ -470,15 +481,38 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
         currRecord.ModifiedProperties = modifiedProperties;
     });
 
-    if (currRecords.length == 1 && noOfNewRecords > 1) {
-        multiplyRecordsAndModifyUniquePropsHelper(formId, currRecords, noOfNewRecords);
+    if (currRecordsClone.length == 1 && noOfNewRecords > 1) {
+        multiplyRecordsAndModifyUniquePropsHelper();
     }
 
-    $.ajax({ type: httpType, url: url, timeout: 120000, data: { records: currRecords }, dataType: "json" })
+    $.ajax({ type: httpType, url: url, timeout: 120000, data: { records: currRecordsClone }, dataType: "json" })
         .done(function (data) { deferred0.resolve(data); })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 
     return deferred0.promise();
+
+    //multiplyRecordsAndModifyUniquePropsHelper
+    function multiplyRecordsAndModifyUniquePropsHelper() {
+
+        for (var i = 1; i < noOfNewRecords; i++) {
+            currRecordsClone[i] = $.extend(true, {}, currRecordsClone[0]);
+        }
+
+        $.each(currRecordsClone, function (i, currRecord) {
+            for (var property in currRecord) {
+                if (!currRecord.hasOwnProperty(property) ||
+                property == "Id" ||
+                property.slice(-3) == "_Id" ||
+                property.slice(-1) == "_") {
+                    continue;
+                }
+                if ($("#" + formId + " #" + property).data("valDbisunique") == true) {
+                    var j = i + 1;
+                    currRecord[property] = currRecord[property] + "_" + ("00" + j).slice(-3);
+                }
+            }
+        });
+    }
 }
 
 //wraps submitEditsGeneric in modalWait and shows modalAJAXFail if failed
