@@ -226,18 +226,22 @@ function refreshTblGenWrp(table, url, data, httpType) {
 
 //exportTableToTxt - exports table data to a txt tab separated file
 function exportTableToTxt(table) {
-    var tableData = table.rows({ search: "applied" }).data().toArray();
-    var txtOutput = convertObjectToStringHelper(tableData[0], true);
-    txtOutput.slice(-1);
-    txtOutput += "\n";
-    $.each(tableData, function (index, tableRow) {
-        txtOutput += convertObjectToStringHelper(tableRow);
+    showModalWait();
+    setTimeout(function () {
+        var tableData = table.rows({ search: "applied" }).data().toArray();
+        var txtOutput = convertObjectToStringHelper(tableData[0], true);
         txtOutput.slice(-1);
         txtOutput += "\n";
-    });
-    var fileData = new Blob([txtOutput], { type: "text/plain;charset=utf-8" });
-    saveAs(fileData, "SDDBdataExport_" + moment().format("YYYYMMDD_HHmmss") + ".txt");
-
+        $.each(tableData, function (index, tableRow) {
+            txtOutput += convertObjectToStringHelper(tableRow);
+            txtOutput.slice(-1);
+            txtOutput += "\n";
+        });
+        var fileData = new Blob([txtOutput], { type: "text/plain;charset=utf-8" });
+        hideModalWait();
+        saveAs(fileData, "SDDBdataExport_" + moment().format("YYYYMMDD_HHmmss") + ".txt");
+    }, 200);
+    
     //convertObjectToStringHelper
     function convertObjectToStringHelper(dataObject, retrievePropNames) {
         var outputString = "";
@@ -387,7 +391,6 @@ function fillFormForEditFromDbEntries(getActive, dbEntries, formId, labelText, m
         });
         return formInput;
     }
-
 
     //setFormForUniqueFieldsHelper
     function setFormForUniqueFieldsHelper() {

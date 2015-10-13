@@ -53,7 +53,9 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel").click(function () {
-        switchView("EditFormView", "MainView", "tdo-btngroup-main", true);
+        refreshMainView().done(function () {
+            switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
+        });
     });
 
     //Wire Up EditFormBtnOk
@@ -286,30 +288,7 @@ function submitEdits() {
 
 //addRemoveAssembliesNow
 function addRemoveAssembliesNow() {
-
-    //updateCurrIdsHelper
-    var updateCurrIdsHelper = function () {
-        var deferred0 = $.Deferred();
-
-        if (CurrIds.length != 0) {
-            return deferred0.resolve();
-        }
-        submitEditsGenericWrp("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonLogEntrySrv/Edit")
-            .done(function (data) {
-                CurrIds = data.newEntryIds;
-                for (var i = 0; i < CurrIds.length; i++) {
-                    CurrRecords[i] = $.extend(true, {}, RecordTemplate);
-                    CurrRecords[i].Id = CurrIds[i];
-                }
-                return deferred0.resolve();
-            });
-        return deferred0.promise();
-    }
-
-    //variable declaration
     var deferred0 = $.Deferred();
-
-    //main execution
     updateCurrIdsHelper()
         .then(function () {
             var idsAssysAdd = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
@@ -328,6 +307,25 @@ function addRemoveAssembliesNow() {
             return deferred0.resolve();
         });
     return deferred0.promise();
+
+    //updateCurrIdsHelper
+    function updateCurrIdsHelper() {
+        var deferred0 = $.Deferred();
+
+        if (CurrIds.length != 0) {
+            return deferred0.resolve();
+        }
+        submitEditsGenericWrp("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonLogEntrySrv/Edit")
+            .done(function (data) {
+                CurrIds = data.newEntryIds;
+                for (var i = 0; i < CurrIds.length; i++) {
+                    CurrRecords[i] = $.extend(true, {}, RecordTemplate);
+                    CurrRecords[i].Id = CurrIds[i];
+                }
+                return deferred0.resolve();
+            });
+        return deferred0.promise();
+    }
 }
 
 //Show modal for chagning assembly(ies) status
