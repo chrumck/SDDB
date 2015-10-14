@@ -348,6 +348,16 @@ function updateMainViewForSelectedType() {
             return deferred0.resolve();
         });
     return deferred0.promise();
+
+    //switchMainViewForExtendedHelper
+    function switchMainViewForExtendedHelper(switchOn) {
+        if (switchOn) {
+            $(ExtColumnSelectClass).removeClass("disabled");
+            return;
+        }
+        if ($.inArray(SelectedColumnSet, ExtColumnSetNos) != -1) { showColumnSet(TableMainColumnSets, 1); }
+        $(ExtColumnSelectClass).addClass("disabled");
+    }
 }
 
 function updateFormForSelectedType() {
@@ -360,13 +370,4 @@ function updateFormForSelectedType() {
 
 //---------------------------------------Helper Methods--------------------------------------//
 
-//switchMainViewForExtendedHelper
-function switchMainViewForExtendedHelper(switchOn) {
-    if (switchOn) {
-        $(ExtColumnSelectClass).removeClass("disabled");
-        return;
-    }
-    if ($.inArray(SelectedColumnSet, ExtColumnSetNos) != -1) { showColumnSet(TableMainColumnSets, 1); }
-    $(ExtColumnSelectClass).addClass("disabled");
-}
 
