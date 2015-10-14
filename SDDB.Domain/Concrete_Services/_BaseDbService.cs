@@ -83,8 +83,8 @@ namespace SDDB.Domain.Services
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
-                
-        //Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T 
+
+        //Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedCollectionName' of entity T 
         public virtual async Task AddRemoveRelated<TAddRem> (string[] ids, string[] idsAddRem, 
             string relatedCollectionName, bool isAdd = true) where TAddRem: class, IDbEntity
         {
@@ -98,19 +98,9 @@ namespace SDDB.Domain.Services
 
                 var dbEntries = await getEntriesFromContextHelperAsync<T>(dbContext, ids, relatedCollectionName)
                     .ConfigureAwait(false);
-                if (dbEntries.Count != ids.Length)
-                { 
-                    throw new DbBadRequestException(
-                        String.Format("Add/Remove to {0} failed, entry(ies) not found",relatedCollectionName));
-                }
 
                 var dbEntriesAddRem = await getEntriesFromContextHelperAsync<TAddRem>(dbContext, idsAddRem)
                     .ConfigureAwait(false);
-                if (dbEntriesAddRem.Count != idsAddRem.Length)
-                {
-                    throw new DbBadRequestException(
-                        String.Format("Add/Remove to {0} failed, related entry(ies) not found", relatedCollectionName)); 
-                }
                 
                 await addRemoveRelatedHelper(dbEntries, dbEntriesAddRem, relatedCollectionName, isAdd).ConfigureAwait(false);
 
@@ -119,21 +109,55 @@ namespace SDDB.Domain.Services
             .ConfigureAwait(false);
         }
 
-        //Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T
+        //Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedCollectionName' of entity T
         //overload taking lamdba expression
         public virtual async Task AddRemoveRelated<TAddRem>(string[] ids, string[] idsAddRem,
             Expression<Func<T, ICollection<TAddRem>>> lambda, bool isAdd = true) where TAddRem : class, IDbEntity
         {
-            var body = (MemberExpression)lambda.Body;
-            if (body == null)
-            {
-                throw new ArgumentException(
-                    string.Format("Expression '{0}' refers to a method, not a property.", lambda.ToString()));
-            }
-            await AddRemoveRelated<TAddRem>(ids, idsAddRem, body.Member.Name, isAdd).ConfigureAwait(false);
+            string relatedCollectionName = getRelatedCollectionNameFromLambdaHelper<TAddRem>(lambda);
+            await AddRemoveRelated<TAddRem>(ids, idsAddRem, relatedCollectionName, isAdd).ConfigureAwait(false);
         }
 
-        
+
+        //UpdateRelated - removes all existing entities from collection 'relatedCollectionName'  and adds idsUpdate
+        public virtual async Task UpdateRelated<TAddRem>(string[] ids, string[] idsUpdate,
+            string relatedCollectionName) where TAddRem : class, IDbEntity
+        {
+            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
+            if (idsUpdate == null || idsUpdate.Length == 0) { throw new ArgumentNullException("idsUpdate"); }
+            if (String.IsNullOrEmpty(relatedCollectionName)) { throw new ArgumentNullException("relatedCollectionName"); }
+
+            await dbScopeHelperAsync(async dbContext =>
+            {
+                await checkBeforeAddRemoveHelperAsync<TAddRem>(dbContext, ids, idsUpdate, true);
+                
+                var dbEntries = await getEntriesFromContextHelperAsync<T>(dbContext, ids, relatedCollectionName)
+                    .ConfigureAwait(false);
+
+                var dbEntriesAdd = await getEntriesFromContextHelperAsync<TAddRem>(dbContext, idsUpdate)
+                    .ConfigureAwait(false);
+
+                foreach (var dbEntry in dbEntries)
+                {
+                    var relatedCollection = (ICollection<TAddRem>)typeof(T).GetProperty(relatedCollectionName).GetValue(dbEntry);
+                    relatedCollection.Clear();
+                }
+
+                await addRemoveRelatedHelper(dbEntries, dbEntriesAdd, relatedCollectionName, true).ConfigureAwait(false);
+
+                return default(int);
+            })
+            .ConfigureAwait(false);
+        }
+
+        //UpdateRelated - removes all existing entities from collection 'relatedCollectionName'  and adds idsUpdate
+        //overload taking lamdba expression
+        public virtual async Task UpdateRelated<TAddRem>(string[] ids, string[] idsUpdate,
+            Expression<Func<T, ICollection<TAddRem>>> lambda) where TAddRem : class, IDbEntity
+        {
+            string relatedCollectionName = getRelatedCollectionNameFromLambdaHelper<TAddRem>(lambda);
+            await UpdateRelated<TAddRem>(ids, idsUpdate, relatedCollectionName).ConfigureAwait(false);
+        }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
@@ -218,8 +242,6 @@ namespace SDDB.Domain.Services
         protected virtual async Task deleteHelperAsync(EFDbContext dbContext, string[] ids)
         {
             var dbEntries = await getEntriesFromContextHelperAsync<T>(dbContext, ids).ConfigureAwait(false);
-            if (dbEntries.Count != ids.Length) { throw new DbBadRequestException("Delete failed, entry(ies) not found"); }
-
             dbEntries.ForEach(x => x.IsActive_bl = false);
         }
 
@@ -304,18 +326,30 @@ namespace SDDB.Domain.Services
         protected virtual async Task<List<TOut>> getEntriesFromContextHelperAsync<TOut>(EFDbContext dbContext, string[] ids) 
             where TOut: class, IDbEntity
         {
-            return await dbContext.Set<TOut>()
+            var dbEntries = await dbContext.Set<TOut>()
                 .Where(x => ids.Contains(x.Id))
                 .ToListAsync<TOut>().ConfigureAwait(false);
+            
+            if (dbEntries.Count != ids.Length) { throw new DbBadRequestException("Entry(ies) not found"); }
+
+            return dbEntries;
         }
 
-        //helper -  getEntriesFromContextAsync - overload with relatedCollectionName
+        //helper -  getEntriesFromContextAsync
+        // overload with relatedCollectionName
         protected virtual async Task<List<TOut>> getEntriesFromContextHelperAsync<TOut>(EFDbContext dbContext, string[] ids,
             string relatedCollectionName) where TOut : class, IDbEntity
         {
-            return await dbContext.Set<TOut>().Where(x => ids.Contains(x.Id))
+            var dbEntries = await dbContext.Set<TOut>().Where(x => ids.Contains(x.Id))
                 .Include(relatedCollectionName)
                 .ToListAsync<TOut>().ConfigureAwait(false);
+
+            if (dbEntries.Count != ids.Length)
+            {
+                throw new DbBadRequestException( String.Format("Entry(ies) in collection {0} not found", relatedCollectionName));
+            }
+            return dbEntries;
+
         }
 
         //helper - checks if user is in Role
@@ -334,6 +368,19 @@ namespace SDDB.Domain.Services
                 }
                 return userRoles.Any(x => x.Name == roleName);
             }
+        }
+
+        //helper - gets relatedCollectionName from expression
+        protected string getRelatedCollectionNameFromLambdaHelper<TOut>(Expression<Func<T, ICollection<TOut>>> lambda) 
+            where TOut: class, IDbEntity
+        {
+            var body = (MemberExpression)lambda.Body;
+            if (body == null)
+            {
+                throw new ArgumentException(
+                    string.Format("Expression '{0}' refers to a method, not a property.", lambda.ToString()));
+            }
+            return body.Member.Name;
         }
 
         //-----------------------------------------------------------------------------------------------------------------------

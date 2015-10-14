@@ -61,43 +61,7 @@ CallBackBeforeCreate = function () {
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
-
-    //wire up dropdownId1
-    $("#dropdownId1").click(function (event) {
-        event.preventDefault();
-        showColumnSet(TableMainColumnSets, 1);
-        });
-
-    //wire up dropdownId2
-    $("#dropdownId2").click(function (event) {
-        event.preventDefault();
-        showColumnSet(TableMainColumnSets, 2);
-        });
-
-    //wire up dropdownId3
-    $("#dropdownId3").click(function (event) {
-        event.preventDefault();
-        showColumnSet(TableMainColumnSets, 3);
-    });
-
-    //wire up dropdownId4
-    $("#dropdownId4").click(function (event) {
-        event.preventDefault();
-        showColumnSet(TableMainColumnSets, 4);
-    });
-
-    //wire up dropdownId5
-    $("#dropdownId5").click(function (event) {
-        event.preventDefault();
-        showColumnSet(TableMainColumnSets, 5);
-    });
-
-    //wire up dropdownId6
-    $("#dropdownId6").click(function (event) {
-        event.preventDefault();
-        showColumnSet(TableMainColumnSets, 6);
-    });
-
+        
     //---------------------------------------DataTables------------
     
     //TableMainColumnSets

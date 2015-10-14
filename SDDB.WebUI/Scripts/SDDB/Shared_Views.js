@@ -65,13 +65,13 @@ $(document).ready(function () {
             return;
         }
         fillFormForEditGenericWrp(CurrIds, HttpTypeFillForEdit, UrlFillForEdit, GetActive, EditFormId, LabelTextEdit, MagicSuggests)
-            .done(function (currRecords) {
+            .then(function (currRecords) {
                 CurrRecords = currRecords;
-                CallBackBeforeEdit(currRecords)
-                    .done(function () {
-                        saveViewSettings(TableMain);
-                        switchView(MainViewId, EditFormViewId, EditFormBtnGroupEditClass);
-                    });
+                return CallBackBeforeEdit(currRecords);
+            })
+            .done(function () {
+                saveViewSettings(TableMain);
+                switchView(MainViewId, EditFormViewId, EditFormBtnGroupEditClass);
             });
     });
 
@@ -176,12 +176,12 @@ $("#EditFormBtnOk").click(function () {
     }
     var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
     submitEditsGenericWrp(EditFormId, MagicSuggests, CurrRecords, HttpTypeEdit, UrlEdit, createMultiple)
+        .then(function () {
+            return refreshMainView();
+        })
         .done(function () {
-            refreshMainView()
-                .done(function () {
-                    switchView(EditFormViewId, MainViewId, MainViewBtnGroupClass, true, TableMain);
-                });
-        });
+            switchView(EditFormViewId, MainViewId, MainViewBtnGroupClass, true, TableMain);
+        })
 });
 
 
