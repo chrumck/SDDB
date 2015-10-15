@@ -117,48 +117,7 @@ namespace SDDB.Domain.Services
             string relatedCollectionName = getRelatedCollectionNameFromLambdaHelper<TAddRem>(lambda);
             await AddRemoveRelated<TAddRem>(ids, idsAddRem, relatedCollectionName, isAdd).ConfigureAwait(false);
         }
-
-
-        //UpdateRelated - removes all existing entities from collection 'relatedCollectionName'  and adds idsUpdate
-        public virtual async Task UpdateRelated<TAddRem>(string[] ids, string[] idsUpdate,
-            string relatedCollectionName) where TAddRem : class, IDbEntity
-        {
-            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
-            if (idsUpdate == null || idsUpdate.Length == 0) { throw new ArgumentNullException("idsUpdate"); }
-            if (String.IsNullOrEmpty(relatedCollectionName)) { throw new ArgumentNullException("relatedCollectionName"); }
-
-            await dbScopeHelperAsync(async dbContext =>
-            {
-                await checkBeforeAddRemoveHelperAsync<TAddRem>(dbContext, ids, idsUpdate, true);
-                
-                var dbEntries = await getEntriesFromContextHelperAsync<T>(dbContext, ids, relatedCollectionName)
-                    .ConfigureAwait(false);
-
-                var dbEntriesAdd = await getEntriesFromContextHelperAsync<TAddRem>(dbContext, idsUpdate)
-                    .ConfigureAwait(false);
-
-                foreach (var dbEntry in dbEntries)
-                {
-                    var relatedCollection = (ICollection<TAddRem>)typeof(T).GetProperty(relatedCollectionName).GetValue(dbEntry);
-                    relatedCollection.Clear();
-                }
-
-                await addRemoveRelatedHelper(dbEntries, dbEntriesAdd, relatedCollectionName, true).ConfigureAwait(false);
-
-                return default(int);
-            })
-            .ConfigureAwait(false);
-        }
-
-        //UpdateRelated - removes all existing entities from collection 'relatedCollectionName'  and adds idsUpdate
-        //overload taking lamdba expression
-        public virtual async Task UpdateRelated<TAddRem>(string[] ids, string[] idsUpdate,
-            Expression<Func<T, ICollection<TAddRem>>> lambda) where TAddRem : class, IDbEntity
-        {
-            string relatedCollectionName = getRelatedCollectionNameFromLambdaHelper<TAddRem>(lambda);
-            await UpdateRelated<TAddRem>(ids, idsUpdate, relatedCollectionName).ConfigureAwait(false);
-        }
-
+                        
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
 

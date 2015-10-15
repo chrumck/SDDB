@@ -96,7 +96,6 @@ $(document).ready(function () {
         }
         else { $("#DBRolesViewPanel").text("_MULTIPLE_"); }
 
-        saveViewSettings(TableMain);
         showModalWait();
         fillFormForRelatedGeneric(
                 TableDBRolesAdd, TableDBRolesRemove, CurrIds,
@@ -106,6 +105,7 @@ $(document).ready(function () {
                 null, 0)
             .always(hideModalWait)
             .done(function () {
+                saveViewSettings(TableMain);
                 switchView("MainView", "DBRolesView", "tdo-btngroup-dbroles");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -153,7 +153,7 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel").click(function () {
-        switchView("EditFormView","MainView", "tdo-btngroup-main", true);
+        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
     });
 
     //Wire Up EditFormBtnOk
@@ -179,7 +179,7 @@ $(document).ready(function () {
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
@@ -190,7 +190,7 @@ $(document).ready(function () {
 
     //Wire Up DBRolesViewBtnCancel
     $("#DBRolesViewBtnCancel").click(function () {
-        switchView("DBRolesView", "MainView", "tdo-btngroup-main", true);
+        switchView("DBRolesView", "MainView", "tdo-btngroup-main", TableMain);
     });
 
     //Wire Up DBRolesViewBtnOk
@@ -210,7 +210,7 @@ $(document).ready(function () {
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("DBRolesView", "MainView", "tdo-btngroup-main", true, TableMain);
+                        switchView("DBRolesView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });

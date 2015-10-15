@@ -66,7 +66,7 @@ namespace SDDB.WebUI.ControllersSrv
         }
 
         // GET: /AssemblyDbSrv/LookupByLoc
-        public async Task<ActionResult> LookupByLoc(string locId = null, bool getActive = true)
+        public async Task<ActionResult> LookupByLoc(string locId = "", bool getActive = true)
         {
             ViewBag.ServiceName = "AssemblyDbService.LookupByLocAsync";
             var records = await assemblyDbService.LookupByLocAsync(locId, getActive).ConfigureAwait(false);
@@ -74,7 +74,7 @@ namespace SDDB.WebUI.ControllersSrv
         }
 
         // GET: /AssemblyDbSrv/LookupByLocDTables
-        public async Task<ActionResult> LookupByLocDTables(string locId = null, bool getActive = true)
+        public async Task<ActionResult> LookupByLocDTables(string locId = "", bool getActive = true)
         {
             ViewBag.ServiceName = "AssemblyDbService.LookupByLocAsync";
             var records = await assemblyDbService.LookupByLocAsync(locId, getActive).ConfigureAwait(false);

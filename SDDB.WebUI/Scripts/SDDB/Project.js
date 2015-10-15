@@ -80,7 +80,6 @@ $(document).ready(function () {
         }
         else { $("#ProjectPersonsViewPanel").text("_MULTIPLE_"); }
 
-        saveViewSettings(TableMain);
         showModalWait();
         fillFormForRelatedGeneric(TableProjectPersonsAdd, TableProjectPersonsRemove, CurrIds,
                 "GET", "/ProjectSrv/GetProjectPersons", { id: CurrIds[0] },
@@ -88,6 +87,7 @@ $(document).ready(function () {
                 "GET", "/PersonSrv/GetAll", { getActive: true })
             .always(hideModalWait)
             .done(function () {
+                saveViewSettings(TableMain);
                 switchView("MainView", "ProjectPersonsView", "tdo-btngroup-projectpersons");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -157,7 +157,7 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel").click(function () {
-        switchView("EditFormView","MainView", "tdo-btngroup-main", true);
+        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
     });
 
     //Wire Up EditFormBtnOk
@@ -174,7 +174,7 @@ $(document).ready(function () {
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
@@ -185,7 +185,7 @@ $(document).ready(function () {
 
     //Wire Up ProjectPersonsViewBtnCancel
     $("#ProjectPersonsViewBtnCancel").click(function () {
-        switchView("ProjectPersonsView", "MainView", "tdo-btngroup-main", true);
+        switchView("ProjectPersonsView", "MainView", "tdo-btngroup-main", TableMain);
     });
 
     //Wire Up ProjectPersonsViewBtnOk
@@ -205,7 +205,7 @@ $(document).ready(function () {
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("ProjectPersonsView", "MainView", "tdo-btngroup-main", true, TableMain);
+                        switchView("ProjectPersonsView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });

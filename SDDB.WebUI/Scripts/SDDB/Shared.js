@@ -160,7 +160,7 @@ function showModalAJAXFail(xhr, status, error) {
 //-----------------------------------------------------------------------------
 
 //switchView 
-function switchView(fromViewId, toViewId, toBtnGroupClass, scrollToWindowYpos, dataTable) {
+function switchView(fromViewId, toViewId, toBtnGroupClass, dataTable) {
     if (toBtnGroupClass) {
         $("[class*='tdo-btngroup']").addClass("hidden");
         $("[class~='" + toBtnGroupClass + "']").removeClass("hidden");
@@ -174,7 +174,7 @@ function switchView(fromViewId, toViewId, toBtnGroupClass, scrollToWindowYpos, d
         }).eq(0).toArray();
         dataTable.rows(indexesToSelect).nodes().to$().addClass("ui-selected");
     }
-    if (scrollToWindowYpos) { window.scrollTo(0, windowYpos); } else { window.scrollTo(0, 0); }
+    if (dataTable) { window.scrollTo(0, windowYpos); } else { window.scrollTo(0, 0); }
 }
 
 //saveViewSettings

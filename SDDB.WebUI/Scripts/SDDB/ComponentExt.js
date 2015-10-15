@@ -255,7 +255,7 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel").click(function () {
-        switchView("EditFormView", "MainView", "tdo-btngroup-main", true);
+        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
     });
 
     //Wire Up EditFormBtnOk
@@ -271,7 +271,7 @@ $(document).ready(function () {
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });

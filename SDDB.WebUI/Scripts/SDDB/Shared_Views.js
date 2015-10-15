@@ -164,7 +164,7 @@ $(document).ready(function () {
 
 //Wire Up EditFormBtnCancel
 $("#" + EditFormId + "BtnCancel").click(function () {
-    switchView(EditFormViewId, MainViewId, MainViewBtnGroupClass, true);
+    switchView(EditFormViewId, MainViewId, MainViewBtnGroupClass, TableMain);
 });
 
 //Wire Up EditFormBtnOk
@@ -180,7 +180,7 @@ $("#EditFormBtnOk").click(function () {
             return refreshMainView();
         })
         .done(function () {
-            switchView(EditFormViewId, MainViewId, MainViewBtnGroupClass, true, TableMain);
+            switchView(EditFormViewId, MainViewId, MainViewBtnGroupClass, TableMain);
         })
 });
 

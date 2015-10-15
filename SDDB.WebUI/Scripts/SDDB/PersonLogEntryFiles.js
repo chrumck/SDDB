@@ -27,9 +27,9 @@ $(document).ready(function () {
             showModalSelectOne();
             return;
         }
-        saveViewSettings(TableMain);
         fillLogEntryFilesForm()
             .done(function () {
+                saveViewSettings(TableMain);
                 switchView("MainView", "LogEntryFilesView", "tdo-btngroup-logentryfiles");
             });
     });
@@ -40,7 +40,7 @@ $(document).ready(function () {
     $("#LogEntryFilesViewBtnBack").click(function() {
         refreshMainView()
             .done(function () {
-                switchView("LogEntryFilesView", "MainView", "tdo-btngroup-main", true, TableMain);
+                switchView("LogEntryFilesView", "MainView", "tdo-btngroup-main", TableMain);
             });
     });
 

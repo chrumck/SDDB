@@ -30,7 +30,6 @@ $(document).ready(function () {
         TableLogEntryAssysRemove.clear().search("").draw();
         $("#EditFormBtnOkFiles").removeClass("disabled");
 
-        saveViewSettings(TableMain);
         showModalWait();
         fillFormForRelatedGeneric(
                 TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
@@ -39,6 +38,7 @@ $(document).ready(function () {
                 "GET", "/PersonSrv/Get", { getActive: true })
             .always(hideModalWait)
             .done(function () {
+                saveViewSettings(TableMain);
                 switchView("MainView", "EditFormView", "tdo-btngroup-edit");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -55,7 +55,6 @@ $(document).ready(function () {
         if (CurrIds.length > 1) $("#EditFormBtnOkFiles").addClass("disabled");
         else $("#EditFormBtnOkFiles").removeClass("disabled");
 
-        saveViewSettings(TableMain);
         showModalWait();
         $.when(
             fillFormForEditGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
@@ -75,10 +74,11 @@ $(document).ready(function () {
                     "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
                     { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] },
                     "GET", "AssemblyDbSrv/LookupByLocDTables",
-                    { getActive: true });
+                    { locId: MagicSuggests[3].getValue()[0], getActive: true });
             })
             .always(hideModalWait)
             .done(function () {
+                saveViewSettings(TableMain);
                 switchView("MainView", "EditFormView", "tdo-btngroup-edit");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });

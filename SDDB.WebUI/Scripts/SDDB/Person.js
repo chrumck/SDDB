@@ -89,7 +89,6 @@ $(document).ready(function () {
         }
         else $("#PrsProjViewPanel").text("_MULTIPLE_");
 
-        saveViewSettings(TableMain);
         showModalWait();
         fillFormForRelatedGeneric(
                 TableProjectsAdd, TableProjectsRemove, CurrIds,
@@ -98,6 +97,7 @@ $(document).ready(function () {
                 "GET", "/ProjectSrv/Get", { getActive: true })
             .always(hideModalWait)
             .done(function () {
+                saveViewSettings(TableMain);
                 switchView("MainView", "PrsProjView", "tdo-btngroup-prsproj");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -116,7 +116,6 @@ $(document).ready(function () {
         }
         else $("#PersonGroupsViewPanel").text("_MULTIPLE_");
 
-        saveViewSettings(TableMain);
         showModalWait();
         fillFormForRelatedGeneric(
                 TablePersonGroupsAdd, TablePersonGroupsRemove, CurrIds,
@@ -125,6 +124,7 @@ $(document).ready(function () {
                 "GET", "/PersonGroupSrv/Get", { getActive: true })
             .always(hideModalWait)
             .done(function () {
+                saveViewSettings(TableMain);
                 switchView("MainView", "PersonGroupsView", "tdo-btngroup-prsgroups");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -143,7 +143,6 @@ $(document).ready(function () {
         }
         else $("#ManagedGroupsViewPanel").text("_MULTIPLE_");
 
-        saveViewSettings(TableMain);
         showModalWait();
         fillFormForRelatedGeneric(
                 TableManagedGroupsAdd, TableManagedGroupsRemove, CurrIds,
@@ -152,6 +151,7 @@ $(document).ready(function () {
                 "GET", "/PersonGroupSrv/Get", { getActive: true })
             .always(hideModalWait)
             .done(function () {
+                saveViewSettings(TableMain);
                 switchView("MainView", "ManagedGroupsView", "tdo-btngroup-managedgroups");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -250,7 +250,7 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel").click(function () {
-        switchView("EditFormView","MainView", "tdo-btngroup-main", true);
+        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
     });
 
     //Wire Up EditFormBtnOk
@@ -267,7 +267,7 @@ $(document).ready(function () {
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
@@ -277,7 +277,7 @@ $(document).ready(function () {
 
     //Wire Up PrsProjViewBtnCancel
     $("#PrsProjViewBtnCancel").click(function () {
-        switchView("PrsProjView", "MainView", "tdo-btngroup-main", true);
+        switchView("PrsProjView", "MainView", "tdo-btngroup-main", TableMain);
     });
 
     //Wire Up PrsProjViewBtnOk
@@ -297,7 +297,7 @@ $(document).ready(function () {
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("PrsProjView", "MainView", "tdo-btngroup-main", true, TableMain);
+                        switchView("PrsProjView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -358,7 +358,7 @@ $(document).ready(function () {
 
     //Wire Up PersonGroupsViewBtnCancel
     $("#PersonGroupsViewBtnCancel").click(function () {
-        switchView("PersonGroupsView", "MainView", "tdo-btngroup-main", true);
+        switchView("PersonGroupsView", "MainView", "tdo-btngroup-main", TableMain);
     });
 
     //Wire Up PersonGroupsViewBtnOk
@@ -378,7 +378,7 @@ $(document).ready(function () {
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("PersonGroupsView", "MainView", "tdo-btngroup-main", true, TableMain);
+                        switchView("PersonGroupsView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -438,7 +438,7 @@ $(document).ready(function () {
 
     //Wire Up ManagedGroupsViewBtnCancel
     $("#ManagedGroupsViewBtnCancel").click(function () {
-        switchView("ManagedGroupsView", "MainView", "tdo-btngroup-main", true);
+        switchView("ManagedGroupsView", "MainView", "tdo-btngroup-main", TableMain);
     });
 
     //Wire Up ManagedGroupsViewBtnOk
@@ -458,7 +458,7 @@ $(document).ready(function () {
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("ManagedGroupsView", "MainView", "tdo-btngroup-main", true, TableMain);
+                        switchView("ManagedGroupsView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
