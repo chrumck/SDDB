@@ -150,7 +150,7 @@ $(document).ready(function () {
 //Delete Records from DB
 function deleteRecords() {
     CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-    deleteRecordsGeneric(CurrIds, "/LocationTypeSrv/Delete", refreshMainView);
+    deleteRecordsGenericWrp(CurrIds, "/LocationTypeSrv/Delete", refreshMainView);
 }
 
 //refresh Main view 

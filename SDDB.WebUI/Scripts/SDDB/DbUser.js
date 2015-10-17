@@ -268,7 +268,7 @@ $(document).ready(function () {
 //Delete Records from DB
 function deleteRecords() {
     CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-    deleteRecordsGeneric(CurrIds, "/DbUserSrv/Delete", refreshMainView);
+    deleteRecordsGenericWrp(CurrIds, "/DbUserSrv/Delete", refreshMainView);
 }
 
 //refresh Main view 

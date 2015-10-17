@@ -37,6 +37,7 @@ var UrlDelete = "";
 
 var CallBackBeforeCreate = function () { return $.Deferred().resolve(); }
 var CallBackBeforeEdit = function (currRecords) { return $.Deferred().resolve(); }
+var CallBackAfterEdit = function (data) { return $.Deferred().resolve(); }
 
 //-------------------------------------------------------------------------------------------//
 
@@ -78,8 +79,11 @@ $(document).ready(function () {
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) { showModalNothingSelected(); }
-        else { showModalDelete(CurrIds.length); }
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
+        }
+        showModalDelete(CurrIds.length);
     });
 
     //wire up columnsSelectId1
@@ -176,12 +180,12 @@ $("#EditFormBtnOk").click(function () {
     }
     var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
     submitEditsGenericWrp(EditFormId, MagicSuggests, CurrRecords, HttpTypeEdit, UrlEdit, createMultiple)
-        .then(function () {
-            return refreshMainView();
+        .then(function (data, currRecords) {
+            CurrRecords = currRecords;
+            return CallBackAfterEdit(data);
         })
-        .done(function () {
-            switchView(EditFormViewId, MainViewId, MainViewBtnGroupClass, TableMain);
-        })
+        .then(function () { return refreshMainView(); })
+        .done(function () { switchView(EditFormViewId, MainViewId, MainViewBtnGroupClass, TableMain); });
 });
 
 
@@ -189,8 +193,11 @@ $("#EditFormBtnOk").click(function () {
 
 //Delete Records from DB
 function deleteRecords() {
-    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-    deleteRecordsGeneric(CurrIds, UrlDelete, refreshMainView);
+    deleteRecordsGenericWrp(CurrIds, UrlDelete, refreshMainView)
+        .done(function () {
+            CurrIds = [];
+            CurrRecords = [];
+        });
 }
 
 //---------------------------------------Helper Methods--------------------------------------//

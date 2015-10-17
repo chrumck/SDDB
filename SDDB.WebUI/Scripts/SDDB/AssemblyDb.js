@@ -54,15 +54,25 @@ var ExtColumnSetNos = [5, 6, 7];
 var ExtUrl = "/AssemblyTypeSrv/GetByIds";
 var ExtHttpType = "POST";
 
-var CallBackBeforeCreate = function () {
+CallBackBeforeCreate = function () {
     updateFormForSelectedType();
     clearFormInputs(ExtFormId);
     return $.Deferred().resolve();
 }
 
-var CallBackBeforeEdit = function (currRecords) {
+CallBackBeforeEdit = function (currRecords) {
     fillFormForEditFromDbEntries(GetActive, currRecords, ExtFormId);
     updateFormForSelectedType();
+    return $.Deferred().resolve();
+}
+
+CallBackAfterEdit = function (data) {
+    if (CurrIds.length = 0) {
+        CurrIds = data.newEntryIds;
+        for (var i = 0; i < CurrIds.length; i++) {
+            CurrRecords[i] = data.newEntryIds[i];
+        }
+    }
     return $.Deferred().resolve();
 }
 
@@ -283,17 +293,14 @@ function refreshMainView() {
 
     updateMainViewForSelectedType()
         .done(function () {
-            if (MsFilterByType.getValue().length == 0 &&
-                MsFilterByProject.getValue().length == 0 &&
-                MsFilterByLoc.getValue().length == 0)
-            {
+            if (MsFilterByType.getValue().length == 0 && MsFilterByProject.getValue().length == 0 &&
+                    MsFilterByLoc.getValue().length == 0) {
                 if (typeof AssemblyIds !== "undefined" && AssemblyIds != null && AssemblyIds.length > 0) {
                     refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByIds", { ids: AssemblyIds, getActive: GetActive }, "POST")
                         .done(deferred0.resolve);
                 }
-                return deferred0.promise();
+                return deferred0.resolve();
             }
-
             refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByAltIds2",
                 {
                     projectIds: MsFilterByProject.getValue(),
@@ -304,7 +311,6 @@ function refreshMainView() {
                 "POST")
                 .done(deferred0.resolve);
         });
-
     return deferred0.promise();
 }
 
@@ -360,6 +366,7 @@ function updateMainViewForSelectedType() {
     }
 }
 
+//updateFormForSelectedType
 function updateFormForSelectedType() {
     if (MagicSuggests[0].getValue().length == 1 && MagicSuggests[0].getValue()[0] != "_VARIES_") {
         updateFormForExtendedWrp(ExtHttpType, ExtUrl, { ids: MagicSuggests[0].getValue()[0] }, ExtFormId);

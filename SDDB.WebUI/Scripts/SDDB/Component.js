@@ -283,7 +283,7 @@ $(document).ready(function () {
 //Delete Records from DB
 function deleteRecords() {
     CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-    deleteRecordsGeneric(CurrIds, "/ComponentSrv/Delete", refreshMainView);
+    deleteRecordsGenericWrp(CurrIds, "/ComponentSrv/Delete", refreshMainView);
 }
 
 //refresh view after magicsuggest update

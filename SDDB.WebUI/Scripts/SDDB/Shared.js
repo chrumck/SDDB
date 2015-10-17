@@ -268,12 +268,20 @@ function exportTableToTxt(table) {
 //-----------------------------------------------------------------------------
 
 //Delete Records from DB - generic version
-function deleteRecordsGeneric(ids, url, callback) {
+function deleteRecordsGenericWrp(ids, url, callback) {
+    var deferred0 = $.Deferred();
     showModalWait();
     $.ajax({ type: "POST", url: url, timeout: 120000, data: { ids: ids }, dataType: "json" })
         .always(hideModalWait)
-        .done(callback)
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        .done(function () {
+            callback();
+            deferred0.resolve();
+        } )
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject(xhr, status, error);
+        });
+    return deferred0.promise();
 }
 
 //-----------------------------------------------------------------------------
@@ -452,44 +460,37 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
     $.each(msArray, function (i, ms) {
         if (ms.isModified == true) modifiedProperties.push(ms.id);
     });
-    if (modifiedProperties.length == 0) { deferred0.resolve([]); }
 
     $.each(currRecordsClone, function (i, currRecord) {
         for (var property in currRecord) {
-            if (!currRecord.hasOwnProperty(property) || property == "Id") {
-                continue;
-            }
-            if (property.slice(-1) == "_") {
-                currRecord[property] = (function () { return; })();
+            if (!currRecord.hasOwnProperty(property) || property == "Id" || $.inArray(property, modifiedProperties) == -1) {
                 continue;
             }
             if (property.slice(-3) == "_Id") {
                 $.each(msArray, function (i, ms) {
-                    if (ms.id == property && ms.isModified) {
-                        currRecord[property] = ms.getSelection().length != 0 ? (ms.getSelection())[0].id : "";
+                    if (ms.id == property) {
+                        currRecord[property]= ms.getSelection().length != 0 ? (ms.getSelection())[0].id : "";
+                        currRecord[property.slice(-2)] = (function () { return; })();
                         return false;
                     }
                 });
                 continue;
             }
-            if (property.slice(-3) == "_bl" && $.inArray(property, modifiedProperties) != -1) {
+            if (property.slice(-3) == "_bl") {
                 currRecord[property] = $("#" + formId + " #" + property).prop("checked");
                 continue;
             }
-            if ($.inArray(property, modifiedProperties) != -1) {
-                currRecord[property] = $("#" + formId +" #" + property).val();
-                continue;
-            }
+            currRecord[property] = $("#" + formId +" #" + property).val();
         }
         currRecord.ModifiedProperties = modifiedProperties;
     });
 
-    if (currRecordsClone.length == 1 && noOfNewRecords > 1) {
-        multiplyRecordsAndModifyUniquePropsHelper();
-    }
+    if (currRecordsClone.length == 1 && noOfNewRecords > 1) { multiplyRecordsAndModifyUniquePropsHelper(); }
+
+    if (modifiedProperties.length == 0) { deferred0.resolve({ "Success": "True", "newEntryIds": []}, currRecordsClone); }
 
     $.ajax({ type: httpType, url: url, timeout: 120000, data: { records: currRecordsClone }, dataType: "json" })
-        .done(function (data) { deferred0.resolve(data); })
+        .done(function (data) { deferred0.resolve(data, currRecordsClone); })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 
     return deferred0.promise();

@@ -279,7 +279,7 @@ $(document).ready(function () {
 //Delete Records from DB
 function deleteRecords() {
     CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-    deleteRecordsGeneric(CurrIds, "/AssemblyModelSrv/Delete", refreshMainView);
+    deleteRecordsGenericWrp(CurrIds, "/AssemblyModelSrv/Delete", refreshMainView);
 }
 
 //refresh Main view 
