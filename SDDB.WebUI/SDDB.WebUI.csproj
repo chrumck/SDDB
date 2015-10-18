@@ -163,6 +163,8 @@
     <Content Include="Scripts\FileSaver.js" />
     <Content Include="Scripts\FileSaver.min.js" />
     <Content Include="Scripts\SDDB\ActivitySummary.js" />
+    <Content Include="Scripts\SDDB\ComponentType.js" />
+    <Content Include="Scripts\SDDB\Component_new.js" />
     <Content Include="Scripts\SDDB\Shared_Views.js" />
     <Content Include="Scripts\SDDB\_temp.js" />
     <Content Include="_app_offline.htm" />
@@ -429,7 +431,6 @@
     <Content Include="Scripts\SDDB\LocationType.js" />
     <Content Include="Scripts\SDDB\ComponentStatus.js" />
     <Content Include="Scripts\SDDB\AssemblyStatus.js" />
-    <Content Include="Scripts\SDDB\ComponentType.js" />
     <Content Include="Scripts\SDDB\AssemblyType.js" />
     <Content Include="Scripts\SDDB\DocumentType.js" />
     <Content Include="Scripts\SDDB\Document.js" />
