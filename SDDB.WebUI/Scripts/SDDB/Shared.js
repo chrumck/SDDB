@@ -450,7 +450,7 @@ function fillFormForEditFromDbEntries(getActive, dbEntries, formId, labelText, m
 //SubmitEdits to DB - generic version
 function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNewRecords) {
     noOfNewRecords = (noOfNewRecords && noOfNewRecords >= 1 && noOfNewRecords <= 100) ? noOfNewRecords : 1;
-    currRecordsClone = $.extend(true, [], currRecords);
+    var currRecordsClone = $.extend(true, [], currRecords);
     var deferred0 = $.Deferred();
     var modifiedProperties = [];
 
@@ -470,7 +470,7 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
                 $.each(msArray, function (i, ms) {
                     if (ms.id == property) {
                         currRecord[property]= ms.getSelection().length != 0 ? (ms.getSelection())[0].id : "";
-                        currRecord[property.slice(-2)] = (function () { return; })();
+                        currRecord[property.slice(0, -2)] = (function () { return; })();
                         return false;
                     }
                 });
@@ -487,7 +487,7 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
 
     if (currRecordsClone.length == 1 && noOfNewRecords > 1) { multiplyRecordsAndModifyUniquePropsHelper(); }
 
-    if (modifiedProperties.length == 0) { deferred0.resolve({ "Success": "True", "newEntryIds": []}, currRecordsClone); }
+    if (modifiedProperties.length == 0) { return deferred0.resolve({ "Success": "True", "newEntryIds": []}, currRecordsClone); }
 
     $.ajax({ type: httpType, url: url, timeout: 120000, data: { records: currRecordsClone }, dataType: "json" })
         .done(function (data) { deferred0.resolve(data, currRecordsClone); })
@@ -525,7 +525,7 @@ function submitEditsGenericWrp(formId, msArray, currRecords, httpType, url, noOf
     showModalWait();
     submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNewRecords)
         .always(hideModalWait)
-        .done(function (data) { deferred0.resolve(data); })
+        .done(function (data, currRecordsClone) { deferred0.resolve(data, currRecordsClone); })
         .fail(function (xhr, status, error) {
             showModalAJAXFail(xhr, status, error);
             deferred0.reject(xhr, status, error);
@@ -781,10 +781,8 @@ function updateFormForExtended(httpType, url, data, formId) {
     var deferred0 = $.Deferred();
     $.ajax({ type: httpType, url: url, data: data, timeout: 120000, dataType: "json" })
         .done(function (data) {
-            $("#" + formId).removeClass("hidden");
             var typeHasAttrs = false;
             var entityType = data[0];
-
             for (var prop in entityType) {
                 if (prop.indexOf("Attr") == -1) { continue; }
                 if (prop.indexOf("Type") != -1 && entityType[prop] != "NotUsed") { typeHasAttrs = true; }
@@ -794,11 +792,82 @@ function updateFormForExtended(httpType, url, data, formId) {
             $("#" + formId).removeData("validator");
             $("#" + formId).removeData('unobtrusiveValidation');
             $.validator.unobtrusive.parse("#" + formId)
-            if (!typeHasAttrs) { $("#" + formId).addClass("hidden"); }
             deferred0.resolve(typeHasAttrs);
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
     return deferred0.promise();
+
+    //changeFormFieldDescriptionHelper
+    function changeFormFieldDescriptionHelper(formId, entityType, prop) {
+        if (prop.indexOf("Desc") != -1) {
+            var attrName = prop.slice(prop.indexOf("Attr"), 6);
+            $("#" + formId + " label[for=" + attrName + "]").text(entityType[prop]);
+            $("#" + formId + " #" + attrName).prop("placeholder", entityType[prop]);
+        }
+    }
+
+    //changeFormFieldValidationHelper
+    function changeFormFieldValidationHelper(formId, entityType, prop) {
+        if (prop.indexOf("Type") != -1) {
+            var attrName = prop.slice(prop.indexOf("Attr"), 6);
+            var $targetEl = $("#" + formId + " #" + attrName);
+
+            removeValidationAttributesHelper($targetEl);
+            if ($targetEl.data("DateTimePicker")) {
+                $targetEl.off("dp.change");
+                $targetEl.data("DateTimePicker").destroy();
+            }
+            $("#" + formId + " #FrmGrp" + attrName).removeClass("hidden");
+
+            if (entityType[prop] == "NotUsed") {
+                $("#" + formId + " #FrmGrp" + attrName).addClass("hidden");
+            }
+            if (entityType[prop] == "String") {
+                $targetEl.attr({
+                    "data-val": "true",
+                    "data-val-length": "The field must be a string with a maximum length of 255.",
+                    "data-val-length-max": "255"
+                });
+            }
+            if (entityType[prop] == "Int") {
+                $targetEl.attr({
+                    "data-val": "true",
+                    "data-val-dbisinteger": "The field must be an integer."
+                });
+            }
+            if (entityType[prop] == "Decimal") {
+                $targetEl.attr({
+                    "data-val": "true",
+                    "data-val-number": "The field must be a number."
+                });
+            }
+            if (entityType[prop] == "DateTime") {
+                $targetEl.attr({
+                    "data-val": "true",
+                    "data-val-dbisdatetimeiso": "The field must have YYYY-MM-DD HH:mm format."
+                });
+                $targetEl.datetimepicker({ format: "YYYY-MM-DD HH:mm" })
+                    .on("dp.change", function (e) { $(this).data("ismodified", true); });
+            }
+            if (entityType[prop] == "Bool") {
+                $targetEl.attr({
+                    "data-val": "true",
+                    "data-val-dbisbool": "The field must be 'true' or 'false'."
+                });
+            }
+        }
+    }
+
+    //removeValidationAttributesHelper
+    function removeValidationAttributesHelper($element) {
+        var attrsToRemove = "";
+        $.each($element[0].attributes, function (i, attrib) {
+            if (typeof attrib !== "undefined" && attrib.name.indexOf("data-val") == 0) {
+                attrsToRemove += (attrsToRemove == "") ? attrib.name : " " + attrib.name;
+            }
+        });
+        $element.removeAttr(attrsToRemove);
+    }
 }
 
 //updateFormForExtendedWrp
@@ -807,83 +876,13 @@ function updateFormForExtendedWrp(httpType, url, data, formId) {
     showModalWait();
     updateFormForExtended(httpType, url, data, formId)
         .always(hideModalWait)
-        .done(deferred0.resolve)
+        .done(function (typeHasAttrs) { deferred0.resolve(typeHasAttrs); })
         .fail(function (xhr, status, error) {
             showModalAJAXFail(xhr, status, error);
             deferred0.reject(xhr, status, error);
         });
     return deferred0.promise();
 }
-
-//changeFormFieldDescriptionHelper
-function changeFormFieldDescriptionHelper(formId, entityType, prop) {
-    if (prop.indexOf("Desc") != -1) {
-        var attrName = prop.slice(prop.indexOf("Attr"), 6);
-        $("#" + formId + " label[for=" + attrName + "]").text(entityType[prop]);
-        $("#" + formId + " #" + attrName).prop("placeholder", entityType[prop]);
-    }
-}
-
-//changeFormFieldValidationHelper
-function changeFormFieldValidationHelper(formId, entityType, prop) {
-    if (prop.indexOf("Type") != -1) {
-        var attrName = prop.slice(prop.indexOf("Attr"), 6);
-        var $targetEl = $("#" + formId + " #" + attrName);
-
-        removeValidationAttributesHelper($targetEl);
-        if ($targetEl.data("DateTimePicker")) { $targetEl.data("DateTimePicker").destroy(); }
-        $("#" + formId + " #FrmGrp" + attrName).removeClass("hidden");
-
-        if (entityType[prop] == "NotUsed") {
-            $("#" + formId + " #FrmGrp" + attrName).addClass("hidden");
-        }
-        if (entityType[prop] == "String") {
-            $targetEl.attr({
-                "data-val": "true",
-                "data-val-length": "The field must be a string with a maximum length of 255.",
-                "data-val-length-max": "255"
-            });
-        }
-        if (entityType[prop] == "Int") {
-            $targetEl.attr({
-                "data-val": "true",
-                "data-val-dbisinteger": "The field must be an integer."
-            });
-        }
-        if (entityType[prop] == "Decimal") {
-            $targetEl.attr({
-                "data-val": "true",
-                "data-val-number": "The field must be a number."
-            });
-        }
-        if (entityType[prop] == "DateTime") {
-            $targetEl.attr({
-                "data-val": "true",
-                "data-val-dbisdatetimeiso": "The field must have YYYY-MM-DD HH:mm format."
-            });
-            $targetEl.datetimepicker({ format: "YYYY-MM-DD HH:mm" })
-                .on("dp.change", function (e) { $(this).data("ismodified", true); });
-        }
-        if (entityType[prop] == "Bool") {
-            $targetEl.attr({
-                "data-val": "true",
-                "data-val-dbisbool": "The field must be 'true' or 'false'."
-            });
-        }
-    }
-}
-
-//removeValidationAttributesHelper
-function removeValidationAttributesHelper($element) {
-    var attrsToRemove = "";
-    $.each($element[0].attributes, function (i, attrib) {
-        if (typeof attrib !== "undefined" && attrib.name.indexOf("data-val") == 0) {
-            attrsToRemove += (attrsToRemove == "") ? attrib.name : " " + attrib.name;
-        }
-    });
-    $element.removeAttr(attrsToRemove);
-}
-
 
 //-----------------------------------------------------------------------------
 

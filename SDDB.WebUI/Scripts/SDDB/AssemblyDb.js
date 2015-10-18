@@ -36,6 +36,27 @@ var RecordTemplate = {
     AssemblyStatus_Id: null,
     AssignedToLocation_Id: null
 };
+
+var ExtCurrRecords = [];
+var ExtRecordTemplate = {
+    Id: "RecordTemplateId",
+    Attr01: null,
+    Attr02: null,
+    Attr03: null,
+    Attr04: null,
+    Attr05: null,
+    Attr06: null,
+    Attr07: null,
+    Attr08: null,
+    Attr09: null,
+    Attr10: null,
+    Attr11: null,
+    Attr12: null,
+    Attr13: null,
+    Attr14: null,
+    Attr15: null,
+};
+
 var MsFilterByProject = {};
 var MsFilterByType = {};
 var MsFilterByLoc = {};
@@ -48,32 +69,48 @@ UrlFillForEdit = "/AssemblyDbSrv/GetByIds";
 UrlEdit = "/AssemblyDbSrv/Edit";
 UrlDelete = "/AssemblyDbSrv/Delete";
 
-var ExtFormId = "EditFormExtended";
+var ExtEditFormId = "EditFormExtended";
 var ExtColumnSelectClass = ".extColumnSelect";
 var ExtColumnSetNos = [5, 6, 7];
-var ExtUrl = "/AssemblyTypeSrv/GetByIds";
-var ExtHttpType = "POST";
+var ExtTypeUrl = "/AssemblyTypeSrv/GetByIds";
+var ExtTypeHttpType = "POST";
+var ExtHttpTypeEdit = "POST";
+var ExtUrlEdit = "/AssemblyDbSrv/EditExt";
 
 CallBackBeforeCreate = function () {
-    updateFormForSelectedType();
-    clearFormInputs(ExtFormId);
-    return $.Deferred().resolve();
+    var deferred0 = $.Deferred();
+    updateFormForSelectedType().done(function () {
+        return deferred0.resolve();
+    });
+    return deferred0.promise();
 }
 
 CallBackBeforeEdit = function (currRecords) {
-    fillFormForEditFromDbEntries(GetActive, currRecords, ExtFormId);
-    updateFormForSelectedType();
+    var deferred0 = $.Deferred();
+    updateFormForSelectedType()
+        .then(function () { return fillFormForEditFromDbEntries(GetActive, currRecords, ExtEditFormId); })
+        .done(function () { return deferred0.resolve(); });
+    return deferred0.promise();
+}
+
+CallBackBeforeSubmitEdit = function (data) {
+    if (!formIsValid(ExtEditFormId, CurrIds.length == 0)) {
+        showModalFail("Errors in Form", "Extended attributes have invalid inputs. Please correct.");
+        return $.Deferred().reject();
+    }
     return $.Deferred().resolve();
 }
 
 CallBackAfterEdit = function (data) {
-    if (CurrIds.length = 0) {
-        CurrIds = data.newEntryIds;
-        for (var i = 0; i < CurrIds.length; i++) {
-            CurrRecords[i] = data.newEntryIds[i];
-        }
+    var deferred0 = $.Deferred();
+    ExtCurrRecords = [];
+    for (var i = 0; i < CurrIds.length; i++) {
+        ExtCurrRecords[i] = $.extend(true, {}, ExtRecordTemplate);
+        ExtCurrRecords[i].Id = CurrIds[i];
     }
-    return $.Deferred().resolve();
+    submitEditsGenericWrp(ExtEditFormId, [], ExtCurrRecords, ExtHttpTypeEdit, ExtUrlEdit)
+        .done(deferred0.resolve);
+    return deferred0.promise();
 }
 
 //-------------------------------------------------------------------------------------------//
@@ -348,7 +385,7 @@ function updateMainViewForSelectedType() {
         switchMainViewForExtendedHelper(false);
         return deferred0.resolve();
     }
-    updateTableForExtended(ExtHttpType, ExtUrl, { ids: MsFilterByType.getValue()[0] }, TableMain)
+    updateTableForExtended(ExtTypeHttpType, ExtTypeUrl, { ids: MsFilterByType.getValue()[0] }, TableMain)
         .done(function (typeHasAttrs) {
             switchMainViewForExtendedHelper(typeHasAttrs);
             return deferred0.resolve();
@@ -368,11 +405,20 @@ function updateMainViewForSelectedType() {
 
 //updateFormForSelectedType
 function updateFormForSelectedType() {
+    clearFormInputs(ExtEditFormId);
+    $("#" + ExtEditFormId + " .modifiable").data("ismodified", true);
     if (MagicSuggests[0].getValue().length == 1 && MagicSuggests[0].getValue()[0] != "_VARIES_") {
-        updateFormForExtendedWrp(ExtHttpType, ExtUrl, { ids: MagicSuggests[0].getValue()[0] }, ExtFormId);
-        return;
+        var deferred0 = $.Deferred();
+        updateFormForExtendedWrp(ExtTypeHttpType, ExtTypeUrl, { ids: MagicSuggests[0].getValue()[0] }, ExtEditFormId)
+            .done(function (typeHasAttrs) {
+                if (typeHasAttrs) { $("#" + ExtEditFormId).removeClass("hidden"); } 
+                return deferred0.resolve();
+            })
+            .fail(function () { return deferred0.reject(); })
+        return deferred0.promise();
     }
-    $("#" + ExtFormId).addClass("hidden");
+    $("#" + ExtEditFormId).addClass("hidden");
+    return $.Deferred().resolve();
 }
 
 //---------------------------------------Helper Methods--------------------------------------//

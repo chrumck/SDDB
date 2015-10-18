@@ -37,6 +37,7 @@ var UrlDelete = "";
 
 var CallBackBeforeCreate = function () { return $.Deferred().resolve(); }
 var CallBackBeforeEdit = function (currRecords) { return $.Deferred().resolve(); }
+var CallBackBeforeSubmitEdit = function (data) { return $.Deferred().resolve(); }
 var CallBackAfterEdit = function (data) { return $.Deferred().resolve(); }
 
 //-------------------------------------------------------------------------------------------//
@@ -178,14 +179,25 @@ $("#EditFormBtnOk").click(function () {
         showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
         return;
     }
-    var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
-    submitEditsGenericWrp(EditFormId, MagicSuggests, CurrRecords, HttpTypeEdit, UrlEdit, createMultiple)
+    CallBackBeforeSubmitEdit()
+        .then(function () {
+            var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
+            return submitEditsGenericWrp(EditFormId, MagicSuggests, CurrRecords, HttpTypeEdit, UrlEdit, createMultiple);
+        })
         .then(function (data, currRecords) {
             CurrRecords = currRecords;
+            if (CurrIds.length == 0) {
+                CurrIds = data.newEntryIds;
+                for (var i = 0; i < CurrIds.length; i++) { CurrRecords[i] = data.newEntryIds[i]; }
+            }
             return CallBackAfterEdit(data);
         })
-        .then(function () { return refreshMainView(); })
-        .done(function () { switchView(EditFormViewId, MainViewId, MainViewBtnGroupClass, TableMain); });
+        .then(function () {
+            return refreshMainView();
+        })
+        .done(function () {
+            switchView(EditFormViewId, MainViewId, MainViewBtnGroupClass, TableMain);
+        });
 });
 
 
