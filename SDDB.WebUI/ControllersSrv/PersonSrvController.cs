@@ -78,6 +78,14 @@ namespace SDDB.WebUI.ControllersSrv
             return DbJson(filterForJsonLookup(records) );
         }
 
+        // GET: /PersonSrv/LookupFromProject
+        public async Task<ActionResult> LookupFromProject(string query = "", bool getActive = true)
+        {
+            ViewBag.ServiceName = "PersonService.LookupFromProjectAsync";
+            var records = await personService.LookupFromProjectAsync(query, getActive).ConfigureAwait(false);
+            return DbJson(filterForJsonLookup(records));
+        }
+
         //-----------------------------------------------------------------------------------------------------------------------
 
         // POST: /PersonSrv/Edit

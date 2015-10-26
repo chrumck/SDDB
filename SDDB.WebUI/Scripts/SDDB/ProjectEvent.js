@@ -143,8 +143,8 @@ $(document).ready(function () {
 
     //Initialize MagicSuggest Array
     msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "CreatedByPerson_Id", "/PersonSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "ClosedByPerson_Id", "/PersonSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "CreatedByPerson_Id", "/PersonSrv/LookupFromProject", 1);
+    msAddToMsArray(MagicSuggests, "ClosedByPerson_Id", "/PersonSrv/LookupFromProject", 1);
 
     //Enable DateTimePicker
     $("[data-val-dbisdatetimeiso]").datetimepicker({ format: "YYYY-MM-DD HH:mm" })

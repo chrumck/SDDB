@@ -79,7 +79,7 @@ $(document).ready(function () {
 
     //Initialize MagicSuggest MsFilterByPerson
     MsFilterByPerson = $("#MsFilterByPerson").magicSuggest({
-        data: "/PersonSrv/Lookup",
+        data: "/PersonSrv/LookupFromProject",
         allowFreeEntries: false,
         ajaxConfig: {
             error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }

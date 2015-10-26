@@ -213,7 +213,7 @@ $(document).ready(function () {
     //Initialize MagicSuggest Array
     msAddToMsArray(MagicSuggests, "LocationType_Id", "/LocationTypeSrv/Lookup", 1);
     msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "ContactPerson_Id", "/PersonSrv/Lookup", 1);
+    msAddToMsArray(MagicSuggests, "ContactPerson_Id", "/PersonSrv/LookupAll", 1);
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel").click(function () {

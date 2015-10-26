@@ -117,6 +117,23 @@ namespace SDDB.Domain.Services
                 return records;
             }
         }
+
+        //look up project persons by query, WITH BY-PROJECT filtering
+        public async virtual Task<List<Person>> LookupFromProjectAsync(string query = "", bool getActive = true)
+        {
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+                var records = await dbContext.Persons.Where(x =>
+                        x.PersonProjects.Any(y => y.ProjectPersons.Any(z => z.Id == userId)) &&
+                        (x.LastName.Contains(query) || x.FirstName.Contains(query) || x.Initials.Contains(query)) &&
+                        x.IsActive_bl == getActive
+                    )
+                    .Take(maxRecordsFromLookup)
+                    .ToListAsync().ConfigureAwait(false);
+                return records;
+            }
+        }
         
         //-----------------------------------------------------------------------------------------------------------------------
 
