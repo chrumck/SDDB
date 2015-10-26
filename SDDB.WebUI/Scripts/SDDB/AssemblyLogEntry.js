@@ -98,7 +98,7 @@ $(document).ready(function () {
         [1],
         [2, 3, 4, 5],
         [6, 7, 8, 9, 10, 11],
-        [12, 13, 14, 15, 16, 17],
+        [12, 13, 14, 15, 16, 17]
     ];
 
     //TableMain PersonLogEntrys
@@ -155,7 +155,7 @@ $(document).ready(function () {
             { targets: [9, 10, 11], className: "hidden-xs hidden-sm" },
             // - third set of columns
             { targets: [12, 13, 14], className: "hidden-xs" }, 
-            { targets: [16, 17], className: "hidden-xs hidden-sm" },
+            { targets: [16, 17], className: "hidden-xs hidden-sm" }
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
