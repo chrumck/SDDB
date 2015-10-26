@@ -77,7 +77,7 @@ namespace SDDB.WebUI.ControllersSrv
         public async Task<ActionResult> LookupByLocDTables(string locId = "", bool getActive = true)
         {
             ViewBag.ServiceName = "AssemblyDbService.LookupByLocAsync";
-            var records = await assemblyDbService.LookupByLocAsync(locId, getActive).ConfigureAwait(false);
+            var records = await assemblyDbService.LookupByLocAsync(locId, getActive, true).ConfigureAwait(false);
             return DbJson(filterForJsonDTables(records));
         }
 
