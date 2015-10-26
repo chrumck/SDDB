@@ -265,8 +265,8 @@ $(document).ready(function () {
         columnDefs: [
             { targets: [0, 19, 39, 40, 41, 42], searchable: false },  //"orderable": false, "visible": false
             //1st set of columns - responsive
-            { targets: [2, 3], className: "hidden-xs" },
-            { targets: [4, 6], className: "hidden-xs hidden-sm" }, 
+            { targets: [4, 6], className: "hidden-xs" },
+            { targets: [3], className: "hidden-xs hidden-sm" }, 
             //2nd set of columns - responsive
             { targets: [8, 9], className: "hidden-xs" }, 
             { targets: [10, 11, 12], className: "hidden-xs hidden-sm" }, 
@@ -327,26 +327,29 @@ function refreshMainView() {
     var deferred0 = $.Deferred();
 
     TableMain.clear().search("").draw();
-
     updateMainViewForSelectedType()
         .done(function () {
-            if (MsFilterByType.getValue().length == 0 && MsFilterByProject.getValue().length == 0 &&
-                    MsFilterByLoc.getValue().length == 0) {
-                if (typeof AssemblyIds !== "undefined" && AssemblyIds != null && AssemblyIds.length > 0) {
-                    refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByIds", { ids: AssemblyIds, getActive: GetActive }, "POST")
-                        .done(deferred0.resolve);
-                }
-                return deferred0.resolve();
+            if (MsFilterByType.getValue().length != 0 || MsFilterByProject.getValue().length != 0 ||
+                    MsFilterByLoc.getValue().length != 0) {
+                refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByAltIds2",
+                    {
+                        projectIds: MsFilterByProject.getValue(),
+                        typeIds: MsFilterByType.getValue(),
+                        locIds: MsFilterByLoc.getValue(),
+                        getActive: GetActive
+                    },
+                    "POST")
+                    .done(deferred0.resolve);
+                return;
             }
-            refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByAltIds2",
-                {
-                    projectIds: MsFilterByProject.getValue(),
-                    typeIds: MsFilterByType.getValue(),
-                    locIds: MsFilterByLoc.getValue(),
-                    getActive: GetActive
-                },
-                "POST")
-                .done(deferred0.resolve);
+            if (typeof AssemblyIds !== "undefined" && AssemblyIds != null && AssemblyIds.length > 0) {
+                refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByIds",
+                    {
+                        ids: AssemblyIds,
+                        getActive: GetActive
+                    }, "POST")
+                    .done(deferred0.resolve);
+            }
         });
     return deferred0.promise();
 }
