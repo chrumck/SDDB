@@ -392,8 +392,8 @@ fieldset[disabled] .btn-tdo-success.active {
 /*custom buttons btn-tdo-success2*/
 .btn-tdo-success2 {
   color: #fff;
-  background-color: #96db96;
-  border-color: #7ecb7e;
+  background-color: #75e475;
+  border-color: #5fd15f;
 }
 .btn-tdo-success2:hover,
 .btn-tdo-success2:focus,
@@ -402,8 +402,8 @@ fieldset[disabled] .btn-tdo-success.active {
 .btn-tdo-success2.active,
 .open > .dropdown-toggle.btn-tdo-success2 {
   color: #fff;
-  background-color: #7ecb7e;
-  border-color: #63b763;
+  background-color: #5fd15f;
+  border-color: #4fc34f;
 }
 .btn-tdo-success2:active,
 .btn-tdo-success2.active,
@@ -428,11 +428,11 @@ fieldset[disabled] .btn-tdo-success2:active,
 .btn-tdo-success2.disabled.active,
 .btn-tdo-success2[disabled].active,
 fieldset[disabled] .btn-tdo-success2.active {
-  background-color: #c0f6c0;
-  border-color: #a0e4a0;
+  background-color: #aff5af;
+  border-color: #99e299;
 }
 .btn-tdo-success2 .badge {
-  color: #96db96;
+  color: #75e475;
   background-color: #fff;
 }
 

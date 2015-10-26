@@ -5,15 +5,10 @@
 /// <reference path="../jquery-2.1.4.js" />
 /// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
-/// <reference path="Shared.js" />
+/// <reference path="Shared_Views.js" />
 
 //--------------------------------------Global Properties------------------------------------//
 
-var TableMain;
-var MsFilterByProject;
-var MsFilterByComponent;
-var MsFilterByPerson;
-var MagicSuggests = [];
 var RecordTemplate = {
     Id: "RecordTemplateId",
     LogEntryDateTime: null,
@@ -25,57 +20,27 @@ var RecordTemplate = {
     Comments: null,
     IsActive_bl: null
 };
-var CurrRecords = [];
-var CurrIds = [];
-var GetActive = true;
+
+var MsFilterByProject;
+var MsFilterByComponent;
+var MsFilterByPerson;
+
+
+LabelTextCreate = "Create Log Entry";
+LabelTextEdit = "Edit Log Entry";
+UrlFillForEdit = "/ComponentLogEntrySrv/GetByIds";
+UrlEdit = "/ComponentLogEntrySrv/Edit";
+UrlDelete = "/ComponentLogEntrySrv/Delete";
 
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
 
-    //Wire up BtnCreate
-    $("#BtnCreate").click(function () {
-        CurrIds = [];
-        CurrRecords = [];
-        CurrRecords[0] = $.extend(true, {}, RecordTemplate);
-        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Log Entry", "MainView");
-        saveViewSettings(TableMain);
-        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
-    });
-
-    //Wire up BtnEdit
-    $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) {
-            showModalNothingSelected();
-            return;
-        }
-        showModalWait();
-        fillFormForEditGeneric(CurrIds, "POST", "/ComponentLogEntrySrv/GetByIds",
-	        GetActive, "EditForm", "Edit Log Entry", MagicSuggests)
-            .always(hideModalWait)
-            .done(function (currRecords) {
-                CurrRecords = currRecords;
-                saveViewSettings(TableMain);
-                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    });
-
-    //Wire up BtnDelete 
-    $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) { showModalNothingSelected(); }
-        else { showModalDelete(CurrIds.length); }
-    });
-
     //Initialize DateTimePicker FilterDateStart
-    $("#FilterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("dp.hide", function (e) { refreshMainView(); });
+    $("#FilterDateStart").datetimepicker({ format: "YYYY-MM-DD" }).on("dp.hide", function (e) { refreshMainView(); });
 
     //Initialize DateTimePicker FilterDateEnd
-    $("#FilterDateEnd").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("dp.hide", function (e) { refreshMainView(); });
+    $("#FilterDateEnd").datetimepicker({ format: "YYYY-MM-DD" }).on("dp.hide", function (e) { refreshMainView(); });
 
     //Initialize MagicSuggest MsFilterByProject
     MsFilterByProject = $("#MsFilterByProject").magicSuggest({
@@ -87,6 +52,7 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
+    //Wire up on change event for MsFilterByProject
     $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
 
     //Initialize MagicSuggest MsFilterByComponent
@@ -99,6 +65,7 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
+    //Wire up on change event for MsFilterByComponent
     $(MsFilterByComponent).on("selectionchange", function (e, m) { refreshMainView(); });
 
     //Initialize MagicSuggest MsFilterByPerson
@@ -111,22 +78,17 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
+    //Wire up on change event for MsFilterByPerson
     $(MsFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
-   
-        
+
+
     //---------------------------------------DataTables------------
 
-    //Wire up ChBoxShowDeleted
-    $("#ChBoxShowDeleted").change(function (event) {
-        if (!$(this).prop("checked")) {
-            GetActive = true;
-            $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
-        } else {
-            GetActive = false;
-            $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
-        }
-        refreshMainView();
-    });
+    //TableMainColumnSets
+    TableMainColumnSets = [
+        [1],
+        [2, 3, 4, 5, 6, 7, 8]
+    ];
 
     //TableMain PersonLogEntrys
     TableMain = $("#TableMain").DataTable({
@@ -134,11 +96,26 @@ $(document).ready(function () {
             { data: "Id", name: "Id" },//0
             { data: "LogEntryDateTime", name: "LogEntryDateTime" },//1
             //------------------------------------------------first set of columns
-            { data: "Component_", render: function (data, type, full, meta) { return data.CompName }, name: "Component_" }, //2
-            { data: "LastSavedByPerson_", render: function (data, type, full, meta) { return data.LastName + " " + data.Initials }, name: "LastSavedByPerson_" }, //3
-            { data: "ComponentStatus_", render: function (data, type, full, meta) { return data.CompStatusName }, name: "ComponentStatus_" }, //4
-            { data: "AssignedToProject_", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject_" }, //5
-            { data: "AssignedToAssemblyDb_", render: function (data, type, full, meta) { return data.AssyName }, name: "AssignedToAssemblyDb_" }, //6
+            {
+                data: "Component_", name: "Component_",
+                render: function (data, type, full, meta) { return data.CompName }
+            }, //2
+            {
+                data: "LastSavedByPerson_", name: "LastSavedByPerson_",
+                render: function (data, type, full, meta) { return data.LastName + " " + data.Initials }
+            }, //3
+            {
+                data: "ComponentStatus_", name: "ComponentStatus_",
+                render: function (data, type, full, meta) { return data.CompStatusName }
+            }, //4
+            {
+                data: "AssignedToProject_", name: "AssignedToProject_",
+                render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }
+            }, //5
+            {
+                data: "AssignedToAssemblyDb_", name: "AssignedToAssemblyDb_",
+                render: function (data, type, full, meta) { return data.AssyName }
+            }, //6
             { data: "LastCalibrationDate", name: "LastCalibrationDate" },//7
             { data: "Comments", name: "Comments" },//8
             //------------------------------------------------never visible
@@ -150,11 +127,12 @@ $(document).ready(function () {
             { data: "AssignedToAssemblyDb_Id", name: "AssignedToAssemblyDb_Id" }//14
         ],
         columnDefs: [
-            { targets: [0, 9, 10, 11, 12, 13, 14], visible: false }, // - never show
-            { targets: [0, 1, 7, 9, 10, 11, 12, 13, 14], searchable: false },  //"orderable": false, "visible": false
-            { targets: [3, 4], className: "hidden-xs" }, // - first set of columns
-            { targets: [5, 6], className: "hidden-xs hidden-sm" }, // - first set of columns
-            { targets: [7, 8], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
+            //"orderable": false, "visible": false
+            { targets: [0, 1, 7, 9, 10, 11, 12, 13, 14], searchable: false },
+            // - first set of columns
+            { targets: [3, 4], className: "hidden-xs" },
+            { targets: [5, 6], className: "hidden-xs hidden-sm" }, 
+            { targets: [7, 8], className: "hidden-xs hidden-sm hidden-md" }
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
@@ -167,6 +145,8 @@ $(document).ready(function () {
             paginate: { previous: "", next: "" }
         }
     });
+    //showing the first Set of columns on startup;
+    showColumnSet(TableMainColumnSets, 1);
 
     //---------------------------------------EditFormView----------------------------------------//
 
@@ -184,48 +164,16 @@ $(document).ready(function () {
     msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
     msAddToMsArray(MagicSuggests, "AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
 
-    //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel").click(function () {
-        switchView("EditFormView", "MainView", "tdo-btngroup-main", true);
-    });
-
-    //Wire Up EditFormBtnOk
-    $("#EditFormBtnOk").click(function () {
-        msValidate(MagicSuggests);
-        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
-            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
-            return;
-        }
-        showModalWait();
-        submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/ComponentLogEntrySrv/Edit")
-            .always(hideModalWait)
-            .done(function () {
-                refreshMainView()
-                    .done(function () {
-                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
-                    });
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
-    });
-
     //--------------------------------------View Initialization------------------------------------//
 
     fillFiltersFromRequestParams().done(refreshMainView);
+    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
 
-    $("#InitialView").addClass("hidden");
-    $("#MainView").removeClass("hidden");
-    
     //--------------------------------End of execution at Start-----------
 });
 
 
 //--------------------------------------Main Methods---------------------------------------//
-
-//Delete Records from DB
-function DeleteRecords() {
-    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-    deleteRecordsGeneric(CurrIds, "/ComponentLogEntrySrv/Delete", refreshMainView);
-}
 
 //refresh Main view 
 function refreshMainView() {
@@ -269,25 +217,22 @@ function fillFiltersFromRequestParams() {
             .always(hideModalWait)
             .done(function (data) {
                 msSetSelectionSilent(MsFilterByComponent, [{ id: data[0].Id, name: data[0].CompName, }]);
-                deferred0.resolve();
+                return deferred0.resolve();
             })
             .fail(function (xhr, status, error) {
-                showModalAJAXFail(xhr, status, error); 
+                showModalAJAXFail(xhr, status, error);
                 deferred0.reject(xhr, status, error);
             });
     }
     else {
         $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
         $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
-        deferred0.resolve();
+        return deferred0.resolve();
     }
 
     return deferred0.promise();
 }
 
 //---------------------------------------Helper Methods--------------------------------------//
-
-
-
 
 

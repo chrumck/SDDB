@@ -137,6 +137,11 @@ $(document).ready(function () {
 
     //---------------------------------------DataTables------------
 
+    //wire up BtnTableMainExport
+    $("#BtnTableMainExport").click(function (event) {
+        exportTableToTxt(TableMain);
+    });
+
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
         if (!$(this).prop("checked")) {
@@ -212,7 +217,7 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel").click(function () {
-        switchView("EditFormView","MainView", "tdo-btngroup-main", true);
+        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
     });
 
     //Wire Up EditFormBtnOk
@@ -229,7 +234,7 @@ $(document).ready(function () {
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
@@ -250,9 +255,9 @@ $(document).ready(function () {
 
 
 //Delete Records from DB
-function DeleteRecords() {
+function deleteRecords() {
     CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-    deleteRecordsGeneric(CurrIds, "/LocationSrv/Delete", refreshMainView);
+    deleteRecordsGenericWrp(CurrIds, "/LocationSrv/Delete", refreshMainView);
 }
 
 //refresh view after magicsuggest update
@@ -292,14 +297,14 @@ function fillFiltersFromRequestParams() {
             .done(function (data) {
                 msSetSelectionSilent(MsFilterByProject, 
                     [{ id: data[0].Id, name: data[0].ProjectName + " - " + data[0].ProjectCode }]);
-                deferred0.resolve();
+                return deferred0.resolve();
             })
             .fail(function (xhr, status, error) {
                 showModalAJAXFail(xhr, status, error);
                 deferred0.reject(xhr, status, error);
             });
     }
-    else { deferred0.resolve(); }
+    else { return deferred0.resolve(); }
     return deferred0.promise();
 }
 

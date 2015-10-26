@@ -67,6 +67,11 @@ $(document).ready(function () {
 
     //---------------------------------------DataTables------------
 
+    //wire up BtnTableMainExport
+    $("#BtnTableMainExport").click(function (event) {
+        exportTableToTxt(TableMain);
+    });
+
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
         if (!$(this).prop("checked")) {
@@ -110,7 +115,7 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel").click(function () {
-        switchView("EditFormView", "MainView", "tdo-btngroup-main", true);
+        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
     });
 
     //Wire Up EditFormBtnOk
@@ -126,7 +131,7 @@ $(document).ready(function () {
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
@@ -147,9 +152,9 @@ $(document).ready(function () {
 
 
 //Delete Records from DB
-function DeleteRecords() {
+function deleteRecords() {
     CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-    deleteRecordsGeneric(CurrIds, "/ComponentStatusSrv/Delete", refreshMainView);
+    deleteRecordsGenericWrp(CurrIds, "/ComponentStatusSrv/Delete", refreshMainView);
 }
 
 //refresh Main view 

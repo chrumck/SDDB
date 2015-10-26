@@ -120,7 +120,7 @@
     <Compile Include="Abstract_Infrastructure\ILogger.cs" />
     <Compile Include="Abstract_Services\IAppRoleManager.cs" />
     <Compile Include="Abstract_Services\IAppUserManager.cs" />
-    <Compile Include="Concrete_HelperEntities\MAttrTypes.cs" />
+    <Compile Include="Concrete_HelperEntities\ExtAttrTypes.cs" />
     <Compile Include="Concrete_HelperEntities\ActivitySummary.cs" />
     <Compile Include="Concrete_Infrastructure\DbExceptions.cs" />
     <Compile Include="Concrete_Infrastructure\EFDbContextExtensions.cs" />
@@ -134,12 +134,10 @@
     <Compile Include="Concrete_Entities\Component.cs" />
     <Compile Include="Concrete_Entities\AssemblyExt.cs" />
     <Compile Include="Concrete_Entities\AssemblyDb.cs" />
-    <Compile Include="Concrete_Entities\ComponentModel.cs" />
     <Compile Include="Concrete_Entities\Location.cs" />
     <Compile Include="Concrete_Entities\LocationType.cs" />
     <Compile Include="Concrete_Entities\ComponentStatus.cs" />
     <Compile Include="Concrete_Entities\AssemblyStatus.cs" />
-    <Compile Include="Concrete_Entities\AssemblyModel.cs" />
     <Compile Include="Concrete_Entities\ComponentType.cs" />
     <Compile Include="Concrete_Entities\DBResult.cs" />
     <Compile Include="Concrete_Entities\AssemblyType.cs" />
@@ -162,8 +160,6 @@
     <Compile Include="Concrete_Services\_BaseDbService.cs" />
     <Compile Include="Concrete_Services\PersonLogEntryService.cs" />
     <Compile Include="Concrete_Services\ComponentService.cs" />
-    <Compile Include="Concrete_Services\ComponentModelService.cs" />
-    <Compile Include="Concrete_Services\AssemblyModelService.cs" />
     <Compile Include="Concrete_Services\AssemblyDbService.cs" />
     <Compile Include="Concrete_Services\ProjectEventService.cs" />
     <Compile Include="Concrete_Services\LocationService.cs" />
@@ -454,6 +450,10 @@
     <Compile Include="Migrations\201508250635554_location5.Designer.cs">
       <DependentUpon>201508250635554_location5.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201509191721055_modelRemove.cs" />
+    <Compile Include="Migrations\201509191721055_modelRemove.Designer.cs">
+      <DependentUpon>201509191721055_modelRemove.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -664,6 +664,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201508250635554_location5.resx">
       <DependentUpon>201508250635554_location5.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201509191721055_modelRemove.resx">
+      <DependentUpon>201509191721055_modelRemove.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

@@ -1,7 +1,7 @@
 ﻿@model SDDB.Domain.Entities.AssemblyStatus
 @using SDDB.WebUI.Infrastructure
 @{
-    ViewBag.Title = "Assembly Statuses";
+    ViewBag.Title = "SDDB Assembly Statuses";
 }
 <!------- InitialView ------->
 <div class="container-fluid" id="InitialView">
@@ -30,7 +30,12 @@
 
     <div class="panel panel-primary" id="PanelTableMain">
         <div class="panel-heading text-center" style="font-size:130%">
-            <strong>Assembly Statuses</strong>
+            <strong>Assy Statuses</strong>
+            <div class="pull-left">
+                <button type="button" class="btn btn-xs btn-info" id="BtnTableMainExport">
+                    <span class="glyphicon glyphicon-download-alt"></span>
+                </button>
+            </div>
             <div class="pull-right">
                 <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="65"
                         data-onstyle="warning" data-offstyle="primary" data-on="Deleted" data-off="Active">

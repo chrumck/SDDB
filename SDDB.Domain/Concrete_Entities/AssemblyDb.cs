@@ -39,16 +39,7 @@ namespace SDDB.Domain.Entities
         [StringLength(40)]
         [ForeignKey("AssemblyStatus")]
         public string AssemblyStatus_Id { get; set; }
-
-        [StringLength(40)]
-        [ForeignKey("AssemblyModel")]
-        public string AssemblyModel_Id { get; set; }
-
-        [Required(ErrorMessage = "Project field is required")]
-        [StringLength(40)]
-        [ForeignKey("AssignedToProject")]
-        public string AssignedToProject_Id { get; set; }
-
+       
         [Required(ErrorMessage = "Location field is required")]
         [StringLength(40)]
         [ForeignKey("AssignedToLocation")]
@@ -126,8 +117,6 @@ namespace SDDB.Domain.Entities
         //one to many
         public virtual AssemblyType AssemblyType { get; set; }
         public virtual AssemblyStatus AssemblyStatus { get; set; }
-        public virtual AssemblyModel AssemblyModel { get; set; }
-        public virtual Project AssignedToProject { get; set; }
         public virtual Location AssignedToLocation { get; set; }
         
         public virtual AssemblyExt AssemblyExt { get; set; }

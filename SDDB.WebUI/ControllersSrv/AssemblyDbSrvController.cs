@@ -16,12 +16,12 @@ namespace SDDB.WebUI.ControllersSrv
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
-        private AssemblyDbService assemblyService;
+        private AssemblyDbService assemblyDbService;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
-        public AssemblyDbSrvController(AssemblyDbService assemblyService)
+        public AssemblyDbSrvController(AssemblyDbService assemblyDbService)
         {
-            this.assemblyService = assemblyService;
+            this.assemblyDbService = assemblyDbService;
         }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
@@ -32,45 +32,25 @@ namespace SDDB.WebUI.ControllersSrv
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
             ViewBag.ServiceName = "AssemblyDbService.GetAsync";
-            var records = await assemblyService.GetAsync(ids, getActive).ConfigureAwait(false);
+            var records = await assemblyDbService.GetAsync(ids, getActive).ConfigureAwait(false);
             return DbJson( filterForJsonFull(records) );
         }
 
-        // POST: /AssemblyDbSrv/GetByAltIds
-        [HttpPost]
-        [DBSrvAuth("Assembly_View")]
-        public async Task<ActionResult> GetByAltIds(string[] projectIds, string[] modelIds, bool getActive = true)
-        {
-            ViewBag.ServiceName = "AssemblyDbService.GetByAltIdsAsync";
-            var records = await assemblyService.GetByAltIdsAsync(projectIds, modelIds, getActive).ConfigureAwait(false);
-            return DbJson(filterForJsonFull(records));
-        }
-
-        // POST: /AssemblyDbSrv/GetByAltIds
+        // POST: /AssemblyDbSrv/GetByAltIds2
         [HttpPost]
         [DBSrvAuth("Assembly_View")]
         public async Task<ActionResult> GetByAltIds2(string[] projectIds, string[] typeIds, string[] locIds, bool getActive = true)
         {
             ViewBag.ServiceName = "AssemblyDbService.GetByAltIdsAsync";
-            var records = await assemblyService.GetByAltIdsAsync(projectIds, typeIds, locIds, getActive).ConfigureAwait(false);
+            var records = await assemblyDbService.GetByAltIdsAsync(projectIds, typeIds, locIds, getActive).ConfigureAwait(false);
             return DbJson(filterForJsonFull(records));
-        }
-
-        // POST: /AssemblyDbSrv/CountByAltIds2
-        [HttpPost]
-        [DBSrvAuth("Assembly_View")]
-        public async Task<ActionResult> CountByAltIds2(string[] projectIds, string[] typeIds, string[] locIds, bool getActive = true)
-        {
-            ViewBag.ServiceName = "AssemblyDbService.CountByAltIdsAsync";
-            var count = await assemblyService.CountByAltIdsAsync(projectIds, typeIds, locIds, getActive).ConfigureAwait(false);
-            return DbJson(count);
         }
         
         // GET: /AssemblyDbSrv/Lookup
         public async Task<ActionResult> Lookup(string query = "", bool getActive = true)
         {
             ViewBag.ServiceName = "AssemblyDbService.LookupAsync";
-            var records = await assemblyService.LookupAsync(query, getActive).ConfigureAwait(false);
+            var records = await assemblyDbService.LookupAsync(query, getActive).ConfigureAwait(false);
             return DbJson(filterForJsonLookup(records));
         }
 
@@ -81,23 +61,23 @@ namespace SDDB.WebUI.ControllersSrv
             if (!String.IsNullOrEmpty(projectIds)) { projectIdsArray = projectIds.Split(','); }
 
             ViewBag.ServiceName = "AssemblyDbService.LookupByProjAsync";
-            var records = await assemblyService.LookupByProjAsync(projectIdsArray, query, getActive).ConfigureAwait(false);
+            var records = await assemblyDbService.LookupByProjAsync(projectIdsArray, query, getActive).ConfigureAwait(false);
             return DbJson(filterForJsonLookup(records));
         }
 
         // GET: /AssemblyDbSrv/LookupByLoc
-        public async Task<ActionResult> LookupByLoc(string locId = null, bool getActive = true)
+        public async Task<ActionResult> LookupByLoc(string locId = "", bool getActive = true)
         {
             ViewBag.ServiceName = "AssemblyDbService.LookupByLocAsync";
-            var records = await assemblyService.LookupByLocAsync(locId, getActive).ConfigureAwait(false);
+            var records = await assemblyDbService.LookupByLocAsync(locId, getActive).ConfigureAwait(false);
             return DbJson(filterForJsonLookup(records));
         }
 
         // GET: /AssemblyDbSrv/LookupByLocDTables
-        public async Task<ActionResult> LookupByLocDTables(string locId = null, bool getActive = true)
+        public async Task<ActionResult> LookupByLocDTables(string locId = "", bool getActive = true)
         {
             ViewBag.ServiceName = "AssemblyDbService.LookupByLocAsync";
-            var records = await assemblyService.LookupByLocAsync(locId, getActive, true).ConfigureAwait(false);
+            var records = await assemblyDbService.LookupByLocAsync(locId, getActive, true).ConfigureAwait(false);
             return DbJson(filterForJsonDTables(records));
         }
 
@@ -109,7 +89,7 @@ namespace SDDB.WebUI.ControllersSrv
         public async Task<ActionResult> Edit(AssemblyDb[] records)
         {
             ViewBag.ServiceName = "AssemblyDbService.EditAsync";
-            var newEntryIds = await assemblyService.EditAsync(records).ConfigureAwait(false);
+            var newEntryIds = await assemblyDbService.EditAsync(records).ConfigureAwait(false);
             return DbJson(new { Success = "True", newEntryIds = newEntryIds });
         }
 
@@ -119,7 +99,7 @@ namespace SDDB.WebUI.ControllersSrv
         public async Task<ActionResult> EditStatus(string[] ids, string statusId)
         {
             ViewBag.ServiceName = "AssemblyDbService.EditStatusAsync";
-            await assemblyService.EditStatusAsync(ids, statusId).ConfigureAwait(false);
+            await assemblyDbService.EditStatusAsync(ids, statusId).ConfigureAwait(false);
             return DbJson(new { Success = "True" });
         }
 
@@ -129,7 +109,7 @@ namespace SDDB.WebUI.ControllersSrv
         public async Task<ActionResult> Delete(string[] ids)
         {
             ViewBag.ServiceName = "AssemblyDbService.DeleteAsync";
-            await assemblyService.DeleteAsync(ids).ConfigureAwait(false);
+            await assemblyDbService.DeleteAsync(ids).ConfigureAwait(false);
             return DbJson(new { Success = "True" });
         }
 
@@ -141,7 +121,7 @@ namespace SDDB.WebUI.ControllersSrv
         public async Task<ActionResult> EditExt(AssemblyExt[] records)
         {
             ViewBag.ServiceName = "AssemblyDbService.EditExtendedAsync";
-            await assemblyService.EditExtendedAsync(records).ConfigureAwait(false);
+            await assemblyDbService.EditExtendedAsync(records).ConfigureAwait(false);
             return DbJson(new { Success = "True" });
         }
 
@@ -163,16 +143,10 @@ namespace SDDB.WebUI.ControllersSrv
                 AssemblyStatus_ = new {
                     x.AssemblyStatus.AssyStatusName
                 },
-                AssemblyModel_ = new {
-                    x.AssemblyModel.AssyModelName
-                },
-                AssignedToProject_ = new {
-                    x.AssignedToProject.ProjectCode,
-                    x.AssignedToProject.ProjectName
-                },
                 AssignedToLocation_ = new {
                     x.AssignedToLocation.LocName,
-                    x.AssignedToLocation.LocationType.LocTypeName
+                    x.AssignedToLocation.LocationType.LocTypeName,
+                    x.AssignedToLocation.AssignedToProject.ProjectName,
                 },
                 x.AssyGlobalX,
                 x.AssyGlobalY,
@@ -209,8 +183,6 @@ namespace SDDB.WebUI.ControllersSrv
                 x.AssemblyExt.Attr15,
                 x.AssemblyType_Id,
                 x.AssemblyStatus_Id,
-                x.AssemblyModel_Id,
-                x.AssignedToProject_Id,
                 x.AssignedToLocation_Id
             })
             .ToList();
@@ -225,7 +197,7 @@ namespace SDDB.WebUI.ControllersSrv
                 .Select(x => new
                 {
                     id = x.Id,
-                    name = x.AssyName + " - " + x.AssignedToProject.ProjectName
+                    name = x.AssyName + " - " + x.AssignedToLocation.AssignedToProject.ProjectName
                 })
                 .ToList();
         }

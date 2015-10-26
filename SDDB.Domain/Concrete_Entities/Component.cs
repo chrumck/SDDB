@@ -40,10 +40,6 @@ namespace SDDB.Domain.Entities
         [ForeignKey("ComponentStatus")]
         public string ComponentStatus_Id { get; set; }
 
-        [StringLength(40)]
-        [ForeignKey("ComponentModel")]
-        public string ComponentModel_Id { get; set; }
-
         [Required(ErrorMessage = "Project field is required")]
         [StringLength(40)]
         [ForeignKey("AssignedToProject")]
@@ -98,7 +94,6 @@ namespace SDDB.Domain.Entities
         //one to many
         public virtual ComponentType ComponentType { get; set; }
         public virtual ComponentStatus ComponentStatus { get; set; }
-        public virtual ComponentModel ComponentModel { get; set; }
         public virtual Project AssignedToProject { get; set; }
         public virtual AssemblyDb AssignedToAssemblyDb { get; set; }
                 

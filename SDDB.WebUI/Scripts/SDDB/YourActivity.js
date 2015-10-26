@@ -49,7 +49,6 @@ $(document).ready(function () {
         TableLogEntryPersonsRemove.clear().search("").draw();
         $("#LogEntryPersonsView").addClass("hidden");
 
-        saveViewSettings(TableMain);
         showModalWait();
         $.when(
             fillFormForEditGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
@@ -64,7 +63,7 @@ $(document).ready(function () {
                     "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
                     { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] },
                     "GET", "AssemblyDbSrv/LookupByLocDTables",
-                    { getActive: true }
+                    { locId: MagicSuggests[3].getValue()[0], getActive: true }
                 );
 
             })
@@ -75,7 +74,8 @@ $(document).ready(function () {
                 $("#HoursWorkedPicker").data('DateTimePicker').date(moment($("#ManHours").val(), "HH"));
                 $("#ManHours").data("ismodified", false);
 
-                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
+                    saveViewSettings(TableMain);
+                    switchView("MainView", "EditFormView", "tdo-btngroup-edit");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });

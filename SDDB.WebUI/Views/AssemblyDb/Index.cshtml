@@ -1,7 +1,7 @@
 ﻿@model SDDB.Domain.Entities.AssemblyDb
 @using SDDB.WebUI.Infrastructure
 @{
-    ViewBag.Title = "Assemblies";
+    ViewBag.Title = "SDDB Assemblies";
 }
 <!------- InitialView ------->
 <div class="container-fluid" id="InitialView">
@@ -10,7 +10,9 @@
 
 <!----- Navbar Section ----->
 @section Navbar{
-<div class="btn-group navbar-btn tdo-btngroup-main">
+<div class="btn-group navbar-btn tdo-btngroup-initial"></div>
+
+<div class="btn-group navbar-btn tdo-btngroup-main hidden">
     <button type="button" class="btn btn-default" id="BtnCreate">New</button>
     <button type="button" class="btn btn-tdo-nav" id="BtnEdit">&nbsp;&nbsp;Edit&nbsp;&nbsp;</button>
     <button type="button" class="btn btn-danger" id="BtnDelete">&nbsp;&nbsp;Del&nbsp;&nbsp;</button>
@@ -25,18 +27,23 @@
 </div>
 }
 @section NavbarCollapse{
-<ul class="nav navbar-nav tdo-btngroup-main">
+<ul class="nav navbar-nav tdo-btngroup-initial"></ul>
+
+<ul class="nav navbar-nav tdo-btngroup-main hidden">
     <li class="dropdown margin-left-5px">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">More<span class="caret"></span></a>
         <ul class="dropdown-menu">
-            <li><a class="collapsenav" href=# id="dropdownId1">Show 1st Columns</a></li>
-            <li><a class="collapsenav" href=# id="dropdownId2">Show 2nd Columns</a></li>
-            <li><a class="collapsenav" href=# id="dropdownId3">Show 3rd Columns</a></li>
-            <li><a class="collapsenav" href=# id="dropdownId4">Show 4th Columns</a></li>
+            <li><a class="collapsenav" href=# id="columnsSelectId1">Show 1st Columns</a></li>
+            <li><a class="collapsenav" href=# id="columnsSelectId2">Show 2nd Columns</a></li>
+            <li><a class="collapsenav" href=# id="columnsSelectId3">Show 3rd Columns</a></li>
+            <li><a class="collapsenav" href=# id="columnsSelectId4">Show 4th Columns</a></li>
             <li class="divider"></li>
-            <li><a class="collapsenav" href=# id="dropdownId5">Show Assy Components</a></li>
-            <li><a class="collapsenav" href=# id="dropdownId6">Show Assy Log</a></li>
-            <li><a class="collapsenav" href=# id="dropdownId7">Go to Extended</a></li>
+            <li class="extColumnSelect"><a class="collapsenav" href=# id="columnsSelectId5">Show 1st Extended</a></li>
+            <li class="extColumnSelect"><a class="collapsenav" href=# id="columnsSelectId6">Show 2nd Extended</a></li>
+            <li class="extColumnSelect"><a class="collapsenav" href=# id="columnsSelectId7">Show 3rd Extended</a></li>
+            <li class="divider"></li>
+            <li><a class="collapsenav" href=# id="dropdownId1">Show Assy Components</a></li>
+            <li><a class="collapsenav" href=# id="dropdownId2">Show Assy Log</a></li>
         </ul>
     </li>
 </ul> 
@@ -62,6 +69,11 @@
     <div class="panel panel-primary" id="PanelTableMain">
         <div class="panel-heading text-center" style="font-size:130%">
             <strong>Assemblies</strong>
+            <div class="pull-left">
+                <button type="button" class="btn btn-xs btn-info" id="BtnTableMainExport">
+                    <span class="glyphicon glyphicon-download-alt"></span>
+                </button>
+            </div>
             <div class="pull-right">
                 <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="65"
                        data-onstyle="warning" data-offstyle="primary" data-on="Deleted" data-off="Active">
@@ -76,8 +88,6 @@
                     <th>2Alt. Name</th>
                     <th>Type</th>
                     <th>Status</th>
-                    <th>Model</th>
-                    <th>Project</th>
                     <th>Location</th>
                     <th>Global X</th>
                     <th>Global Y</th>
@@ -96,11 +106,24 @@
                     <th>Power Details</th>
                     <th>HSE Details</th>
                     <th>Comments</th>
+                    <th>Attr01</th>
+                    <th>Attr02</th>
+                    <th>Attr03</th>
+                    <th>Attr04</th>
+                    <th>Attr05</th>
+                    <th>Attr06</th>
+                    <th>Attr07</th>
+                    <th>Attr08</th>
+                    <th>Attr09</th>
+                    <th>Attr10</th>
+                    <th>Attr11</th>
+                    <th>Attr12</th>
+                    <th>Attr13</th>
+                    <th>Attr14</th>
+                    <th>Attr15</th>
                     <th>Is Active</th>
                     <th>AssemblyType_Id</th>
                     <th>AssemblyStatus_Id</th>
-                    <th>AssemblyModel_Id</th>
-                    <th>AssignedToProject_Id</th>
                     <th>AssignedToLocation_Id</th>
                 </tr>
             </thead>
@@ -170,20 +193,6 @@
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.AssemblyStatus_Id, new { @class = "form-control modifiable", placeholder = "Assembly Status" })
                             @Html.ValidationMessageFor(x => x.AssemblyStatus_Id)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.AssemblyModel_Id, "Model", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.AssemblyModel_Id, new { @class = "form-control modifiable", placeholder = "Assembly Model" })
-                            @Html.ValidationMessageFor(x => x.AssemblyModel_Id)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(x => x.AssignedToProject_Id, "Project", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.AssignedToProject_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Project" })
-                            @Html.ValidationMessageFor(x => x.AssignedToProject_Id)
                         </div>
                     </div>
                     <div class="form-group">
@@ -321,11 +330,130 @@
                         </div>
                     </div>
                 </div>
-
             </div>
-
         </form>
     </div>
+    <!------- EditFormExtended ------->
+
+    <form class="form-horizontal hidden" role="form" id="EditFormExtended">
+        <div class="well well-tdo">
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group" id="FrmGrpAttr01">
+                        <label class="control-label col-sm-2" for="Attr01">Attr01</label>
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" id="Attr01" name="Attr01" placeholder="Attr01" type="text" value="" />
+                            <span class="field-validation-valid" data-valmsg-for="Attr01" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="FrmGrpAttr02">
+                        <label class="control-label col-sm-2" for="Attr02">Attr02</label>
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" id="Attr02" name="Attr02" placeholder="Attr02" type="text" value="" />
+                            <span class="field-validation-valid" data-valmsg-for="Attr02" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="FrmGrpAttr03">
+                        <label class="control-label col-sm-2" for="Attr03">Attr03</label>
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" id="Attr03" name="Attr03" placeholder="Attr03" type="text" value="" />
+                            <span class="field-validation-valid" data-valmsg-for="Attr03" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="FrmGrpAttr04">
+                        <label class="control-label col-sm-2" for="Attr04">Attr04</label>
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" id="Attr04" name="Attr04" placeholder="Attr04" type="text" value="" />
+                            <span class="field-validation-valid" data-valmsg-for="Attr04" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="FrmGrpAttr05">
+                        <label class="control-label col-sm-2" for="Attr05">Attr05</label>
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" id="Attr05" name="Attr05" placeholder="Attr05" type="text" value="" />
+                            <span class="field-validation-valid" data-valmsg-for="Attr05" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="FrmGrpAttr06">
+                        <label class="control-label col-sm-2" for="Attr06">Attr06</label>
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" id="Attr06" name="Attr06" placeholder="Attr06" type="text" value="" />
+                            <span class="field-validation-valid" data-valmsg-for="Attr06" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="FrmGrpAttr07">
+                        <label class="control-label col-sm-2" for="Attr07">Attr07</label>
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" id="Attr07" name="Attr07" placeholder="Attr07" type="text" value="" />
+                            <span class="field-validation-valid" data-valmsg-for="Attr07" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group" id="FrmGrpAttr08">
+                        <label class="control-label col-sm-2" for="Attr08">Attr08</label>
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" id="Attr08" name="Attr08" placeholder="Attr08" type="text" value="" />
+                            <span class="field-validation-valid" data-valmsg-for="Attr08" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="FrmGrpAttr09">
+                        <label class="control-label col-sm-2" for="Attr09">Attr09</label>
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" id="Attr09" name="Attr09" placeholder="Attr09" type="text" value="" />
+                            <span class="field-validation-valid" data-valmsg-for="Attr09" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="FrmGrpAttr10">
+                        <label class="control-label col-sm-2" for="Attr10">Attr10</label>
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" id="Attr10" name="Attr10" placeholder="Attr10" type="text" value="" />
+                            <span class="field-validation-valid" data-valmsg-for="Attr10" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="FrmGrpAttr11">
+                        <label class="control-label col-sm-2" for="Attr11">Attr11</label>
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" id="Attr11" name="Attr11" placeholder="Attr11" type="text" value="" />
+                            <span class="field-validation-valid" data-valmsg-for="Attr11" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="FrmGrpAttr12">
+                        <label class="control-label col-sm-2" for="Attr12">Attr12</label>
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" id="Attr12" name="Attr12" placeholder="Attr12" type="text" value="" />
+                            <span class="field-validation-valid" data-valmsg-for="Attr12" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="FrmGrpAttr13">
+                        <label class="control-label col-sm-2" for="Attr13">Attr13</label>
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" id="Attr13" name="Attr13" placeholder="Attr13" type="text" value="" />
+                            <span class="field-validation-valid" data-valmsg-for="Attr13" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="FrmGrpAttr14">
+                        <label class="control-label col-sm-2" for="Attr14">Attr14</label>
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" id="Attr14" name="Attr14" placeholder="Attr14" type="text" value="" />
+                            <span class="field-validation-valid" data-valmsg-for="Attr14" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="FrmGrpAttr15">
+                        <label class="control-label col-sm-2" for="Attr15">Attr15</label>
+                        <div class="col-sm-10">
+                            <input class="form-control modifiable" id="Attr15" name="Attr15" placeholder="Attr15" type="text" value="" />
+                            <span class="field-validation-valid" data-valmsg-for="Attr15" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+
 </div>
 
 <!------- ScriptVariables ------->
@@ -337,6 +465,8 @@
     @Scripts.Render("~/bundles/DataTables")
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
+    @Scripts.Render("~/bundles/bootstrap-datetimepicker")
+    @Scripts.Render("~/bundles/sddb/shared_views")
     <script src="~/Scripts/SDDB/AssemblyDb.js?v=@Html.GetAppVersion()"></script>
 }
 
@@ -344,4 +474,5 @@
     @Styles.Render("~/bundles/DataTables-CSS")
     @Styles.Render("~/bundles/bootstrap-toggle-CSS")
     @Styles.Render("~/bundles/magicsuggest-css")
+    @Styles.Render("~/bundles/bootstrap-datetimepicker-CSS")
 }

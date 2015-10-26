@@ -6,10 +6,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title</title>
-    <link rel="icon" href="~/Images/SolDataIcon.png">
+    <link rel="icon" href="~/Images/SolDataIcon.png?v=@Html.GetAppVersion()">
+    
     @Scripts.Render("~/bundles/modernizr")
+    
     @Styles.Render("~/Content/css")
+    @Styles.Render("~/bundles/jquery-ui-CSS")
     <link href="/Content/SDDB/Site.css?v=@Html.GetAppVersion()" rel="stylesheet" />
+    @RenderSection("CSS", required: false)
 </head>
 
 <body>
@@ -126,12 +130,10 @@
     @Scripts.Render("~/bundles/jqueryval")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/moment")
-    @Scripts.Render("~/bundles/sddb")
-
-    @Styles.Render("~/bundles/jquery-ui-CSS")
-
+    @Scripts.Render("~/bundles/filesaver")
+    @Scripts.Render("~/bundles/sddb/shared")
+        
     @RenderSection("Scripts", required: false)
-
-    @RenderSection("CSS", required: false)
+        
 </body>
 </html>

@@ -95,15 +95,11 @@ namespace SDDB.WebUI.ControllersSrv
                 {
                     x.AssemblyStatus.AssyStatusName
                 },
-                AssignedToProject_ = new
-                {
-                    x.AssignedToProject.ProjectCode,
-                    x.AssignedToProject.ProjectName
-                },
                 AssignedToLocation_ = new
                 {
                     x.AssignedToLocation.LocName,
-                    x.AssignedToLocation.LocAltName
+                    x.AssignedToLocation.LocAltName,
+                    x.AssignedToLocation.AssignedToProject.ProjectName,
                 },
                 x.AssyGlobalX,
                 x.AssyGlobalY,
@@ -121,7 +117,6 @@ namespace SDDB.WebUI.ControllersSrv
                 x.AssemblyDb_Id,
                 x.LastSavedByPerson_Id,
                 x.AssemblyStatus_Id,
-                x.AssignedToProject_Id,
                 x.AssignedToLocation_Id
             })
             .ToList();

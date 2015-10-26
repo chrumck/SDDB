@@ -1,7 +1,7 @@
 ﻿@model SDDB.Domain.Entities.AssemblyLogEntry
 @using SDDB.WebUI.Infrastructure
 @{
-    ViewBag.Title = "Assembly Log Entries";
+    ViewBag.Title = "SDDB Assembly Log Entries";
 }
 <!------- InitialView ------->
 <div class="container-fluid" id="InitialView">
@@ -29,9 +29,9 @@
         <li class="dropdown margin-left-5px">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">More<span class="caret"></span></a>
             <ul class="dropdown-menu">
-                <li><a class="collapsenav" href=# id="dropdownId1">Show 1st Columns</a></li>
-                <li><a class="collapsenav" href=# id="dropdownId2">Show 2nd Columns</a></li>
-                <li><a class="collapsenav" href=# id="dropdownId3">Show 3rd Columns</a></li>
+                <li><a class="collapsenav" href=# id="columnsSelectId1">Show 1st Columns</a></li>
+                <li><a class="collapsenav" href=# id="columnsSelectId2">Show 2nd Columns</a></li>
+                <li><a class="collapsenav" href=# id="columnsSelectId3">Show 3rd Columns</a></li>
             </ul>
         </li>
     </ul>
@@ -66,7 +66,12 @@
 
     <div class="panel panel-primary" id="PanelTableMain">
         <div class="panel-heading text-center" style="font-size:130%">
-            <strong>Assy Log Entries</strong>
+            <strong>Assy Log</strong>
+            <div class="pull-left">
+                <button type="button" class="btn btn-xs btn-info" id="BtnTableMainExport">
+                    <span class="glyphicon glyphicon-download-alt"></span>
+                </button>
+            </div>
             <div class="pull-right">
                 <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="65"
                         data-onstyle="warning" data-offstyle="primary" data-on="Deleted" data-off="Active">
@@ -80,7 +85,6 @@
                     <th>Assembly</th>
                     <th>Changed By</th>
                     <th>Status</th>
-                    <th>Project</th>
                     <th>Location</th>
                     <th>GlobalX</th>
                     <th>GlobalY</th>
@@ -98,7 +102,6 @@
                     <th>AssemblyDb_Id</th>
                     <th>LastSavedByPerson_Id</th>
                     <th>AssemblyStatus_Id</th>
-                    <th>AssignedToProject_Id</th>
                     <th>AssignedToLocation_Id</th>
                 </tr>
             </thead>
@@ -141,13 +144,6 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.AssignedToProject_Id, "Project", new { @class = "control-label col-sm-2" })
-                        <div class="col-sm-10">
-                            @Html.TextBoxFor(x => x.AssignedToProject_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Project" })
-                            @Html.ValidationMessageFor(x => x.AssignedToProject_Id)
-                        </div>
-                    </div>
-                    <div class="form-group">
                         @Html.LabelFor(x => x.AssignedToLocation_Id, "Location", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.AssignedToLocation_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Location" })
@@ -175,9 +171,6 @@
                             @Html.ValidationMessageFor(x => x.AssyGlobalZ)
                         </div>
                     </div>
-                </div>
-
-                <div class="col-md-6">
                     <div class="form-group">
                         @Html.LabelFor(x => x.AssyLocalXDesign, "LocalX Design", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
@@ -199,6 +192,9 @@
                             @Html.ValidationMessageFor(x => x.AssyLocalZDesign)
                         </div>
                     </div>
+                </div>
+
+                <div class="col-md-6">
                     <div class="form-group">
                         @Html.LabelFor(x => x.AssyLocalXAsBuilt, "LocalX AsBuilt", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
@@ -263,6 +259,7 @@
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
     @Scripts.Render("~/bundles/bootstrap-datetimepicker")
+    @Scripts.Render("~/bundles/sddb/shared_views")
     <script src="~/Scripts/SDDB/AssemblyLogEntry.js?v=@Html.GetAppVersion()"></script>
 }
 

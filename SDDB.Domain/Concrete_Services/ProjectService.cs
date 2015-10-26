@@ -148,13 +148,6 @@ namespace SDDB.Domain.Services
                     throw new DbBadRequestException(
                         string.Format("Project {0} has locations assigned to it.\nDelete aborted.", dbEntry.ProjectName));
                 }
-                if (await dbContext.AssemblyDbs.AnyAsync(x => x.IsActive_bl && x.AssignedToProject_Id == currentId)
-                    .ConfigureAwait(false))
-                {
-                    var dbEntry = await dbContext.Projects.FindAsync(currentId).ConfigureAwait(false);
-                    throw new DbBadRequestException(
-                        string.Format("Project {0} has assemblies assigned to it.\nDelete aborted.", dbEntry.ProjectName));
-                }
                 if (await dbContext.Components.AnyAsync(x => x.IsActive_bl && x.AssignedToProject_Id == currentId)
                     .ConfigureAwait(false))
                 {

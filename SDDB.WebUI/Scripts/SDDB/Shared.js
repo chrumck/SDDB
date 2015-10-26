@@ -116,7 +116,7 @@ function showModalDelete(noOfRows) {
 //Wire Up ModalDeleteBtnOk
 $("#ModalDeleteBtnOk").click(function () {
     $("#ModalDelete").modal("hide");
-    DeleteRecords();
+    deleteRecords();
 });
 
 //showModalWait
@@ -157,8 +157,10 @@ function showModalAJAXFail(xhr, status, error) {
     setTimeout(function () { $("#ModalInfo").modal("show"); }, 10);
 }
 
+//-----------------------------------------------------------------------------
+
 //switchView 
-function switchView(fromViewId, toViewId, toBtnGroupClass, scrollToWindowYpos, dataTable) {
+function switchView(fromViewId, toViewId, toBtnGroupClass, dataTable) {
     if (toBtnGroupClass) {
         $("[class*='tdo-btngroup']").addClass("hidden");
         $("[class~='" + toBtnGroupClass + "']").removeClass("hidden");
@@ -172,7 +174,7 @@ function switchView(fromViewId, toViewId, toBtnGroupClass, scrollToWindowYpos, d
         }).eq(0).toArray();
         dataTable.rows(indexesToSelect).nodes().to$().addClass("ui-selected");
     }
-    if (scrollToWindowYpos) { window.scrollTo(0, windowYpos); } else { window.scrollTo(0, 0); }
+    if (dataTable) { window.scrollTo(0, windowYpos); } else { window.scrollTo(0, 0); }
 }
 
 //saveViewSettings
@@ -201,7 +203,7 @@ function refreshTableGeneric(table, url, data, httpType) {
     $.ajax({ type: httpType, url: url, timeout: 120000, data: data, dataType: "json", })
         .done(function (dbEntries) {
             table.rows.add(dbEntries).order([1, "asc"]).draw();
-            deferred0.resolve();
+            return deferred0.resolve();
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 
@@ -211,9 +213,7 @@ function refreshTableGeneric(table, url, data, httpType) {
 //Refresh  table from AJAX - generic version - showing wait dialogs
 function refreshTblGenWrp(table, url, data, httpType) {
     var deferred0 = $.Deferred();
-
     showModalWait();
-
     refreshTableGeneric(table, url, data, httpType)
         .always(hideModalWait)
         .done(deferred0.resolve)
@@ -221,19 +221,67 @@ function refreshTblGenWrp(table, url, data, httpType) {
             showModalAJAXFail(xhr, status, error);
             deferred0.reject(xhr, status, error);
         });
-
     return deferred0.promise();
 }
+
+//exportTableToTxt - exports table data to a txt tab separated file
+function exportTableToTxt(table) {
+    showModalWait();
+    setTimeout(function () {
+        var tableData = table.rows({ search: "applied" }).data().toArray();
+        var txtOutput = convertObjectToStringHelper(tableData[0], true);
+        txtOutput.slice(-1);
+        txtOutput += "\n";
+        $.each(tableData, function (index, tableRow) {
+            txtOutput += convertObjectToStringHelper(tableRow);
+            txtOutput.slice(-1);
+            txtOutput += "\n";
+        });
+        var fileData = new Blob([txtOutput], { type: "text/plain;charset=utf-8" });
+        hideModalWait();
+        saveAs(fileData, "SDDBdataExport_" + moment().format("YYYYMMDD_HHmmss") + ".txt");
+    }, 200);
+    
+    //convertObjectToStringHelper
+    function convertObjectToStringHelper(dataObject, retrievePropNames) {
+        var outputString = "";
+        for (var property in dataObject) {
+            if (!dataObject.hasOwnProperty(property)) {
+                continue;
+            }
+            if (typeof dataObject[property] === "object" && dataObject[property] !== null) {
+                outputString += convertObjectToStringHelper(dataObject[property], retrievePropNames);
+                continue;
+            }
+            if (retrievePropNames) {
+                outputString += property + "\t";
+                continue;
+            }
+            outputString += dataObject[property] !== null ? dataObject[property] + "\t" : "\t";
+        }
+        outputString = outputString.replace(/\n/g, " ");
+        return outputString;
+    }
+}
+
 
 //-----------------------------------------------------------------------------
 
 //Delete Records from DB - generic version
-function deleteRecordsGeneric(ids, url, callback) {
+function deleteRecordsGenericWrp(ids, url, callback) {
+    var deferred0 = $.Deferred();
     showModalWait();
     $.ajax({ type: "POST", url: url, timeout: 120000, data: { ids: ids }, dataType: "json" })
         .always(hideModalWait)
-        .done(callback)
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        .done(function () {
+            callback();
+            deferred0.resolve();
+        } )
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject(xhr, status, error);
+        });
+    return deferred0.promise();
 }
 
 //-----------------------------------------------------------------------------
@@ -262,15 +310,14 @@ function clearFormInputs(formId, msArray) {
     $("#" + formId + " .input-validation-error").removeClass("input-validation-error");
     $("#" + formId + " .modifiable").data("ismodified", false);
 
-    if (typeof msArray !== "undefined") {
-        $.each(msArray, function (i, ms) { ms.clear(true); ms.isModified = false; });
+    if (msArray) { $.each(msArray, function (i, ms) { ms.clear(true); ms.isModified = false; });
     }
 }
 
 //Prepare Form For Create
 function fillFormForCreateGeneric(formId, msArray, labelText) {
     clearFormInputs(formId, msArray);
-    $("#" + formId + "Label").text(labelText);
+    if (labelText) { $("#" + formId + "Label").text(labelText); } 
     $("#" + formId + " [data-val-dbisunique]").prop("disabled", false);
     msDisableUnique(msArray, false);
     $("#" + formId + " .modifiable").data("ismodified", true);
@@ -281,93 +328,132 @@ function fillFormForCreateGeneric(formId, msArray, labelText) {
     $("#" + formId + "CreateMultiple").removeClass("hidden");
 }
 
+//-----------------------------------------------------------------------------
+
 //FillFormForEdit Generic version
 function fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText, msArray) {
-
-    if (GetActive) { $("#" + formId + "GroupIsActive").addClass("hidden"); }
-    else { $("#" + formId + "GroupIsActive").removeClass("hidden"); }
-    $("#" + formId + "CreateMultiple").addClass("hidden");
-
     var deferred0 = $.Deferred();
-
-    clearFormInputs(formId, msArray);
-    if (labelText) {$("#" + formId + "Label").text(labelText);}
-
     $.ajax({ type: httpType, url: url, timeout: 120000, data: { ids: ids, getActive: getActive }, dataType: "json" })
         .done(function (dbEntries) {
-            var formInput = $.extend(true, {}, dbEntries[0]);
-            $.each(dbEntries, function (i, dbEntry) {
-                for (var property in dbEntry) {
-                    if (!dbEntry.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") {
-                        continue;
-                    }
-                    if (property.slice(-3) == "_Id") {
-                        if (formInput[property] != dbEntry[property]) {
-                            formInput[property] = "_VARIES_";
-                            formInput[property.slice(0, -2)] = "_VARIES_";
-                        }
-                        else {
-                            formInput[property.slice(0, -2)] = "";
-                            for (var subProp in dbEntry[property.slice(0, -2)]) {
-                                if (dbEntry[property.slice(0, -2)][subProp] != null) {
-                                    if (formInput[property.slice(0, -2)] != "") { formInput[property.slice(0, -2)] += " "; }
-                                    formInput[property.slice(0, -2)] += dbEntry[property.slice(0, -2)][subProp];
-                                }
-                            }
-                        }
-                        continue;
-                    }
-                    if (formInput[property] != dbEntry[property]) { formInput[property] = "_VARIES_"; }
-                }
-            });
-
-            for (var property in formInput) {
-                if (!formInput.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") {
-                    continue;
-                }
-                if (property.slice(-3) == "_Id") {
-                    $.each(msArray, function (i, ms) {
-                        if (ms.id == property) {
-                            if (formInput[property] != null) {
-                                ms.addToSelection([{ id: formInput[property], name: formInput[property.slice(0, -2)] }], true);
-                            }
-                            return false;
-                        }
-                    });
-                    continue;
-                }
-                if (property.slice(-3) == "_bl") {
-                    if (formInput[property] == true) { $("#" + formId + " #" + property).prop("checked", true); }
-                    continue;
-                }
-                $("#" + formId + " #" + property).val(formInput[property]);
-            }
-
-            if (dbEntries.length == 1) {
-                $("[data-val-dbisunique]").prop("disabled", false);
-                msDisableUnique(msArray, false);
-            }
-            else {
-                $("[data-val-dbisunique]").prop("disabled", true);
-                msDisableUnique(msArray, true);
-            }
-
-            deferred0.resolve(dbEntries);
+            fillFormForEditFromDbEntries(getActive, dbEntries, formId, labelText, msArray)
+                .done(function () { deferred0.resolve(dbEntries); });
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
-
     return deferred0.promise();
 }
 
+//wraps FormForEditGeneric in modalWait and shows modalAJAXFail if failed
+function fillFormForEditGenericWrp(ids, httpType, url, getActive, formId, labelText, msArray) {
+    var deferred0 = $.Deferred();
+    showModalWait();
+    fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText, msArray)
+        .always(hideModalWait)
+        .done(function (dbEntries) { deferred0.resolve(dbEntries); })
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject(xhr, status, error);
+        });
+    return deferred0.promise();
+}
+
+//fillFormForEditFromDbEntries - takes dbEntries instead of executing AJAX request
+function fillFormForEditFromDbEntries(getActive, dbEntries, formId, labelText, msArray) {
+
+    setFormforEditHelper();
+    setFormFromFormInputHelper(getFormInputFromDbEntriesHelper());
+    setFormForUniqueFieldsHelper();
+    return $.Deferred().resolve(dbEntries);
+
+    //getFormInputFromDbEntriesHelper
+    function getFormInputFromDbEntriesHelper() {
+        var formInput = $.extend(true, {}, dbEntries[0]);
+        $.each(dbEntries, function (i, dbEntry) {
+            for (var property in dbEntry) {
+                if (!dbEntry.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") {
+                    continue;
+                }
+                if (property.slice(-3) == "_Id") {
+                    var msNameProperty = property.slice(0, -2);
+                    if (formInput[property] != dbEntry[property]) {
+                        formInput[property] = "_VARIES_";
+                        formInput[msNameProperty] = "_VARIES_";
+                    }
+                    else {
+                        formInput[msNameProperty] = "";
+                        for (var subProp in dbEntry[msNameProperty]) {
+                            if (dbEntry[msNameProperty][subProp] != null) {
+                                if (formInput[msNameProperty] != "") {
+                                    formInput[msNameProperty] += " ";
+                                }
+                                formInput[msNameProperty] += dbEntry[msNameProperty][subProp];
+                            }
+                        }
+                    }
+                }
+                else {
+                    if (formInput[property] != dbEntry[property]) {
+                        formInput[property] = "_VARIES_";
+                    }
+                }
+            }
+        });
+        return formInput;
+    }
+
+    //setFormForUniqueFieldsHelper
+    function setFormForUniqueFieldsHelper() {
+        if (dbEntries.length == 1) {
+            $("#" + formId + " [data-val-dbisunique]").prop("disabled", false);
+            msDisableUnique(msArray, false);
+        }
+        else {
+            $("#" + formId + " [data-val-dbisunique]").prop("disabled", true);
+            msDisableUnique(msArray, true);
+        }
+    }
+
+    //setFormFromFormInputHelper
+    function setFormFromFormInputHelper(formInput) {
+        for (var property in formInput) {
+            if (!formInput.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") { continue; }
+            if (property.slice(-3) == "_Id" && msArray) {
+                $.each(msArray, function (i, ms) {
+                    if (ms.id == property) {
+                        if (formInput[property] != null) {
+                            msSetSelectionSilent(ms, [{ id: formInput[property], name: formInput[property.slice(0, -2)] }]);
+                        }
+                        return false;
+                    }
+                });
+                continue;
+            }
+            if (property.slice(-3) == "_bl") {
+                if (formInput[property] == true) { $("#" + formId + " #" + property).prop("checked", true); }
+                continue;
+            }
+            $("#" + formId + " #" + property).val(formInput[property]);
+        }
+    }
+
+    //setFormforEditHelper
+    function setFormforEditHelper() {
+        if (getActive) { $("#" + formId + "GroupIsActive").addClass("hidden"); }
+        else { $("#" + formId + "GroupIsActive").removeClass("hidden"); }
+        $("#" + formId + "CreateMultiple").addClass("hidden");
+        clearFormInputs(formId, msArray);
+        if (labelText) { $("#" + formId + "Label").text(labelText); }
+    }
+}
+
+//-----------------------------------------------------------------------------
+
 //SubmitEdits to DB - generic version
 function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNewRecords) {
-
-    noOfNewRecords = (typeof noOfNewRecords !== "undefined" && noOfNewRecords >= 1 && noOfNewRecords <= 100) ? noOfNewRecords : 1;
-    currRecords = $.extend(true, [], currRecords);
-
+    noOfNewRecords = (noOfNewRecords && noOfNewRecords >= 1 && noOfNewRecords <= 100) ? noOfNewRecords : 1;
+    var currRecordsClone = $.extend(true, [], currRecords);
     var deferred0 = $.Deferred();
-
     var modifiedProperties = [];
+
     $("#" + formId + " .modifiable").each(function (index) {
         if ($(this).data("ismodified")) modifiedProperties.push($(this).prop("id"));
     });
@@ -375,68 +461,76 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
         if (ms.isModified == true) modifiedProperties.push(ms.id);
     });
 
-    $.each(currRecords, function (i, currRecord) {
+    $.each(currRecordsClone, function (i, currRecord) {
         for (var property in currRecord) {
-            if (!currRecord.hasOwnProperty(property) || property == "Id") {
-                continue;
-            }
-            if (property.slice(-1) == "_") {
-                currRecord[property] = (function () { return; })();
+            if (!currRecord.hasOwnProperty(property) || property == "Id" || $.inArray(property, modifiedProperties) == -1) {
                 continue;
             }
             if (property.slice(-3) == "_Id") {
                 $.each(msArray, function (i, ms) {
-                    if (ms.id == property && ms.isModified) {
-                        currRecord[property] = ms.getSelection().length != 0 ? (ms.getSelection())[0].id : "";
+                    if (ms.id == property) {
+                        currRecord[property]= ms.getSelection().length != 0 ? (ms.getSelection())[0].id : "";
+                        currRecord[property.slice(0, -2)] = (function () { return; })();
                         return false;
                     }
                 });
                 continue;
             }
-            if (property.slice(-3) == "_bl" && $.inArray(property, modifiedProperties) != -1) {
+            if (property.slice(-3) == "_bl") {
                 currRecord[property] = $("#" + formId + " #" + property).prop("checked");
                 continue;
             }
-            if ($.inArray(property, modifiedProperties) != -1) {
-                currRecord[property] = $("#" + formId +" #" + property).val();
-                continue;
-            }
+            currRecord[property] = $("#" + formId +" #" + property).val();
         }
         currRecord.ModifiedProperties = modifiedProperties;
     });
 
-    if (currRecords.length == 1 && noOfNewRecords > 1) {
-        multiplyRecordsAndModifyUniqueProps(formId, currRecords, noOfNewRecords);
-    }
+    if (currRecordsClone.length == 1 && noOfNewRecords > 1) { multiplyRecordsAndModifyUniquePropsHelper(); }
 
-    $.ajax({ type: httpType, url: url, timeout: 120000, data: { records: currRecords }, dataType: "json" })
-        .done(function (newEntryIds) { deferred0.resolve(newEntryIds); })
+    if (modifiedProperties.length == 0) { return deferred0.resolve({ "Success": "True", "newEntryIds": []}, currRecordsClone); }
+
+    $.ajax({ type: httpType, url: url, timeout: 120000, data: { records: currRecordsClone }, dataType: "json" })
+        .done(function (data) { deferred0.resolve(data, currRecordsClone); })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 
     return deferred0.promise();
+
+    //multiplyRecordsAndModifyUniquePropsHelper
+    function multiplyRecordsAndModifyUniquePropsHelper() {
+
+        for (var i = 1; i < noOfNewRecords; i++) {
+            currRecordsClone[i] = $.extend(true, {}, currRecordsClone[0]);
+        }
+
+        $.each(currRecordsClone, function (i, currRecord) {
+            for (var property in currRecord) {
+                if (!currRecord.hasOwnProperty(property) ||
+                property == "Id" ||
+                property.slice(-3) == "_Id" ||
+                property.slice(-1) == "_") {
+                    continue;
+                }
+                if ($("#" + formId + " #" + property).data("valDbisunique") == true) {
+                    var j = i + 1;
+                    currRecord[property] = currRecord[property] + "_" + ("00" + j).slice(-3);
+                }
+            }
+        });
+    }
 }
 
-//look up if the input field has dbisunique class and modify record prop to be unique
-function multiplyRecordsAndModifyUniqueProps(formId, currRecords, noOfNewRecords) {
-
-    for (var i = 1; i < noOfNewRecords; i++) {
-        currRecords[i] = $.extend(true, {}, currRecords[0]);
-    }
-
-    $.each(currRecords, function (i, currRecord) {
-        for (var property in currRecord) {
-            if (!currRecord.hasOwnProperty(property) ||
-            property == "Id" ||
-            property.slice(-3) == "_Id" ||
-            property.slice(-1) == "_") {
-                continue;
-            }
-            if ($("#" + formId + " #" + property).data("valDbisunique") == true) {
-                var j = i + 1;
-                currRecord[property] = currRecord[property] + "_" + ("00" + j).slice(-3);
-            }
-        }
-    });
+//wraps submitEditsGeneric in modalWait and shows modalAJAXFail if failed
+function submitEditsGenericWrp(formId, msArray, currRecords, httpType, url, noOfNewRecords) {
+    var deferred0 = $.Deferred();
+    showModalWait();
+    submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNewRecords)
+        .always(hideModalWait)
+        .done(function (data, currRecordsClone) { deferred0.resolve(data, currRecordsClone); })
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject(xhr, status, error);
+            });
+    return deferred0.promise();
 }
 
 //-----------------------------------------------------------------------------
@@ -460,7 +554,7 @@ function fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
         .done(function (done1, done2) {
             tableAdd.rows.add(done1[0]).order([sortColumn, "asc"]).draw();
             tableRemove.rows.add(done2[0]).order([sortColumn, "asc"]).draw();
-            deferred0.resolve();
+            return deferred0.resolve();
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
     }
@@ -469,11 +563,28 @@ function fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
             .done(function (data) {
                 tableAdd.rows.add(data).order([sortColumn, "asc"]).draw();
                 if (ids.length != 0) tableRemove.rows.add(data).order([sortColumn, "asc"]).draw();
-                deferred0.resolve();
+                return deferred0.resolve();
             })
             .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
     }
+    return deferred0.promise();
+}
 
+//wraps fillFormForRelatedGeneric in modalWait and shows modalAJAXFail if failed
+function fillFormForRelatedGenericWrp(tableAdd, tableRemove, ids,
+        httpType, url, data, httpTypeNot, urlNot, dataNot, httpTypeMany, urlMany, dataMany, sortColumn) {
+    var deferred0 = $.Deferred();
+    showModalWait();
+    fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
+        httpType, url, data, httpTypeNot, urlNot, dataNot, httpTypeMany, urlMany, dataMany, sortColumn)
+        .always(hideModalWait)
+        .done(function () {
+            return deferred0.resolve();
+        })
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject(xhr, status, error);
+        });
     return deferred0.promise();
 }
 
@@ -484,14 +595,14 @@ function submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
     var deferred1 = $.Deferred();
     var deferred2 = $.Deferred();
 
-    if (idsAdd.length == 0) deferred1.resolve();
+    if (idsAdd.length == 0) { deferred1.resolve(); }
     else {
-        $.ajax({type: "POST", url: url, timeout: 120000, data: { ids: ids, idsAddRem: idsAdd, isAdd: true }, dataType: "json" })
+        $.ajax({ type: "POST", url: url, timeout: 120000, data: { ids: ids, idsAddRem: idsAdd, isAdd: true }, dataType: "json" })
             .done(function () { deferred1.resolve(); })
             .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
     }
 
-    if (idsRemove.length == 0) deferred2.resolve();
+    if (idsRemove.length == 0) { deferred2.resolve(); }
     else {
         setTimeout(function () {
             $.ajax({ type: "POST", url: url, timeout: 120000, data: { ids: ids, idsAddRem: idsRemove, isAdd: false }, dataType: "json" })
@@ -501,19 +612,29 @@ function submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
     }
 
     $.when(deferred1, deferred2)
-        .done(function () { deferred0.resolve(); })
+        .done(function () { return deferred0.resolve(); })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 
     return deferred0.promise();
 }
 
-//-----------------------------------------------------------------------------
-
-//msSetSelectionSilent - version of setSelection not triggering events
-function msSetSelectionSilent(ms, itemsArray) {
-    ms.clear(true);
-    ms.addToSelection(itemsArray, true);
+//wraps submitEditsForRelatedGeneric in modalWait and shows modalAJAXFail if failed
+function submitEditsForRelatedGenericWrp(ids, idsAdd, idsRemove, url) {
+    var deferred0 = $.Deferred();
+    showModalWait();
+    submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url)
+        .always(hideModalWait)
+        .done(function () {
+            return deferred0.resolve();
+        })
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject(xhr, status, error);
+        });
+    return deferred0.promise();
 }
+
+//-----------------------------------------------------------------------------
 
 //initialize MagicSuggest and add to MagicSuggest array
 function msAddToMsArray(msArray, id, url, maxSelection, minChars, dataUrlParams, disabled, editable) {
@@ -568,6 +689,7 @@ function msAddToMsArray(msArray, id, url, maxSelection, minChars, dataUrlParams,
 
 //check if MagicSuggests in MagicSugest Array are valid
 function msIsValid(msArray) {
+    if (!msArray) { return; }
     var msCheck = true;
     $.each(msArray, function (i, ms) {
         if (!ms.isValid()) msCheck = false;
@@ -577,6 +699,7 @@ function msIsValid(msArray) {
 
 //change formatting of invalid MagicSugest's
 function msValidate(msArray) {
+    if (!msArray) { return; }
     $.each(msArray, function (i, ms) {
         if (!ms.isValid()) {
             $("#" + ms.id).addClass("input-validation-error");
@@ -586,8 +709,9 @@ function msValidate(msArray) {
     });
 }
 
-//enable or disable DbUnique MagicSuggests
+//enable or disable DbUnique MagicSuggests in ms array
 function msDisableUnique(msArray, disable) {
+    if (!msArray) { return; }
     disable = (typeof disable !== "undefined" && disable == false) ? false : true;
     $.each(msArray, function (i, ms) {
         if (disable == true && typeof ms.dataValDbisunique !== "undefined" && ms.dataValDbisunique == "true") { ms.disable(); }
@@ -595,8 +719,9 @@ function msDisableUnique(msArray, disable) {
     });
 }
 
-//enable or disable DbUnique MagicSuggests
+//enable or disable All MagicSuggests in ms array
 function msDisableAll(msArray, disable) {
+    if (!msArray) { return; }
     disable = (typeof disable !== "undefined" && disable == false) ? false : true;
     $.each(msArray, function (i, ms) {
         if (disable == true) { ms.disable(); }
@@ -606,94 +731,44 @@ function msDisableAll(msArray, disable) {
 
 //set MagicSuggests as modified ot not
 function msSetAsModified(msArray, isModified) {
+    if (!msArray) { return; }
     isModified = (typeof isModified !== "undefined" && isModified == false) ? false : true;
     $.each(msArray, function (i, ms) { ms.isModified = isModified; });
 }
 
+//msSetSelectionSilent - version of setSelection not triggering events
+function msSetSelectionSilent(ms, itemsArray) {
+    ms.clear(true);
+    ms.addToSelection(itemsArray, true);
+}
+
 //-----------------------------------------------------------------------------
 
-//Pulls Model Information and formats edit form and column names
-function updateViewsForModelGeneric(table, url, modelId, tableTitleId, editFormLabelId) {
+//Pulls type information and formats table column names
+function updateTableForExtended(httpType, url, data, table) {
+    var deferred0 = $.Deferred();
+    $.ajax({ type: httpType, url: url, data: data, timeout: 120000, dataType: "json" })
+        .done(function (data) {
+            var typeHasAttrs = false;
+            var entityType = data[0];
+            for (var prop in entityType) {
+                if (prop.indexOf("Attr") == -1 || prop.indexOf("Desc") == -1) { continue; }
+                if (entityType[prop] != null && entityType[prop] != "") { typeHasAttrs = true; }
+                $(table.column(prop.slice(prop.indexOf("Attr"), 6) + ":name").header()).text(entityType[prop]);
+            }
+            deferred0.resolve(typeHasAttrs);
+        })
+        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
+    return deferred0.promise();
+}
+
+//updateTableForExtendedWrp
+function updateTableForExtendedWrp(httpType, url, data, table) {
     var deferred0 = $.Deferred();
     showModalWait();
-    $.ajax({ type: "POST", url: url, timeout: 120000, data: { ids: [modelId] }, dataType: "json" })
+    updateTableForExtended(httpType, url, data, table)
         .always(hideModalWait)
-        .done(function (data) {
-            var modelName = (data[0].CompModelName) ? data[0].CompModelName : data[0].AssyModelName;
-            if (tableTitleId) { $("#" + tableTitleId).text(modelName); }
-            if (editFormLabelId) { $("#" + editFormLabelId).text("Edit " + modelName); }
-
-            for (var prop in data[0]) {
-                if (prop.indexOf("Attr") != -1 && prop.indexOf("Desc") != -1) {
-
-                    var attrName = prop.slice(prop.indexOf("Attr"), 6);
-
-                    $(table.column(attrName + ":name").header()).text(data[0][prop]);
-                    $("label[for=" + attrName + "]").text(data[0][prop]);
-                    $("#" + attrName).prop("placeholder", data[0][prop]);
-                }
-                if (prop.indexOf("Attr") != -1 && prop.indexOf("Type") != -1) {
-
-                    var attrName = prop.slice(prop.indexOf("Attr"), 6);
-                    var $targetEl = $("#" + attrName);
-                    var attrsToRemove = "";
-
-                    $.each($targetEl[0].attributes, function (i, attrib) {
-                        if (typeof attrib !== "undefined" && attrib.name.indexOf("data-val") == 0) {
-                            attrsToRemove += (attrsToRemove == "") ? attrib.name : " " + attrib.name;
-                        }
-                    });
-
-                    var picker = $targetEl.data("DateTimePicker");
-                    if (typeof picker !== "undefined") { picker.destroy(); }
-
-                    $("#FrmGrp" + attrName).removeClass("hidden");
-
-                    switch (data[0][prop]) {
-                        case "NotUsed":
-                            $("#FrmGrp" + attrName).addClass("hidden");
-                            break;
-                        case "String":
-                            $targetEl.removeAttr(attrsToRemove).attr({
-                                "data-val": "true",
-                                "data-val-length": "The field must be a string with a maximum length of 255.",
-                                "data-val-length-max": "255"
-                            });
-                            break;
-                        case "Int":
-                            $targetEl.removeAttr(attrsToRemove).attr({
-                                "data-val": "true",
-                                "data-val-dbisinteger": "The field must be an integer."
-                            });
-                            break;
-                        case "Decimal":
-                            $targetEl.removeAttr(attrsToRemove).attr({
-                                "data-val": "true",
-                                "data-val-number": "The field must be a number."
-                            });
-                            break;
-                        case "DateTime":
-                            $targetEl.removeAttr(attrsToRemove).attr({
-                                "data-val": "true",
-                                "data-val-dbisdatetimeiso": "The field must have YYYY-MM-DD HH:mm format."
-                            });
-                            $targetEl.datetimepicker({ format: "YYYY-MM-DD HH:mm" })
-                                .on("dp.change", function (e) { $(this).data("ismodified", true); });
-                            break;
-                        case "Bool":
-                            $targetEl.removeAttr(attrsToRemove).attr({
-                                "data-val": "true",
-                                "data-val-dbisbool": "The field must be 'true' or 'false'."
-                            });
-                            break;
-                    }
-                }
-            }
-            $("#EditForm").removeData("validator");
-            $("#EditForm").removeData('unobtrusiveValidation');
-            $.validator.unobtrusive.parse("#EditForm")
-            deferred0.resolve();
-        })
+        .done(deferred0.resolve)
         .fail(function (xhr, status, error) {
             showModalAJAXFail(xhr, status, error);
             deferred0.reject(xhr, status, error);
@@ -701,17 +776,112 @@ function updateViewsForModelGeneric(table, url, modelId, tableTitleId, editFormL
     return deferred0.promise();
 }
 
-//checkAllEqualInArray - checks if all items in array are same
-function modelIdsAreSame(modelIds) {
-    if (!modelIds || modelIds.length == 0) {
-        return false;
-    }
-    for (var i in modelIds) {
-        if (modelIds[i] == "" || modelIds[i] == null || modelIds[i] != modelIds[0]) {
-            return false;
+//pulls type information and formats form fields including validation reset
+function updateFormForExtended(httpType, url, data, formId) {
+    var deferred0 = $.Deferred();
+    $.ajax({ type: httpType, url: url, data: data, timeout: 120000, dataType: "json" })
+        .done(function (data) {
+            var typeHasAttrs = false;
+            var entityType = data[0];
+            for (var prop in entityType) {
+                if (prop.indexOf("Attr") == -1) { continue; }
+                if (prop.indexOf("Type") != -1 && entityType[prop] != "NotUsed") { typeHasAttrs = true; }
+                changeFormFieldDescriptionHelper(formId, entityType, prop);
+                changeFormFieldValidationHelper(formId, entityType, prop);
+            }
+            $("#" + formId).removeData("validator");
+            $("#" + formId).removeData('unobtrusiveValidation');
+            $.validator.unobtrusive.parse("#" + formId)
+            deferred0.resolve(typeHasAttrs);
+        })
+        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
+    return deferred0.promise();
+
+    //changeFormFieldDescriptionHelper
+    function changeFormFieldDescriptionHelper(formId, entityType, prop) {
+        if (prop.indexOf("Desc") != -1) {
+            var attrName = prop.slice(prop.indexOf("Attr"), 6);
+            $("#" + formId + " label[for=" + attrName + "]").text(entityType[prop]);
+            $("#" + formId + " #" + attrName).prop("placeholder", entityType[prop]);
         }
     }
-    return true;
+
+    //changeFormFieldValidationHelper
+    function changeFormFieldValidationHelper(formId, entityType, prop) {
+        if (prop.indexOf("Type") != -1) {
+            var attrName = prop.slice(prop.indexOf("Attr"), 6);
+            var $targetEl = $("#" + formId + " #" + attrName);
+
+            removeValidationAttributesHelper($targetEl);
+            if ($targetEl.data("DateTimePicker")) {
+                $targetEl.off("dp.change");
+                $targetEl.data("DateTimePicker").destroy();
+            }
+            $("#" + formId + " #FrmGrp" + attrName).removeClass("hidden");
+
+            if (entityType[prop] == "NotUsed") {
+                $("#" + formId + " #FrmGrp" + attrName).addClass("hidden");
+            }
+            if (entityType[prop] == "String") {
+                $targetEl.attr({
+                    "data-val": "true",
+                    "data-val-length": "The field must be a string with a maximum length of 255.",
+                    "data-val-length-max": "255"
+                });
+            }
+            if (entityType[prop] == "Int") {
+                $targetEl.attr({
+                    "data-val": "true",
+                    "data-val-dbisinteger": "The field must be an integer."
+                });
+            }
+            if (entityType[prop] == "Decimal") {
+                $targetEl.attr({
+                    "data-val": "true",
+                    "data-val-number": "The field must be a number."
+                });
+            }
+            if (entityType[prop] == "DateTime") {
+                $targetEl.attr({
+                    "data-val": "true",
+                    "data-val-dbisdatetimeiso": "The field must have YYYY-MM-DD HH:mm format."
+                });
+                $targetEl.datetimepicker({ format: "YYYY-MM-DD HH:mm" })
+                    .on("dp.change", function (e) { $(this).data("ismodified", true); });
+            }
+            if (entityType[prop] == "Bool") {
+                $targetEl.attr({
+                    "data-val": "true",
+                    "data-val-dbisbool": "The field must be 'true' or 'false'."
+                });
+            }
+        }
+    }
+
+    //removeValidationAttributesHelper
+    function removeValidationAttributesHelper($element) {
+        var attrsToRemove = "";
+        $.each($element[0].attributes, function (i, attrib) {
+            if (typeof attrib !== "undefined" && attrib.name.indexOf("data-val") == 0) {
+                attrsToRemove += (attrsToRemove == "") ? attrib.name : " " + attrib.name;
+            }
+        });
+        $element.removeAttr(attrsToRemove);
+    }
+}
+
+//updateFormForExtendedWrp
+function updateFormForExtendedWrp(httpType, url, data, formId) {
+    var deferred0 = $.Deferred();
+    showModalWait();
+    updateFormForExtended(httpType, url, data, formId)
+        .always(hideModalWait)
+        .done(function (typeHasAttrs) { deferred0.resolve(typeHasAttrs); })
+        .fail(function (xhr, status, error) {
+            showModalAJAXFail(xhr, status, error);
+            deferred0.reject(xhr, status, error);
+        });
+    return deferred0.promise();
 }
 
 //-----------------------------------------------------------------------------

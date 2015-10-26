@@ -126,9 +126,6 @@
     <Compile Include="Tests_AssemblyLogEntryService.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Tests_AssemblyModelService.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Tests_AssemblyStatusService.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -136,9 +133,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Tests_ComponentLogEntryService.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Tests_ComponentModelService.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Tests_ComponentService.cs">

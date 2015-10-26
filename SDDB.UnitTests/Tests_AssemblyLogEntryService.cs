@@ -34,39 +34,41 @@ namespace SDDB.UnitTests
             var project1 = new Project
             {
                 Id = "dummyProjId1",
-                ProjectName = "Project1",
+               ProjectName = "Project1",
                 ProjectAltName = "ProjectAlt1",
                 IsActive_bl = true,
                 ProjectCode = "CODE1",
                 ProjectPersons = new List<Person> { projectPerson1 }
             };
 
+            var location1 = new Location { Id = "dummyLocId1", LocName = "Loc1", AssignedToProject_Id = project1.Id, AssignedToProject = project1 };
+
             var dbEntry1 = new AssemblyLogEntry
             {
                 Id = "dummyEntryId1",
                 AssemblyDb_Id = "dummyAssyId1",
-                AssignedToProject_Id = "dummyProjId1",
+                AssignedToLocation_Id = location1.Id,
                 IsActive_bl = false,
                 Comments = "DummyComments1",
-                AssignedToProject = project1
+                AssignedToLocation = location1
             };
             var dbEntry2 = new AssemblyLogEntry
             {
                 Id = "dummyEntryId2",
                 AssemblyDb_Id = "dummyAssyId2",
-                AssignedToProject_Id = "dummyProjId1",
+                AssignedToLocation_Id = location1.Id,
                 IsActive_bl = true,
                 Comments = "DummyComments2",
-                AssignedToProject = project1
+                AssignedToLocation = location1
             };
             var dbEntry3 = new AssemblyLogEntry
             {
                 Id = "dummyEntryId3",
                 AssemblyDb_Id = "dummyAssyId3",
-                AssignedToProject_Id = "dummyProjId1",
+                AssignedToLocation_Id = location1.Id,
                 IsActive_bl = true,
                 Comments = "DummyComments3",
-                AssignedToProject = project1
+                AssignedToLocation = location1
             };
             var dbEntries = (new List<AssemblyLogEntry> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 
@@ -113,6 +115,9 @@ namespace SDDB.UnitTests
                 ProjectCode = "CODE1",
                 ProjectPersons = new List<Person> { projectPerson1 }
             };
+
+            var location1 = new Location { Id = "dummyLocId1", LocName = "Loc1", AssignedToProject_Id = project1.Id, AssignedToProject = project1 };
+
             var project2 = new Project
             {
                 Id = "dummyId2",
@@ -123,23 +128,25 @@ namespace SDDB.UnitTests
                 ProjectPersons = new List<Person> { projectPerson2 }
             };
 
+            var location2 = new Location { Id = "dummyLocId2", LocName = "Loc2", AssignedToProject_Id = project2.Id, AssignedToProject = project2 };
+
             var dbEntry1 = new AssemblyLogEntry
             {
                 Id = "dummyEntryId1",
                 AssemblyDb_Id = "dummyAssyId1",
-                AssignedToProject_Id = "dummyProjId1",
+                AssignedToLocation_Id = location1.Id,
                 IsActive_bl = false,
                 Comments = "DummyComments1",
-                AssignedToProject = project1
+                AssignedToLocation = location1
             };
             var dbEntry2 = new AssemblyLogEntry
             {
                 Id = "dummyEntryId2",
                 AssemblyDb_Id = "dummyAssyId2",
-                AssignedToProject_Id = "dummyProjId1",
+                AssignedToLocation_Id = location2.Id,
                 IsActive_bl = true,
                 Comments = "DummyComments2",
-                AssignedToProject = project2
+                AssignedToLocation = location2
             };
             var dbEntries = (new List<AssemblyLogEntry> { dbEntry1, dbEntry2 }).AsQueryable();
 
@@ -184,32 +191,34 @@ namespace SDDB.UnitTests
                 ProjectPersons = new List<Person> { projectPerson1 }
             };
 
+            var location1 = new Location { Id = "dummyLocId1", LocName = "Loc1", AssignedToProject_Id = project1.Id, AssignedToProject = project1 };
+
             var dbEntry1 = new AssemblyLogEntry
             {
                 Id = "dummyEntryId1",
                 AssemblyDb_Id = "dummyAssyId1",
-                AssignedToProject_Id = "dummyProjId1",
+                AssignedToLocation_Id = location1.Id,
                 IsActive_bl = false,
                 Comments = "DummyComments1",
-                AssignedToProject = project1
+                AssignedToLocation = location1
             };
             var dbEntry2 = new AssemblyLogEntry
             {
                 Id = "dummyEntryId2",
                 AssemblyDb_Id = "dummyAssyId2",
-                AssignedToProject_Id = "dummyProjId1",
+                AssignedToLocation_Id = location1.Id,
                 IsActive_bl = true,
                 Comments = "DummyComments2",
-                AssignedToProject = project1
+                AssignedToLocation = location1
             };
             var dbEntry3 = new AssemblyLogEntry
             {
                 Id = "dummyEntryId3",
                 AssemblyDb_Id = "dummyAssyId3",
-                AssignedToProject_Id = "dummyProjId1",
+                AssignedToLocation_Id = location1.Id,
                 IsActive_bl = false,
                 Comments = "DummyComments3",
-                AssignedToProject = project1
+                AssignedToLocation = location1
             };
             var dbEntries = (new List<AssemblyLogEntry> { dbEntry1, dbEntry2, dbEntry3 }).AsQueryable();
 

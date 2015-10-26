@@ -81,7 +81,6 @@ $(document).ready(function () {
         }
         else { $("#GroupPersonsViewPanel").text("_MULTIPLE_") }
 
-        saveViewSettings(TableMain);
         showModalWait();
         fillFormForRelatedGeneric(
                 TableGroupPersonsAdd, TableGroupPersonsRemove, CurrIds,
@@ -91,6 +90,7 @@ $(document).ready(function () {
                 {getActive: true }, 1)
             .always(hideModalWait)
             .done(function () {
+                saveViewSettings(TableMain);
                 switchView("MainView", "GroupPersonsView", "tdo-btngroup-grouppersons");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -110,7 +110,6 @@ $(document).ready(function () {
         }
         else { $("#GroupManagersViewPanel").text("_MULTIPLE_") }
 
-        saveViewSettings(TableMain);
         showModalWait();
         fillFormForRelatedGeneric(
                 TableGroupManagersAdd, TableGroupManagersRemove, CurrIds,
@@ -119,6 +118,7 @@ $(document).ready(function () {
                 "GET", "/PersonSrv/GetAll", { getActive: true }, 1)
             .always(hideModalWait)
             .done(function () {
+                saveViewSettings(TableMain);
                 switchView("MainView", "GroupManagersView", "tdo-btngroup-groupmanagers");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -126,6 +126,11 @@ $(document).ready(function () {
     });
             
     //---------------------------------------DataTables------------
+
+    //wire up BtnTableMainExport
+    $("#BtnTableMainExport").click(function (event) {
+        exportTableToTxt(TableMain);
+    });
 
     //Wire up ChBoxShowDeleted
     $("#ChBoxShowDeleted").change(function (event) {
@@ -170,7 +175,7 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnCancel
     $("#EditFormBtnCancel").click(function () {
-        switchView("EditFormView","MainView", "tdo-btngroup-main", true);
+        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
     });
 
     //Wire Up EditFormBtnOk
@@ -187,7 +192,7 @@ $(document).ready(function () {
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("EditFormView", "MainView", "tdo-btngroup-main", true, TableMain);
+                        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
@@ -197,7 +202,7 @@ $(document).ready(function () {
 
     //Wire Up GroupPersonsViewBtnCancel
     $("#GroupPersonsViewBtnCancel").click(function () {
-        switchView("GroupPersonsView", "MainView", "tdo-btngroup-main", true);
+        switchView("GroupPersonsView", "MainView", "tdo-btngroup-main", TableMain);
     });
 
     //Wire Up GroupPersonsViewBtnOk
@@ -217,7 +222,7 @@ $(document).ready(function () {
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("GroupPersonsView", "MainView", "tdo-btngroup-main", true, TableMain);
+                        switchView("GroupPersonsView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -280,7 +285,7 @@ $(document).ready(function () {
 
     //Wire Up GroupManagersViewBtnCancel
     $("#GroupManagersViewBtnCancel").click(function () {
-        switchView("GroupManagersView", "MainView", "tdo-btngroup-main", true);
+        switchView("GroupManagersView", "MainView", "tdo-btngroup-main", TableMain);
     });
 
     //Wire Up GroupManagersViewBtnOk
@@ -300,7 +305,7 @@ $(document).ready(function () {
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("GroupManagersView", "MainView", "tdo-btngroup-main", true, TableMain);
+                        switchView("GroupManagersView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -373,9 +378,9 @@ $(document).ready(function () {
 //--------------------------------------Main Methods---------------------------------------//
 
 //Delete Records from DB
-function DeleteRecords() {
+function deleteRecords() {
     CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-    deleteRecordsGeneric(CurrIds, "/PersonGroupSrv/Delete", refreshMainView);
+    deleteRecordsGenericWrp(CurrIds, "/PersonGroupSrv/Delete", refreshMainView);
 }
 
 //refresh Main view 

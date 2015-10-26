@@ -1,7 +1,7 @@
 ﻿@model SDDB.Domain.Entities.PersonLogEntry
 @using SDDB.WebUI.Infrastructure
 @{
-    ViewBag.Title = "Person Activities";
+    ViewBag.Title = "SDDB Person Activities";
 }
 <!------- InitialView ------->
 <div class="container-fluid" id="InitialView">
@@ -69,6 +69,11 @@
     <div class="panel panel-primary" id="PanelTableMain">
         <div class="panel-heading text-center" style="font-size:130%">
             <strong>Person Activities</strong>
+            <div class="pull-left">
+                <button type="button" class="btn btn-xs btn-info" id="BtnTableMainExport">
+                    <span class="glyphicon glyphicon-download-alt"></span>
+                </button>
+            </div>
             <div class="pull-right">
                 <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="65" 
                        data-onstyle="warning" data-offstyle="primary" data-on="Deleted" data-off="Active">
@@ -180,81 +185,81 @@
                 </div>
             </div>
 
-            <div class="row" id="LogEntryAssysView">
-                <div class="col-xs-12 col-sm-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading" >
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    @if (User.IsInRole("Assembly_EditStatus"))
-                                    {
-                                        <button class="btn btn-sm btn-warning pull-right" id="EditFormBtnChngSts" type="button">Change Status</button>
-                                    }
-                                    <strong>Add Assemblies </strong><small><em> Choose Location first.</em></small>
-                                </div>
-                            </div>
+            <div class="well well-tdo">
+                <div class="row" id="LogEntryAssysView">
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading"><strong>Add Assemblies </strong><small><em> Choose Location first.</em></small></div>
+                            <table class="table table-striped" id="TableLogEntryAssysAdd">
+                                <thead class="hidden">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="selectable"></tbody>
+                            </table>
                         </div>
-                        <table class="table table-striped" id="TableLogEntryAssysAdd">
-                            <thead class="hidden">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                </tr>
-                            </thead>
-                            <tbody class="selectable"></tbody>
-                        </table>
                     </div>
-                </div>
-                <div class="col-xs-12 col-sm-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading"><strong>Remove Assemblies </strong><small><em> Choose Location first</em></small></div>
-                        <table class="table table-striped" id="TableLogEntryAssysRemove">
-                            <thead class="hidden">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                </tr>
-                            </thead>
-                            <tbody class="selectable"></tbody>
-                        </table>
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading"><strong>Remove Assemblies </strong><small><em> Choose Location first</em></small></div>
+                            <table class="table table-striped" id="TableLogEntryAssysRemove">
+                                <thead class="hidden">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="selectable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-xs-12">
+                        <button class="btn btn-sm btn-info" id="EditFormBtnAddRemoveAssys" type="button">Add/Remove Now</button>
+                        @if (User.IsInRole("Assembly_EditStatus"))
+                        {
+                            <button class="btn btn-sm btn-warning pull-right" id="EditFormBtnChngSts" type="button">Change Status</button>
+                        }
                     </div>
                 </div>
             </div>
-
-            <div class="row" id="LogEntryPersonsView">
-                <div class="col-xs-12 col-sm-6">
-                    <div class="panel panel-tdo-info">
-                        <div class="panel-heading">
-                            <strong>Add People</strong> 
-                            <div class="small"><em> Adding others adds hours to their records!</em></div>
+            <div class="well well-tdo">
+                <div class="row" id="LogEntryPersonsView">
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="panel panel-tdo-info">
+                            <div class="panel-heading">
+                                <strong>Add People</strong>
+                                <div class="small"><em> Adding others adds hours to their records!</em></div>
+                            </div>
+                            <table class="table table-striped" id="TableLogEntryPersonsAdd">
+                                <thead class="hidden">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Last Name</th>
+                                        <th>First Name</th>
+                                        <th>Initials</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="selectable"></tbody>
+                            </table>
                         </div>
-                        <table class="table table-striped" id="TableLogEntryPersonsAdd">
-                            <thead class="hidden">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Last Name</th>
-                                    <th>First Name</th>
-                                    <th>Initials</th>
-                                </tr>
-                            </thead>
-                            <tbody class="selectable"></tbody>
-                        </table>
                     </div>
-                </div>
-                <div class="col-xs-12 col-sm-6">
-                    <div class="panel panel-tdo-info">
-                        <div class="panel-heading"><strong>Remove People</strong></div>
-                        <table class="table table-striped" id="TableLogEntryPersonsRemove">
-                            <thead class="hidden">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Last Name</th>
-                                    <th>First Name</th>
-                                    <th>Initials</th>
-                                </tr>
-                            </thead>
-                            <tbody class="selectable"></tbody>
-                        </table>
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="panel panel-tdo-info">
+                            <div class="panel-heading"><strong>Remove People</strong></div>
+                            <table class="table table-striped" id="TableLogEntryPersonsRemove">
+                                <thead class="hidden">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Last Name</th>
+                                        <th>First Name</th>
+                                        <th>Initials</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="selectable"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
