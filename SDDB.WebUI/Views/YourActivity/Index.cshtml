@@ -16,7 +16,7 @@
     </div>
 
     <div class="btn-group navbar-btn tdo-btngroup-edit hidden">
-        <button type="button" class="btn btn-default" id="EditFormBtnCancel">Cancel</button>
+        <button type="button" class="btn btn-default" id="EditFormBtnCancel">Back</button>
         <button type="button" class="btn btn-tdo-success" id="EditFormBtnOkFiles">
             &nbsp;<span class="glyphicon glyphicon-cloud-upload"></span>&nbsp;
         </button>
@@ -203,7 +203,7 @@
                 </div>
             </div>
             <div class="col-xs-12">
-                <button class="btn btn-sm btn-info" id="EditFormBtnAddRemoveAssys" type="button">Add/Remove Now</button>
+                <button class="btn btn-sm btn-info" id="EditFormBtnAddRemoveAssys" type="button">Add/Remove Assys</button>
                 @if (User.IsInRole("Assembly_EditStatus"))
                 {
                     <button class="btn btn-sm btn-warning pull-right" id="EditFormBtnChngSts" type="button">Change Status</button>
@@ -255,6 +255,9 @@
                             <tbody class="selectable"></tbody>
                         </table>
                     </div>
+                </div>
+                <div class="col-xs-12">
+                    <button class="btn btn-sm btn-info" id="EditFormBtnAddRemovePersons" type="button">Add/Remove People</button>
                 </div>
             </div>
         </div>

@@ -82,8 +82,11 @@ $(document).ready(function () {
     //Get focus on ModalDeleteBtnCancel
     $("#ModalDelete").on("shown.bs.modal", function () { $("#ModalDeleteBtnCancel").focus(); });
 
-    //Wire Up ModalDeleteBtnCancel 
+    //Wire Up ModalDeleteBtnCancel
     $("#ModalDeleteBtnCancel").click(function () { $("#ModalDelete").modal("hide"); });
+
+    //Get focus on ModalConfirmBtnYes
+    $("#ModalConfirm").on("shown.bs.modal", function () { $("#ModalConfirmBtnYes").focus(); });
 
 });
 
@@ -155,6 +158,19 @@ function showModalAJAXFail(xhr, status, error) {
     $("#ModalInfoBody").html("Error type: <strong>" + error + "</strong> , Status: <strong>" + status + "</strong>");
     $("#ModalInfoBodyPre").text(errMessage).removeClass("hidden");
     setTimeout(function () { $("#ModalInfo").modal("show"); }, 10);
+}
+
+//showModalConfirm
+function showModalConfirm(bodyText) {
+    var deferred0 = $.Deferred();
+    if (bodyText) { $("#ModalConfirmBody").text(bodyText); } 
+    else { $("#ModalConfirmBody").text("Please confirm..."); }
+    $("#ModalConfirmBtnNo, #ModalConfirmBtnYes").off("click");
+    $("#ModalConfirmBtnNo, #ModalConfirmBtnYes").click(function () { $("#ModalConfirm").modal("hide"); });
+    $("#ModalConfirmBtnNo").click(function () { return deferred0.reject(); });
+    $("#ModalConfirmBtnYes").click(function () { return deferred0.resolve(); });
+    $("#ModalConfirm").modal("show");
+    return deferred0.promise();
 }
 
 //-----------------------------------------------------------------------------
@@ -310,8 +326,7 @@ function clearFormInputs(formId, msArray) {
     $("#" + formId + " .input-validation-error").removeClass("input-validation-error");
     $("#" + formId + " .modifiable").data("ismodified", false);
 
-    if (msArray) { $.each(msArray, function (i, ms) { ms.clear(true); ms.isModified = false; });
-    }
+    if (msArray) { $.each(msArray, function (i, ms) { ms.clear(true); ms.isModified = false; }); }
 }
 
 //Prepare Form For Create
@@ -490,7 +505,11 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
     if (modifiedProperties.length == 0) { return deferred0.resolve({ "Success": "True", "newEntryIds": []}, currRecordsClone); }
 
     $.ajax({ type: httpType, url: url, timeout: 120000, data: { records: currRecordsClone }, dataType: "json" })
-        .done(function (data) { deferred0.resolve(data, currRecordsClone); })
+        .done(function (data) {
+            $("#" + formId + " .modifiable").data("ismodified", false);
+            msSetAsModified(msArray, false);
+            deferred0.resolve(data, currRecordsClone);
+        })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 
     return deferred0.promise();

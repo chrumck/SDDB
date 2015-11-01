@@ -37,12 +37,10 @@ namespace SDDB.WebUI
                 
                 new DBRole {Name = "Assembly_View" },new DBRole {Name = "Assembly_Edit" }, new DBRole {Name = "Assembly_EditStatus" },
                 new DBRole {Name = "AssemblyType_View" },new DBRole {Name = "AssemblyType_Edit" },
-                new DBRole {Name = "AssemblyModel_View" },new DBRole {Name = "AssemblyModel_Edit" },
                 new DBRole {Name = "AssemblyStatus_View" },new DBRole {Name = "AssemblyStatus_Edit" },
                 
                 new DBRole {Name = "Component_View" },new DBRole {Name = "Component_Edit" },
                 new DBRole {Name = "ComponentType_View" },new DBRole {Name = "ComponentType_Edit" },
-                new DBRole {Name = "ComponentModel_View" },new DBRole {Name = "ComponentModel_Edit" },
                 new DBRole {Name = "ComponentStatus_View" },new DBRole {Name = "ComponentStatus_Edit" },
             };
 

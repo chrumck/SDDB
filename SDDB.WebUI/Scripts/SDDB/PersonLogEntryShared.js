@@ -58,12 +58,7 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
-        msValidate(MagicSuggests);
-        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
-            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
-            return;
-        }
-        submitEdits().done(function () {
+        checkAndSubmitEdits().done(function () {
             refreshMainView().done(function() {
                 switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
             });
@@ -72,13 +67,8 @@ $(document).ready(function () {
 
     //Wire Up EditFormBtnOkFiles
     $("#EditFormBtnOkFiles").click(function () {
-        msValidate(MagicSuggests);
-        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
-            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
-            return;
-        }
         var entryFilesPanelText = $("#LogEntryDateTime").val() + " " + MagicSuggests[0].getSelection()[0].name;
-        submitEdits().done(function () {
+        checkAndSubmitEdits().done(function () {
             setTimeout(function () {
                 fillLogEntryFilesForm(entryFilesPanelText)
                     .done(function () { switchView("EditFormView", "LogEntryFilesView", "tdo-btngroup-logentryfiles"); });
@@ -110,6 +100,21 @@ $(document).ready(function () {
             return;
         }
         showModalChngSts();
+    });
+
+    //Wire Up EditFormBtnAddRemovePersons
+    $("#EditFormBtnAddRemovePersons").click(function () {
+        if (TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().length +
+            TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().length == 0) {
+            showModalNothingSelected();
+            return;
+        }
+        msValidate(MagicSuggests);
+        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct before adding/removing people.");
+            return;
+        }
+        addRemovePersonsNow();
     });
 
     //------------------------------------DataTables - Log Entry Assemblies ---
@@ -250,84 +255,115 @@ function deleteRecords() {
     deleteRecordsGenericWrp(CurrIds, "/PersonLogEntrySrv/Delete", refreshMainView);
 }
 
-//submit edits to DB
-function submitEdits() {
-    var deferred0 = $.Deferred();
+//checkAndSubmitEdits
+function checkAndSubmitEdits() {
+    msValidate(MagicSuggests);
+    if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+        showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
+        return $.Deferred().reject();
+    }
+    return confirmSubmitAddRemoveHelper()
+        .then(confirmNoAssembliesHelper)
+        .then(submitEditsHelper);
 
-    showModalWait();
-    submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonLogEntrySrv/Edit")
-        .then(function (data) {
+    //helpers---------------------------------------
 
-            var deferred1 = $.Deferred();
+    //confirmSubmitAddRemoveHelper
+    function confirmSubmitAddRemoveHelper() {
+        var addRemoveCount = TableLogEntryAssysAdd.rows(".ui-selected", { page: "current" }).data().length +
+                TableLogEntryAssysRemove.rows(".ui-selected", { page: "current" }).data().length +
+                TableLogEntryPersonsAdd.rows(".ui-selected", { page: "current" }).data().length +
+                TableLogEntryPersonsRemove.rows(".ui-selected", { page: "current" }).data().length;
 
-            CurrIds = (CurrIds.length == 0) ? data.newEntryIds : CurrIds;
-            var idsAssysAdd =
-                TableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-            var idsAssysRemove = 
-                TableLogEntryAssysRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-            var idsPersonsAdd =
-                 TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-            var idsPersonsRemove =
-                TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (addRemoveCount == 0) { return $.Deferred().resolve(); }
 
-            $.when(
-                submitEditsForRelatedGeneric(CurrIds, idsAssysAdd, idsAssysRemove, "/PersonLogEntrySrv/EditPrsLogEntryAssys"),
-                submitEditsForRelatedGeneric(CurrIds, idsPersonsAdd, idsPersonsRemove, "/PersonLogEntrySrv/EditPrsLogEntryPersons")
-                )
-                .done(function () { deferred1.resolve(); })
-                .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
+        return showModalConfirm("There are Assemblies and/or People selected in the Add/Remove tables.\n" +
+                "Do you wish to add/remove selected?")
+            .then(
+                function () {
+                    return $.when(addRemoveAssembliesNow(), addRemovePersonsNow());
+                },
+                function () {
+                    return $.Deferred().resolve();
+                }
+            );
+    }
 
-            return deferred1.promise();
-        })
-        .always(hideModalWait)
-        .done(function () { return deferred0.resolve(); })
-        .fail(function (xhr, status, error) {
-            showModalAJAXFail(xhr, status, error);
-            deferred0.reject();
-        });
-    return deferred0.promise();
+    //confirmNoAssembliesHelper
+    function confirmNoAssembliesHelper() {
+        if (TableLogEntryAssysRemove.rows().data().length == 0) {
+            return showModalConfirm("There are no Assemblies added to your entry(ies).\nAre you sure you want to proceed?");
+        }
+        return $.Deferred().resolve();
+    }
+
+    //submitEditsHelper
+    function submitEditsHelper() {
+        return submitEditsGenericWrp("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonLogEntrySrv/Edit")
+            .then(function () {
+                CurrIds = (CurrIds.length == 0) ? data.newEntryIds : CurrIds;
+                return $.Deferred().resolve();
+            });
+    }
 }
 
 //addRemoveAssembliesNow
 function addRemoveAssembliesNow() {
-    var deferred0 = $.Deferred();
-    updateCurrIdsHelper()
+    return updateCurrIdsHelper()
         .then(function () {
-            var idsAssysAdd = TableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-            var idsAssysRemove = TableLogEntryAssysRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-            return submitEditsForRelatedGenericWrp(CurrIds, idsAssysAdd, idsAssysRemove, "/PersonLogEntrySrv/EditPrsLogEntryAssys");
+            var idsAssysAdd =
+                TableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+            var idsAssysRemove =
+                TableLogEntryAssysRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+            return submitEditsForRelatedGenericWrp(CurrIds, idsAssysAdd, idsAssysRemove,
+                "/PersonLogEntrySrv/EditPrsLogEntryAssys");
         })
-        .done(function () {
-            fillFormForRelatedGenericWrp(
-                TableLogEntryAssysAdd, TableLogEntryAssysRemove, CurrIds,
-                "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys",
-                { logEntryId: CurrIds[0] },
+        .then(function () {
+            return fillFormForRelatedGenericWrp(TableLogEntryAssysAdd, TableLogEntryAssysRemove, CurrIds,
+                "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys", { logEntryId: CurrIds[0] },
                 "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
                 { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] },
                 "GET", "AssemblyDbSrv/LookupByLocDTables",
                 { locId: MagicSuggests[3].getValue()[0], getActive: true });
-            return deferred0.resolve();
         });
-    return deferred0.promise();
+}
 
-    //updateCurrIdsHelper
-    function updateCurrIdsHelper() {
-        var deferred0 = $.Deferred();
-        if (CurrIds.length != 0) {
-            return deferred0.resolve();
-        }
-        submitEditsGenericWrp("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonLogEntrySrv/Edit")
-            .then(function (data) {
-                CurrIds = data.newEntryIds;
-                for (var i = 0; i < CurrIds.length; i++) {
-                    CurrRecords[i] = $.extend(true, {}, RecordTemplate);
-                    CurrRecords[i].Id = CurrIds[i];
-                }
-                return refreshMainView();
-            })
-            .done(function () { deferred0.resolve(); });
-        return deferred0.promise();
+//addRemovePersonsNow
+function addRemovePersonsNow() {
+    return updateCurrIdsHelper()
+        .then(function () {
+            var idsPersonsAdd =
+                TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+            var idsPersonsRemove =
+                TableLogEntryPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+            return submitEditsForRelatedGenericWrp(CurrIds, idsPersonsAdd, idsPersonsRemove,
+                "/PersonLogEntrySrv/EditPrsLogEntryPersons");
+        })
+        .then(function () {
+            return fillFormForRelatedGenericWrp(TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
+                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { logEntryId: CurrIds[0] },
+                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { logEntryId: CurrIds[0] },
+                "GET", "/PersonSrv/Get", { getActive: true });
+        });
+}
+
+//updateCurrIdsHelper
+function updateCurrIdsHelper() {
+    var deferred0 = $.Deferred();
+    if (CurrIds.length != 0) {
+        return deferred0.resolve();
     }
+    submitEditsGenericWrp("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonLogEntrySrv/Edit")
+        .then(function (data) {
+            CurrIds = data.newEntryIds;
+            for (var i = 0; i < CurrIds.length; i++) {
+                CurrRecords[i] = $.extend(true, {}, RecordTemplate);
+                CurrRecords[i].Id = CurrIds[i];
+            }
+            return refreshMainView();
+        })
+        .done(function () { deferred0.resolve(); });
+    return deferred0.promise();
 }
 
 //Show modal for chagning assembly(ies) status

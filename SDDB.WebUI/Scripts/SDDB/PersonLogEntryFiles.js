@@ -36,7 +36,7 @@ $(document).ready(function () {
 
     //--------------------------------------LogEntryFilesView---------------------------------------//
 
-    //Wire Up EditFormBtnCancel
+    //Wire Up LogEntryFilesViewBtnBack
     $("#LogEntryFilesViewBtnBack").click(function() {
         refreshMainView()
             .done(function () {
@@ -134,29 +134,6 @@ $(document).ready(function () {
             $("#ModalDeleteFiles").modal("show");
         }
     });
-    //Wire Up ModalUploadBtnAbort
-    $("#ModalUploadBtnAbort").click(function () { XHR.abort(); $("#ModalUpload").modal("hide"); });
-
-    //Get focus on ModalDeleteBtnCancel
-    $("#ModalDeleteFiles").on("shown.bs.modal", function () { $("#ModalDeleteFilesBtnCancel").focus(); });
-
-    //Wire Up ModalDeleteBtnCancel 
-    $("#ModalDeleteFilesBtnCancel").click(function () { $("#ModalDeleteFiles").modal("hide"); });
-
-    //Wire Up ModalDeleteFilesBtnOk
-    $("#ModalDeleteFilesBtnOk").click(function () {
-        $("#ModalDeleteFiles").modal("hide");
-        showModalWait();
-        $.ajax({
-            type: "POST", url: "/PersonLogEntrySrv/DeleteFiles", timeout: 120000,
-            data: { logEntryId: CurrIds[0], ids: FileCurrIds }, dataType: "json"
-        })
-            .always(hideModalWait)
-            .done(function () {
-                setTimeout(fillLogEntryFilesForm, 200);
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    });
 
     //------------------------------------DataTables - Log Entry Files ---
 
@@ -187,7 +164,34 @@ $(document).ready(function () {
         },
         pageLength: 10
     });
-        
+
+    //-------------------------------------ModalUpload dialog---------------------------------------//
+
+    //Wire Up ModalUploadBtnAbort
+    $("#ModalUploadBtnAbort").click(function () { XHR.abort(); $("#ModalUpload").modal("hide"); });
+
+    //-----------------------------------ModalDeleteFiles dialog------------------------------------//
+
+    //Get focus on ModalDeleteBtnCancel
+    $("#ModalDeleteFiles").on("shown.bs.modal", function () { $("#ModalDeleteFilesBtnCancel").focus(); });
+
+    //Wire Up ModalDeleteBtnCancel 
+    $("#ModalDeleteFilesBtnCancel").click(function () { $("#ModalDeleteFiles").modal("hide"); });
+
+    //Wire Up ModalDeleteFilesBtnOk
+    $("#ModalDeleteFilesBtnOk").click(function () {
+        $("#ModalDeleteFiles").modal("hide");
+        showModalWait();
+        $.ajax({
+            type: "POST", url: "/PersonLogEntrySrv/DeleteFiles", timeout: 120000,
+            data: { logEntryId: CurrIds[0], ids: FileCurrIds }, dataType: "json"
+        })
+            .always(hideModalWait)
+            .done(function () {
+                setTimeout(fillLogEntryFilesForm, 200);
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+    });
 
     //--------------------------------End of execution at Start-----------
 });
