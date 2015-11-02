@@ -161,10 +161,12 @@ function showModalAJAXFail(xhr, status, error) {
 }
 
 //showModalConfirm
-function showModalConfirm(bodyText) {
+function showModalConfirm(bodyText, labelText) {
     var deferred0 = $.Deferred();
     if (bodyText) { $("#ModalConfirmBody").text(bodyText); } 
     else { $("#ModalConfirmBody").text("Please confirm..."); }
+    if (labelText) { $("#ModalConfirmLabel").text(labelText); }
+    else { $("#ModalConfirmLabel").text("Please Confirm"); }
     $("#ModalConfirmBtnNo, #ModalConfirmBtnYes").off("click");
     $("#ModalConfirmBtnNo, #ModalConfirmBtnYes").click(function () { $("#ModalConfirm").modal("hide"); });
     $("#ModalConfirmBtnNo").click(function () { return deferred0.reject(); });

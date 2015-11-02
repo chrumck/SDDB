@@ -410,6 +410,7 @@ function updateMainViewForSelectedType() {
 function updateFormForSelectedType() {
     clearFormInputs(ExtEditFormId);
     $("#" + ExtEditFormId + " .modifiable").data("ismodified", true);
+    $("#" + ExtEditFormId).addClass("hidden");
     if (MagicSuggests[0].getValue().length == 1 && MagicSuggests[0].getValue()[0] != "_VARIES_") {
         var deferred0 = $.Deferred();
         updateFormForExtendedWrp(ExtTypeHttpType, ExtTypeUrl, { ids: MagicSuggests[0].getValue()[0] }, ExtEditFormId)
@@ -420,7 +421,6 @@ function updateFormForSelectedType() {
             .fail(function () { return deferred0.reject(); })
         return deferred0.promise();
     }
-    $("#" + ExtEditFormId).addClass("hidden");
     return $.Deferred().resolve();
 }
 

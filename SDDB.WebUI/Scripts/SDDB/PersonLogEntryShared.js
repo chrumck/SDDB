@@ -278,10 +278,10 @@ function checkAndSubmitEdits() {
         if (addRemoveCount == 0) { return $.Deferred().resolve(); }
 
         return showModalConfirm("There are Assemblies and/or People selected in the Add/Remove tables.\n" +
-                "Do you wish to add/remove selected?")
+                "Do you wish to add/remove selected?","Confirm Add/Remove")
             .then(
                 function () {
-                    return $.when(addRemoveAssembliesNow(), addRemovePersonsNow());
+                    return addRemoveAssembliesNow().then(addRemovePersonsNow);
                 },
                 function () {
                     return $.Deferred().resolve();
@@ -292,7 +292,8 @@ function checkAndSubmitEdits() {
     //confirmNoAssembliesHelper
     function confirmNoAssembliesHelper() {
         if (TableLogEntryAssysRemove.rows().data().length == 0) {
-            return showModalConfirm("There are no Assemblies added to your entry(ies).\nAre you sure you want to proceed?");
+            return showModalConfirm("There are no Assemblies added to your entry(ies).\nAre you sure you want to proceed?",
+                "Missing ASSEMBLIES");
         }
         return $.Deferred().resolve();
     }

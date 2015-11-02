@@ -167,7 +167,6 @@
     <Content Include="Scripts\SDDB\ActivitySummary.js" />
     <Content Include="Scripts\SDDB\ComponentType.js" />
     <Content Include="Scripts\SDDB\Shared_Views.js" />
-    <Content Include="Scripts\SDDB\_temp.js" />
     <Content Include="_app_offline.htm" />
     <Content Include="Content\bootstrap-datetimepicker.css" />
     <Content Include="Content\bootstrap-datetimepicker.min.css" />
