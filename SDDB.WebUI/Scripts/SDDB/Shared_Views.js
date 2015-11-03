@@ -188,7 +188,9 @@ $("#EditFormBtnOk").click(function () {
             CurrRecords = currRecords;
             if (CurrIds.length == 0) {
                 CurrIds = data.newEntryIds;
-                for (var i = 0; i < CurrIds.length; i++) { CurrRecords[i] = data.newEntryIds[i]; }
+                for (var i = 0; i < CurrIds.length; i++) {
+                    CurrRecords[i].Id = CurrIds[i];
+                }
             }
             return CallBackAfterEdit(data);
         })

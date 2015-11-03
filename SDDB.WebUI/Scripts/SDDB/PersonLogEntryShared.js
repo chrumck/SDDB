@@ -355,10 +355,10 @@ function updateCurrIdsHelper() {
         return deferred0.resolve();
     }
     submitEditsGenericWrp("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonLogEntrySrv/Edit")
-        .then(function (data) {
+        .then(function (data, currRecords) {
+            CurrRecords = currRecords;
             CurrIds = data.newEntryIds;
             for (var i = 0; i < CurrIds.length; i++) {
-                CurrRecords[i] = $.extend(true, {}, RecordTemplate);
                 CurrRecords[i].Id = CurrIds[i];
             }
             return refreshMainView();
