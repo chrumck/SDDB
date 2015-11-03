@@ -216,18 +216,15 @@ namespace SDDB.Domain.Services
 
         //helper - Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T 
         //taking taking single T and TAddRem
-        protected virtual async Task<int> addRemoveRelatedHelper<TAddRem>(T dbEntry, TAddRem dbEntryAddRem,
+        protected virtual Task<int> addRemoveRelatedHelper<TAddRem>(T dbEntry, TAddRem dbEntryAddRem,
             string relatedCollectionName, bool isAdd) where TAddRem : class, IDbEntity
         {
-            await Task.Run(() =>
-            {
-                var relatedCollection = (ICollection<TAddRem>)typeof(T).GetProperty(relatedCollectionName).GetValue(dbEntry);
+            var relatedCollection = (ICollection<TAddRem>)typeof(T).GetProperty(relatedCollectionName).GetValue(dbEntry);
 
-                if (isAdd && !relatedCollection.Contains(dbEntryAddRem)) { relatedCollection.Add(dbEntryAddRem); }
-                if (!isAdd && relatedCollection.Contains(dbEntryAddRem)) { relatedCollection.Remove(dbEntryAddRem); }    
-            }).ConfigureAwait(false);
+            if (isAdd && !relatedCollection.Contains(dbEntryAddRem)) { relatedCollection.Add(dbEntryAddRem); }
+            if (!isAdd && relatedCollection.Contains(dbEntryAddRem)) { relatedCollection.Remove(dbEntryAddRem); }    
 
-            return default(int);
+            return Task.FromResult(default(int));
         }
 
         //Add (or Remove  when set isAdd to false) related entities TAddRem to collection 'relatedPropName' of entity T 
