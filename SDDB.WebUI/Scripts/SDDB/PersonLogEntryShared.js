@@ -301,8 +301,14 @@ function checkAndSubmitEdits() {
     //submitEditsHelper
     function submitEditsHelper() {
         return submitEditsGenericWrp("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonLogEntrySrv/Edit")
-            .then(function () {
-                CurrIds = (CurrIds.length == 0) ? data.newEntryIds : CurrIds;
+            .then(function (data, currRecords) {
+                CurrRecords = currRecords;
+                if (CurrIds.length == 0) {
+                    CurrIds = data.newEntryIds;
+                    for (var i = 0; i < CurrIds.length; i++) {
+                        CurrRecords[i].Id = CurrIds[i];
+                    }
+                }
                 return $.Deferred().resolve();
             });
     }
