@@ -316,7 +316,7 @@ function checkAndSubmitEdits() {
 
 //addRemoveAssembliesNow
 function addRemoveAssembliesNow() {
-    return updateCurrIdsHelper()
+    return submitEditsHelper()
         .then(function () {
             var idsAssysAdd =
                 TableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
@@ -337,7 +337,7 @@ function addRemoveAssembliesNow() {
 
 //addRemovePersonsNow
 function addRemovePersonsNow() {
-    return updateCurrIdsHelper()
+    return submitEditsHelper()
         .then(function () {
             var idsPersonsAdd =
                 TableLogEntryPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
@@ -354,20 +354,20 @@ function addRemovePersonsNow() {
         });
 }
 
-//updateCurrIdsHelper
-function updateCurrIdsHelper() {
+//submitEditsHelper
+function submitEditsHelper() {
     var deferred0 = $.Deferred();
-    if (CurrIds.length != 0) {
-        return deferred0.resolve();
-    }
     submitEditsGenericWrp("EditForm", MagicSuggests, CurrRecords, "POST", "/PersonLogEntrySrv/Edit")
         .then(function (data, currRecords) {
             CurrRecords = currRecords;
-            CurrIds = data.newEntryIds;
-            for (var i = 0; i < CurrIds.length; i++) {
-                CurrRecords[i].Id = CurrIds[i];
+            if (CurrIds.length == 0) {
+                CurrIds = data.newEntryIds;
+                for (var i = 0; i < CurrIds.length; i++) {
+                    CurrRecords[i].Id = CurrIds[i];
+                }
             }
-            return refreshMainView();
+            if (data && data.propsModified) { return refreshMainView(); }
+            return $.Deferred().resolve();
         })
         .done(function () { deferred0.resolve(); });
     return deferred0.promise();

@@ -76,6 +76,7 @@ namespace SDDB.Domain.Services
                     .Include(x => x.AssignedToProject)
                     .Include(x => x.AssignedToLocation)
                     .Include(x => x.AssignedToProjectEvent)
+                    .Include(x => x.PrsLogEntryAssemblyDbs)
                     .Include(x => x.PrsLogEntryPersons)
                     .Include(x => x.PersonLogEntryFiles)
                     .ToListAsync().ConfigureAwait(false);
@@ -126,6 +127,7 @@ namespace SDDB.Domain.Services
                        .Include(x => x.AssignedToProject)
                        .Include(x => x.AssignedToLocation)
                        .Include(x => x.AssignedToProjectEvent)
+                       .Include(x => x.PrsLogEntryAssemblyDbs)
                        .Include(x => x.PrsLogEntryPersons)
                        .Include(x => x.PersonLogEntryFiles)
                        .ToListAsync().ConfigureAwait(false);

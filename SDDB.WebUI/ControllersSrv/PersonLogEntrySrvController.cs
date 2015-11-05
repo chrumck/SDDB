@@ -260,6 +260,10 @@ namespace SDDB.WebUI.ControllersSrv
                 },
                 x.Comments,
                 PersonLogEntryFilesCount = x.PersonLogEntryFiles.Count,
+                PersonLogEntryAssysCount = x.PrsLogEntryAssemblyDbs.Count,
+                PersonLogEntryPersonsInitials = x.PrsLogEntryPersons.Aggregate(
+                    "",(initials, person) => initials += String.IsNullOrEmpty(initials) ? person.Initials : " " + person.Initials
+                ),
                 x.IsActive_bl,
                 x.EnteredByPerson_Id,
                 x.PersonActivityType_Id,

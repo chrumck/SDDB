@@ -504,12 +504,15 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
 
     if (currRecordsClone.length == 1 && noOfNewRecords > 1) { multiplyRecordsAndModifyUniquePropsHelper(); }
 
-    if (modifiedProperties.length == 0) { return deferred0.resolve({ "Success": "True", "newEntryIds": []}, currRecordsClone); }
+    if (modifiedProperties.length == 0) {
+        return deferred0.resolve({ "Success": "True", "newEntryIds": [], "propsModified": false }, currRecordsClone);
+    }
 
     $.ajax({ type: httpType, url: url, timeout: 120000, data: { records: currRecordsClone }, dataType: "json" })
         .done(function (data) {
             $("#" + formId + " .modifiable").data("ismodified", false);
             msSetAsModified(msArray, false);
+            data.propsModified = true;
             deferred0.resolve(data, currRecordsClone);
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });

@@ -167,28 +167,30 @@ $(document).ready(function () {
             { data: "Id", name: "Id" },//0
             { data: "LogEntryDateTime", name: "LogEntryDateTime" },//1
             //------------------------------------------------first set of columns
-            { data: "EnteredByPerson_", render: function (data, type, full, meta) { return data.LastName + " " + data.Initials }, name: "EnteredByPerson_" }, //2
-            { data: "PersonActivityType_", render: function (data, type, full, meta) { return data.ActivityTypeName }, name: "PersonActivityType_" }, //3
-            { data: "ManHours", name: "ManHours" },//4
-            { data: "AssignedToProject_", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject_" }, //5
-            { data: "AssignedToLocation_", render: function (data, type, full, meta) { return data.LocName }, name: "AssignedToLocation_" }, //6
-            { data: "AssignedToProjectEvent_", render: function (data, type, full, meta) { return data.EventName }, name: "AssignedToProjectEvent_" }, //7
-            { data: "Comments", name: "Comments" },//8
+            { data: "EnteredByPerson_", render: function (data, type, full, meta) { return data.Initials }, name: "EnteredByPerson_" }, //2
+            { data: "PersonLogEntryPersonsInitials", name: "PersonLogEntryPersonsInitials" },//3
+            { data: "PersonActivityType_", render: function (data, type, full, meta) { return data.ActivityTypeName }, name: "PersonActivityType_" }, //4
+            { data: "ManHours", name: "ManHours" },//5
+            { data: "AssignedToProject_", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject_" }, //6
+            { data: "AssignedToLocation_", render: function (data, type, full, meta) { return data.LocName }, name: "AssignedToLocation_" }, //7
+            { data: "AssignedToProjectEvent_", render: function (data, type, full, meta) { return data.EventName }, name: "AssignedToProjectEvent_" }, //8
             { data: "PersonLogEntryFilesCount", name: "PersonLogEntryFilesCount" },//9
+            { data: "PersonLogEntryAssysCount", name: "PersonLogEntryAssysCount" },//10
+            { data: "Comments", name: "Comments" },//11
             //------------------------------------------------never visible
-            { data: "IsActive_bl", name: "IsActive_bl" },//10
-            { data: "EnteredByPerson_Id", name: "EnteredByPerson_Id" },//11
-            { data: "PersonActivityType_Id", name: "PersonActivityType_Id" },//12
-            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//13
-            { data: "AssignedToLocation_Id", name: "AssignedToLocation_Id" },//14
-            { data: "AssignedToProjectEvent_Id", name: "AssignedToProjectEvent_Id" },//15
+            { data: "IsActive_bl", name: "IsActive_bl" },//12
+            { data: "EnteredByPerson_Id", name: "EnteredByPerson_Id" },//13
+            { data: "PersonActivityType_Id", name: "PersonActivityType_Id" },//14
+            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//15
+            { data: "AssignedToLocation_Id", name: "AssignedToLocation_Id" },//16
+            { data: "AssignedToProjectEvent_Id", name: "AssignedToProjectEvent_Id" },//17
         ],
         columnDefs: [
-            { targets: [0, 10, 11, 12, 13, 14, 15], visible: false }, // - never show
-            { targets: [0, 1, 4, 9, 10, 11, 12, 13, 14, 15], searchable: false },  //"orderable": false, "visible": false
-            { targets: [5, 4], className: "hidden-xs" }, // - first set of columns
-            { targets: [3, 9], className: "hidden-xs hidden-sm" }, // - first set of columns
-            { targets: [6, 7, 8], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
+            { targets: [0, 12, 13, 14, 15, 16, 17], visible: false }, // - never show
+            { targets: [0, 1, 5, 10, 11, 12, 13, 14, 15, 16, 17], searchable: false },  //"orderable": false, "visible": false
+            { targets: [4, 5], className: "hidden-xs" }, // - first set of columns
+            { targets: [3, 11], className: "hidden-xs hidden-sm" }, // - first set of columns
+            { targets: [7, 8, 9, 10], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
