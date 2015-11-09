@@ -293,7 +293,7 @@ function checkAndSubmitEdits() {
     function confirmNoAssembliesHelper() {
         if (TableLogEntryAssysRemove.rows().data().length == 0) {
             return showModalConfirm("There are no Assemblies added to your entry(ies).\nAre you sure you want to proceed?",
-                "Missing ASSEMBLIES");
+                "Missing ASSEMBLIES !");
         }
         return $.Deferred().resolve();
     }

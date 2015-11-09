@@ -187,7 +187,7 @@ $(document).ready(function () {
         ],
         columnDefs: [
             { targets: [0, 12, 13, 14, 15, 16, 17], visible: false }, // - never show
-            { targets: [0, 1, 5, 10, 11, 12, 13, 14, 15, 16, 17], searchable: false },  //"orderable": false, "visible": false
+            { targets: [0, 1, 5, 9, 10, 12, 13, 14, 15, 16, 17], searchable: false },  //"orderable": false, "visible": false
             { targets: [4, 5], className: "hidden-xs" }, // - first set of columns
             { targets: [3, 11], className: "hidden-xs hidden-sm" }, // - first set of columns
             { targets: [7, 8, 9, 10], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
