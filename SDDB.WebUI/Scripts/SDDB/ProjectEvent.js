@@ -129,6 +129,7 @@ $(document).ready(function () {
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
+        lengthMenu: [10, 25, 50, 75, 100, 500, 1000, 5000],
         language: {
             search: "",
             lengthMenu: "_MENU_",
