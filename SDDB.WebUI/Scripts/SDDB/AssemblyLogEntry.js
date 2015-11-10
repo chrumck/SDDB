@@ -77,6 +77,19 @@ $(document).ready(function () {
     //Wire up on change event for MsFilterByAssembly
     $(MsFilterByAssembly).on("selectionchange", function (e, m) { refreshMainView(); });
 
+    //Initialize MagicSuggest MsFilterByAssembly
+    MsFilterByAssyType = $("#MsFilterByAssyType").magicSuggest({
+        data: "/AssemblyTypeSrv/Lookup",
+        allowFreeEntries: false,
+        ajaxConfig: {
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
+        },
+        infoMsgCls: "hidden",
+        style: "min-width: 240px;"
+    });
+    //Wire up on change event for MsFilterByAssembly
+    $(MsFilterByAssyType).on("selectionchange", function (e, m) { refreshMainView(); });
+
     //Initialize MagicSuggest MsFilterByPerson
     MsFilterByPerson = $("#MsFilterByPerson").magicSuggest({
         data: "/PersonSrv/LookupFromProject",
@@ -206,7 +219,7 @@ function refreshMainView() {
 
     if ( ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "") &&
          (MsFilterByProject.getValue().length == 0 && MsFilterByAssembly.getValue().length == 0 &&
-                MsFilterByPerson.getValue().length == 0)
+                MsFilterByAssyType.getValue().length == 0 && MsFilterByPerson.getValue().length == 0)
         ) { return deferred0.resolve(); }
 
     var endDate = ($("#FilterDateEnd").val() == "") ? "" : moment($("#FilterDateEnd").val())
@@ -216,6 +229,7 @@ function refreshMainView() {
         {
             projectIds: MsFilterByProject.getValue(),
             assyIds: MsFilterByAssembly.getValue(),
+            assyTypeIds: MsFilterByAssyType.getValue(),
             personIds: MsFilterByPerson.getValue(),
             startDate: $("#FilterDateStart").val(),
             endDate: endDate,

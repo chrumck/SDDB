@@ -38,11 +38,12 @@ namespace SDDB.WebUI.ControllersSrv
         // POST: /AssemblyLogEntrySrv/GetByAltIds
         [HttpPost]
         [DBSrvAuth("Assembly_View")]
-        public async Task<ActionResult> GetByAltIds(string[] projectIds, string[] assyIds, string[] personIds, 
-            DateTime? startDate, DateTime? endDate, bool getActive = true)
+        public async Task<ActionResult> GetByAltIds(string[] projectIds, string[] assyIds, string[] assyTypeIds,
+            string[] personIds, DateTime? startDate, DateTime? endDate, bool getActive = true)
         {
             ViewBag.ServiceName = "AssemblyLogEntryService.GetByAltIdsAsync";
-            var records = await assyLogEntryService.GetByAltIdsAsync(projectIds, assyIds, personIds, startDate, endDate, getActive)
+            var records = await assyLogEntryService.GetByAltIdsAsync(projectIds, assyIds, assyTypeIds,
+                        personIds, startDate, endDate, getActive)
                 .ConfigureAwait(false);
             return DbJsonDateTime(filterForJsonFull(records));
         }

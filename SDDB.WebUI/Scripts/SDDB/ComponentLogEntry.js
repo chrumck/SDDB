@@ -68,6 +68,19 @@ $(document).ready(function () {
     //Wire up on change event for MsFilterByComponent
     $(MsFilterByComponent).on("selectionchange", function (e, m) { refreshMainView(); });
 
+    //Initialize MagicSuggest MsFilterByComponent
+    MsFilterByCompType = $("#MsFilterByCompType").magicSuggest({
+        data: "/ComponentTypeSrv/Lookup",
+        allowFreeEntries: false,
+        ajaxConfig: {
+            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
+        },
+        infoMsgCls: "hidden",
+        style: "min-width: 240px;"
+    });
+    //Wire up on change event for MsFilterByComponent
+    $(MsFilterByCompType).on("selectionchange", function (e, m) { refreshMainView(); });
+
     //Initialize MagicSuggest MsFilterByPerson
     MsFilterByPerson = $("#MsFilterByPerson").magicSuggest({
         data: "/PersonSrv/LookupFromProject",
@@ -184,7 +197,7 @@ function refreshMainView() {
 
     if (($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "") &&
          (MsFilterByProject.getValue().length == 0 && MsFilterByComponent.getValue().length == 0 &&
-                MsFilterByPerson.getValue().length == 0)
+                MsFilterByCompType.getValue().length == 0 &&  MsFilterByPerson.getValue().length == 0)
         ) { return deferred0.resolve(); }
 
     var endDate = ($("#FilterDateEnd").val() == "") ? "" : moment($("#FilterDateEnd").val())
@@ -194,6 +207,7 @@ function refreshMainView() {
         {
             projectIds: MsFilterByProject.getValue(),
             componentIds: MsFilterByComponent.getValue(),
+            compTypeIds: MsFilterByCompType.getValue(),
             personIds: MsFilterByPerson.getValue(),
             startDate: $("#FilterDateStart").val(),
             endDate: endDate,

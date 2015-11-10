@@ -55,10 +55,11 @@ namespace SDDB.Domain.Services
                 
         //get by projectIds and componentIds
         public virtual async Task<List<ComponentLogEntry>> GetByAltIdsAsync(string[] projectIds, string[] componentIds, 
-            string[] personIds, DateTime? startDate, DateTime? endDate , bool getActive = true)
+            string[] compTypeIds, string[] personIds, DateTime? startDate, DateTime? endDate , bool getActive = true)
         {
             projectIds = projectIds ?? new string[] { };
             componentIds = componentIds ?? new string[] { };
+            compTypeIds = compTypeIds ?? new string[] { };
             personIds = personIds ?? new string[] { };
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
@@ -70,6 +71,7 @@ namespace SDDB.Domain.Services
                         x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                         (componentIds.Count() == 0 || componentIds.Contains(x.Component_Id)) &&
+                        (compTypeIds.Count() == 0 || compTypeIds.Contains(x.Component.ComponentType.Id)) &&
                         (personIds.Count() == 0 || personIds.Contains(x.LastSavedByPerson_Id)) &&
                         (startDate == null || x.LogEntryDateTime >= startDate) &&
                         (endDate == null || x.LogEntryDateTime <= endDate) &&

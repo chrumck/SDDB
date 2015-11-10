@@ -53,11 +53,12 @@ namespace SDDB.Domain.Services
         }
                 
         //get by projectIds and componentIds
-        public virtual async Task<List<AssemblyLogEntry>> GetByAltIdsAsync(string[] projectIds, string[] assemblyIds, 
-            string[] personIds, DateTime? startDate, DateTime? endDate, bool getActive = true)
+        public virtual async Task<List<AssemblyLogEntry>> GetByAltIdsAsync(string[] projectIds, string[] assemblyIds,
+            string[] assyTypeIds, string[] personIds, DateTime? startDate, DateTime? endDate, bool getActive = true)
         {
             projectIds = projectIds ?? new string[] { };
             assemblyIds = assemblyIds ?? new string[] { };
+            assyTypeIds = assyTypeIds ?? new string[] { };
             personIds = personIds ?? new string[] { };
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
@@ -69,6 +70,7 @@ namespace SDDB.Domain.Services
                         x.AssignedToLocation.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToLocation.AssignedToProject_Id)) &&
                         (assemblyIds.Count() == 0 || assemblyIds.Contains(x.AssemblyDb_Id)) &&
+                        (assyTypeIds.Count() == 0 || assyTypeIds.Contains(x.AssemblyDb.AssemblyType.Id)) &&
                         (personIds.Count() == 0 || personIds.Contains(x.LastSavedByPerson_Id)) &&
                         (startDate == null || x.LogEntryDateTime >= startDate) &&
                         (endDate == null || x.LogEntryDateTime <= endDate) &&
