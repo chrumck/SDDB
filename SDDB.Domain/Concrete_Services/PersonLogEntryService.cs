@@ -40,12 +40,6 @@ namespace SDDB.Domain.Services
 
                 var records = await dbContext.PersonLogEntrys
                     .Where(x => ids.Contains(x.Id))
-                    .Include(x => x.EnteredByPerson)
-                    .Include(x => x.PersonActivityType)
-                    .Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToLocation)
-                    .Include(x => x.AssignedToProjectEvent)
-                    .Include(x => x.PersonLogEntryFiles)
                     .ToListAsync().ConfigureAwait(false);
 
                 records.FillRelatedIfNull();
@@ -79,6 +73,7 @@ namespace SDDB.Domain.Services
                     .Include(x => x.PrsLogEntryAssemblyDbs)
                     .Include(x => x.PrsLogEntryPersons)
                     .Include(x => x.PersonLogEntryFiles)
+                    .Include(x => x.QcdByPerson)
                     .ToListAsync().ConfigureAwait(false);
 
                 if (!(await userIsInRoleHelperAsync("PersonLogEntry_View").ConfigureAwait(false)))
@@ -130,6 +125,7 @@ namespace SDDB.Domain.Services
                        .Include(x => x.PrsLogEntryAssemblyDbs)
                        .Include(x => x.PrsLogEntryPersons)
                        .Include(x => x.PersonLogEntryFiles)
+                       .Include(x => x.QcdByPerson)
                        .ToListAsync().ConfigureAwait(false);
 
                 if (!(await userIsInRoleHelperAsync("PersonLogEntry_View").ConfigureAwait(false)))
@@ -176,6 +172,35 @@ namespace SDDB.Domain.Services
 
 
         // Delete records by their Ids - same as BaseDbService
+
+        //QcLogEntries find Person Log Entries by ids and ad Quality Control data based on userId and DateTime.Now
+        public virtual async Task QcLogEntries(string[] ids)
+        {
+            if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
+
+            if (!await userIsInRoleHelperAsync("PersonLogEntry_Qc"))
+            { throw new DbBadRequestException("You do not have sufficient rights to QC Person Entries."); }
+
+            await dbScopeHelperAsync(async dbContext =>
+            {
+                List<PersonLogEntry> dbEntrys = await dbContext.PersonLogEntrys
+                    .Where(x => ids.Contains(x.Id)).ToListAsync().ConfigureAwait(false);
+                
+                if (dbEntrys.Count != ids.Length)
+                { throw new DbBadRequestException("Some or all DB Entries not found"); }
+
+                if (dbEntrys.Any(x => x.EnteredByPerson_Id == userId))
+                { throw new DbBadRequestException("You cannot QC your own entry."); }
+                
+                dbEntrys.ForEach(dbEntry => 
+                {
+                    dbEntry.QcdByPerson_Id = userId;
+                    dbEntry.QcdDateTime = DateTime.Now;
+                });
+                return default(int);
+            })
+            .ConfigureAwait(false);
+        }
 
         //-----------------------------------------------------------------------------------------------------------------------
 

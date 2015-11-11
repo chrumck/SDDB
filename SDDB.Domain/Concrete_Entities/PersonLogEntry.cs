@@ -49,6 +49,13 @@ namespace SDDB.Domain.Entities
         [ForeignKey("AssignedToProjectEvent")]
         public string AssignedToProjectEvent_Id { get; set; }
 
+        [StringLength(40)]
+        [ForeignKey("QcdByPerson")]
+        public string QcdByPerson_Id { get; set; }
+
+        [DBIsDateTimeISO]
+        public DateTime QcdDateTime { get; set; }
+
         [Column(TypeName = "text")] [StringLength(65535)]
         public string Comments { get; set; }
 
@@ -84,6 +91,7 @@ namespace SDDB.Domain.Entities
         public virtual Project AssignedToProject { get; set; }
         public virtual Location AssignedToLocation { get; set; }
         public virtual ProjectEvent AssignedToProjectEvent { get; set; }
+        public virtual Person QcdByPerson { get; set; }
 
         [InverseProperty("AssignedToPersonLogEntry")]
         public virtual ICollection<PersonLogEntryFile> PersonLogEntryFiles { get; set; }

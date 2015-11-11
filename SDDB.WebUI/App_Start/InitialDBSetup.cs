@@ -19,11 +19,12 @@ namespace SDDB.WebUI
                 new DBRole {Name = "_DBAdmin" }, new DBRole {Name = "_DBManager" }, new DBRole {Name = "_DBPowerUser" },
                 
                 new DBRole {Name = "DBUser_View" }, new DBRole {Name = "DBUser_Edit" },
-                new DBRole {Name = "Person_View" },new DBRole {Name = "Person_Edit" },
-                new DBRole {Name = "PersonGroup_View" },new DBRole {Name = "PersonGroup_Edit" },
-                new DBRole {Name = "PersonActivityType_View" },new DBRole {Name = "PersonActivityType_Edit" },
-                new DBRole {Name = "PersonLogEntry_View" },new DBRole {Name = "PersonLogEntry_Edit" },
-                new DBRole {Name = "YourActivity_View" },new DBRole {Name = "YourActivity_Edit" },
+                new DBRole {Name = "Person_View" }, new DBRole {Name = "Person_Edit" },
+                new DBRole {Name = "PersonGroup_View" }, new DBRole {Name = "PersonGroup_Edit" },
+                new DBRole {Name = "PersonActivityType_View" }, new DBRole {Name = "PersonActivityType_Edit" },
+                new DBRole {Name = "PersonLogEntry_View" }, new DBRole {Name = "PersonLogEntry_Edit" }, 
+                new DBRole {Name = "PersonLogEntry_Qc" },
+                new DBRole {Name = "YourActivity_View" }, new DBRole {Name = "YourActivity_Edit" },
                 new DBRole {Name = "ActivitySummary_ViewOthers" },
                                 
                 new DBRole {Name = "Project_View" },new DBRole {Name = "Project_Edit" },
@@ -35,7 +36,8 @@ namespace SDDB.WebUI
                 new DBRole {Name = "Location_View" },new DBRole {Name = "Location_Edit" }, 
                 new DBRole {Name = "LocationType_View" },new DBRole {Name = "LocationType_Edit" }, 
                 
-                new DBRole {Name = "Assembly_View" },new DBRole {Name = "Assembly_Edit" }, new DBRole {Name = "Assembly_EditStatus" },
+                new DBRole {Name = "Assembly_View" },new DBRole {Name = "Assembly_Edit" },
+                new DBRole {Name = "Assembly_EditStatus" },
                 new DBRole {Name = "AssemblyType_View" },new DBRole {Name = "AssemblyType_Edit" },
                 new DBRole {Name = "AssemblyStatus_View" },new DBRole {Name = "AssemblyStatus_Edit" },
                 

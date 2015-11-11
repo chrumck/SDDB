@@ -109,6 +109,9 @@ namespace SDDB.Domain.Entities
         [InverseProperty("EnteredByPerson")]
         public virtual ICollection<PersonLogEntry> EnteredPrsLogEntrys { get; set; }
 
+        [InverseProperty("QcdByPerson")]
+        public virtual ICollection<PersonLogEntry> QcdPrsLogEntrys { get; set; }
+
         //many to many
 
         [InverseProperty("ProjectPersons")]
