@@ -35,7 +35,7 @@ namespace SDDB.WebUI.ControllersSrv
 
         // POST: /AssemblyTypeSrv/GetByIds
         [HttpPost]
-        [DBSrvAuth("AssemblyType_View")]
+        [DBSrvAuth("Assembly_View,AssemblyType_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
             ViewBag.ServiceName = "AssemblyTypeService.GetAsync";

@@ -59,6 +59,12 @@ namespace SDDB.WebUI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel login, string returnUrl)
         {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.returnUrl = returnUrl;
+                return View(login);
+            }
+
             var identity = await dbUserService.LoginAsync(login.UserName, login.Password).ConfigureAwait(false);
             if (identity == null)
             {

@@ -35,7 +35,7 @@ namespace SDDB.WebUI.ControllersSrv
 
         // POST: /ComponentTypeSrv/GetByIds
         [HttpPost]
-        [DBSrvAuth("ComponentType_View")]
+        [DBSrvAuth("Component_View,ComponentType_View")]
         public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
             ViewBag.ServiceName = "ComponentTypeService.GetAsync";
