@@ -322,7 +322,7 @@ function formIsValid(id, isCreate) {
         if (!$(this).hasClass("modifiable")) { return true; }
         if ($(this).data("ismodified") && $(this).hasClass("input-validation-error")) {
             isValid = false;
-            return false;
+            return true;
         }
         $(this).removeClass("input-validation-error");
         $("[data-valmsg-for='" + this.id + "']").empty();
@@ -338,7 +338,12 @@ function clearFormInputs(formId, msArray) {
     $("#" + formId + " .input-validation-error").removeClass("input-validation-error");
     $("#" + formId + " .modifiable").data("ismodified", false);
 
-    if (msArray) { $.each(msArray, function (i, ms) { ms.clear(true); ms.isModified = false; }); }
+    if (msArray) {
+        $.each(msArray, function (i, ms) {
+            ms.clear(true);
+            ms.isModified = false;
+        });
+    }
 }
 
 //Prepare Form For Create

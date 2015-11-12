@@ -142,6 +142,7 @@ namespace SDDB.Domain.Entities
             this.DocumentsReviewer = new HashSet<Document>();
             this.LocationsContact = new HashSet<Location>();
             this.EnteredPrsLogEntrys = new HashSet<PersonLogEntry>();
+            this.QcdPrsLogEntrys = new HashSet<PersonLogEntry>();
 
             this.PersonProjects = new HashSet<Project>();
             this.PersonGroups = new HashSet<PersonGroup>();
