@@ -24,6 +24,10 @@ $(document).ready(function () {
         CurrRecords = [];
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
         fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Activity", "MainView");
+
+        $("#LogEntryDateTime").val(moment().format("YYYY-MM-DD HH:mm"));
+        MagicSuggests[0].setValue([UserId]);
+        $("#ManHours").val(0);
         MagicSuggests[3].disable();
         MagicSuggests[4].disable();
         TableLogEntryAssysAdd.clear().search("").draw();
@@ -83,6 +87,18 @@ $(document).ready(function () {
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
+
+    //wire up dropdownId1
+    $("#dropdownId1").click(function (event) {
+        event.preventDefault();
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
+        }
+        showModalConfirm("Confirm that you want to QC the entry(ies).", "Confirm QC")
+            .done(qcSelected);
+    })
 
     //Initialize DateTimePicker FilterDateEnd
     $("#FilterDateEnd").datetimepicker({ format: "YYYY-MM-DD" })
@@ -176,21 +192,22 @@ $(document).ready(function () {
             { data: "AssignedToProjectEvent_", render: function (data, type, full, meta) { return data.EventName }, name: "AssignedToProjectEvent_" }, //8
             { data: "PersonLogEntryFilesCount", name: "PersonLogEntryFilesCount" },//9
             { data: "PersonLogEntryAssysCount", name: "PersonLogEntryAssysCount" },//10
-            { data: "Comments", name: "Comments" },//11
+            { data: "QcdByPerson_", render: function (data, type, full, meta) { return data.Initials }, name: "QcdByPerson_" }, //11
+            { data: "Comments", name: "Comments" },//12
             //------------------------------------------------never visible
-            { data: "IsActive_bl", name: "IsActive_bl" },//12
-            { data: "EnteredByPerson_Id", name: "EnteredByPerson_Id" },//13
-            { data: "PersonActivityType_Id", name: "PersonActivityType_Id" },//14
-            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//15
-            { data: "AssignedToLocation_Id", name: "AssignedToLocation_Id" },//16
-            { data: "AssignedToProjectEvent_Id", name: "AssignedToProjectEvent_Id" },//17
+            { data: "IsActive_bl", name: "IsActive_bl" },//13
+            { data: "EnteredByPerson_Id", name: "EnteredByPerson_Id" },//14
+            { data: "PersonActivityType_Id", name: "PersonActivityType_Id" },//15
+            { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//16
+            { data: "AssignedToLocation_Id", name: "AssignedToLocation_Id" },//17
+            { data: "AssignedToProjectEvent_Id", name: "AssignedToProjectEvent_Id" },//18
         ],
         columnDefs: [
-            { targets: [0, 12, 13, 14, 15, 16, 17], visible: false }, // - never show
-            { targets: [0, 1, 5, 9, 10, 12, 13, 14, 15, 16, 17], searchable: false },  //"orderable": false, "visible": false
+            { targets: [0, 13, 14, 15, 16, 17, 18], visible: false }, // - never show
+            { targets: [0, 1, 5, 9, 10, 13, 14, 15, 16, 17, 18], searchable: false },  //"orderable": false, "visible": false
             { targets: [4, 5], className: "hidden-xs" }, // - first set of columns
-            { targets: [3, 11], className: "hidden-xs hidden-sm" }, // - first set of columns
-            { targets: [7, 8, 9, 10], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
+            { targets: [3, 12], className: "hidden-xs hidden-sm" }, // - first set of columns
+            { targets: [7, 8, 9, 10, 11], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
@@ -219,6 +236,7 @@ $(document).ready(function () {
         { projectIds: MagicSuggests[2].getValue });
     msAddToMsArray(MagicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
         { projectIds: MagicSuggests[2].getValue });
+    msAddToMsArray(MagicSuggests, "QcdByPerson_Id", "/PersonSrv/Lookup", 1);
     
     //Initialize MagicSuggest Array Event - AssignedToProject_Id
     $(MagicSuggests[2]).on("selectionchange", function (e, m) {
@@ -253,7 +271,21 @@ $(document).ready(function () {
         }
     });
     
-
+    //Wire Up EditFormBtnQcSelected
+    $("#EditFormBtnQcSelected").click(function () {
+        if (CurrIds.length == 0) {
+            showModalFail("QC failed!", "You cannot QC an entry while it is being created.");
+            return;
+        }
+        showModalConfirm("Confirm that you want to QC the entry(ies).", "Confirm QC")
+            .then(function () {
+                return qcSelected();
+            })
+            .done(function () {
+                fillFormForEditGenericWrp(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
+                GetActive, "EditForm", "Edit Person Activity", MagicSuggests)
+            });
+    });
 
     //--------------------------------------View Initialization------------------------------------//
 
@@ -338,6 +370,23 @@ function fillFiltersFromRequestParams() {
     else { return deferred0.resolve(); }
 
     return deferred0.promise();
+}
+
+//QC selected assemblies
+function qcSelected() {
+    saveViewSettings(TableMain);
+    showModalWait();
+    return $.ajax({
+        type: "POST", url: "/PersonLogEntrySrv/QcLogEntries",
+        timeout: 120000,
+        data: { ids: CurrIds },
+        dataType: "json"
+    })
+        .then(function () { return refreshMainView(); })
+        .done(function () { loadViewSettings(TableMain); })
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); })
+        .always(hideModalWait);
+
 }
 
 //---------------------------------------Helper Methods--------------------------------------//

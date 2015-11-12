@@ -31,9 +31,10 @@
 </div>
 }
 @section NavbarCollapse{
-<div class="btn-group navbar-btn margin-left-5px tdo-btngroup-main">
-    <button type="button" class="btn btn-success collapsenav" id="BtnEditLogEntryFiles">&nbsp; Files &nbsp;</button>
-</div>
+<ul class="nav navbar-nav tdo-btngroup-main">
+    <li><a class="margin-left-5px collapsenav" href="#" id="BtnEditLogEntryFiles">&nbsp; Files </a></li>
+    <li><a class="collapsenav" href=# id="dropdownId1">QC Selected</a></li>
+</ul>
 }
 
 <!------- MainView ------->
@@ -93,6 +94,7 @@
                     <th>Event</th>
                     <th>Files Count</th>
                     <th>Assys Count</th>
+                    <th>QC'd By</th>
                     <th>Comments</th>
                     <th>Is Active</th>
                     <th>PersonActivityType_Id</th>
@@ -112,28 +114,28 @@
             <h3 id="EditFormLabel">Create/Edit Activity</h3>
         </div>
     </div>
-    <div class="well well-tdo">
-        <form class="form-horizontal" role="form" id="EditForm">
-            <div class="row">
 
+    <form class="form-horizontal" role="form" id="EditForm">
+        <div class="well well-tdo">
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
                         @Html.LabelFor(x => x.LogEntryDateTime, "DateTime", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
-                            <input class="form-control modifiable" data-val="true" data-val-dbisdatetimeiso="The field has to be in 'yyyy-MM-dd HH:mm' format." 
+                            <input class="form-control modifiable" data-val="true" data-val-dbisdatetimeiso="The field has to be in 'yyyy-MM-dd HH:mm' format."
                                    data-val-required="Entry Date field is required" id="LogEntryDateTime" name="LogEntryDateTime" placeholder="Log Entry Date &amp; Time" value="" type="text">
                             @Html.ValidationMessageFor(x => x.LogEntryDateTime)
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.EnteredByPerson_Id, "Entered By", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.EnteredByPerson_Id, "By", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.EnteredByPerson_Id, new { @class = "form-control modifiable", placeholder = "Entered By Person" })
                             @Html.ValidationMessageFor(x => x.EnteredByPerson_Id)
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(x => x.ManHours, "Man Hours", new { @class = "control-label col-sm-2" })
+                        @Html.LabelFor(x => x.ManHours, "Hours", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
                             @Html.TextBoxFor(x => x.ManHours, new { @class = "form-control modifiable", placeholder = "Man Hours" })
                             @Html.ValidationMessageFor(x => x.ManHours)
@@ -146,9 +148,6 @@
                             @Html.ValidationMessageFor(x => x.PersonActivityType_Id)
                         </div>
                     </div>
-                </div>
-
-                <div class="col-md-6">
                     <div class="form-group">
                         @Html.LabelFor(x => x.AssignedToProject_Id, "Project", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
@@ -161,9 +160,12 @@
                         <div class="col-sm-10">
                             <div class="small"><em> Choose Project first</em></div>
                             @Html.TextBoxFor(x => x.AssignedToLocation_Id, new { @class = "form-control modifiable", placeholder = "Assigned to Location" })
-                            @Html.ValidationMessageFor(x => x.AssignedToLocation_Id) 
+                            @Html.ValidationMessageFor(x => x.AssignedToLocation_Id)
                         </div>
                     </div>
+                </div>
+
+                <div class="col-md-6">
                     <div class="form-group">
                         @Html.LabelFor(x => x.AssignedToProjectEvent_Id, "Event", new { @class = "control-label col-sm-2" })
                         <div class="col-sm-10">
@@ -178,6 +180,21 @@
                             @Html.ValidationMessageFor(x => x.Comments)
                         </div>
                     </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.QcdByPerson_Id, "QC'd By", new { @class = "control-label col-sm-2" })
+                        <div class="col-sm-10">
+                            @Html.TextBoxFor(x => x.QcdByPerson_Id, new { @class = "form-control", placeholder = "QC'd By Person" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.QcdDateTime, "QC Date", new { @class = "control-label col-xs-12 col-sm-2" })
+                        <div class="col-xs-9 col-sm-8">
+                            <input class="form-control" disabled id="QcdDateTime" name="QcdDateTime" placeholder="QC'd Date &amp; Time" value="" type="text">
+                        </div>
+                        <div class="col-xs-3 col-sm-2">
+                            <button class="btn btn-block btn-success" id="EditFormBtnQcSelected" type="button">QC</button>
+                        </div>
+                    </div>
                     <div class="form-group hidden" id="EditFormGroupIsActive">
                         <div class="col-sm-10 col-sm-offset-2">
                             @Html.CheckBoxFor(x => x.IsActive_bl, new { @class = "modifiable" }) &nbsp;&nbsp;
@@ -186,95 +203,98 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="well well-tdo">
-                <div class="row" id="LogEntryAssysView">
-                    <div class="col-xs-12 col-sm-6">
-                        <div class="panel panel-default">
-                            <div class="panel-heading"><strong>Add Assemblies </strong><small><em> Choose Location first.</em></small></div>
-                            <table class="table table-striped" id="TableLogEntryAssysAdd">
-                                <thead class="hidden">
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="selectable"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-6">
-                        <div class="panel panel-default">
-                            <div class="panel-heading"><strong>Remove Assemblies </strong><small><em> Choose Location first</em></small></div>
-                            <table class="table table-striped" id="TableLogEntryAssysRemove">
-                                <thead class="hidden">
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="selectable"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col-xs-12">
-                        <button class="btn btn-sm btn-info" id="EditFormBtnAddRemoveAssys" type="button">Add/Remove Assys</button>
-                        @if (User.IsInRole("Assembly_EditStatus"))
-                        {
-                            <button class="btn btn-sm btn-warning pull-right" id="EditFormBtnChngSts" type="button">Change Status</button>
-                        }
+
+        <div class="well well-tdo">
+            <div class="row" id="LogEntryAssysView">
+                <div class="col-xs-12 col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><strong>Add Assemblies </strong><small><em> Choose Location first.</em></small></div>
+                        <table class="table table-striped" id="TableLogEntryAssysAdd">
+                            <thead class="hidden">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                </tr>
+                            </thead>
+                            <tbody class="selectable"></tbody>
+                        </table>
                     </div>
                 </div>
-            </div>
-            <div class="well well-tdo">
-                <div class="row" id="LogEntryPersonsView">
-                    <div class="col-xs-12 col-sm-6">
-                        <div class="panel panel-tdo-info">
-                            <div class="panel-heading">
-                                <strong>Add People</strong>
-                                <div class="small"><em> Adding others adds hours to their records!</em></div>
-                            </div>
-                            <table class="table table-striped" id="TableLogEntryPersonsAdd">
-                                <thead class="hidden">
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Last Name</th>
-                                        <th>First Name</th>
-                                        <th>Initials</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="selectable"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-6">
-                        <div class="panel panel-tdo-info">
-                            <div class="panel-heading"><strong>Remove People</strong></div>
-                            <table class="table table-striped" id="TableLogEntryPersonsRemove">
-                                <thead class="hidden">
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Last Name</th>
-                                        <th>First Name</th>
-                                        <th>Initials</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="selectable"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col-xs-12">
-                        <button class="btn btn-sm btn-info" id="EditFormBtnAddRemovePersons" type="button">Add/Remove People</button>
+                <div class="col-xs-12 col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><strong>Remove Assemblies </strong><small><em> Choose Location first</em></small></div>
+                        <table class="table table-striped" id="TableLogEntryAssysRemove">
+                            <thead class="hidden">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                </tr>
+                            </thead>
+                            <tbody class="selectable"></tbody>
+                        </table>
                     </div>
                 </div>
+                <div class="col-xs-12">
+                    <button class="btn btn-sm btn-info" id="EditFormBtnAddRemoveAssys" type="button">Add/Remove Assys</button>
+                    @if (User.IsInRole("Assembly_EditStatus"))
+                    {
+                        <button class="btn btn-sm btn-warning pull-right" id="EditFormBtnChngSts" type="button">Change Status</button>
+                    }
+                </div>
             </div>
-        </form>
-    </div>
+        </div>
+        <div class="well well-tdo">
+            <div class="row" id="LogEntryPersonsView">
+                <div class="col-xs-12 col-sm-6">
+                    <div class="panel panel-tdo-info">
+                        <div class="panel-heading">
+                            <strong>Add People</strong>
+                            <div class="small"><em> Adding others adds hours to their records!</em></div>
+                        </div>
+                        <table class="table table-striped" id="TableLogEntryPersonsAdd">
+                            <thead class="hidden">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Last Name</th>
+                                    <th>First Name</th>
+                                    <th>Initials</th>
+                                </tr>
+                            </thead>
+                            <tbody class="selectable"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <div class="panel panel-tdo-info">
+                        <div class="panel-heading"><strong>Remove People</strong></div>
+                        <table class="table table-striped" id="TableLogEntryPersonsRemove">
+                            <thead class="hidden">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Last Name</th>
+                                    <th>First Name</th>
+                                    <th>Initials</th>
+                                </tr>
+                            </thead>
+                            <tbody class="selectable"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-xs-12">
+                    <button class="btn btn-sm btn-info" id="EditFormBtnAddRemovePersons" type="button">Add/Remove People</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
 </div>
 
 @Html.Partial("_PersonLogEntryShared")
 
 <!------- ScriptVariables ------->
+<script>var UserId = "@Html.GetUserId()";</script>
 <script>var PersonId = "@ViewBag.PersonId";</script>
 
 @section Scripts {

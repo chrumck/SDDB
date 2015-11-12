@@ -24,6 +24,8 @@ var RecordTemplate = {
     AssignedToProject_Id: null,
     AssignedToLocation_Id: null,
     AssignedToProjectEvent_Id: null,
+    QcdByPerson_Id: null,
+    QcdDateTime: null,
     Comments: null,
     IsActive_bl: null
 };
@@ -41,8 +43,11 @@ $(document).ready(function () {
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) showModalNothingSelected();
-        else showModalDelete(CurrIds.length);
+        if (CurrIds.length == 0) {
+            showModalNothingSelected();
+            return;
+        }
+        showModalDelete(CurrIds.length);
     });
 
     //Initialize DateTimePicker FilterDateStart

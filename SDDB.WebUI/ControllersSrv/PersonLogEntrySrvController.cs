@@ -95,6 +95,16 @@ namespace SDDB.WebUI.ControllersSrv
             return DbJson(new { Success = "True" });
         }
 
+        // POST: /PersonLogEntrySrv/QcLogEntries
+        [HttpPost]
+        [DBSrvAuth("PersonLogEntry_Qc")]
+        public async Task<ActionResult> QcLogEntries(string[] ids)
+        {
+            ViewBag.ServiceName = "PersonLogEntryService.QcLogEntriesAsync";
+            await personLogEntryService.QcLogEntriesAsync(ids).ConfigureAwait(false);
+            return DbJson(new { Success = "True" });
+        }
+
         //-----------------------------------------------------------------------------------------------------------------------
 
         // GET: /PersonLogEntrySrv/GetPrsLogEntryAssys
@@ -258,6 +268,13 @@ namespace SDDB.WebUI.ControllersSrv
                 {
                     x.AssignedToProjectEvent.EventName
                 },
+                QcdByPerson_ = new 
+                {
+                    x.QcdByPerson.FirstName,
+                    x.QcdByPerson.LastName,
+                    x.QcdByPerson.Initials
+                },
+                x.QcdDateTime,
                 x.Comments,
                 PersonLogEntryFilesCount = x.PersonLogEntryFiles.Count,
                 PersonLogEntryAssysCount = x.PrsLogEntryAssemblyDbs.Count,
@@ -269,7 +286,8 @@ namespace SDDB.WebUI.ControllersSrv
                 x.PersonActivityType_Id,
                 x.AssignedToProject_Id,
                 x.AssignedToLocation_Id,
-                x.AssignedToProjectEvent_Id
+                x.AssignedToProjectEvent_Id,
+                x.QcdByPerson_Id
             }).ToList();
         }
 

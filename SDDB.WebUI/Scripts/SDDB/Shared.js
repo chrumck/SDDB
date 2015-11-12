@@ -185,14 +185,14 @@ function switchView(fromViewId, toViewId, toBtnGroupClass, dataTable) {
     }
     $("#" + fromViewId).addClass("hidden");
     $("#" + toViewId).removeClass("hidden");
+
     if (dataTable) {
-        dataTable.order(tableOrder).search(tableSearch).page(tablePage).draw(false);
-        var indexesToSelect = dataTable.rows(function (idx, data, node) {
-            return $.inArray(data.Id, tableSelectedIds) != -1;
-        }).eq(0).toArray();
-        dataTable.rows(indexesToSelect).nodes().to$().addClass("ui-selected");
+        loadViewSettings(dataTable);
+        window.scrollTo(0, windowYpos);
     }
-    if (dataTable) { window.scrollTo(0, windowYpos); } else { window.scrollTo(0, 0); }
+    else {
+        window.scrollTo(0, 0);
+    }
 }
 
 //saveViewSettings
@@ -204,6 +204,15 @@ function saveViewSettings(dataTable) {
         tableSearch = dataTable.search();
         tableSelectedIds = dataTable.cells(".ui-selected", "Id:name").data().toArray();
     }
+}
+
+//loadViewSettings
+function loadViewSettings(dataTable) {
+    dataTable.order(tableOrder).search(tableSearch).page(tablePage).draw(false);
+    var indexesToSelect = dataTable.rows(function (idx, data, node) {
+        return $.inArray(data.Id, tableSelectedIds) != -1;
+    }).eq(0).toArray();
+    dataTable.rows(indexesToSelect).nodes().to$().addClass("ui-selected");
 }
 
 //-----------------------------------------------------------------------------
@@ -310,9 +319,10 @@ function formIsValid(id, isCreate) {
     if (isCreate) { return false; }
     var isValid = true;
     $("#" + id + " input").each(function (index) {
+        if (!$(this).hasClass("modifiable")) { return true; }
         if ($(this).data("ismodified") && $(this).hasClass("input-validation-error")) {
             isValid = false;
-            return true;
+            return false;
         }
         $(this).removeClass("input-validation-error");
         $("[data-valmsg-for='" + this.id + "']").empty();
@@ -335,7 +345,7 @@ function clearFormInputs(formId, msArray) {
 function fillFormForCreateGeneric(formId, msArray, labelText) {
     clearFormInputs(formId, msArray);
     if (labelText) { $("#" + formId + "Label").text(labelText); } 
-    $("#" + formId + " [data-val-dbisunique]").prop("disabled", false);
+    $("#" + formId + " [data-val-dbisunique][class ~= 'modifiable']").prop("disabled", false);
     msDisableUnique(msArray, false);
     $("#" + formId + " .modifiable").data("ismodified", true);
     msSetAsModified(msArray, true);
@@ -420,11 +430,11 @@ function fillFormForEditFromDbEntries(getActive, dbEntries, formId, labelText, m
     //setFormForUniqueFieldsHelper
     function setFormForUniqueFieldsHelper() {
         if (dbEntries.length == 1) {
-            $("#" + formId + " [data-val-dbisunique]").prop("disabled", false);
+            $("#" + formId + " [data-val-dbisunique][class ~= 'modifiable']").prop("disabled", false);
             msDisableUnique(msArray, false);
         }
         else {
-            $("#" + formId + " [data-val-dbisunique]").prop("disabled", true);
+            $("#" + formId + " [data-val-dbisunique][class ~= 'modifiable']").prop("disabled", true);
             msDisableUnique(msArray, true);
         }
     }
@@ -663,7 +673,6 @@ function submitEditsForRelatedGenericWrp(ids, idsAdd, idsRemove, url) {
 //initialize MagicSuggest and add to MagicSuggest array
 function msAddToMsArray(msArray, id, url, maxSelection, minChars, dataUrlParams, disabled, editable) {
 
-    disabled = (typeof disabled !== "undefined" && disabled == false) ? false : true;
     editable = (typeof editable !== "undefined" && editable == false) ? false : true;
 
     var element = $("#" + id);
@@ -689,24 +698,30 @@ function msAddToMsArray(msArray, id, url, maxSelection, minChars, dataUrlParams,
     ms.id = id;
     ms.dataValRequired = dataValRequired;
     ms.dataValDbisunique = dataValDbisunique;
+    
     ms.isModified = false;
+    if ($(element).hasClass("modifiable")) {
+        ms.modifiable = true;
+        $(ms).on("selectionchange", function (e, m) { this.isModified = true });
 
-    $(ms).on("blur", function (e, m) {
-        if (!this.isValid()) {
-            $("#" + this.id).addClass("input-validation-error");
-            $("[data-valmsg-for=" + this.id + "]").text("Input missing or invalid.").removeClass("field-validation-valid")
-                .addClass("field-validation-error");
-        }
-        else {
-            $("#" + this.id).removeClass("input-validation-error");
-            $("[data-valmsg-for=" + this.id + "]").text("").addClass("field-validation-valid")
-                .removeClass("field-validation-error");
-        }
-    });
-
-    $(ms).on("selectionchange", function (e, m) { this.isModified = true });
-
-    if (!editable) { $(ms).on("focus", function (e, m) { this.expand(); }); }
+        $(ms).on("blur", function (e, m) {
+            if (!this.isValid()) {
+                $("#" + this.id).addClass("input-validation-error");
+                $("[data-valmsg-for=" + this.id + "]").text("Input missing or invalid.").removeClass("field-validation-valid")
+                    .addClass("field-validation-error");
+            }
+            else {
+                $("#" + this.id).removeClass("input-validation-error");
+                $("[data-valmsg-for=" + this.id + "]").text("").addClass("field-validation-valid")
+                    .removeClass("field-validation-error");
+            }
+        });
+        if (!editable) { $(ms).on("focus", function (e, m) { this.expand(); }); }
+    }
+    else {
+        ms.modifiable = false;
+        ms.disable();
+    }
 
     msArray.push(ms);
 }
@@ -716,6 +731,7 @@ function msIsValid(msArray) {
     if (!msArray) { return; }
     var msCheck = true;
     $.each(msArray, function (i, ms) {
+        if (!ms.modifiable) { return true; }
         if (!ms.isValid()) msCheck = false;
     });
     return msCheck;
@@ -725,6 +741,7 @@ function msIsValid(msArray) {
 function msValidate(msArray) {
     if (!msArray) { return; }
     $.each(msArray, function (i, ms) {
+        if (!ms.modifiable) { return true; }
         if (!ms.isValid()) {
             $("#" + ms.id).addClass("input-validation-error");
             $("[data-valmsg-for=" + ms.id + "]").text("Input missing or invalid.").removeClass("field-validation-valid")
@@ -738,7 +755,8 @@ function msDisableUnique(msArray, disable) {
     if (!msArray) { return; }
     disable = (typeof disable !== "undefined" && disable == false) ? false : true;
     $.each(msArray, function (i, ms) {
-        if (disable == true && typeof ms.dataValDbisunique !== "undefined" && ms.dataValDbisunique == "true") { ms.disable(); }
+        if (!ms.modifiable) { return true; }
+        if (disable && typeof ms.dataValDbisunique !== "undefined" && ms.dataValDbisunique == "true") { ms.disable(); }
         else { ms.enable(); }
     });
 }
@@ -748,7 +766,8 @@ function msDisableAll(msArray, disable) {
     if (!msArray) { return; }
     disable = (typeof disable !== "undefined" && disable == false) ? false : true;
     $.each(msArray, function (i, ms) {
-        if (disable == true) { ms.disable(); }
+        if (!ms.modifiable) { return true; }
+        if (disable) { ms.disable(); }
         else { ms.enable(); }
     });
 }
@@ -757,7 +776,10 @@ function msDisableAll(msArray, disable) {
 function msSetAsModified(msArray, isModified) {
     if (!msArray) { return; }
     isModified = (typeof isModified !== "undefined" && isModified == false) ? false : true;
-    $.each(msArray, function (i, ms) { ms.isModified = isModified; });
+    $.each(msArray, function (i, ms) {
+        if (!ms.modifiable) { return true; }
+        ms.isModified = isModified;
+    });
 }
 
 //msSetSelectionSilent - version of setSelection not triggering events

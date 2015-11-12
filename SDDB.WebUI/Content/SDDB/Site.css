@@ -17,12 +17,12 @@
 }
 
 /* Set width on the form input elements since they're 100% wide by default */
-input,
+/*input,
 select,
 textarea,
 .ms-ctn {
     max-width: 640px;
-}
+}*/
 
 /*DataTables tweaks*/
 div.dataTables_filter input[type=search] {

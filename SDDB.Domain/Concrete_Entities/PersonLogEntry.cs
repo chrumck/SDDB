@@ -54,7 +54,7 @@ namespace SDDB.Domain.Entities
         public string QcdByPerson_Id { get; set; }
 
         [DBIsDateTimeISO]
-        public DateTime QcdDateTime { get; set; }
+        public DateTime? QcdDateTime { get; set; }
 
         [Column(TypeName = "text")] [StringLength(65535)]
         public string Comments { get; set; }
