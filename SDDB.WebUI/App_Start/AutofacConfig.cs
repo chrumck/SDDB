@@ -39,15 +39,7 @@ namespace SDDB.WebUI
                         return userId ?? "NotLoggedIn";
                     }
                 );
-
-            //following Krystian's advice - file storage on FTP is discontinued
-            //var ftpAddress = ConfigurationManager.AppSettings["ftpAddress"] ?? "";
-            //var ftpUserName = ConfigurationManager.AppSettings["ftpUserName"] ?? "";
-            //var ftpPwd = ConfigurationManager.AppSettings["ftpPwd"] ?? "";
-            //var ftpIsSSL = bool.Parse(ConfigurationManager.AppSettings["ftpIsSSL"] ?? "false");
-            //var ftpIsPassive = bool.Parse(ConfigurationManager.AppSettings["ftpIsPassive"] ?? "true");
-            //var maxConnections = int.Parse(ConfigurationManager.AppSettings["maxConnections"] ?? "3");
-
+                        
             //register DB contexts
             builder.RegisterType<EFDbContext>().AsSelf().InstancePerDependency();
 
@@ -64,13 +56,7 @@ namespace SDDB.WebUI
                 .WithParameter("dbLogginglevel", dbLoggingLevel)
                 .WithParameter("procTooLongmSec", procTooLongmSec)
                 .InstancePerDependency();
-
-            //builder.RegisterType<DbFtpRepoService>().As<IFileRepoService>()
-            //    .WithParameter("ftpAddress", ftpAddress).WithParameter("ftpUserName", ftpUserName)
-            //    .WithParameter("ftpPwd", ftpPwd).WithParameter("ftpIsSSL", ftpIsSSL)
-            //    .WithParameter("maxConnections", maxConnections).WithParameter("ftpIsPassive", ftpIsPassive)
-            //    .InstancePerDependency();
-            
+                                    
             builder.RegisterType<DBUserService>().AsSelf()
                 .WithParameter("ldapAuthenticationEnabled", LDAPAuthenticationEnabled).InstancePerDependency();
             builder.RegisterType<PersonService>().AsSelf().WithParameter(userIdParameter).InstancePerDependency();

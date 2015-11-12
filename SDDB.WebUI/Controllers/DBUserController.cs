@@ -8,6 +8,8 @@ using System.Web;
 using SDDB.Domain.Services;
 using SDDB.Domain.Entities;
 using SDDB.WebUI.Models;
+using SDDB.Domain.Abstract;
+using System.Net;
 
 
 namespace SDDB.WebUI.Controllers
@@ -18,12 +20,14 @@ namespace SDDB.WebUI.Controllers
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
         private DBUserService dbUserService;
+        private ILogger logger;
         
         //Constructors---------------------------------------------------------------------------------------------------------//
 
-        public DBUserController(DBUserService dbUserService)
+        public DBUserController(DBUserService dbUserService, ILogger logger)
         {
             this.dbUserService = dbUserService;
+            this.logger = logger;
         }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
@@ -61,6 +65,15 @@ namespace SDDB.WebUI.Controllers
         {
             if (!ModelState.IsValid)
             {
+                logger.LogResult(new DBResult
+                {
+                    ActionName = RouteData.Values["action"].ToString(),
+                    ControllerName = RouteData.Values["controller"].ToString(),
+                    UserHostAddress = Request.UserHostAddress,
+                    StatusCode = HttpStatusCode.Unauthorized,
+                    StatusDescription = getErrorsFromModelStateHelper()
+                });
+
                 ViewBag.returnUrl = returnUrl;
                 return View(login);
             }
@@ -68,7 +81,18 @@ namespace SDDB.WebUI.Controllers
             var identity = await dbUserService.LoginAsync(login.UserName, login.Password).ConfigureAwait(false);
             if (identity == null)
             {
-                ModelState.AddModelError("","Invalid name or password.");
+                logger.LogResult(new DBResult
+                {
+                    ActionName = RouteData.Values["action"].ToString(),
+                    ControllerName = RouteData.Values["controller"].ToString(),
+                    ServiceName = "DBUserService.LoginAsync",
+                    UserHostAddress = Request.UserHostAddress,
+                    StatusCode = HttpStatusCode.Unauthorized,
+                    StatusDescription = "Invalid name or password."
+                });
+
+                ModelState.AddModelError("", "Invalid name or password.");
+
                 ViewBag.returnUrl = returnUrl;
                 return View(login);
             }
@@ -95,6 +119,21 @@ namespace SDDB.WebUI.Controllers
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
+
+        //getErrorsFromModelStateHelper
+        private string getErrorsFromModelStateHelper()
+        {
+            string errorsFromModelState = "";
+            foreach (ModelState state in ModelState.Values)
+            {
+                foreach (ModelError error in state.Errors)
+                {
+                    errorsFromModelState = String.IsNullOrEmpty(errorsFromModelState) ? errorsFromModelState : errorsFromModelState + " \n";
+                    errorsFromModelState += error.ErrorMessage;
+                }
+            }
+            return errorsFromModelState;
+        }
 
 
         #endregion
