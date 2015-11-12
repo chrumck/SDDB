@@ -188,7 +188,6 @@ function switchView(fromViewId, toViewId, toBtnGroupClass, dataTable) {
 
     if (dataTable) {
         loadViewSettings(dataTable);
-        window.scrollTo(0, windowYpos);
     }
     else {
         window.scrollTo(0, 0);
@@ -213,6 +212,7 @@ function loadViewSettings(dataTable) {
         return $.inArray(data.Id, tableSelectedIds) != -1;
     }).eq(0).toArray();
     dataTable.rows(indexesToSelect).nodes().to$().addClass("ui-selected");
+    window.scrollTo(0, windowYpos);
 }
 
 //-----------------------------------------------------------------------------

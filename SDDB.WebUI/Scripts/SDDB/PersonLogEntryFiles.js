@@ -21,7 +21,8 @@ $(document).ready(function () {
     //-----------------------------------------MainView------------------------------------------//
 
     //Wire up BtnEditLogEntryFiles 
-    $("#BtnEditLogEntryFiles").click(function () {
+    $("#BtnEditLogEntryFiles").click(function (event) {
+        event.preventDefault();
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (CurrIds.length != 1) {
             showModalSelectOne();

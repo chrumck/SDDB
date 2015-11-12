@@ -96,8 +96,10 @@ $(document).ready(function () {
             showModalNothingSelected();
             return;
         }
+        saveViewSettings(TableMain);
         showModalConfirm("Confirm that you want to QC the entry(ies).", "Confirm QC")
-            .done(qcSelected);
+            .then(function () { return qcSelected(); })
+            .done(function () { loadViewSettings(TableMain); })
     })
 
     //Initialize DateTimePicker FilterDateEnd
@@ -374,7 +376,6 @@ function fillFiltersFromRequestParams() {
 
 //QC selected assemblies
 function qcSelected() {
-    saveViewSettings(TableMain);
     showModalWait();
     return $.ajax({
         type: "POST", url: "/PersonLogEntrySrv/QcLogEntries",
@@ -383,7 +384,6 @@ function qcSelected() {
         dataType: "json"
     })
         .then(function () { return refreshMainView(); })
-        .done(function () { loadViewSettings(TableMain); })
         .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); })
         .always(hideModalWait);
 
