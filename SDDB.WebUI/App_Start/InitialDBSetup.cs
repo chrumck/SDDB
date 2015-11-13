@@ -36,14 +36,15 @@ namespace SDDB.WebUI
                 new DBRole {Name = "Location_View" },new DBRole {Name = "Location_Edit" }, 
                 new DBRole {Name = "LocationType_View" },new DBRole {Name = "LocationType_Edit" }, 
                 
-                new DBRole {Name = "Assembly_View" },new DBRole {Name = "Assembly_Edit" },
-                new DBRole {Name = "Assembly_EditStatus" },
+                new DBRole {Name = "Assembly_View" }, new DBRole {Name = "Assembly_Edit" },
+                new DBRole {Name = "Assembly_EditStatus" }, new DBRole {Name = "AssemblyLogEntry_Edit" },
                 new DBRole {Name = "AssemblyType_View" },new DBRole {Name = "AssemblyType_Edit" },
                 new DBRole {Name = "AssemblyStatus_View" },new DBRole {Name = "AssemblyStatus_Edit" },
                 
-                new DBRole {Name = "Component_View" },new DBRole {Name = "Component_Edit" },
-                new DBRole {Name = "ComponentType_View" },new DBRole {Name = "ComponentType_Edit" },
-                new DBRole {Name = "ComponentStatus_View" },new DBRole {Name = "ComponentStatus_Edit" },
+                new DBRole {Name = "Component_View" }, new DBRole {Name = "Component_Edit" },
+                new DBRole {Name = "ComponentLogEntry_Edit" },
+                new DBRole {Name = "ComponentType_View" }, new DBRole {Name = "ComponentType_Edit" },
+                new DBRole {Name = "ComponentStatus_View" }, new DBRole {Name = "ComponentStatus_Edit" },
             };
 
             var roleManager = DependencyResolver.Current.GetService<IAppRoleManager>();

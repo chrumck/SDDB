@@ -53,7 +53,7 @@ namespace SDDB.WebUI.ControllersSrv
 
         // POST: /AssemblyLogEntrySrv/Edit
         [HttpPost]
-        [DBSrvAuth("Assembly_Edit")]
+        [DBSrvAuth("AssemblyLogEntry_Edit")]
         public async Task<ActionResult> Edit(AssemblyLogEntry[] records)
         {
             ViewBag.ServiceName = "AssemblyLogEntryService.EditAsync";
@@ -63,7 +63,7 @@ namespace SDDB.WebUI.ControllersSrv
 
         // POST: /AssemblyLogEntrySrv/Delete
         [HttpPost]
-        [DBSrvAuth("Assembly_Edit")]
+        [DBSrvAuth("AssemblyLogEntry_Edit")]
         public async Task<ActionResult> Delete(string[] ids)
         {
             ViewBag.ServiceName = "AssemblyLogEntryService.DeleteAsync";
