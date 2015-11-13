@@ -36,7 +36,6 @@ namespace SDDB.Domain.Services
                 
                 var records = await dbContext.AssemblyLogEntrys
                     .Where(x =>
-                        x.AssignedToLocation.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
                         ids.Contains(x.Id) &&
                         x.IsActive_bl == getActive
                         )
@@ -67,7 +66,6 @@ namespace SDDB.Domain.Services
 
                 var records = await dbContext.AssemblyLogEntrys
                     .Where(x =>
-                        x.AssignedToLocation.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
                         (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToLocation.AssignedToProject_Id)) &&
                         (assemblyIds.Count() == 0 || assemblyIds.Contains(x.AssemblyDb_Id)) &&
                         (assyTypeIds.Count() == 0 || assyTypeIds.Contains(x.AssemblyDb.AssemblyType.Id)) &&
