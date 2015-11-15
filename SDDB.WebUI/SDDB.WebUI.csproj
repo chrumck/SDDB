@@ -164,6 +164,7 @@
     <Content Include="Images\SDDB_help.png" />
     <Content Include="Scripts\FileSaver.js" />
     <Content Include="Scripts\FileSaver.min.js" />
+    <Content Include="Scripts\SDDB\LastEntrySummary.js" />
     <Content Include="Scripts\SDDB\ActivitySummary.js" />
     <Content Include="Scripts\SDDB\ComponentType.js" />
     <Content Include="Scripts\SDDB\Shared_Views.js" />
@@ -472,6 +473,7 @@
     <Compile Include="ControllersSrv\ProjectSrvController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controllers\LastEntrySummaryController.cs" />
     <Compile Include="Controllers\AssemblyLogEntryController.cs" />
     <Compile Include="Controllers\ComponentLogEntryController.cs" />
     <Compile Include="Controllers\ComponentController.cs" />
@@ -537,6 +539,7 @@
     <Content Include="Views\Shared\_PersonLogEntryShared.cshtml" />
     <Content Include="Views\Home\Maintenance.cshtml" />
     <Content Include="Views\ActivitySummary\Index.cshtml" />
+    <Content Include="Views\LastEntrySummary\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -1,0 +1,79 @@
+﻿@using SDDB.WebUI.Infrastructure
+@{
+    ViewBag.Title = "SDDB Person Last Entries Summary";
+}
+
+<!------- InitialView ------->
+<div class="container-fluid" id="InitialView">
+    <h4>Please wait, page loading...</h4>
+</div>
+
+<!------- MainView ------->
+<div class="container-fluid hidden" id="MainView">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="btn-group margin-bottom-2px">
+                <input class="form-control input-tdo-warning" data-val="true" data-val-dbisdateiso="The field must have YYYY-MM-DD format."
+                       id="FilterDateStart" placeholder="Select Day" type="text" value="">
+            </div>
+            &nbsp; &nbsp;
+            <div class="btn-group margin-bottom-2px">
+                <div id="MsFilterByActivityType" placeholder="Activity Type"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-warning" id="PanelTableMain">
+        <div class="panel-heading text-center" style="font-size:130%">
+            <strong>Person Last Entries</strong>
+        </div>
+        <table class="table table-striped" id="TableMain">
+            <thead>
+                <tr>
+                    <th id="thNo0">Project</th>
+                    <th id="thNo1"></th>
+                    <th id="thNo2"></th>
+                    <th id="thNo3"></th>
+                    <th id="thNo4"></th>
+                    <th id="thNo5"></th>
+                    <th id="thNo6" class="hidden-xs"></th>
+                    <th id="thNo7" class="hidden-xs"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>DumTxt</td>
+                    <td>DumTxt</td>
+                    <td>DumTxt</td>
+                    <td>DumTxt</td>
+                    <td>DumTxt</td>
+                    <td>DumTxt</td>
+                    <td>DumTxt</td>
+                    <td>DumTxt</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!------- ScriptVariables ------->
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/DataTables")
+    @Scripts.Render("~/bundles/bootstrap-toggle")
+    @Scripts.Render("~/bundles/magicsuggest")
+    @Scripts.Render("~/bundles/bootstrap-datetimepicker")
+    <script src="~/Scripts/SDDB/LastEntrySummary.js?v=@Html.GetAppVersion()"></script>
+}
+
+@section CSS {
+    @Styles.Render("~/bundles/DataTables-CSS")
+    @Styles.Render("~/bundles/bootstrap-toggle-CSS")
+    @Styles.Render("~/bundles/magicsuggest-css")
+    @Styles.Render("~/bundles/bootstrap-datetimepicker-CSS")
+}
+
+
+

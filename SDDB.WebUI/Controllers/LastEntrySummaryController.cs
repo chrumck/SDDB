@@ -3,7 +3,7 @@
 namespace SDDB.WebUI.Controllers
 {
     [Authorize]
-    public class ActivitySummaryController : Controller
+    public class LastEntrySummaryController : Controller
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
@@ -12,7 +12,7 @@ namespace SDDB.WebUI.Controllers
         //Methods--------------------------------------------------------------------------------------------------------------//
 
         // GET: ActivitySummary
-        [Authorize(Roles = "YourActivity_View,ActivitySummary_ViewOthers")]
+        [Authorize(Roles = "PersonLogEntry_View")]
         public ActionResult Index()
         {
             return View();

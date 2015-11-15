@@ -141,7 +141,7 @@ namespace SDDB.Domain.Services
             }
         }
 
-        //GetActivitySummariesAsync - get by personId, endDate
+        //GetActivitySummariesAsync
         public virtual async Task<List<ActivitySummary>> GetActivitySummariesAsync(string personId, 
             DateTime startDate, DateTime endDate, bool getActive = true)
         {
@@ -162,6 +162,45 @@ namespace SDDB.Domain.Services
                     .ToListAsync().ConfigureAwait(false);
                 var recordGroupsByDay = records.GroupBy(x => x.LogEntryDateTime.Date).ToList();
                 return getSummariesFromGroups(personId, recordGroupsByDay);
+            }
+        }
+
+        //GetLastEntrySummaryAsync
+        public virtual async Task<List<LastEntrySummary>> GetLastEntrySummariesAsync(string activityTypeId,
+            DateTime startDate, DateTime endDate, bool getActive = true)
+        {
+            if (String.IsNullOrEmpty(activityTypeId)) { throw new ArgumentNullException("activityTypeId"); }
+
+            using (var dbContextScope = contextScopeFac.CreateReadOnly())
+            {
+                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
+
+                var records = await dbContext.PersonLogEntrys
+                    .Where(x =>
+                           (activityTypeId == x.PersonActivityType_Id) &&
+                           (x.LogEntryDateTime >= startDate) &&
+                           (x.LogEntryDateTime <= endDate) &&
+                           x.IsActive_bl == getActive
+                           )
+                    .Include(x => x.AssignedToProject)
+                    .Include(x => x.EnteredByPerson)
+                    .ToListAsync().ConfigureAwait(false);
+
+                return records.GroupBy(x => new { project = x.AssignedToProject, date = x.LogEntryDateTime.Date})
+                    .Select(x => {
+                        var lastEntry = x.OrderBy(y => y.LogEntryDateTime).Last();
+                        return new LastEntrySummary(
+                                    x.Key.date,
+                                    x.Key.project.Id,
+                                    x.Key.project.ProjectName,
+                                    x.Key.project.ProjectCode,
+                                    x.Count(),
+                                    lastEntry.LogEntryDateTime,
+                                    lastEntry.EnteredByPerson.Initials,
+                                    lastEntry.Comments
+                            );
+                        })
+                    .ToList();
             }
         }
                 

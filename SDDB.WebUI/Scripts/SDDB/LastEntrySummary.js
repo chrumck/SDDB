@@ -9,7 +9,7 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var MsFilterByPerson;
+var MsFilterByActivityType;
 
 $(document).ready(function () {
 
@@ -21,9 +21,9 @@ $(document).ready(function () {
         .on("dp.hide", function (e) { refreshMainView(); });
 
 
-    //Initialize MagicSuggest MsFilterByPerson
-    MsFilterByPerson = $("#MsFilterByPerson").magicSuggest({
-        data: "/PersonSrv/Lookup",
+    //Initialize MagicSuggest MsFilterByActivityType
+    MsFilterByActivityType = $("#MsFilterByActivityType").magicSuggest({
+        data: "/PersonActivityTypeSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
             error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
@@ -32,11 +32,8 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByPerson
-    $(MsFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
-
-    //Hide MsFilterByPerson if !CanViewOthers
-    if (typeof CanViewOthers === "undefined" || !CanViewOthers) { MsFilterByPerson.disable(); } 
+    //Wire up on change event for MsFilterByActivityType
+    $(MsFilterByActivityType).on("selectionchange", function (e, m) { refreshMainView(); });
            
     //--------------------------------------View Initialization------------------------------------//
            
@@ -47,7 +44,8 @@ $(document).ready(function () {
     if ($("#thNo6").is(":hidden") && $("#thNo7").is(":hidden")) { weekOffset = 1; }
     $("#FilterDateStart").val(moment().day(weekOffset).format("YYYY-MM-DD"));
 
-    MsFilterByPerson.setSelection([{ id: UserId, name: UserFullName }]);
+    refreshMainView();
+
 
     //--------------------------------End of execution at Start-----------
 });
@@ -63,15 +61,15 @@ function refreshMainView() {
     tableMain.find("tbody").empty();
     clearSumTblFirstRowHelper(tableMain);
 
-    if (startDate != "" && MsFilterByPerson.getSelection().length != 0) {
+    if (startDate != "" && MsFilterByActivityType.getSelection().length != 0) {
         showModalWait();
         var endDate = moment(startDate).add(6, "days").hour(23).minute(59).format("YYYY-MM-DD HH:mm");
         $.ajax({
             type: "POST",
-            url: "/PersonLogEntrySrv/GetActivitySummaries",
+            url: "/PersonLogEntrySrv/GetLastEntrySummaries",
             timeout: 120000,
             data: {
-                personId: (MsFilterByPerson.getSelection())[0].id,
+                activityTypeId: (MsFilterByActivityType.getSelection())[0].id,
                 startDate: startDate,
                 endDate: endDate,
                 getActive: true
@@ -95,19 +93,32 @@ function fillSummaryTableHelper(tableMain, startDate, records) {
 
     fillSumTblFirstRowHelper(tableMain, columnDates);
 
-    var projectNames = getProjectNamesHelper(records);
+    getCurrentProjectsHelper().done(function (currentProjects) {
+        $.each(currentProjects, function (i, project) {
 
-    $.each(projectNames, function (i, projectName) {
-
-        var row = $("<tr/>");
-        row.append($("<td />").text(projectName));
-        $.each(columnDates, function (j, columnDate) {
-            var columnHours = getColumnHoursHelper(records, columnDate, projectName, i == 0);
-            row.append($("<td />").text(columnHours));
-            if (j >= columnDates.length - 2) { row.find("td:last").addClass("hidden-xs"); }
+            var row = $("<tr/>");
+            row.append($("<td />").text(project.name));
+            $.each(columnDates, function (j, columnDate) {
+                var tableData = getColumnDataHelper(records, columnDate, project);
+                row.append($("<td />").html(tableData));
+                if (j >= columnDates.length - 2) { row.find("td:last").addClass("hidden-xs"); }
+            });
+            tableMain.append(row);
         });
-        tableMain.append(row);
+    })
+}
+
+//getColumnHoursHelper - used by fillSummaryTableHelper
+function getColumnDataHelper(records, columnDate, project) {
+    var tableData = "<span style='color:red'><em>No Entries</em></span>";
+    $.each(records, function (i, record) {
+        if (moment(record.SummaryDay).isSame(columnDate) && record.ProjectId == project.id) {
+            var qtyText = (record.TotalEntries === 1) ? "entry: " : "entries, last: ";
+            tableData = "<strong>" + record.TotalEntries + " " + qtyText + "</strong> " + record.LastEntryDateTime + "<br />" +
+                "<strong>" + record.LastEntryPersonInitials + ":</strong> " + $($.parseHTML(record.LastEntryComments)).text();
+        }
     });
+    return tableData;
 }
 
 //getColumnDatesHelper - used by fillSummaryTableHelper
@@ -138,35 +149,17 @@ function clearSumTblFirstRowHelper(tableMain) {
 }
 
 //getProjectNamesHelper - used by fillSummaryTableHelper
-function getProjectNamesHelper(records) {
-    var projectNames = [];
-    projectNames.push("_TOTAL_");
-    $.each(records, function (i, record) {
-        $.each(record.SummaryDetails, function (j, detail) {
-            if ($.inArray(detail.ProjectName, projectNames) == -1) { projectNames.push(detail.ProjectName); }
-        });
-    });
-    return projectNames;
+function getCurrentProjectsHelper() {
+    return $.ajax({
+            type: "POST",
+            url: "/ProjectSrv/Lookup",
+            timeout: 120000,
+            data: { getActive: true },
+            dataType: "json"
+        })
+        .always(hideModalWait)
+        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 }
 
-//getColumnHoursHelper - used by fillSummaryTableHelper
-function getColumnHoursHelper(records, columnDate, projectName, isTotalHoursRow) {
-    var columnHours = 0;
-    $.each(records, function (i, record) {
-        if (moment(record.SummaryDay).isSame(columnDate)) {
-            if (isTotalHoursRow) {
-                columnHours = record.TotalManHours;
-                return false;
-            }
-            $.each(record.SummaryDetails, function (j, detail) {
-                if (detail.ProjectName == projectName) {
-                    columnHours = detail.ManHours;
-                    return false;
-                }
-            });
-            return false;
-        }
-    });
-    return columnHours;
-}
+
 

@@ -62,11 +62,23 @@ namespace SDDB.WebUI.ControllersSrv
         public async Task<ActionResult> GetActivitySummaries(string personId,
             DateTime startDate, DateTime endDate, bool getActive = true)
         {
-            ViewBag.ServiceName = "PersonLogEntryService.GetActivitySummaries";
+            ViewBag.ServiceName = "PersonLogEntryService.GetActivitySummariesAsync";
             if (!User.IsInRole("ActivitySummary_ViewOthers") && personId != UserId) { return JsonResponseForNoRights(); }
             var records = await personLogEntryService.GetActivitySummariesAsync(personId, startDate, endDate, getActive)
                 .ConfigureAwait(false);
             return DbJsonDate(records);
+        }
+
+        // POST: /PersonLogEntrySrv/GetLastEntrySummaries
+        [HttpPost]
+        [DBSrvAuth("PersonLogEntry_View")]
+        public async Task<ActionResult> GetLastEntrySummaries(string activityTypeId,
+            DateTime startDate, DateTime endDate, bool getActive = true)
+        {
+            ViewBag.ServiceName = "PersonLogEntryService.GetLastEntrySummariesAsync";
+            var records = await personLogEntryService.GetLastEntrySummariesAsync(activityTypeId, startDate, endDate, getActive)
+                .ConfigureAwait(false);
+            return DbJsonDateTime(records);
         }
         
         //-----------------------------------------------------------------------------------------------------------------------
