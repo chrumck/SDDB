@@ -10,31 +10,38 @@
 
 <!----- Navbar Section ----->
 @section Navbar{
-<div class="btn-group navbar-btn tdo-btngroup-main">
-    <button type="button" class="btn btn-default" id="BtnCreate">New</button>
-    <button type="button" class="btn btn-tdo-nav" id="BtnEdit">&nbsp;&nbsp;Edit&nbsp;&nbsp;</button>
-    <button type="button" class="btn btn-danger" id="BtnDelete">&nbsp;&nbsp;Del&nbsp;&nbsp;</button>
-</div>
+    <div class="btn-group navbar-btn tdo-btngroup-main">
+        <button type="button" class="btn btn-default" id="BtnCreate">New</button>
+        <button type="button" class="btn btn-tdo-nav" id="BtnEdit">&nbsp;&nbsp;Edit&nbsp;&nbsp;</button>
+        <button type="button" class="btn btn-danger" id="BtnDelete">&nbsp;&nbsp;Del&nbsp;&nbsp;</button>
+    </div>
 
-<div class="btn-group navbar-btn tdo-btngroup-edit hidden">
-    <button type="button" class="btn btn-default" id="EditFormBtnCancel">Back</button>
-    <button type="button" class="btn btn-tdo-success disabled" id="EditFormBtnOkFiles">
-        &nbsp;<span class="glyphicon glyphicon-cloud-upload"></span>&nbsp;
-    </button>
-    <button type="button" class="btn btn-success" id="EditFormBtnOk">
-        &nbsp;&nbsp;&nbsp<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;
-    </button>
-</div>
+    <div class="btn-group navbar-btn tdo-btngroup-edit hidden">
+        <button type="button" class="btn btn-default" id="EditFormBtnCancel">Back</button>
+        <button type="button" class="btn btn-tdo-success disabled" id="EditFormBtnOkFiles">
+            &nbsp;<span class="glyphicon glyphicon-cloud-upload"></span>&nbsp;
+        </button>
+        <button type="button" class="btn btn-success" id="EditFormBtnOk">
+            &nbsp;&nbsp;&nbsp<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;
+        </button>
+    </div>
 
-<div class="btn-group navbar-btn tdo-btngroup-logentryfiles hidden">
-    <button type="button" class="btn btn-default" id="LogEntryFilesViewBtnBack">Back</button>
-</div>
+    <div class="btn-group navbar-btn tdo-btngroup-logentryfiles hidden">
+        <button type="button" class="btn btn-default" id="LogEntryFilesViewBtnBack">Back</button>
+    </div>
 }
 @section NavbarCollapse{
-<ul class="nav navbar-nav tdo-btngroup-main">
-    <li><a class="margin-left-5px collapsenav" href="#" id="BtnEditLogEntryFiles">&nbsp; Files </a></li>
-    <li><a class="collapsenav" href=# id="dropdownId1">QC Selected</a></li>
-</ul>
+
+
+    <ul class="nav navbar-nav margin-left-5px tdo-btngroup-main">
+        <li>
+            <div class="btn-group navbar-btn">
+                <button type="button" class="btn btn-warning collapsenav" id="BtnCopy"> Copy </button>
+            </div>
+        </li>
+        <li><a class="collapsenav" href="#" id="BtnEditLogEntryFiles">Files</a></li>
+        <li><a class="collapsenav" href=# id="dropdownId1">QC Selected</a></li>
+    </ul>
 }
 
 <!------- MainView ------->

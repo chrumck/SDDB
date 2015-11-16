@@ -150,6 +150,7 @@ function clearSumTblFirstRowHelper(tableMain) {
 
 //getProjectNamesHelper - used by fillSummaryTableHelper
 function getCurrentProjectsHelper() {
+    showModalWait();
     return $.ajax({
             type: "POST",
             url: "/ProjectSrv/Lookup",

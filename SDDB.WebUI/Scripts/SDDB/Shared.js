@@ -144,7 +144,7 @@ function showModalFail(label, body, bodyPre) {
   
     $("#ModalInfoLabel").text(label);
     $("#ModalInfoBody").html(body);
-    if (bodyPre != "") { $("#ModalInfoBodyPre").text(bodyPre).removeClass("hidden"); }
+    if (bodyPre !== "") { $("#ModalInfoBodyPre").text(bodyPre).removeClass("hidden"); }
     else { $("#ModalInfoBodyPre").addClass("hidden"); }
     $("#ModalInfo").modal("show");
 }
@@ -303,7 +303,7 @@ function deleteRecordsGenericWrp(ids, url, callback) {
         .done(function () {
             callback();
             deferred0.resolve();
-        } )
+        })
         .fail(function (xhr, status, error) {
             showModalAJAXFail(xhr, status, error);
             deferred0.reject(xhr, status, error);
@@ -356,7 +356,7 @@ function fillFormForCreateGeneric(formId, msArray, labelText) {
     msSetAsModified(msArray, true);
     $("#" + formId + "GroupIsActive").addClass("hidden");
     $("#IsActive").prop("checked", true);
-    $("#IsActive_bl").prop("checked", true)
+    $("#IsActive_bl").prop("checked", true);
     $("#" + formId + "CreateMultiple").removeClass("hidden");
 }
 
@@ -413,8 +413,8 @@ function fillFormForEditFromDbEntries(getActive, dbEntries, formId, labelText, m
                     else {
                         formInput[msNameProperty] = "";
                         for (var subProp in dbEntry[msNameProperty]) {
-                            if (dbEntry[msNameProperty][subProp] != null) {
-                                if (formInput[msNameProperty] != "") {
+                            if (dbEntry[msNameProperty][subProp] !== null) {
+                                if (formInput[msNameProperty] !== "") {
                                     formInput[msNameProperty] += " ";
                                 }
                                 formInput[msNameProperty] += dbEntry[msNameProperty][subProp];
@@ -451,7 +451,7 @@ function fillFormForEditFromDbEntries(getActive, dbEntries, formId, labelText, m
             if (property.slice(-3) == "_Id" && msArray) {
                 $.each(msArray, function (i, ms) {
                     if (ms.id == property) {
-                        if (formInput[property] != null) {
+                        if (formInput[property] !== null) {
                             msSetSelectionSilent(ms, [{ id: formInput[property], name: formInput[property.slice(0, -2)] }]);
                         }
                         return false;
@@ -460,7 +460,7 @@ function fillFormForEditFromDbEntries(getActive, dbEntries, formId, labelText, m
                 continue;
             }
             if (property.slice(-3) == "_bl") {
-                if (formInput[property] == true) { $("#" + formId + " #" + property).prop("checked", true); }
+                if (formInput[property] === true) { $("#" + formId + " #" + property).prop("checked", true); }
                 continue;
             }
             $("#" + formId + " #" + property).val(formInput[property]);
@@ -490,7 +490,7 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
         if ($(this).data("ismodified")) modifiedProperties.push($(this).prop("id"));
     });
     $.each(msArray, function (i, ms) {
-        if (ms.isModified == true) modifiedProperties.push(ms.id);
+        if (ms.isModified === true) modifiedProperties.push(ms.id);
     });
 
     $.each(currRecordsClone, function (i, currRecord) {
@@ -501,7 +501,7 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
             if (property.slice(-3) == "_Id") {
                 $.each(msArray, function (i, ms) {
                     if (ms.id == property) {
-                        currRecord[property]= ms.getSelection().length != 0 ? (ms.getSelection())[0].id : "";
+                        currRecord[property] = ms.getSelection().length !== 0 ? (ms.getSelection())[0].id : "";
                         currRecord[property.slice(0, -2)] = (function () { return; })();
                         return false;
                     }
@@ -512,14 +512,14 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
                 currRecord[property] = $("#" + formId + " #" + property).prop("checked");
                 continue;
             }
-            currRecord[property] = $("#" + formId +" #" + property).val();
+            currRecord[property] = $("#" + formId + " #" + property).val();
         }
         currRecord.ModifiedProperties = modifiedProperties;
     });
 
     if (currRecordsClone.length == 1 && noOfNewRecords > 1) { multiplyRecordsAndModifyUniquePropsHelper(); }
 
-    if (modifiedProperties.length == 0) {
+    if (modifiedProperties.length === 0) {
         return deferred0.resolve({ "Success": "True", "newEntryIds": [], "propsModified": false }, currRecordsClone);
     }
 
@@ -549,7 +549,7 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
                 property.slice(-1) == "_") {
                     continue;
                 }
-                if ($("#" + formId + " #" + property).data("valDbisunique") == true) {
+                if ($("#" + formId + " #" + property).data("valDbisunique") === true) {
                     var j = i + 1;
                     currRecord[property] = currRecord[property] + "_" + ("00" + j).slice(-3);
                 }
@@ -601,7 +601,7 @@ function fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
         $.ajax({ type: httpTypeMany, url: urlMany, timeout: 120000, data: dataMany, dataType: "json" })
             .done(function (data) {
                 tableAdd.rows.add(data).order([sortColumn, "asc"]).draw();
-                if (ids.length != 0) tableRemove.rows.add(data).order([sortColumn, "asc"]).draw();
+                if (ids.length !== 0) tableRemove.rows.add(data).order([sortColumn, "asc"]).draw();
                 return deferred0.resolve();
             })
             .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
@@ -634,17 +634,22 @@ function submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url) {
     var deferred1 = $.Deferred();
     var deferred2 = $.Deferred();
 
-    if (idsAdd.length == 0) { deferred1.resolve(); }
+    if (idsAdd.length === 0) { deferred1.resolve(); }
     else {
         $.ajax({ type: "POST", url: url, timeout: 120000, data: { ids: ids, idsAddRem: idsAdd, isAdd: true }, dataType: "json" })
             .done(function () { deferred1.resolve(); })
             .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
     }
 
-    if (idsRemove.length == 0) { deferred2.resolve(); }
+    if (idsRemove.length === 0) { deferred2.resolve(); }
     else {
         setTimeout(function () {
-            $.ajax({ type: "POST", url: url, timeout: 120000, data: { ids: ids, idsAddRem: idsRemove, isAdd: false }, dataType: "json" })
+            $.ajax({
+                type: "POST",
+                url: url, timeout: 120000,
+                data: { ids: ids, idsAddRem: idsRemove, isAdd: false },
+                dataType: "json"
+            })
                 .done(function () { deferred2.resolve(); })
                 .fail(function (xhr, status, error) { deferred2.reject(xhr, status, error); });
         }, 500);
@@ -678,7 +683,7 @@ function submitEditsForRelatedGenericWrp(ids, idsAdd, idsRemove, url) {
 //initialize MagicSuggest and add to MagicSuggest array
 function msAddToMsArray(msArray, id, url, maxSelection, minChars, dataUrlParams, disabled, editable) {
 
-    editable = (typeof editable !== "undefined" && editable == false) ? false : true;
+    editable = (typeof editable !== "undefined" && editable === false) ? false : true;
 
     var element = $("#" + id);
     var dataValRequired = $(element).attr("data-val-required");
@@ -707,7 +712,7 @@ function msAddToMsArray(msArray, id, url, maxSelection, minChars, dataUrlParams,
     ms.isModified = false;
     if ($(element).hasClass("modifiable")) {
         ms.modifiable = true;
-        $(ms).on("selectionchange", function (e, m) { this.isModified = true });
+        $(ms).on("selectionchange", function (e, m) { this.isModified = true; });
 
         $(ms).on("blur", function (e, m) {
             if (!this.isValid()) {
@@ -758,7 +763,7 @@ function msValidate(msArray) {
 //enable or disable DbUnique MagicSuggests in ms array
 function msDisableUnique(msArray, disable) {
     if (!msArray) { return; }
-    disable = (typeof disable !== "undefined" && disable == false) ? false : true;
+    disable = (typeof disable !== "undefined" && disable === false) ? false : true;
     $.each(msArray, function (i, ms) {
         if (!ms.modifiable) { return true; }
         if (disable && typeof ms.dataValDbisunique !== "undefined" && ms.dataValDbisunique == "true") { ms.disable(); }
@@ -769,7 +774,7 @@ function msDisableUnique(msArray, disable) {
 //enable or disable All MagicSuggests in ms array
 function msDisableAll(msArray, disable) {
     if (!msArray) { return; }
-    disable = (typeof disable !== "undefined" && disable == false) ? false : true;
+    disable = (typeof disable !== "undefined" && disable === false) ? false : true;
     $.each(msArray, function (i, ms) {
         if (!ms.modifiable) { return true; }
         if (disable) { ms.disable(); }
@@ -780,7 +785,7 @@ function msDisableAll(msArray, disable) {
 //set MagicSuggests as modified ot not
 function msSetAsModified(msArray, isModified) {
     if (!msArray) { return; }
-    isModified = (typeof isModified !== "undefined" && isModified == false) ? false : true;
+    isModified = (typeof isModified !== "undefined" && isModified === false) ? false : true;
     $.each(msArray, function (i, ms) {
         if (!ms.modifiable) { return true; }
         ms.isModified = isModified;
@@ -804,7 +809,7 @@ function updateTableForExtended(httpType, url, data, table) {
             var entityType = data[0];
             for (var prop in entityType) {
                 if (prop.indexOf("Attr") == -1 || prop.indexOf("Desc") == -1) { continue; }
-                if (entityType[prop] != null && entityType[prop] != "") { typeHasAttrs = true; }
+                if (entityType[prop] !== null && entityType[prop] !== "") { typeHasAttrs = true; }
                 $(table.column(prop.slice(prop.indexOf("Attr"), 6) + ":name").header()).text(entityType[prop]);
             }
             deferred0.resolve(typeHasAttrs);
@@ -842,7 +847,7 @@ function updateFormForExtended(httpType, url, data, formId) {
             }
             $("#" + formId).removeData("validator");
             $("#" + formId).removeData('unobtrusiveValidation');
-            $.validator.unobtrusive.parse("#" + formId)
+            $.validator.unobtrusive.parse("#" + formId);
             deferred0.resolve(typeHasAttrs);
         })
         .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
@@ -913,8 +918,8 @@ function updateFormForExtended(httpType, url, data, formId) {
     function removeValidationAttributesHelper($element) {
         var attrsToRemove = "";
         $.each($element[0].attributes, function (i, attrib) {
-            if (typeof attrib !== "undefined" && attrib.name.indexOf("data-val") == 0) {
-                attrsToRemove += (attrsToRemove == "") ? attrib.name : " " + attrib.name;
+            if (typeof attrib !== "undefined" && attrib.name.indexOf("data-val") === 0) {
+                attrsToRemove += (attrsToRemove === "") ? attrib.name : " " + attrib.name;
             }
         });
         $element.removeAttr(attrsToRemove);
@@ -952,7 +957,7 @@ function submitFormFromArray(verb, url, target, dataArray, parameterName) {
     form.style.display = 'none';
     document.body.appendChild(form);
     form.submit();
-};
+}
 
 
 
