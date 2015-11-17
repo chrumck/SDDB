@@ -34,11 +34,7 @@ $(document).ready(function () {
         TableLogEntryAssysRemove.clear().search("").draw();
         $("#EditFormBtnOkFiles").removeClass("disabled");
 
-        fillFormForRelatedGenericWrp(
-                TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
-                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", {},
-                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", {},
-                "GET", "/PersonSrv/Get", { getActive: true })
+        refreshTblGenWrp(TableLogEntryPersonsAdd, "/PersonSrv/Get", { getActive: true }, "GET")
             .done(function () {
                 saveViewSettings(TableMain);
                 switchView("MainView", "EditFormView", "tdo-btngroup-edit");
@@ -84,6 +80,41 @@ $(document).ready(function () {
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
+
+    //Wire up BtnCopy
+    $("#BtnCopy").click(function () {
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (CurrIds.length === 0) {
+            showModalNothingSelected();
+            return;
+        }
+        $("#EditFormBtnOkFiles").removeClass("disabled");
+        TableLogEntryAssysAdd.clear().search("").draw();
+        TableLogEntryAssysRemove.clear().search("").draw();
+        showModalWait();
+        $.when(
+            fillFormForCopyGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
+                GetActive, "EditForm", "Copy Person Activity", MagicSuggests),
+            refreshTableGeneric(TableLogEntryPersonsAdd, "/PersonSrv/Get", { getActive: true }, "GET")
+            )
+            .then(function (currRecords) {
+                CurrIds =[];
+                CurrRecords =[];
+                CurrRecords[0] = $.extend(true, {}, RecordTemplate);
+                MagicSuggests[5].clear();
+                $("#QcdDateTime").val("");
+                return refreshTableGeneric(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
+                { getActive: true, locId: MagicSuggests[3].getValue()[0] }, "GET");
+            })
+            .done(function () {
+                hideModalWait();
+                saveViewSettings(TableMain);
+                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
+            })
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+
+    });
+
 
     //wire up dropdownId1
     $("#dropdownId1").click(function (event) {
