@@ -88,11 +88,11 @@ $(document).ready(function () {
     //Get focus on ModalConfirmBtnYes
     $("#ModalConfirm").on("shown.bs.modal", function () { $("#ModalConfirmBtnYes").focus(); });
 
-    //Enable DatePicker on ModalDTPromptInput
-    $("#ModalDTPromptInput").datetimepicker({ format: "YYYY-MM-DD HH:mm" });
+    //Enable DatePicker on ModalDatePromptInput
+    $("#ModalDatePromptInput").datetimepicker({ format: "YYYY-MM-DD", inline: true });
 
     //Get focus on ModalDatePromptBtnOk
-    $("#ModalDTPrompt").on("shown.bs.modal", function () { $("#ModalDTPromptBtnOk").focus(); });
+    $("#ModalDatePrompt").on("shown.bs.modal", function () { $("#ModalDatePromptBtnOk").focus(); });
 
 });
 
@@ -183,26 +183,22 @@ function showModalConfirm(bodyText, labelText) {
 }
 
 //showModalDatePrompt
-function showModalDTPrompt(bodyText, labelText, promptDT) {
+function showModalDatePrompt(labelText, promptDate) {
     var deferred0 = $.Deferred();
-    if (bodyText) { $("#ModalDTPromptBody").text(bodyText); }
-    else { $("#ModalDTPromptBody").text("Please select date and time:"); }
-    if (labelText) { $("#ModalDTPromptLabel").text(labelText); }
-    else { $("#ModalDTPromptLabel").text("Please Select Date And Time"); }
-    if (promptDT) { $("#ModalDTPromptInput").val(promptDT); }
-    else { $("#ModalDTPromptInput").val(moment().format("YYYY-MM-DD HH:mm")); }
-    $("#ModalDTPromptBtnCancel, #ModalDTPromptBtnOk").off("click");
-    $("#ModalDTPromptBtnCancel").click(function () {
-        $("#ModalDTPrompt").modal("hide");
-        return deferred0.reject();
-    });
-    $("#ModalDTPromptBtnOk").click(function () {
-        if (!$("#ModalDTPromptForm").valid()) { return; }
-        $("#ModalDTPrompt").modal("hide");
-        return deferred0.resolve($("#ModalDTPromptInput").val());
+
+    if (labelText) { $("#ModalDatePromptLabel").text(labelText); }
+    else { $("#ModalDatePromptLabel").text("Please Select Date"); }
+
+    if (promptDate) { $("#ModalDatePromptInput").data("DateTimePicker").date(promptDate); }
+    else { $("#ModalDatePromptInput").data("DateTimePicker").date(moment().format("YYYY-MM-DD")); }
+
+    $("#ModalDatePromptBtnCancel, #ModalDatePromptBtnOk").off("click");
+    $("#ModalDatePromptBtnCancel, #ModalDatePromptBtnOk").click(function () { $("#ModalDatePrompt").modal("hide");});
+    $("#ModalDatePromptBtnCancel").click(deferred0.reject);
+    $("#ModalDatePromptBtnOk").click(function () {
+        return deferred0.resolve($("#ModalDatePromptInput").data("DateTimePicker").date());
     });    
-    $("#ModalDTPrompt").modal("show");
-    $("#ModalDTPromptForm").valid();
+    $("#ModalDatePrompt").modal("show");
     return deferred0.promise();
 }
 

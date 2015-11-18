@@ -139,28 +139,27 @@
         </div>
     </div>
 
-    <!------------ ModalDTPrompt dialog ------------>
-    <div class="modal" id="ModalDTPrompt" tabindex="-1" role="dialog">
+    <!------------ ModalDatePrompt dialog ------------>
+    <div class="modal" id="ModalDatePrompt" tabindex="-1" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="ModalDTPromptLabel">Please Select DT</h4>
+                    <h4 class="modal-title" id="ModalDatePromptLabel">Please Select Date</h4>
                 </div>
                 <div class="modal-body">
-                    <form role="form" id="ModalDTPromptForm">
+                    <form role="form" id="ModalDatePromptForm">
                         <div class="form-group">
-                            <label for="ModalDTPromptInput" id="ModalDTPromptBody"></label>
-                            <input class="form-control" data-val="true" data-val-dbisdatetimeiso="The field has to be in 'yyyy-MM-dd' format."
-                                   data-val-required="DateTime field is required" id="ModalDTPromptInput" name="ModalDTPromptInput"
-                                    placeholder="Date And Time" value="" type="text">
-                            <span class="field-validation-valid" data-valmsg-for="ModalDTPromptInput" data-valmsg-replace="true"></span>
-
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div id="ModalDatePromptInput"></div>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-default pull-left" id="ModalDTPromptBtnCancel">Cancel</button>
-                    <button class="btn btn-warning" id="ModalDTPromptBtnOk">
+                    <button class="btn btn-default pull-left" id="ModalDatePromptBtnCancel">Cancel</button>
+                    <button class="btn btn-warning" id="ModalDatePromptBtnOk">
                         &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
                     </button>
                 </div>

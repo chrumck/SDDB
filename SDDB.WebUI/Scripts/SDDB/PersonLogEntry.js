@@ -106,8 +106,8 @@ $(document).ready(function () {
                 return refreshTableGeneric(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
                 { getActive: true, locId: MagicSuggests[3].getValue()[0] }, "GET");
             })
+            .always(hideModalWait)
             .done(function () {
-                hideModalWait();
                 saveViewSettings(TableMain);
                 switchView("MainView", "EditFormView", "tdo-btngroup-edit");
             })

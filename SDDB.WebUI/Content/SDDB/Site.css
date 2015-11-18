@@ -104,3 +104,7 @@ input[type="checkbox"].input-validation-error {
     width: 280px;
 }
 
+/* ModalWait modal */
+#ModalDatePrompt .modal-dialog {
+    width: 300px;
+}

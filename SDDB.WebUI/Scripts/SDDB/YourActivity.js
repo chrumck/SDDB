@@ -30,7 +30,7 @@ $(document).ready(function () {
         $("#LogEntryPersonsView").addClass("hidden");
         MagicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
         $("#LogEntryDateTime").val(moment($("#FilterDateStart").val()).hour(moment().hour()).format("YYYY-MM-DD HH:mm"));
-        $("#LogEntryTime").data('DateTimePicker').date(moment($("#LogEntryDateTime").val()));
+        $("#EntryDTPicker").data('DateTimePicker').date($("#LogEntryDateTime").val());
         $("#ManHours").val(0);
         $("#HoursWorkedPicker").data("DateTimePicker").date("00:00");
 
@@ -69,7 +69,7 @@ $(document).ready(function () {
             })
             .always(hideModalWait)
             .done(function () {
-                $("#LogEntryTime").data('DateTimePicker').date(moment($("#LogEntryDateTime").val()));
+                $("#EntryDTPicker").data('DateTimePicker').date($("#LogEntryDateTime").val());
                 $("#LogEntryDateTime").data("ismodified", false);
                 $("#HoursWorkedPicker").data('DateTimePicker').date(moment($("#ManHours").val(), "HH"));
                 $("#ManHours").data("ismodified", false);
@@ -80,41 +80,43 @@ $(document).ready(function () {
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
-    ////Wire up BtnCopy
-    //$("#BtnCopy").click(function () {
-    //    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-    //    if(CurrIds.length !== 1) {
-    //        showModalSelectOne();
-    //        return;
-    //        }
-    //    $("#EditFormBtnOkFiles").removeClass("disabled");
-    //    TableLogEntryAssysAdd.clear().search("").draw();
-    //    TableLogEntryAssysRemove.clear().search("").draw();
-    //    showModalWait();
-    //    $.when(
-    //        fillFormForCopyGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
-    //            GetActive, "EditForm", "Copy Person Activity", MagicSuggests),
-    //        refreshTableGeneric(TableLogEntryPersonsAdd, "/PersonSrv/Get", { getActive: true }, "GET")
-    //        )
-    //        .then(function (currRecords) {
-    //            CurrIds =[];
-    //            CurrRecords =[];
-    //            CurrRecords[0]= $.extend(true, {
-    //            }, RecordTemplate);
-    //            MagicSuggests[5].clear();
-    //            $("#QcdDateTime").val("");
-    //            return refreshTableGeneric(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
-    //            {
-    //                getActive: true, locId: MagicSuggests[3].getValue()[0]}, "GET");
-    //            })
-    //        .done(function () {
-    //            hideModalWait();
-    //            saveViewSettings(TableMain);
-    //            switchView("MainView", "EditFormView", "tdo-btngroup-edit");
-    //            })
-    //        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+    //Wire up BtnCopy
+    $("#BtnCopy").click(function () {
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if(CurrIds.length !== 1) {
+            showModalSelectOne();
+            return;
+        }
+        showModalDatePrompt("Copy To Date:",$("#FilterDateStart").val()).done(function (moveToDate) {
 
-    //});
+            TableLogEntryPersonsAdd.clear().search("").draw();
+            TableLogEntryPersonsRemove.clear().search("").draw();
+            $("#LogEntryPersonsView").addClass("hidden");
+
+            showModalWait();
+            fillFormForCopyGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
+                    GetActive, "EditForm", "Copy Activity to " + moveToDate.format("YYYY-MM-DD"), MagicSuggests)
+                .then(function (currRecords) {
+                    CurrIds = [];
+                    CurrRecords = [];
+                    CurrRecords[0] = $.extend(true, {}, RecordTemplate);
+                    return refreshTableGeneric(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
+                        { getActive: true, locId: MagicSuggests[3].getValue()[0] }, "GET");
+                    })
+                    .always(hideModalWait)
+                    .done(function () {
+
+                        //TODO:
+                        //$("#EntryDTPicker").data('DateTimePicker').date(moment($("#LogEntryDateTime").val()).);
+
+                        $("#HoursWorkedPicker").data('DateTimePicker').date(moment($("#ManHours").val(), "HH"));
+
+                        saveViewSettings(TableMain);
+                        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
+                    })
+                    .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        });
+    });
         
     //---------------------------------------DataTables------------
 
@@ -191,13 +193,10 @@ $(document).ready(function () {
 
     //---------------------------------------EditFormView----------------------------------------//
 
-    //Initialize DateTimePicker - LogEntryTime
-    $("#LogEntryTime").datetimepicker({ format: "HH", inline: true })
+    //Initialize DateTimePicker - EntryDTPicker
+    $("#EntryDTPicker").datetimepicker({ format: "HH", inline: true })
         .on("dp.change", function (e) {
-            var entryDateTime = moment($("#FilterDateStart").val())
-                .hour($(this).data('DateTimePicker').date().hour())
-                .format("YYYY-MM-DD HH:mm");
-            $("#LogEntryDateTime").val(entryDateTime);
+            $("#LogEntryDateTime").val($("#EntryDTPicker").data('DateTimePicker').date().format("YYYY-MM-DD HH:mm"));
             $("#LogEntryDateTime").data("ismodified", true);
         });
 
