@@ -46,13 +46,13 @@ $(document).ready(function () {
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) {
+        if (CurrIds.length === 0) {
             showModalNothingSelected();
             return;
         }
         showModalWait();
         fillFormForEditGeneric(CurrIds, "POST", "/ProjectEventSrv/GetByIds",
-	        GetActive, "EditForm", "Edit Event", MagicSuggests)
+                GetActive, "EditForm", "Edit Event", MagicSuggests)
             .always(hideModalWait)
             .done(function (currRecords) {
                 CurrRecords = currRecords;
@@ -65,7 +65,7 @@ $(document).ready(function () {
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) { showModalNothingSelected(); }
+        if (CurrIds.length === 0) { showModalNothingSelected(); }
         else { showModalDelete(CurrIds.length); }
     });
     
@@ -80,7 +80,7 @@ $(document).ready(function () {
         style: "min-width: 240px;"
     });
     //Wire up on change event for MsFilterByProject
-    $(MsFilterByProject).on('selectionchange', function (e, m) { refreshMainView(); });
+    $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
 
 
     //---------------------------------------DataTables------------
@@ -109,17 +109,29 @@ $(document).ready(function () {
             { data: "EventName", name: "EventName" },//1
             //------------------------------------------------first set of columns
             { data: "EventAltName", name: "EventAltName" },//2
-            { data: "AssignedToProject_", render: function (data, type, full, meta) { return data.ProjectName }, name: "AssignedToProject_" }, //3
+            {
+                data: "AssignedToProject_",
+                name: "AssignedToProject_",
+                render: function (data, type, full, meta) { return data.ProjectName; }
+            }, //3
             { data: "EventCreated", name: "EventCreated" },//4
-            { data: "CreatedByPerson_", render: function (data, type, full, meta) { return data.Initials }, name: "CreatedByPerson_" },//5
+            {
+                data: "CreatedByPerson_",
+                name: "CreatedByPerson_",
+                render: function (data, type, full, meta) { return data.Initials; }
+            },//5
             { data: "EventClosed", name: "EventClosed" },//6
-            { data: "ClosedByPerson_", render: function (data, type, full, meta) { return data.Initials }, name: "ClosedByPerson_" }, //7
+            {
+                data: "ClosedByPerson_",
+                name: "ClosedByPerson_",
+                render: function (data, type, full, meta) { return data.Initials; }
+            }, //7
             { data: "Comments", name: "Comments" },//8
             //------------------------------------------------never visible
             { data: "IsActive_bl", name: "IsActive_bl" },//9
             { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//10
             { data: "CreatedByPerson_Id", name: "CreatedByPerson_Id" },//11
-            { data: "ClosedByPerson_Id", name: "ClosedByPerson_Id" },//12
+            { data: "ClosedByPerson_Id", name: "ClosedByPerson_Id" }//12
         ],
         columnDefs: [
             { targets: [0, 9, 10, 11, 12], visible: false }, // - never show
@@ -159,7 +171,7 @@ $(document).ready(function () {
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
-        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+        if (!formIsValid("EditForm", CurrIds.length === 0) || !msIsValid(MagicSuggests)) {
             showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
             return;
         }
@@ -172,7 +184,7 @@ $(document).ready(function () {
                         switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //--------------------------------------View Initialization------------------------------------//

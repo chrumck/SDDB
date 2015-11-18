@@ -183,9 +183,11 @@ function showModalConfirm(bodyText, labelText) {
 }
 
 //showModalDatePrompt
-function showModalDatePrompt(labelText, promptDate) {
+function showModalDatePrompt(bodyText, labelText, promptDate) {
     var deferred0 = $.Deferred();
 
+    if (bodyText) { $("#ModalDatePromptBody").text(bodyText); }
+    else { $("#ModalDatePromptBody").text(""); }
     if (labelText) { $("#ModalDatePromptLabel").text(labelText); }
     else { $("#ModalDatePromptLabel").text("Please Select Date"); }
 
@@ -193,7 +195,7 @@ function showModalDatePrompt(labelText, promptDate) {
     else { $("#ModalDatePromptInput").data("DateTimePicker").date(moment().format("YYYY-MM-DD")); }
 
     $("#ModalDatePromptBtnCancel, #ModalDatePromptBtnOk").off("click");
-    $("#ModalDatePromptBtnCancel, #ModalDatePromptBtnOk").click(function () { $("#ModalDatePrompt").modal("hide");});
+    $("#ModalDatePromptBtnCancel, #ModalDatePromptBtnOk").click(function () { $("#ModalDatePrompt").modal("hide"); });
     $("#ModalDatePromptBtnCancel").click(deferred0.reject);
     $("#ModalDatePromptBtnOk").click(function () {
         return deferred0.resolve($("#ModalDatePromptInput").data("DateTimePicker").date());
@@ -292,8 +294,8 @@ function refreshTblGenWrp(table, url, data, httpType) {
 function exportTableToTxt(table) {
     showModalWait();
     setTimeout(function () {
-        var tableData = table.rows({ search: "applied" }).data().toArray();
-        var txtOutput = convertObjectToStringHelper(tableData[0], true);
+        var tableData = table.rows({ search: "applied" }).data().toArray(),
+            txtOutput = convertObjectToStringHelper(tableData[0], true);
         txtOutput.slice(-1);
         txtOutput += "\n";
         $.each(tableData, function (index, tableRow) {
@@ -402,7 +404,13 @@ function fillFormForCreateGeneric(formId, msArray, labelText) {
 
 //fillFormForCopyGeneric
 function fillFormForCopyGeneric(ids, httpType, url, getActive, formId, labelText, msArray) {
-    return $.ajax({ type: httpType, url: url, timeout: 120000, data: { ids: ids, getActive: getActive }, dataType: "json" })
+    return $.ajax({
+        type: httpType,
+        url: url,
+        timeout: 120000,
+        data: { ids: ids, getActive: getActive },
+        dataType: "json"
+    })
         .then(function (dbEntries) {
             return fillFormForCopyFromDbEntries(dbEntries, formId, labelText, msArray);
         });
@@ -413,7 +421,10 @@ function fillFormForCopyFromDbEntries(dbEntries, formId, labelText, msArray) {
     fillFormForCreateGeneric(formId, msArray, labelText);
     setFormFromFormInputHelper(getFormInputFromDbEntriesHelper(dbEntries), formId, msArray);
     $("#IsActive_bl").prop("checked", true);
-    $("#" + formId + " [data-val-dbisunique]").val("");
+    $("#" + formId + " [data-val-dbisunique]").each(function (index, element) {
+        if ($(element).val() === "") { return true; }
+        $(element).val($(element).val() + "_COPY");
+    })
     if (msArray) {
         $.each(msArray, function (i, ms) {
             if (ms.dataValDbisunique) {

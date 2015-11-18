@@ -53,8 +53,8 @@ UrlFillForEdit = "/ComponentTypeSrv/GetByIds";
 UrlEdit = "/ComponentTypeSrv/Edit";
 UrlDelete = "/ComponentTypeSrv/Delete";
 
-CallBackBeforeCreate = function () {
-    $("#EditForm select").find("option:first").prop('selected', 'selected');
+callBackBeforeCreate = function () {
+    $("#EditForm select").find("option:first").prop("selected", "selected");
     return $.Deferred().resolve();
 };
 
@@ -72,7 +72,7 @@ $(document).ready(function () {
         [10, 11, 12, 13, 14, 15],
         [16, 17, 18, 19, 20, 21],
         [22, 23, 24, 25, 26, 27],
-        [28, 29, 30, 31, 32, 33],
+        [28, 29, 30, 31, 32, 33]
     ];
 
     //TableMain Component Types
@@ -119,7 +119,7 @@ $(document).ready(function () {
             { data: "Attr15Type", name: "Attr15Type" },//32
             { data: "Attr15Desc", name: "Attr15Desc" },//33
             //------------------------------------------------never visible
-            { data: "IsActive_bl", name: "IsActive_bl" },//34
+            { data: "IsActive_bl", name: "IsActive_bl" }//34
         ],
         columnDefs: [
             //"orderable": false, "visible": false

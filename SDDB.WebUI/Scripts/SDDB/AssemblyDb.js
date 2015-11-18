@@ -54,7 +54,7 @@ var ExtRecordTemplate = {
     Attr12: null,
     Attr13: null,
     Attr14: null,
-    Attr15: null,
+    Attr15: null
 };
 
 var MsFilterByProject = {};
@@ -77,31 +77,31 @@ var ExtTypeHttpType = "POST";
 var ExtHttpTypeEdit = "POST";
 var ExtUrlEdit = "/AssemblyDbSrv/EditExt";
 
-CallBackBeforeCreate = function () {
+callBackBeforeCreate = function () {
     var deferred0 = $.Deferred();
     updateFormForSelectedType().done(function () {
         return deferred0.resolve();
     });
     return deferred0.promise();
-}
+};
 
-CallBackBeforeEdit = function (currRecords) {
+callBackBeforeEdit = function (currRecords) {
     var deferred0 = $.Deferred();
     updateFormForSelectedType()
         .then(function () { return fillFormForEditFromDbEntries(GetActive, currRecords, ExtEditFormId); })
         .done(function () { return deferred0.resolve(); });
     return deferred0.promise();
-}
+};
 
-CallBackBeforeSubmitEdit = function (data) {
-    if (!formIsValid(ExtEditFormId, CurrIds.length == 0)) {
+callBackBeforeSubmitEdit = function (data) {
+    if (!formIsValid(ExtEditFormId, CurrIds.length === 0)) {
         showModalFail("Errors in Form", "Extended attributes have invalid inputs. Please correct.");
         return $.Deferred().reject();
     }
     return $.Deferred().resolve();
-}
+};
 
-CallBackAfterEdit = function (data) {
+callBackAfterSubmitEdit = function (data) {
     var deferred0 = $.Deferred();
     ExtCurrRecords = [];
     for (var i = 0; i < CurrIds.length; i++) {
@@ -111,7 +111,7 @@ CallBackAfterEdit = function (data) {
     submitEditsGenericWrp(ExtEditFormId, [], ExtCurrRecords, ExtHttpTypeEdit, ExtUrlEdit)
         .done(deferred0.resolve);
     return deferred0.promise();
-}
+};
 
 //-------------------------------------------------------------------------------------------//
 
@@ -127,8 +127,8 @@ $(document).ready(function () {
             showModalSelectOne();
             return;
         }
-        window.open("/Component?AssemblyId="
-            + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
+        window.open("/Component?AssemblyId=" +
+            TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data());
     });
 
     //wire up dropdownId2 - Show Assy Log
@@ -139,8 +139,8 @@ $(document).ready(function () {
             showModalSelectOne();
             return;
         }
-        window.open("/AssemblyLogEntry?AssemblyId="
-            + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
+        window.open("/AssemblyLogEntry?AssemblyId=" +
+            TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data());
     });
 
     //Initialize MagicSuggest MsFilterByType
@@ -154,7 +154,7 @@ $(document).ready(function () {
         style: "min-width: 240px;"
     });
     //Wire up on change event for MsFilterByType
-    $(MsFilterByType).on('selectionchange', function (e, m) { refreshMainView(); });
+    $(MsFilterByType).on("selectionchange", function (e, m) { refreshMainView(); });
 
     //Initialize MagicSuggest MsFilterByProject
     MsFilterByProject = $("#MsFilterByProject").magicSuggest({
@@ -167,7 +167,7 @@ $(document).ready(function () {
         style: "min-width: 240px;"
     });
     //Wire up on change event for MsFilterByProject
-    $(MsFilterByProject).on('selectionchange', function (e, m) { refreshMainView(); });
+    $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
 
     //Initialize MagicSuggest MsFilterByLoc
     MsFilterByLoc = $("#MsFilterByLoc").magicSuggest({
@@ -181,7 +181,7 @@ $(document).ready(function () {
         style: "min-width: 240px;"
     });
     //Wire up on change event for MsFilterByLoc
-    $(MsFilterByLoc).on('selectionchange', function (e, m) { refreshMainView(); });
+    $(MsFilterByLoc).on("selectionchange", function (e, m) { refreshMainView(); });
 
 
     //---------------------------------------DataTables------------
@@ -207,16 +207,19 @@ $(document).ready(function () {
             { data: "AssyAltName", name: "AssyAltName" },//2
             { data: "AssyAltName2", name: "AssyAltName2" },//3
             {
-                data: "AssemblyType_", name: "AssemblyType_",
-                render: function (data, type, full, meta) { return data.AssyTypeName },
+                data: "AssemblyType_",
+                name: "AssemblyType_",
+                render: function (data, type, full, meta) { return data.AssyTypeName; }
             }, //4
             {
-                data: "AssemblyStatus_", name: "AssemblyStatus_",
-                render: function (data, type, full, meta) { return data.AssyStatusName },
+                data: "AssemblyStatus_",
+                name: "AssemblyStatus_",
+                render: function (data, type, full, meta) { return data.AssyStatusName; }
             }, //5
             {
-                data: "AssignedToLocation_", name: "AssignedToLocation",
-                render: function (data, type, full, meta) { return data.LocName + " - " + data.ProjectName },
+                data: "AssignedToLocation_",
+                name: "AssignedToLocation",
+                render: function (data, type, full, meta) { return data.LocName + " - " + data.ProjectName; }
             }, //6
             //------------------------------------------------2nd set of columns
             { data: "AssyGlobalX", name: "AssyGlobalX" },//7
@@ -330,8 +333,8 @@ function refreshMainView() {
     TableMain.clear().search("").draw();
     updateMainViewForSelectedType()
         .done(function () {
-            if (MsFilterByType.getValue().length != 0 || MsFilterByProject.getValue().length != 0 ||
-                    MsFilterByLoc.getValue().length != 0) {
+            if (MsFilterByType.getValue().length !== 0 || MsFilterByProject.getValue().length !== 0 ||
+                    MsFilterByLoc.getValue().length !== 0) {
                 refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByAltIds2",
                     {
                         projectIds: MsFilterByProject.getValue(),
@@ -343,7 +346,7 @@ function refreshMainView() {
                     .done(deferred0.resolve);
                 return;
             }
-            if (typeof AssemblyIds !== "undefined" && AssemblyIds != null && AssemblyIds.length > 0) {
+            if (typeof AssemblyIds !== "undefined" && AssemblyIds !== null && AssemblyIds.length > 0) {
                 refreshTblGenWrp(TableMain, "/AssemblyDbSrv/GetByIds",
                     {
                         ids: AssemblyIds,
@@ -358,7 +361,7 @@ function refreshMainView() {
 //fillFiltersFromRequestParams
 function fillFiltersFromRequestParams() {
     var deferred0 = $.Deferred();
-    if (typeof LocationId !== "undefined" && LocationId != "") {
+    if (typeof LocationId !== "undefined" && LocationId !== "") {
         showModalWait();
         $.ajax({
             type: "POST",
@@ -416,10 +419,10 @@ function updateFormForSelectedType() {
         var deferred0 = $.Deferred();
         updateFormForExtendedWrp(ExtTypeHttpType, ExtTypeUrl, { ids: MagicSuggests[0].getValue()[0] }, ExtEditFormId)
             .done(function (typeHasAttrs) {
-                if (typeHasAttrs) { $("#" + ExtEditFormId).removeClass("hidden"); } 
+                if (typeHasAttrs) { $("#" + ExtEditFormId).removeClass("hidden"); }
                 return deferred0.resolve();
             })
-            .fail(function () { return deferred0.reject(); })
+            .fail(function () { return deferred0.reject(); });
         return deferred0.promise();
     }
     return $.Deferred().resolve();

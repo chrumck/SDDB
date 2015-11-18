@@ -23,11 +23,12 @@ var MainViewId = "MainView";
 var MainViewBtnGroupClass = "tdo-btngroup-main";
 
 var EditFormId = "EditForm";
-var EditFormViewId = "EditFormView"
+var EditFormViewId = "EditFormView";
 var EditFormBtnGroupCreateClass = "tdo-btngroup-edit";
 var EditFormBtnGroupEditClass = "tdo-btngroup-edit";
 var LabelTextCreate = "Create Record";
 var LabelTextEdit = "Edit Record";
+var LabelTextCopy = "Copy Record";
 
 var HttpTypeFillForEdit = "POST";
 var UrlFillForEdit = "";
@@ -35,10 +36,11 @@ var HttpTypeEdit = "POST";
 var UrlEdit = "";
 var UrlDelete = "";
 
-var CallBackBeforeCreate = function () { return $.Deferred().resolve(); }
-var CallBackBeforeEdit = function (currRecords) { return $.Deferred().resolve(); }
-var CallBackBeforeSubmitEdit = function (data) { return $.Deferred().resolve(); }
-var CallBackAfterEdit = function (data) { return $.Deferred().resolve(); }
+var callBackBeforeCreate = function () { return $.Deferred().resolve(); };
+var callBackBeforeEdit = function (currRecords) { return $.Deferred().resolve(); };
+var callBackBeforeSubmitEdit = function (data) { return $.Deferred().resolve(); };
+var callBackAfterSubmitEdit = function (data) { return $.Deferred().resolve(); };
+var callBackBeforeCopy = function () { return $.Deferred().resolve(); };
 
 //-------------------------------------------------------------------------------------------//
 
@@ -52,7 +54,7 @@ $(document).ready(function () {
         CurrRecords = [];
         CurrRecords[0] = $.extend(true, {}, RecordTemplate);
         fillFormForCreateGeneric(EditFormId, MagicSuggests, LabelTextCreate, MainViewId);
-        CallBackBeforeCreate()
+        callBackBeforeCreate()
             .done(function () {
                 saveViewSettings(TableMain);
                 switchView(MainViewId, EditFormViewId, EditFormBtnGroupCreateClass);
@@ -62,14 +64,38 @@ $(document).ready(function () {
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) {
+        if (CurrIds.length === 0) {
             showModalNothingSelected();
             return;
         }
-        fillFormForEditGenericWrp(CurrIds, HttpTypeFillForEdit, UrlFillForEdit, GetActive, EditFormId, LabelTextEdit, MagicSuggests)
+        fillFormForEditGenericWrp(CurrIds, HttpTypeFillForEdit, UrlFillForEdit,
+                GetActive, EditFormId, LabelTextEdit, MagicSuggests)
             .then(function (currRecords) {
                 CurrRecords = currRecords;
-                return CallBackBeforeEdit(currRecords);
+                return callBackBeforeEdit(currRecords);
+            })
+            .done(function () {
+                saveViewSettings(TableMain);
+                switchView(MainViewId, EditFormViewId, EditFormBtnGroupEditClass);
+            });
+    });
+
+    //Wire up BtnCopy
+    $("#BtnCopy").click(function () {
+        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (CurrIds.length === 0) {
+            showModalNothingSelected();
+            return;
+        }
+        modalWaitWrapper(function () {
+            return fillFormForCopyGeneric(CurrIds, HttpTypeFillForEdit, UrlFillForEdit,
+                GetActive, EditFormId, LabelTextCopy, MagicSuggests);
+        })
+            .then(function (currRecords) {
+                CurrIds = [];
+                CurrRecords = [];
+                CurrRecords[0] = $.extend(true, {}, RecordTemplate);
+                return callBackBeforeCopy();
             })
             .done(function () {
                 saveViewSettings(TableMain);
@@ -80,7 +106,7 @@ $(document).ready(function () {
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) {
+        if (CurrIds.length === 0) {
             showModalNothingSelected();
             return;
         }
@@ -116,7 +142,7 @@ $(document).ready(function () {
     });
 
     //wire up columnsSelectId5
-    $("#columnsSelectId5").click(function(event) {
+    $("#columnsSelectId5").click(function (event) {
         event.preventDefault();
         if ($(this).parent().hasClass("disabled")) { return; }
         showColumnSet(TableMainColumnSets, 5);
@@ -130,14 +156,14 @@ $(document).ready(function () {
     });
 
     //wire up columnsSelectId7
-    $("#columnsSelectId7").click(function(event) {
+    $("#columnsSelectId7").click(function (event) {
         event.preventDefault();
         if ($(this).parent().hasClass("disabled")) { return; }
         showColumnSet(TableMainColumnSets, 7);
     });
 
     //wire up columnsSelectId8
-    $("#columnsSelectId8").click(function(event) {
+    $("#columnsSelectId8").click(function (event) {
         event.preventDefault();
         if ($(this).parent().hasClass("disabled")) { return; }
         showColumnSet(TableMainColumnSets, 8);
@@ -175,24 +201,24 @@ $("#" + EditFormId + "BtnCancel").click(function () {
 //Wire Up EditFormBtnOk
 $("#EditFormBtnOk").click(function () {
     msValidate(MagicSuggests);
-    if (!formIsValid(EditFormId, CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+    if (!formIsValid(EditFormId, CurrIds.length === 0) || !msIsValid(MagicSuggests)) {
         showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
         return;
     }
-    CallBackBeforeSubmitEdit()
+    callBackBeforeSubmitEdit()
         .then(function () {
-            var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
+            var createMultiple = $("#CreateMultiple").val() !== "" ? $("#CreateMultiple").val() : 1;
             return submitEditsGenericWrp(EditFormId, MagicSuggests, CurrRecords, HttpTypeEdit, UrlEdit, createMultiple);
         })
         .then(function (data, currRecords) {
             CurrRecords = currRecords;
-            if (CurrIds.length == 0) {
+            if (CurrIds.length === 0) {
                 CurrIds = data.newEntryIds;
                 for (var i = 0; i < CurrIds.length; i++) {
                     CurrRecords[i].Id = CurrIds[i];
                 }
             }
-            return CallBackAfterEdit(data);
+            return callBackAfterSubmitEdit(data);
         })
         .then(function () {
             return refreshMainView();

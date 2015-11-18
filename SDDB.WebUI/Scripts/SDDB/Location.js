@@ -53,13 +53,13 @@ $(document).ready(function () {
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) {
+        if (CurrIds.length === 0) {
             showModalNothingSelected();
             return;
         }
         showModalWait();
         fillFormForEditGeneric(CurrIds, "POST", "/LocationSrv/GetByIds",
-    		GetActive, "EditForm", "Edit Location", MagicSuggests)
+                GetActive, "EditForm", "Edit Location", MagicSuggests)
             .always(hideModalWait)
             .done(function (currRecords) {
                 CurrRecords = currRecords;
@@ -72,7 +72,7 @@ $(document).ready(function () {
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) { showModalNothingSelected(); }
+        if (CurrIds.length === 0) { showModalNothingSelected(); }
         else { showModalDelete(CurrIds.length); }
     });
 
@@ -104,8 +104,11 @@ $(document).ready(function () {
     $("#dropdownId4").click(function (event) {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
-        if (noOfRows != 1) showModalSelectOne();
-        else window.open("/AssemblyDb?LocationId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
+        if (noOfRows != 1) { showModalSelectOne(); }
+        else {
+            window.open("/AssemblyDb?LocationId=" +
+                TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data());
+        }
     });
 
     //Initialize MagicSuggest MsFilterByType
@@ -119,7 +122,7 @@ $(document).ready(function () {
         style: "min-width: 240px;"
     });
     //Wire up on change event for MsFilterByType
-    $(MsFilterByType).on('selectionchange', function (e, m) { refreshMainView(); });
+    $(MsFilterByType).on("selectionchange", function (e, m) { refreshMainView(); });
 
     //Initialize MagicSuggest msFilterByProject
     MsFilterByProject = $("#MsFilterByProject").magicSuggest({
@@ -132,7 +135,7 @@ $(document).ready(function () {
         style: "min-width: 240px;"
     });
     //Wire up on change event for MsFilterByProject
-    $(MsFilterByProject).on('selectionchange', function (e, m) { refreshMainView(); });
+    $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
     
 
     //---------------------------------------DataTables------------
@@ -162,9 +165,21 @@ $(document).ready(function () {
             //------------------------------------------------first set of columns
             { data: "LocAltName", name: "LocAltName" },//2
             { data: "LocAltName2", name: "LocAltName2" },//3
-            { data: "LocationType_", render: function (data, type, full, meta) { return data.LocTypeName }, name: "LocationType_" }, //4
-            { data: "AssignedToProject_", render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }, name: "AssignedToProject_" }, //5
-            { data: "ContactPerson_", render: function (data, type, full, meta) { return data.Initials }, name: "ContactPerson_" },//6
+            {
+                data: "LocationType_",
+                name: "LocationType_",
+                render: function (data, type, full, meta) { return data.LocTypeName; }
+            }, //4
+            {
+                data: "AssignedToProject_",
+                name: "AssignedToProject_",
+                render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode; }
+            }, //5
+            {
+                data: "ContactPerson_",
+                name: "ContactPerson_",
+                render: function (data, type, full, meta) { return data.Initials; }
+            },//6
             //------------------------------------------------second set of columns
             { data: "Address", name: "Address" },//7
             { data: "LocX", name: "LocX" },//8
@@ -180,21 +195,23 @@ $(document).ready(function () {
             { data: "IsActive_bl", name: "IsActive_bl" },//16
             { data: "LocationType_Id", name: "LocationType_Id" },//17
             { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//18
-            { data: "ContactPerson_Id", name: "ContactPerson_Id" },//19
+            { data: "ContactPerson_Id", name: "ContactPerson_Id" }//19
         ],
         columnDefs: [
-            { targets: [0, 16, 17, 18, 19], visible: false }, // - never show
-            { targets: [0, 12, 13, 16, 17, 18, 19], searchable: false },  //"orderable": false, "visible": false
-            { targets: [4, 5, 6], className: "hidden-xs hidden-sm" }, // - first set of columns
-            { targets: [6], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
-
-            { targets: [7, 8, 9, 10, 11], visible: false }, // - second set of columns - to toggle with options
-            { targets: [8, 9, 10], className: "hidden-xs hidden-sm" }, // - second set of columns
-            { targets: [11], className: "hidden-xs hidden-sm hidden-md" }, // - second set of columns
-
-            { targets: [12, 13, 14, 15], visible: false }, // - third set of columns - to toggle with options
-            { targets: [12, 13, 14], className: "hidden-xs hidden-sm" }, // - third set of columns
-            { targets: [], className: "hidden-xs hidden-sm hidden-md" } // - third set of columns
+            //"orderable": false, "visible": false
+            { targets: [0, 16, 17, 18, 19], visible: false },
+            //"orderable": false, "visible": false
+            { targets: [0, 12, 13, 16, 17, 18, 19], searchable: false },
+            { targets: [4, 5, 6], className: "hidden-xs hidden-sm" },
+            { targets: [6], className: "hidden-xs hidden-sm hidden-md" },
+            // - second set of columns - to toggle with options
+            { targets: [7, 8, 9, 10, 11], visible: false }, 
+            { targets: [8, 9, 10], className: "hidden-xs hidden-sm" },
+            { targets: [11], className: "hidden-xs hidden-sm hidden-md" },
+            // - third set of columns - to toggle with options
+            { targets: [12, 13, 14, 15], visible: false }, 
+            { targets: [12, 13, 14], className: "hidden-xs hidden-sm" },
+            { targets: [], className: "hidden-xs hidden-sm hidden-md" }
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
@@ -224,12 +241,12 @@ $(document).ready(function () {
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
-        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+        if (!formIsValid("EditForm", CurrIds.length === 0) || !msIsValid(MagicSuggests)) {
             showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
             return;
         }
         showModalWait();
-        var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
+        var createMultiple = $("#CreateMultiple").val() !== "" ? $("#CreateMultiple").val() : 1;
         submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/LocationSrv/Edit", createMultiple)
             .always(hideModalWait)
             .done(function () {
@@ -238,7 +255,7 @@ $(document).ready(function () {
                         switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //--------------------------------------View Initialization------------------------------------//
@@ -267,7 +284,7 @@ function refreshMainView() {
 
     TableMain.clear().search("").draw();
 
-    if (MsFilterByType.getValue().length == 0 && MsFilterByProject.getValue().length == 0) {
+    if (MsFilterByType.getValue().length === 0 && MsFilterByProject.getValue().length === 0) {
         return deferred0.resolve();
     }
     refreshTblGenWrp(TableMain, "/LocationSrv/GetByAltIds",
@@ -285,7 +302,7 @@ function refreshMainView() {
 //fillFiltersFromRequestParams
 function fillFiltersFromRequestParams() {
     var deferred0 = $.Deferred();
-    if (typeof ProjectId !== "undefined" && ProjectId != "") {
+    if (typeof ProjectId !== "undefined" && ProjectId !== "") {
         showModalWait();
         $.ajax({
             type: "POST",

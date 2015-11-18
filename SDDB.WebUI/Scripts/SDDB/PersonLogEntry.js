@@ -98,8 +98,8 @@ $(document).ready(function () {
             refreshTableGeneric(TableLogEntryPersonsAdd, "/PersonSrv/Get", { getActive: true }, "GET")
             )
             .then(function (currRecords) {
-                CurrIds =[];
-                CurrRecords =[];
+                CurrIds = [];
+                CurrRecords = [];
                 CurrRecords[0] = $.extend(true, {}, RecordTemplate);
                 MagicSuggests[5].clear();
                 $("#QcdDateTime").val("");
@@ -185,7 +185,7 @@ $(document).ready(function () {
         style: "min-width: 240px;"
     });
     //Wire up on change event for MsFilterByAssy
-    $(MsFilterByAssy).on('selectionchange', function (e, m) { refreshMainView(); });
+    $(MsFilterByAssy).on("selectionchange", function (e, m) { refreshMainView(); });
           
         
     //---------------------------------------DataTables------------
@@ -257,11 +257,14 @@ $(document).ready(function () {
             { data: "AssignedToProjectEvent_Id", name: "AssignedToProjectEvent_Id" }//18
         ],
         columnDefs: [
-            { targets: [0, 13, 14, 15, 16, 17, 18], visible: false }, // - never show
-            { targets: [0, 1, 5, 9, 10, 13, 14, 15, 16, 17, 18], searchable: false },  //"orderable": false, "visible": false
-            { targets: [4, 5], className: "hidden-xs" }, // - first set of columns
-            { targets: [3, 12], className: "hidden-xs hidden-sm" }, // - first set of columns
-            { targets: [7, 8, 9, 10, 11], className: "hidden-xs hidden-sm hidden-md" } // - first set of columns
+            // - never show
+            { targets: [0, 13, 14, 15, 16, 17, 18], visible: false },
+            //"orderable": false, "visible": false
+            { targets: [0, 1, 5, 9, 10, 13, 14, 15, 16, 17, 18], searchable: false },
+             // - first set of columns
+            { targets: [4, 5], className: "hidden-xs" },
+            { targets: [3, 12], className: "hidden-xs hidden-sm" },
+            { targets: [7, 8, 9, 10, 11], className: "hidden-xs hidden-sm hidden-md" }
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,

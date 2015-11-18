@@ -49,13 +49,13 @@ $(document).ready(function () {
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) {
+        if (CurrIds.length === 0) {
             showModalNothingSelected();
             return;
         }
         showModalWait();
-	fillFormForEditGeneric(CurrIds, "POST", "/DocumentSrv/GetByIds", 
-		GetActive, "EditForm", "Edit Document", MagicSuggests)
+        fillFormForEditGeneric(CurrIds, "POST", "/DocumentSrv/GetByIds", 
+                GetActive, "EditForm", "Edit Document", MagicSuggests)
             .always(hideModalWait)
             .done(function (currRecords) {
                 CurrRecords = currRecords;
@@ -68,7 +68,7 @@ $(document).ready(function () {
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) { showModalNothingSelected(); }
+        if (CurrIds.length === 0) { showModalNothingSelected(); }
         else { showModalDelete(CurrIds.length); }
     });
 
@@ -98,7 +98,7 @@ $(document).ready(function () {
         style: "min-width: 240px;"
     });
     //Wire up on change event for MsFilterByType
-    $(MsFilterByType).on('selectionchange', function (e, m) { refreshMainView(); });
+    $(MsFilterByType).on("selectionchange", function (e, m) { refreshMainView(); });
 
     //Initialize MagicSuggest MsFilterByProject
     MsFilterByProject = $("#MsFilterByProject").magicSuggest({
@@ -111,7 +111,7 @@ $(document).ready(function () {
         style: "min-width: 240px;"
     });
     //Wire up on change event for MsFilterByProject
-    $(MsFilterByProject).on('selectionchange', function (e, m) { refreshMainView(); });
+    $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
 
     //---------------------------------------DataTables------------
 
@@ -138,13 +138,37 @@ $(document).ready(function () {
             { data: "Id", name: "Id" },//0
             { data: "DocName", name: "DocName" },//1
             { data: "DocAltName", name: "DocAltName" },//2
-            { data: "DocumentType_", render: function (data, type, full, meta) { return data.DocTypeName }, name: "DocumentType_" }, //3
+            {
+                data: "DocumentType_",
+                name: "DocumentType_",
+                render: function (data, type, full, meta) { return data.DocTypeName; }
+            }, //3
             { data: "DocLastVersion", name: "DocLastVersion" },//4
-            { data: "AuthorPerson_", render: function (data, type, full, meta) { return data.Initials }, name: "AuthorPerson_" },//5
-            { data: "ReviewerPerson_", render: function (data, type, full, meta) { return data.Initials }, name: "ReviewerPerson_" }, //6
-            { data: "AssignedToProject_", render: function (data, type, full, meta) { return data.ProjectName }, name: "AssignedToProject_" }, //7
-            { data: "RelatesToAssyType_", render: function (data, type, full, meta) { return data.AssyTypeName }, name: "RelatesToAssyType_" }, //8
-            { data: "RelatesToCompType_", render: function (data, type, full, meta) { return data.CompTypeName }, name: "RelatesToCompType_" }, //9
+            {
+                data: "AuthorPerson_",
+                name: "AuthorPerson_",
+                render: function (data, type, full, meta) { return data.Initials; }
+            },//5
+            {
+                data: "ReviewerPerson_",
+                name: "ReviewerPerson_",
+                render: function (data, type, full, meta) { return data.Initials; }
+            }, //6
+            {
+                data: "AssignedToProject_",
+                name: "AssignedToProject_",
+                render: function (data, type, full, meta) { return data.ProjectName; }
+            }, //7
+            {
+                data: "RelatesToAssyType_",
+                name: "RelatesToAssyType_",
+                render: function (data, type, full, meta) { return data.AssyTypeName; }
+            }, //8
+            {
+                data: "RelatesToCompType_",
+                name: "RelatesToCompType_",
+                render: function (data, type, full, meta) { return data.CompTypeName; }
+            }, //9
             { data: "DocFilePath", name: "DocFilePath" },//10
             { data: "Comments", name: "Comments" },//11
             { data: "IsActive_bl", name: "IsActive_bl" },//12
@@ -153,7 +177,7 @@ $(document).ready(function () {
             { data: "ReviewerPerson_Id", name: "ReviewerPerson_Id" },//15
             { data: "AssignedToProject_Id", name: "AssignedToProject_Id" },//16
             { data: "RelatesToAssyType_Id", name: "RelatesToAssyType_Id" },//17
-            { data: "RelatesToCompType_Id", name: "RelatesToCompType_Id" },//18
+            { data: "RelatesToCompType_Id", name: "RelatesToCompType_Id" }//18
         ],
         columnDefs: [
             { targets: [0, 12, 13, 14, 15, 16, 17, 18], visible: false }, // - never show
@@ -196,7 +220,7 @@ $(document).ready(function () {
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
-        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+        if (!formIsValid("EditForm", CurrIds.length === 0) || !msIsValid(MagicSuggests)) {
             showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
             return;
         }
@@ -209,7 +233,7 @@ $(document).ready(function () {
                         switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
     //--------------------------------------View Initialization------------------------------------//
@@ -236,7 +260,7 @@ function refreshMainView() {
 
     TableMain.clear().search("").draw();
 
-    if (MsFilterByType.getValue().length == 0 && MsFilterByProject.getValue().length == 0) {
+    if (MsFilterByType.getValue().length === 0 && MsFilterByProject.getValue().length === 0) {
         return deferred0.resolve();
     }
     refreshTblGenWrp(TableMain, "/DocumentSrv/GetByAltIds",
