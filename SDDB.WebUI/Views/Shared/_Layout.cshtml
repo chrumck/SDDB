@@ -12,6 +12,7 @@
     
     @Styles.Render("~/Content/css")
     @Styles.Render("~/bundles/jquery-ui-CSS")
+    @Styles.Render("~/bundles/bootstrap-datetimepicker-CSS")
     <link href="/Content/SDDB/Site.css?v=@Html.GetAppVersion()" rel="stylesheet" />
     @RenderSection("CSS", required: false)
 </head>
@@ -138,6 +139,35 @@
         </div>
     </div>
 
+    <!------------ ModalDTPrompt dialog ------------>
+    <div class="modal" id="ModalDTPrompt" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="ModalDTPromptLabel">Please Select DT</h4>
+                </div>
+                <div class="modal-body">
+                    <form role="form" id="ModalDTPromptForm">
+                        <div class="form-group">
+                            <label for="ModalDTPromptInput" id="ModalDTPromptBody"></label>
+                            <input class="form-control" data-val="true" data-val-dbisdatetimeiso="The field has to be in 'yyyy-MM-dd' format."
+                                   data-val-required="DateTime field is required" id="ModalDTPromptInput" name="ModalDTPromptInput"
+                                    placeholder="Date And Time" value="" type="text">
+                            <span class="field-validation-valid" data-valmsg-for="ModalDTPromptInput" data-valmsg-replace="true"></span>
+
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default pull-left" id="ModalDTPromptBtnCancel">Cancel</button>
+                    <button class="btn btn-warning" id="ModalDTPromptBtnOk">
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!------------------ Footer ---------------->
     <footer class="footer">
         <div class="container-fluid">
@@ -152,6 +182,7 @@
     @Scripts.Render("~/bundles/jqueryval")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/moment")
+    @Scripts.Render("~/bundles/bootstrap-datetimepicker")
     @Scripts.Render("~/bundles/filesaver")
     @Scripts.Render("~/bundles/sddb/shared")
         

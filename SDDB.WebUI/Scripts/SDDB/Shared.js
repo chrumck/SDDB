@@ -88,6 +88,12 @@ $(document).ready(function () {
     //Get focus on ModalConfirmBtnYes
     $("#ModalConfirm").on("shown.bs.modal", function () { $("#ModalConfirmBtnYes").focus(); });
 
+    //Enable DatePicker on ModalDTPromptInput
+    $("#ModalDTPromptInput").datetimepicker({ format: "YYYY-MM-DD HH:mm" });
+
+    //Get focus on ModalDatePromptBtnOk
+    $("#ModalDTPrompt").on("shown.bs.modal", function () { $("#ModalDTPromptBtnOk").focus(); });
+
 });
 
 //------------------------------------Common Main Methods----------------------------------//
@@ -175,6 +181,32 @@ function showModalConfirm(bodyText, labelText) {
     $("#ModalConfirm").modal("show");
     return deferred0.promise();
 }
+
+//showModalDatePrompt
+function showModalDTPrompt(bodyText, labelText, promptDT) {
+    var deferred0 = $.Deferred();
+    if (bodyText) { $("#ModalDTPromptBody").text(bodyText); }
+    else { $("#ModalDTPromptBody").text("Please select date and time:"); }
+    if (labelText) { $("#ModalDTPromptLabel").text(labelText); }
+    else { $("#ModalDTPromptLabel").text("Please Select Date And Time"); }
+    if (promptDT) { $("#ModalDTPromptInput").val(promptDT); }
+    else { $("#ModalDTPromptInput").val(moment().format("YYYY-MM-DD HH:mm")); }
+    $("#ModalDTPromptBtnCancel, #ModalDTPromptBtnOk").off("click");
+    $("#ModalDTPromptBtnCancel").click(function () {
+        $("#ModalDTPrompt").modal("hide");
+        return deferred0.reject();
+    });
+    $("#ModalDTPromptBtnOk").click(function () {
+        if (!$("#ModalDTPromptForm").valid()) { return; }
+        $("#ModalDTPrompt").modal("hide");
+        return deferred0.resolve($("#ModalDTPromptInput").val());
+    });    
+    $("#ModalDTPrompt").modal("show");
+    $("#ModalDTPromptForm").valid();
+    return deferred0.promise();
+}
+
+//-----------------------------------------------------------------------------
 
 //wraps callBackToWrap in modalWait and shows modalAJAXFail if failed
 function modalWaitWrapper(callBackToWrap) {
