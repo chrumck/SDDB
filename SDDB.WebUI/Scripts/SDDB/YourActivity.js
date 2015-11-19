@@ -31,7 +31,7 @@ $(document).ready(function () {
         MagicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
         $("#LogEntryDateTime")
             .val(moment($("#FilterDateStart").val()).hour(moment().hour()).format("YYYY-MM-DD HH:mm"));
-        $("#EntryDTPicker").data("DateTimePicker").date($("#LogEntryDateTime").val());
+        $("#EntryDTPicker").data("DateTimePicker").date(moment($("#LogEntryDateTime").val()));
         $("#ManHours").val(0);
         $("#HoursWorkedPicker").data("DateTimePicker").date("00:00");
 
@@ -70,7 +70,7 @@ $(document).ready(function () {
             })
             .always(hideModalWait)
             .done(function () {
-                $("#EntryDTPicker").data("DateTimePicker").date($("#LogEntryDateTime").val());
+                $("#EntryDTPicker").data("DateTimePicker").date(moment($("#LogEntryDateTime").val()));
                 $("#LogEntryDateTime").data("ismodified", false);
                 $("#HoursWorkedPicker").data("DateTimePicker").date(moment($("#ManHours").val(), "HH"));
                 $("#ManHours").data("ismodified", false);
@@ -216,7 +216,7 @@ $(document).ready(function () {
     //Initialize DateTimePicker - HoursWorkedPicker
     $("#HoursWorkedPicker").datetimepicker({ format: "HH", inline: true })
         .on("dp.change", function (e) {
-            $("#ManHours").val($(this).data("DateTimePicker").date().hour());
+            $("#ManHours").val($("#HoursWorkedPicker").data("DateTimePicker").date().hour());
             $("#ManHours").data("ismodified", true);
         });
 

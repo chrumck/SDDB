@@ -191,7 +191,7 @@ function showModalDatePrompt(bodyText, labelText, promptDate) {
     if (labelText) { $("#ModalDatePromptLabel").text(labelText); }
     else { $("#ModalDatePromptLabel").text("Please Select Date"); }
 
-    if (promptDate) { $("#ModalDatePromptInput").data("DateTimePicker").date(promptDate); }
+    if (promptDate) { $("#ModalDatePromptInput").data("DateTimePicker").date(moment(promptDate)); }
     else { $("#ModalDatePromptInput").data("DateTimePicker").date(moment().format("YYYY-MM-DD")); }
 
     $("#ModalDatePromptBtnCancel, #ModalDatePromptBtnOk").off("click");
