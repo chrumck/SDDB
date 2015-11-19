@@ -294,8 +294,8 @@ function refreshTblGenWrp(table, url, data, httpType) {
 function exportTableToTxt(table) {
     showModalWait();
     setTimeout(function () {
-        var tableData = table.rows({ search: "applied" }).data().toArray(),
-            txtOutput = convertObjectToStringHelper(tableData[0], true);
+        var tableData = table.rows({ search: "applied" }).data().toArray();
+        var txtOutput = convertObjectToStringHelper(tableData[0], true);
         txtOutput.slice(-1);
         txtOutput += "\n";
         $.each(tableData, function (index, tableRow) {
