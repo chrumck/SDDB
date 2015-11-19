@@ -51,7 +51,6 @@ namespace SDDB.Domain.Services
                     .Include(x => x.AssemblyStatus)
                     .Include(x => x.AssignedToLocation.AssignedToProject)
                     .Include(x => x.AssignedToLocation)
-                    .Include(x => x.AssignedToLocation.LocationType)
                     .Include(x => x.AssemblyExt)
                     .ToListAsync().ConfigureAwait(false);
 
@@ -84,7 +83,6 @@ namespace SDDB.Domain.Services
                         .Include(x => x.AssemblyStatus)
                         .Include(x => x.AssignedToLocation.AssignedToProject)
                         .Include(x => x.AssignedToLocation)
-                        .Include(x => x.AssignedToLocation.LocationType)
                         .Include(x => x.AssemblyExt)
                         .ToListAsync().ConfigureAwait(false);
 

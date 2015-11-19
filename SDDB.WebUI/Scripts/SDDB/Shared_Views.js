@@ -40,7 +40,7 @@ var callBackBeforeCreate = function () { return $.Deferred().resolve(); };
 var callBackBeforeEdit = function (currRecords) { return $.Deferred().resolve(); };
 var callBackBeforeSubmitEdit = function (data) { return $.Deferred().resolve(); };
 var callBackAfterSubmitEdit = function (data) { return $.Deferred().resolve(); };
-var callBackBeforeCopy = function () { return $.Deferred().resolve(); };
+var callBackBeforeCopy = function (currRecords) { return $.Deferred().resolve(); };
 
 //-------------------------------------------------------------------------------------------//
 
@@ -68,8 +68,10 @@ $(document).ready(function () {
             showModalNothingSelected();
             return;
         }
-        fillFormForEditGenericWrp(CurrIds, HttpTypeFillForEdit, UrlFillForEdit,
-                GetActive, EditFormId, LabelTextEdit, MagicSuggests)
+        modalWaitWrapper(function () {
+            return fillFormForEditGeneric(CurrIds, HttpTypeFillForEdit, UrlFillForEdit,
+                GetActive, EditFormId, LabelTextEdit, MagicSuggests);
+        })
             .then(function (currRecords) {
                 CurrRecords = currRecords;
                 return callBackBeforeEdit(currRecords);
@@ -95,7 +97,7 @@ $(document).ready(function () {
                 CurrIds = [];
                 CurrRecords = [];
                 CurrRecords[0] = $.extend(true, {}, RecordTemplate);
-                return callBackBeforeCopy();
+                return callBackBeforeCopy(currRecords);
             })
             .done(function () {
                 saveViewSettings(TableMain);

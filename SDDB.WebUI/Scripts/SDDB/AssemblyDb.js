@@ -77,20 +77,11 @@ var ExtTypeHttpType = "POST";
 var ExtHttpTypeEdit = "POST";
 var ExtUrlEdit = "/AssemblyDbSrv/EditExt";
 
-callBackBeforeCreate = function () {
-    var deferred0 = $.Deferred();
-    updateFormForSelectedType().done(function () {
-        return deferred0.resolve();
-    });
-    return deferred0.promise();
-};
+callBackBeforeCreate = updateFormForSelectedType;
 
 callBackBeforeEdit = function (currRecords) {
-    var deferred0 = $.Deferred();
-    updateFormForSelectedType()
-        .then(function () { return fillFormForEditFromDbEntries(GetActive, currRecords, ExtEditFormId); })
-        .done(function () { return deferred0.resolve(); });
-    return deferred0.promise();
+    return updateFormForSelectedType()
+        .then(function () { return fillFormForEditFromDbEntries(GetActive, currRecords, ExtEditFormId); });
 };
 
 callBackBeforeSubmitEdit = function (data) {
@@ -102,17 +93,18 @@ callBackBeforeSubmitEdit = function (data) {
 };
 
 callBackAfterSubmitEdit = function (data) {
-    var deferred0 = $.Deferred();
     ExtCurrRecords = [];
     for (var i = 0; i < CurrIds.length; i++) {
         ExtCurrRecords[i] = $.extend(true, {}, ExtRecordTemplate);
         ExtCurrRecords[i].Id = CurrIds[i];
     }
-    submitEditsGenericWrp(ExtEditFormId, [], ExtCurrRecords, ExtHttpTypeEdit, ExtUrlEdit)
-        .done(deferred0.resolve);
-    return deferred0.promise();
+    return submitEditsGenericWrp(ExtEditFormId, [], ExtCurrRecords, ExtHttpTypeEdit, ExtUrlEdit);
 };
 
+callBackBeforeCopy = function (currRecords) {
+    return updateFormForSelectedType()
+        .then(function () { return fillFormForCopyFromDbEntries(currRecords, ExtEditFormId); });
+};
 //-------------------------------------------------------------------------------------------//
 
 $(document).ready(function () {
@@ -312,7 +304,9 @@ $(document).ready(function () {
     msAddToMsArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/Lookup", 1);
 
     //Initialize MagicSuggest Array Event - AssemblyType_Id
-    $(MagicSuggests[0]).on("selectionchange", function (e, m) { updateFormForSelectedType(); });
+    $(MagicSuggests[0]).on("selectionchange", function (e, m) {
+        updateFormForSelectedType().done(function () { $("#AssemblyType_Id input").focus(); });
+    });
 
         
     //--------------------------------------View Initialization------------------------------------//

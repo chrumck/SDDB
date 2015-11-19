@@ -88,31 +88,33 @@ $(document).ready(function () {
             showModalNothingSelected();
             return;
         }
-        $("#EditFormBtnOkFiles").removeClass("disabled");
-        TableLogEntryAssysAdd.clear().search("").draw();
-        TableLogEntryAssysRemove.clear().search("").draw();
-        showModalWait();
-        $.when(
-            fillFormForCopyGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
-                GetActive, "EditForm", "Copy Person Activity", MagicSuggests),
-            refreshTableGeneric(TableLogEntryPersonsAdd, "/PersonSrv/Get", { getActive: true }, "GET")
-            )
-            .then(function (currRecords) {
-                CurrIds = [];
-                CurrRecords = [];
-                CurrRecords[0] = $.extend(true, {}, RecordTemplate);
-                MagicSuggests[5].clear();
-                $("#QcdDateTime").val("");
-                return refreshTableGeneric(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
-                { getActive: true, locId: MagicSuggests[3].getValue()[0] }, "GET");
-            })
-            .always(hideModalWait)
+        showModalConfirm("NOTE: Assemblies, People and Files are not copied!", "Confirm Copy")
             .done(function () {
-                saveViewSettings(TableMain);
-                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-
+                $("#EditFormBtnOkFiles").removeClass("disabled");
+                TableLogEntryAssysAdd.clear().search("").draw();
+                TableLogEntryAssysRemove.clear().search("").draw();
+                showModalWait();
+                $.when(
+                    fillFormForCopyGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
+                        GetActive, "EditForm", "Copy Person Activity", MagicSuggests),
+                    refreshTableGeneric(TableLogEntryPersonsAdd, "/PersonSrv/Get", { getActive: true }, "GET")
+                    )
+                    .then(function (currRecords) {
+                        CurrIds = [];
+                        CurrRecords = [];
+                        CurrRecords[0] = $.extend(true, {}, RecordTemplate);
+                        MagicSuggests[5].clear();
+                        $("#QcdDateTime").val("");
+                        return refreshTableGeneric(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
+                        { getActive: true, locId: MagicSuggests[3].getValue()[0] }, "GET");
+                    })
+                    .always(hideModalWait)
+                    .done(function () {
+                        saveViewSettings(TableMain);
+                        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
+                    })
+                    .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+            });
     });
 
 

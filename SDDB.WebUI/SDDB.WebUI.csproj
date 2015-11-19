@@ -540,6 +540,7 @@
     <Content Include="Views\Home\Maintenance.cshtml" />
     <Content Include="Views\ActivitySummary\Index.cshtml" />
     <Content Include="Views\LastEntrySummary\Index.cshtml" />
+    <Content Include="Views\Shared\_StandardEditButtons.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

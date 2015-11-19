@@ -145,7 +145,6 @@ namespace SDDB.WebUI.ControllersSrv
                 },
                 AssignedToLocation_ = new {
                     x.AssignedToLocation.LocName,
-                    x.AssignedToLocation.LocationType.LocTypeName,
                     x.AssignedToLocation.AssignedToProject.ProjectName,
                 },
                 x.AssyGlobalX,

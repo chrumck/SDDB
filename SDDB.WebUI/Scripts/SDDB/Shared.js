@@ -627,9 +627,9 @@ function submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNew
         $.each(currRecordsClone, function (i, currRecord) {
             for (var property in currRecord) {
                 if (!currRecord.hasOwnProperty(property) ||
-                property == "Id" ||
-                property.slice(-3) == "_Id" ||
-                property.slice(-1) == "_") {
+                    property === "Id" || property.slice(-3) === "_Id" ||
+                    property.slice(-3) === "_bl" || property.slice(-1) === "_" ||
+                    currRecord[property] === null || currRecord[property] === "") {
                     continue;
                 }
                 if ($("#" + formId + " #" + property).data("valDbisunique") === true) {
