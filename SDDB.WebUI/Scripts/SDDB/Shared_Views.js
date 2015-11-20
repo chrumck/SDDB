@@ -85,8 +85,8 @@ $(document).ready(function () {
     //Wire up BtnCopy
     $("#BtnCopy").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length === 0) {
-            showModalNothingSelected();
+        if (CurrIds.length !== 1) {
+            showModalSelectOne();
             return;
         }
         modalWaitWrapper(function () {

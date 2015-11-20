@@ -94,6 +94,8 @@ $(document).ready(function () {
                 moveToDate = outputDate;
                 TableLogEntryPersonsAdd.clear().search("").draw();
                 TableLogEntryPersonsRemove.clear().search("").draw();
+                TableLogEntryAssysAdd.clear().search("").draw();
+                TableLogEntryAssysRemove.clear().search("").draw();
                 $("#LogEntryPersonsView").addClass("hidden");
                 return modalWaitWrapper(function () {
                     return fillFormForCopyGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds", GetActive,
