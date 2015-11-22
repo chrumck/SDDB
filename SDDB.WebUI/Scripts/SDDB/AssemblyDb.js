@@ -258,7 +258,8 @@ $(document).ready(function () {
             { data: "AssignedToLocation_Id", name: "AssignedToLocation_Id" }//42
         ],
         columnDefs: [
-            { targets: [0, 19, 39, 40, 41, 42], searchable: false },  //"orderable": false, "visible": false
+            //searchable: false
+            { targets: [0, 19, 39, 40, 41, 42], searchable: false },  
             //1st set of columns - responsive
             { targets: [4, 6], className: "hidden-xs" },
             { targets: [3], className: "hidden-xs hidden-sm" }, 

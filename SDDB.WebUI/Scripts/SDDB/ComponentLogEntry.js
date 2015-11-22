@@ -140,7 +140,7 @@ $(document).ready(function () {
             { data: "AssignedToAssemblyDb_Id", name: "AssignedToAssemblyDb_Id" }//14
         ],
         columnDefs: [
-            //"orderable": false, "visible": false
+            //searchable: false
             { targets: [0, 1, 7, 9, 10, 11, 12, 13, 14], searchable: false },
             // - first set of columns
             { targets: [3, 4], className: "hidden-xs" },

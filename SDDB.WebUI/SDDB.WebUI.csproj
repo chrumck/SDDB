@@ -159,8 +159,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Scripts\FileSaver.js" />
-    <Content Include="Scripts\FileSaver.min.js" />
     <Content Include="Images\SDDB_help.png" />
     <Content Include="Scripts\FileSaver.js" />
     <Content Include="Scripts\FileSaver.min.js" />

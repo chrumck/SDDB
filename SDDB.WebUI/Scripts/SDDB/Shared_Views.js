@@ -214,7 +214,7 @@ $("#EditFormBtnOk").click(function () {
         })
         .then(function (data, currRecords) {
             CurrRecords = currRecords;
-            if (CurrIds.length === 0) {
+            if (CurrIds.length === 0 && data.newEntryIds) {
                 CurrIds = data.newEntryIds;
                 for (var i = 0; i < CurrIds.length; i++) {
                     CurrRecords[i].Id = CurrIds[i];
