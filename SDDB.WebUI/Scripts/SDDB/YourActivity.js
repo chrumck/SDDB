@@ -110,6 +110,7 @@ $(document).ready(function () {
                 var entryDTpickerDate = moment($("#LogEntryDateTime").val())
                     .year(moveToDate.year()).dayOfYear(moveToDate.dayOfYear());
                 $("#EntryDTPicker").data("DateTimePicker").date(entryDTpickerDate);
+                $("#EntryDTPicker").trigger("dp.change");
                 $("#HoursWorkedPicker").data("DateTimePicker").date(moment($("#ManHours").val(), "HH"));
 
                 return modalWaitWrapper(function () {

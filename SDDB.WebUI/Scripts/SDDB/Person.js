@@ -245,7 +245,7 @@ $(document).ready(function () {
     //---------------------------------------EditFormView----------------------------------------//
 
     //Enable DatePicker
-    $(".datepicker").datetimepicker({ format: "YYYY-MM-DD" })
+    $("[data-val-dbisdateiso]").datetimepicker({ format: "YYYY-MM-DD" })
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
 
     //Wire Up EditFormBtnCancel
