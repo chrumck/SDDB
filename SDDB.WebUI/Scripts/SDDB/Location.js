@@ -9,10 +9,6 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var TableMain;
-var MsFilterByProject = {};
-var MsFilterByType = {};
-var MagicSuggests = [];
 var RecordTemplate = {
     Id: "RecordTemplateId",
     LocName: null,
@@ -32,76 +28,22 @@ var RecordTemplate = {
     AssignedToProject_Id: null,
     ContactPerson_Id: null
 };
-var CurrRecords = [];
-var CurrIds = [];
-var GetActive = true;
+
+var MsFilterByProject = {};
+var MsFilterByType = {};
+
+LabelTextCreate = "Create Location";
+LabelTextEdit = "Edit Location";
+UrlFillForEdit = "/LocationSrv/GetByIds";
+UrlEdit = "/LocationSrv/Edit";
+UrlDelete = "/LocationSrv/Delete";
 
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
-
-    //Wire up BtnCreate
-    $("#BtnCreate").click(function () {
-        CurrIds = [];
-        CurrRecords = [];
-        CurrRecords[0] = $.extend(true, {}, RecordTemplate);
-        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Location", "MainView");
-        saveViewSettings(TableMain);
-        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
-    });
-
-    //Wire up BtnEdit
-    $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length === 0) {
-            showModalNothingSelected();
-            return;
-        }
-        showModalWait();
-        fillFormForEditGeneric(CurrIds, "POST", "/LocationSrv/GetByIds",
-                GetActive, "EditForm", "Edit Location", MagicSuggests)
-            .always(hideModalWait)
-            .done(function (currRecords) {
-                CurrRecords = currRecords;
-                saveViewSettings(TableMain);
-                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    });
-
-    //Wire up BtnDelete 
-    $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length === 0) { showModalNothingSelected(); }
-        else { showModalDelete(CurrIds.length); }
-    });
-
+            
     //wire up dropdownId1
     $("#dropdownId1").click(function (event) {
-        event.preventDefault();
-        TableMain.columns([2, 3, 4, 5, 6]).visible(true);
-        TableMain.columns([7, 8, 9, 10, 11]).visible(false);
-        TableMain.columns([12, 13, 14, 15]).visible(false);
-    });
-
-    //wire up dropdownId2
-    $("#dropdownId2").click(function (event) {
-        event.preventDefault();
-        TableMain.columns([2, 3, 4, 5, 6]).visible(false);
-        TableMain.columns([7, 8, 9, 10, 11]).visible(true);
-        TableMain.columns([12, 13, 14, 15]).visible(false);
-    });
-
-    //wire up dropdownId3
-    $("#dropdownId3").click(function (event) {
-        event.preventDefault();
-        TableMain.columns([2, 3, 4, 5, 6]).visible(false);
-        TableMain.columns([7, 8, 9, 10, 11]).visible(false);
-        TableMain.columns([12, 13, 14, 15]).visible(true);
-    });
-
-    //wire up dropdownId4
-    $("#dropdownId4").click(function (event) {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) { showModalSelectOne(); }
@@ -140,22 +82,13 @@ $(document).ready(function () {
 
     //---------------------------------------DataTables------------
 
-    //wire up BtnTableMainExport
-    $("#BtnTableMainExport").click(function (event) {
-        exportTableToTxt(TableMain);
-    });
-
-    //Wire up ChBoxShowDeleted
-    $("#ChBoxShowDeleted").change(function (event) {
-        if (!$(this).prop("checked")) {
-            GetActive = true;
-            $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
-        } else {
-            GetActive = false;
-            $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
-        }
-        refreshMainView();
-    });
+    //TableMainColumnSets
+    TableMainColumnSets = [
+        [1],
+        [2, 3, 4, 5, 6],
+        [7, 8, 9, 10, 11],
+        [12, 13, 14, 15]
+    ];
 
     //TableMain Locations
     TableMain = $("#TableMain").DataTable({
@@ -198,17 +131,16 @@ $(document).ready(function () {
             { data: "ContactPerson_Id", name: "ContactPerson_Id" }//19
         ],
         columnDefs: [
-            //"orderable": false, "visible": false
-            { targets: [0, 16, 17, 18, 19], visible: false },
-            //"orderable": false, "visible": false
+            //searchable: false
             { targets: [0, 12, 13, 16, 17, 18, 19], searchable: false },
+            //1st set of columns - responsive
             { targets: [4, 5, 6], className: "hidden-xs hidden-sm" },
             { targets: [6], className: "hidden-xs hidden-sm hidden-md" },
-            // - second set of columns - to toggle with options
+            //2nd set of columns - responsive
             { targets: [7, 8, 9, 10, 11], visible: false }, 
             { targets: [8, 9, 10], className: "hidden-xs hidden-sm" },
             { targets: [11], className: "hidden-xs hidden-sm hidden-md" },
-            // - third set of columns - to toggle with options
+            //3rd set of columns - responsive
             { targets: [12, 13, 14, 15], visible: false }, 
             { targets: [12, 13, 14], className: "hidden-xs hidden-sm" },
             { targets: [], className: "hidden-xs hidden-sm hidden-md" }
@@ -225,6 +157,8 @@ $(document).ready(function () {
             paginate: { previous: "", next: "" }
         }
     });
+    //showing the first Set of columns on startup;
+    showColumnSet(TableMainColumnSets, 1);
 
     //---------------------------------------EditFormView----------------------------------------//
 
@@ -232,38 +166,11 @@ $(document).ready(function () {
     msAddToMsArray(MagicSuggests, "LocationType_Id", "/LocationTypeSrv/Lookup", 1);
     msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
     msAddToMsArray(MagicSuggests, "ContactPerson_Id", "/PersonSrv/LookupAll", 1);
-
-    //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel").click(function () {
-        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
-    });
-
-    //Wire Up EditFormBtnOk
-    $("#EditFormBtnOk").click(function () {
-        msValidate(MagicSuggests);
-        if (!formIsValid("EditForm", CurrIds.length === 0) || !msIsValid(MagicSuggests)) {
-            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
-            return;
-        }
-        showModalWait();
-        var createMultiple = $("#CreateMultiple").val() !== "" ? $("#CreateMultiple").val() : 1;
-        submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/LocationSrv/Edit", createMultiple)
-            .always(hideModalWait)
-            .done(function () {
-                refreshMainView()
-                    .done(function () {
-                        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
-                    });
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    });
-
+        
     //--------------------------------------View Initialization------------------------------------//
 
     fillFiltersFromRequestParams().done(refreshMainView);
-
-    $("#InitialView").addClass("hidden");
-    $("#MainView").removeClass("hidden");
+    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });

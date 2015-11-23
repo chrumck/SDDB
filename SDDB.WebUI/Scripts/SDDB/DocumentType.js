@@ -42,7 +42,7 @@ $(document).ready(function () {
             { data: "DocTypeName", name: "DocTypeName" },//1
             { data: "DocTypeAltName", name: "DocTypeAltName" },//2
             { data: "Comments", name: "Comments" },//3
-            { data: "IsActive_bl", name: "IsActive_bl" },//4
+            { data: "IsActive_bl", name: "IsActive_bl" }//4
         ],
         columnDefs: [
             //searchable: false
@@ -84,7 +84,6 @@ function refreshMainView() {
     refreshTblGenWrp(TableMain, "/DocumentTypeSrv/Get", { getActive: GetActive }).done(deferred0.resolve);
     return deferred0.promise();
 }
-
 
 
 //---------------------------------------Helper Methods--------------------------------------//

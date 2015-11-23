@@ -9,8 +9,8 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var TableDBRolesAdd = {};
-var TableDBRolesRemove = {};
+var TableDBRolesAdd = {},
+    TableDBRolesRemove = {};
 
 var RecordTemplate = {
     Id: "RecordTemplateId",

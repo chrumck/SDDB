@@ -10,7 +10,8 @@
 //--------------------------------------Global Properties------------------------------------//
 
 var TableMain = {};
-var TableProjectPersonsAdd = {}; var TableProjectPersonsRemove = {};
+var TableProjectPersonsAdd = {},
+    TableProjectPersonsRemove = {};
 var MagicSuggests = [];
 var RecordTemplate = {
     Id: "RecordTemplateId",
@@ -43,7 +44,7 @@ $(document).ready(function () {
     //Wire up BtnEdit
     $("#BtnEdit").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) {
+        if (CurrIds.length === 0) {
             showModalNothingSelected();
             return;
         }
@@ -62,7 +63,7 @@ $(document).ready(function () {
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) { showModalNothingSelected(); }
+        if (CurrIds.length === 0) { showModalNothingSelected(); }
         else { showModalDelete(CurrIds.length); }
     });
 
@@ -70,7 +71,7 @@ $(document).ready(function () {
     //Wire Up BtnEditProjectPersons
     $("#BtnEditProjectPersons").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) {
+        if (CurrIds.length === 0) {
             showModalNothingSelected();
             return;
         }
@@ -97,9 +98,13 @@ $(document).ready(function () {
     $("#dropdownId1").click(function (event) {
         event.preventDefault();
         var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
-        if (noOfRows != 1) showModalSelectOne();
-        else window.open("/Location?ProjectId=" + TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data())
-    })
+        if (noOfRows != 1) {
+            showModalSelectOne();
+            return;
+        }
+        window.open("/Location?ProjectId=" +
+            TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data());
+    });
 
     //---------------------------------------DataTables------------
 
@@ -127,16 +132,22 @@ $(document).ready(function () {
             { data: "ProjectName", name: "ProjectName" },//1
             { data: "ProjectAltName", name: "ProjectAltName" },//2
             { data: "ProjectCode", name: "ProjectCode" },//3
-            { data: "ProjectManager_", render: function (data, type, full, meta) { return data.Initials }, name: "ProjectManager_" }, //4
+            {
+                data: "ProjectManager_",
+                name: "ProjectManager_",
+                render: function (data, type, full, meta) { return data.Initials; }
+            }, //4
             { data: "Comments", name: "Comments" },//5
             { data: "IsActive_bl", name: "IsActive_bl" },//6
             { data: "ProjectManager_Id", name: "ProjectManager_Id" }//7
         ],
         columnDefs: [
-            { targets: [0, 6, 7], visible: false }, // - never show
-            { targets: [0, 6, 7], searchable: false },  //"orderable": false, "visible": false
-            { targets: [2, 3], className: "hidden-xs hidden-sm" }, // - first set of columns
-            { targets: [5], className: "hidden-xs hidden-sm hidden-md" } // - first set of columns
+            { targets: [0, 6, 7], visible: false },
+            //searchable: false
+            { targets: [0, 6, 7], searchable: false },
+            // - first set of columns
+            { targets: [2, 3], className: "hidden-xs hidden-sm" }, 
+            { targets: [5], className: "hidden-xs hidden-sm hidden-md" }
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
@@ -163,12 +174,12 @@ $(document).ready(function () {
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
         msValidate(MagicSuggests);
-        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
+        if (!formIsValid("EditForm", CurrIds.length === 0) || !msIsValid(MagicSuggests)) {
             showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
             return;
         }
         showModalWait();
-        var createMultiple = $("#CreateMultiple").val() != "" ? $("#CreateMultiple").val() : 1;
+        var createMultiple = $("#CreateMultiple").val() !== "" ? $("#CreateMultiple").val() : 1;
         submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/ProjectSrv/Edit", createMultiple)
             .always(hideModalWait)
             .done(function () {
@@ -177,7 +188,7 @@ $(document).ready(function () {
                         switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
                     });
             })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
+            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 
     });
 
@@ -191,7 +202,7 @@ $(document).ready(function () {
     //Wire Up ProjectPersonsViewBtnOk
     $("#ProjectPersonsViewBtnOk").click(function () {
         if (TableProjectPersonsAdd.rows(".ui-selected", { page: "current" }).data().length +
-            TableProjectPersonsRemove.rows(".ui-selected", { page: "current" }).data().length == 0) {
+            TableProjectPersonsRemove.rows(".ui-selected", { page: "current" }).data().length === 0) {
             showModalNothingSelected();
             return;
         }

@@ -115,6 +115,7 @@ $(document).ready(function () {
         showModalDelete(CurrIds.length);
     });
 
+    //TODO: refactor columnSelectId so it's not repeated n times
     //wire up columnsSelectId1
     $("#columnsSelectId1").click(function (event) {
         event.preventDefault();

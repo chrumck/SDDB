@@ -5,6 +5,7 @@
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
+/// <reference path="../FileSaver.js" />
 
 //--------------------------------------Global Properties------------------------------------//
 
@@ -770,6 +771,7 @@ function submitEditsForRelatedGenericWrp(ids, idsAdd, idsRemove, url) {
 
 //-----------------------------------------------------------------------------
 
+// TODO: refactor to accept an object for ms settings, get rid of disabled (it doesn't work anyway)
 //initialize MagicSuggest and add to MagicSuggest array
 function msAddToMsArray(msArray, id, url, maxSelection, minChars, dataUrlParams, disabled, editable) {
 
