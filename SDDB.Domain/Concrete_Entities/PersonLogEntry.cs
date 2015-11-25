@@ -19,7 +19,8 @@ namespace SDDB.Domain.Entities
         public string Id { get; set; }
                 
         [Required(ErrorMessage = "Entry Date field is required")]
-        [DBIsDateTimeISO] 
+        [DBIsDateTimeISO]
+        [Index]
         public DateTime LogEntryDateTime { get; set; }
 
         [Required(ErrorMessage = "Entered By Person field is required")]

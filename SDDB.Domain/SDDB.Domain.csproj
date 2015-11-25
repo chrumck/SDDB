@@ -459,6 +459,10 @@
     <Compile Include="Migrations\201511111649176_QcPersonLogEntry.Designer.cs">
       <DependentUpon>201511111649176_QcPersonLogEntry.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201511242235053_LogEntryDateIndex.cs" />
+    <Compile Include="Migrations\201511242235053_LogEntryDateIndex.Designer.cs">
+      <DependentUpon>201511242235053_LogEntryDateIndex.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -675,6 +679,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201511111649176_QcPersonLogEntry.resx">
       <DependentUpon>201511111649176_QcPersonLogEntry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201511242235053_LogEntryDateIndex.resx">
+      <DependentUpon>201511242235053_LogEntryDateIndex.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
