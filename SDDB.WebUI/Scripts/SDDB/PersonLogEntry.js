@@ -220,7 +220,7 @@ $(document).ready(function () {
                 name: "EnteredByPerson_",
                 render: function (data, type, full, meta) { return data.Initials; }
             }, //2
-            { data: "PersonLogEntryPersonsInitials", name: "PersonLogEntryPersonsInitials" },//3
+            { data: "PrsLogEntryPersonsInitials", name: "PrsLogEntryPersonsInitials" },//3
             {
                 data: "PersonActivityType_",
                 name: "PersonActivityType_",
@@ -242,8 +242,8 @@ $(document).ready(function () {
                 name: "AssignedToProjectEvent_",
                 render: function (data, type, full, meta) { return data.EventName; }
             }, //8
-            { data: "PersonLogEntryFilesCount", name: "PersonLogEntryFilesCount" },//9
-            { data: "PersonLogEntryAssysCount", name: "PersonLogEntryAssysCount" },//10
+            { data: "PrsLogEntryFilesCount", name: "PrsLogEntryFilesCount" },//9
+            { data: "PrsLogEntryAssysCount", name: "PrsLogEntryAssysCount" },//10
             {
                 data: "QcdByPerson_",
                 name: "QcdByPerson_",

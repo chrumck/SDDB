@@ -120,6 +120,7 @@
     <Compile Include="Abstract_Infrastructure\ILogger.cs" />
     <Compile Include="Abstract_Services\IAppRoleManager.cs" />
     <Compile Include="Abstract_Services\IAppUserManager.cs" />
+    <Compile Include="Concrete_HelperEntities\JSONEntities.cs" />
     <Compile Include="Concrete_HelperEntities\LastEntrySummary.cs" />
     <Compile Include="Concrete_HelperEntities\ExtAttrTypes.cs" />
     <Compile Include="Concrete_HelperEntities\ActivitySummary.cs" />
