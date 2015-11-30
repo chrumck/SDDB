@@ -48,7 +48,7 @@ namespace SDDB.Domain.Services
         }
 
         //get by PersonLogEntry ids
-        public virtual async Task<List<PersonLogEntry>> GetAsync(string[] ids, bool getActive = true,
+        public virtual async Task<List<PersonLogEntryJSON>> GetAsync(string[] ids, bool getActive = true,
             bool filterForPLEView = false)
         {
             if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
@@ -65,32 +65,87 @@ namespace SDDB.Domain.Services
                         ids.Contains(x.Id) &&
                         x.IsActive_bl == getActive
                         )
-                    .Include(x => x.EnteredByPerson)
-                    .Include(x => x.PersonActivityType)
-                    .Include(x => x.AssignedToProject)
-                    .Include(x => x.AssignedToLocation)
-                    .Include(x => x.AssignedToProjectEvent)
-                    .Include(x => x.PrsLogEntryAssemblyDbs)
-                    .Include(x => x.PrsLogEntryPersons)
-                    .Include(x => x.PersonLogEntryFiles)
-                    .Include(x => x.QcdByPerson)
+                    .Select(x => new PersonLogEntryJSON
+                    {
+                        Id = x.Id,
+                        LogEntryDateTime = x.LogEntryDateTime,
+                        EnteredByPerson_Id = x.EnteredByPerson_Id,
+                        EnteredByPerson_ = new PersonJSON
+                        {
+                            Id = x.EnteredByPerson_Id,
+                            FirstName = x.EnteredByPerson.FirstName,
+                            LastName = x.EnteredByPerson.LastName,
+                            Initials = x.EnteredByPerson.Initials
+                        },
+                        PersonActivityType_Id = x.PersonActivityType_Id,
+                        PersonActivityType_ = new PersonActivityTypeJSON
+                        {
+                            Id = x.PersonActivityType_Id,
+                            ActivityTypeName = x.PersonActivityType.ActivityTypeName
+                        },
+                        ManHours = x.ManHours,
+                        AssignedToProject_Id = x.AssignedToProject_Id,
+                        AssignedToProject_ = new ProjectJSON
+                        {
+                            Id = x.AssignedToProject_Id,
+                            ProjectName = x.AssignedToProject.ProjectName,
+                            ProjectCode = x.AssignedToProject.ProjectCode,
+                        },
+                        AssignedToLocation_Id = x.AssignedToLocation_Id,
+                        AssignedToLocation_ = new LocationJSON
+                        {
+                            Id = x.AssignedToLocation_Id,
+                            LocName = x.AssignedToLocation.LocName
+                        },
+                        AssignedToProjectEvent_Id = x.AssignedToProjectEvent_Id,
+                        AssignedToProjectEvent_ = new ProjectEventJSON
+                        {
+                            Id = x.AssignedToProjectEvent_Id,
+                            EventName = x.AssignedToProjectEvent.EventName,
+                        },
+                        QcdByPerson_Id = x.QcdByPerson_Id,
+                        QcdByPerson_ = new PersonJSON
+                        {
+                            Id = x.QcdByPerson_Id,
+                            FirstName = x.QcdByPerson.FirstName,
+                            LastName = x.QcdByPerson.LastName,
+                            Initials = x.QcdByPerson.Initials
+                        },
+                        QcdDateTime = x.QcdDateTime,
+                        Comments = x.Comments,
+                        PrsLogEntryFilesCount = x.PersonLogEntryFiles.Count,
+                        PrsLogEntryAssysCount = x.PrsLogEntryAssemblyDbs.Count,
+                        PrsLogEntryPersonsInitials = x.PrsLogEntryPersons.Count.ToString(),
+                        PrsLogEntryPersons = x.PrsLogEntryPersons.Select(y => new PersonJSON
+                        {
+                            Id = y.Id,
+                            FirstName = y.FirstName,
+                            LastName = y.LastName,
+                            Initials = y.Initials
+                        }).ToList(),
+                        IsActive_bl = x.IsActive_bl
+                    })
                     .ToListAsync().ConfigureAwait(false);
 
                 if (!(await userIsInRoleHelperAsync("PersonLogEntry_View").ConfigureAwait(false)))
                 {
                     records = records.Where(x =>
-                        x.EnteredByPerson_Id == userId ||
-                        x.PrsLogEntryPersons.Any(y => y.Id == userId)
-                        )
+                            x.EnteredByPerson_Id == userId || x.PrsLogEntryPersons.Any(y => y.Id == userId))
                         .ToList();
                 }
-                records.FillRelatedIfNull();
+
+                records.ForEach(x =>
+                {
+                    x.PrsLogEntryPersonsInitials = x.PrsLogEntryPersons.Aggregate("", (initials, person) =>
+                        initials += String.IsNullOrEmpty(initials) ? person.Initials : " " + person.Initials);
+                });
+
                 return records;
             }
         }
 
         //get by personIds, projectIds, typeIds, startDate, endDate
-        public virtual async Task<List<PersonLogEntry>> GetByAltIdsAsync(string[] personIds, string[] projectIds, 
+        public virtual async Task<List<PersonLogEntryJSON>> GetByAltIdsAsync(string[] personIds, string[] projectIds,
             string[] assyIds, string[] typeIds, DateTime? startDate, DateTime? endDate, bool getActive = true,
             bool filterForPLEView = false)
         {
@@ -104,39 +159,90 @@ namespace SDDB.Domain.Services
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                
+
                 var records = await dbContext.PersonLogEntrys
                        .Where(x =>
-                           (!filterForPLEView || x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId)) && 
+                           (!filterForPLEView || x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId)) &&
                            (personIds.Count() == 0 || x.PrsLogEntryPersons.Any(y => personIds.Contains(y.Id)) ||
-                                personIds.Contains(x.EnteredByPerson_Id) ) &&
+                                personIds.Contains(x.EnteredByPerson_Id)) &&
                            (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
                            (assyIds.Count() == 0 || x.PrsLogEntryAssemblyDbs.Any(y => assyIds.Contains(y.Id))) &&
                            (typeIds.Count() == 0 || typeIds.Contains(x.PersonActivityType_Id)) &&
                            (startDate == null || x.LogEntryDateTime >= startDate) &&
                            (endDate == null || x.LogEntryDateTime <= endDate) &&
                            x.IsActive_bl == getActive
-                           ) 
-                       .Include(x => x.EnteredByPerson)
-                       .Include(x => x.PersonActivityType)
-                       .Include(x => x.AssignedToProject)
-                       .Include(x => x.AssignedToLocation)
-                       .Include(x => x.AssignedToProjectEvent)
-                       .Include(x => x.PrsLogEntryAssemblyDbs)
-                       .Include(x => x.PrsLogEntryPersons)
-                       .Include(x => x.PersonLogEntryFiles)
-                       .Include(x => x.QcdByPerson)
+                           )
+                        .Select(x => new PersonLogEntryJSON
+                        {
+                            Id = x.Id,
+                            LogEntryDateTime = x.LogEntryDateTime,
+                            EnteredByPerson_Id = x.EnteredByPerson_Id,
+                            EnteredByPerson_ = new PersonJSON
+                            {
+                                Id = x.EnteredByPerson_Id,
+                                FirstName = x.EnteredByPerson.FirstName,
+                                LastName = x.EnteredByPerson.LastName,
+                                Initials = x.EnteredByPerson.Initials
+                            },
+                            PersonActivityType_Id = x.PersonActivityType_Id,
+                            PersonActivityType_ = new PersonActivityTypeJSON {
+                                Id = x.PersonActivityType_Id,
+                                ActivityTypeName = x.PersonActivityType.ActivityTypeName
+                            },
+                            ManHours = x.ManHours,
+                            AssignedToProject_Id = x.AssignedToProject_Id,
+                            AssignedToProject_ = new ProjectJSON {
+                                Id = x.AssignedToProject_Id,
+                                ProjectName = x.AssignedToProject.ProjectName,
+                                ProjectCode = x.AssignedToProject.ProjectCode,
+                            },
+                            AssignedToLocation_Id = x.AssignedToLocation_Id,
+                            AssignedToLocation_ = new LocationJSON {
+                                Id = x.AssignedToLocation_Id,
+                                LocName = x.AssignedToLocation.LocName
+                            },
+                            AssignedToProjectEvent_Id = x.AssignedToProjectEvent_Id,
+                            AssignedToProjectEvent_ = new ProjectEventJSON {
+                                Id = x.AssignedToProjectEvent_Id,
+                                EventName = x.AssignedToProjectEvent.EventName,
+                            },
+                            QcdByPerson_Id = x.QcdByPerson_Id,
+                            QcdByPerson_ = new PersonJSON
+                            {
+                                Id = x.QcdByPerson_Id,
+                                FirstName = x.QcdByPerson.FirstName,
+                                LastName = x.QcdByPerson.LastName,
+                                Initials = x.QcdByPerson.Initials
+                            },
+                            QcdDateTime = x.QcdDateTime,
+                            Comments = x.Comments,
+                            PrsLogEntryFilesCount = x.PersonLogEntryFiles.Count,
+                            PrsLogEntryAssysCount = x.PrsLogEntryAssemblyDbs.Count,
+                            PrsLogEntryPersonsInitials = x.PrsLogEntryPersons.Count.ToString(),
+                            PrsLogEntryPersons = x.PrsLogEntryPersons.Select(y => new PersonJSON
+                            {
+                                Id = y.Id,
+                                FirstName = y.FirstName,
+                                LastName = y.LastName,
+                                Initials = y.Initials
+                            }).ToList(),
+                            IsActive_bl = x.IsActive_bl
+                        })
                        .ToListAsync().ConfigureAwait(false);
 
                 if (!(await userIsInRoleHelperAsync("PersonLogEntry_View").ConfigureAwait(false)))
                 {
                     records = records.Where(x =>
-                        x.EnteredByPerson_Id == userId ||
-                        x.PrsLogEntryPersons.Any(y => y.Id == userId)
-                        )
+                            x.EnteredByPerson_Id == userId || x.PrsLogEntryPersons.Any(y => y.Id == userId))
                         .ToList();
                 }
-                records.FillRelatedIfNull();
+
+                records.ForEach(x =>
+                {
+                    x.PrsLogEntryPersonsInitials = x.PrsLogEntryPersons.Aggregate("",(initials, person) =>
+                        initials += String.IsNullOrEmpty(initials) ? person.Initials : " " + person.Initials);
+                });
+                
                 return records;
             }
         }

@@ -20,6 +20,7 @@ namespace SDDB.Domain.Entities
 
         [Required(ErrorMessage = "Entry Date field is required")]
         [DBIsDateTimeISO]
+        [Index]
         public DateTime LogEntryDateTime { get; set; }
                 
         [Required(ErrorMessage = "Component field is required")]

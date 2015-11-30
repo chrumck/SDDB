@@ -9,10 +9,8 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var TableMain;
 var MsFilterByProject = {};
-var MsFilterByType = {};
-var MagicSuggests = [];
+
 var RecordTemplate = {
     Id: "RecordTemplateId",
     EventName: null,
@@ -25,50 +23,17 @@ var RecordTemplate = {
     CreatedByPerson_Id: null,
     ClosedByPerson_Id: null
 };
-var CurrRecords = [];
-var CurrIds = [];
-var GetActive = true;
+
+LabelTextCreate = "Create Event";
+LabelTextEdit = "Edit Event";
+UrlFillForEdit = "/ProjectEventSrv/GetByIds";
+UrlEdit = "/ProjectEventSrv/Edit";
+UrlDelete = "/ProjectEventSrv/Delete";
 
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
 
-    //Wire up BtnCreate
-    $("#BtnCreate").click(function () {
-        CurrIds = [];
-        CurrRecords = [];
-        CurrRecords[0] = $.extend(true, {}, RecordTemplate);
-        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Event", "MainView");
-        saveViewSettings(TableMain);
-        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
-    });
-
-    //Wire up BtnEdit
-    $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length === 0) {
-            showModalNothingSelected();
-            return;
-        }
-        showModalWait();
-        fillFormForEditGeneric(CurrIds, "POST", "/ProjectEventSrv/GetByIds",
-                GetActive, "EditForm", "Edit Event", MagicSuggests)
-            .always(hideModalWait)
-            .done(function (currRecords) {
-                CurrRecords = currRecords;
-                saveViewSettings(TableMain);
-                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    });
-
-    //Wire up BtnDelete 
-    $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length === 0) { showModalNothingSelected(); }
-        else { showModalDelete(CurrIds.length); }
-    });
-    
     //Initialize MagicSuggest msFilterByProject
     MsFilterByProject = $("#MsFilterByProject").magicSuggest({
         data: "/ProjectSrv/Lookup",
@@ -84,24 +49,13 @@ $(document).ready(function () {
 
 
     //---------------------------------------DataTables------------
-
-    //wire up BtnTableMainExport
-    $("#BtnTableMainExport").click(function (event) {
-        exportTableToTxt(TableMain);
-    });
-
-    //Wire up ChBoxShowDeleted
-    $("#ChBoxShowDeleted").change(function (event) {
-        if (!$(this).prop("checked")) {
-            GetActive = true;
-            $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
-        } else {
-            GetActive = false;
-            $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
-        }
-        refreshMainView();
-    });
-
+    
+    //TableMainColumnSets
+    TableMainColumnSets = [
+        [1],
+        [2, 3, 4, 5, 6, 7, 8]
+    ];
+    
     //TableMain ProjectEvents
     TableMain = $("#TableMain").DataTable({
         columns: [
@@ -134,10 +88,11 @@ $(document).ready(function () {
             { data: "ClosedByPerson_Id", name: "ClosedByPerson_Id" }//12
         ],
         columnDefs: [
-            { targets: [0, 9, 10, 11, 12], visible: false }, // - never show
-            { targets: [0, 9, 10, 11, 12], searchable: false },  //"orderable": false, "visible": false
-            { targets: [2, 4, 5], className: "hidden-xs hidden-sm" }, // - first set of columns
-            { targets: [6, 7, 8], className: "hidden-xs hidden-sm hidden-md" } // - first set of columns
+            //searchable: false
+            { targets: [0, 9, 10, 11, 12], searchable: false },
+            // - first set of columns
+            { targets: [2, 4, 5], className: "hidden-xs hidden-sm" },
+            { targets: [6, 7, 8], className: "hidden-xs hidden-sm hidden-md" }
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
@@ -151,6 +106,8 @@ $(document).ready(function () {
             paginate: { previous: "", next: "" }
         }
     });
+    //showing the first Set of columns on startup;
+    showColumnSet(TableMainColumnSets, 1);
 
     //---------------------------------------EditFormView----------------------------------------//
 
@@ -162,50 +119,17 @@ $(document).ready(function () {
     //Enable DateTimePicker
     $("[data-val-dbisdatetimeiso]").datetimepicker({ format: "YYYY-MM-DD HH:mm" })
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
-    
-    //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel").click(function () {
-        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
-    });
-    
-    //Wire Up EditFormBtnOk
-    $("#EditFormBtnOk").click(function () {
-        msValidate(MagicSuggests);
-        if (!formIsValid("EditForm", CurrIds.length === 0) || !msIsValid(MagicSuggests)) {
-            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
-            return;
-        }
-        showModalWait();
-        submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/ProjectEventSrv/Edit")
-            .always(hideModalWait)
-            .done(function () {
-                refreshMainView()
-                    .done(function () {
-                        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
-                    });
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    });
 
     //--------------------------------------View Initialization------------------------------------//
 
     refreshMainView();
-
-    $("#InitialView").addClass("hidden");
-    $("#MainView").removeClass("hidden");
+    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });
 
 
 //--------------------------------------Main Methods---------------------------------------//
-
-
-//Delete Records from DB
-function deleteRecords() {
-    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-    deleteRecordsGenericWrp(CurrIds, "/ProjectEventSrv/Delete", refreshMainView);
-}
 
 //refresh Main view 
 function refreshMainView() {
@@ -217,10 +141,8 @@ function refreshMainView() {
         },
         "POST")
         .done(deferred0.resolve);
-
     return deferred0.promise();	
 }
-
 
 
 //---------------------------------------Helper Methods--------------------------------------//

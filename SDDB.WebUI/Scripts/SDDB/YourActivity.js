@@ -112,6 +112,7 @@ $(document).ready(function () {
                 $("#EntryDTPicker").data("DateTimePicker").date(entryDTpickerDate);
                 $("#EntryDTPicker").trigger("dp.change");
                 $("#HoursWorkedPicker").data("DateTimePicker").date(moment($("#ManHours").val(), "HH"));
+                MagicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
 
                 return modalWaitWrapper(function () {
                     return refreshTableGeneric(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
@@ -176,7 +177,7 @@ $(document).ready(function () {
                 render: function (data, type, full, meta) { return data.EventName; }
             }, //7
             { data: "Comments", name: "Comments" },//8
-            { data: "PersonLogEntryFilesCount", name: "PersonLogEntryFilesCount" },//9
+            { data: "PrsLogEntryFilesCount", name: "PrsLogEntryFilesCount" },//9
             //------------------------------------------------never visible
             { data: "IsActive_bl", name: "IsActive_bl" },//10
             { data: "EnteredByPerson_Id", name: "EnteredByPerson_Id" },//11

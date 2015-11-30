@@ -158,7 +158,7 @@ $(document).ready(function () {
             { data: "AssignedToLocation_Id", name: "AssignedToLocation_Id" }//22
         ],
         columnDefs: [
-            //"orderable": false, "visible": false
+            //searchable: false
             { targets: [0, 1, 18, 19, 20, 21, 22], searchable: false },
             // - first set of columns
             { targets: [3, 4], className: "hidden-xs" },

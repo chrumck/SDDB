@@ -9,10 +9,9 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var TableMain = {};
-var TableDBRolesAdd = {};
-var TableDBRolesRemove = {};
-var MagicSuggests = [];
+var TableDBRolesAdd = {},
+    TableDBRolesRemove = {};
+
 var RecordTemplate = {
     Id: "RecordTemplateId",
     LastName: null,
@@ -21,121 +20,109 @@ var RecordTemplate = {
     Email: null,
     LDAPAuthenticated_bl: null,
     Password: null,
-    PasswordConf:null
+    PasswordConf: null
 };
-var CurrRecords = [];
-var CurrIds = [];
-var GetActive = true;
 
+LabelTextCreate = "Create SDDB User";
+LabelTextEdit = "Edit SDDB User";
+UrlFillForEdit = "/DBUserSrv/GetByIds";
+UrlEdit = "/DBUserSrv/Edit";
+UrlDelete = "/DBUserSrv/Delete";
+
+callBackBeforeCreate = function () {
+    MagicSuggests[0].enable();
+    return $.Deferred().resolve();
+};
+
+callBackBeforeEdit = function () {
+    //Id not handled by submitEditsGeneric, has to be set
+    if (CurrRecords.length == 1) {
+        MagicSuggests[0].addToSelection([{
+            id: CurrRecords[0].Id,
+            name: CurrRecords[0].FirstName + " " + CurrRecords[0].LastName
+        }], true);
+    }
+    else {
+        MagicSuggests[0].addToSelection([{ id: "_VARIES_", name: "_VARIES_" }], true);
+    }
+    MagicSuggests[0].disable();
+    return $.Deferred().resolve();
+};
+
+callBackBeforeSubmitEdit = function () {
+    //Id not handled by submitEditsGeneric, has to be set
+    if (CurrRecords.length == 1) { CurrRecords[0].Id = MagicSuggests[0].getValue()[0]; }
+
+    //Password and PasswordConf not returned in CurrentRecords by server, needs to be added manually
+    for (var i = 0; i < CurrRecords.length; i++) {
+        CurrRecords[i].Password = "";
+        CurrRecords[i].PasswordConf = "";
+    }
+
+    return $.Deferred().resolve();
+};
 
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
 
-    //Wire up BtnCreate
-    $("#BtnCreate").click(function () {
-        CurrIds = [];
-        CurrRecords = [];
-        CurrRecords[0] = $.extend(true, {}, RecordTemplate);
-        MagicSuggests[0].enable();
-        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create SDDB User", "MainView");
-        saveViewSettings(TableMain);
-        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
-    });
-
-    //Wire up BtnEdit
-    $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) {
-            showModalNothingSelected();
-            return;
-        }
-
-        showModalWait();
-        fillFormForEditGeneric(CurrIds, "POST", "/DBUserSrv/GetByIds", null, "EditForm", "Edit SDDB User", MagicSuggests)
-            .always(hideModalWait)
-            .done(function (currRecords) {
-                CurrRecords = currRecords;
-
-                //Id not handled by fillFormForEditGeneric, has to be set -------
-                if (CurrRecords.length == 1) {
-                    MagicSuggests[0].addToSelection([{
-                        id: currRecords[0].Id,
-                        name: currRecords[0].FirstName + " " + currRecords[0].LastName
-                    }], true);
-                }
-                else {
-                    MagicSuggests[0].addToSelection([{ id: "_VARIES_", name: "_VARIES_" }], true);
-                }
-                MagicSuggests[0].disable();
-                //---------------------------------------------------------------
-
-                saveViewSettings(TableMain);
-                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    });
-
-    //Wire up BtnDelete 
-    $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) { showModalNothingSelected(); }
-        else { showModalDelete(CurrIds.length); }
-    });
-
     //Wire Up BtnEditRoles 
     $("#BtnEditRoles").click(function () {
         CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) {
+        if (CurrIds.length === 0) {
             showModalNothingSelected();
             return;
         }
+
         if (CurrIds.length == 1) {
-            var selectedRecord = TableMain.row(".ui-selected", { page: "current"}).data()
+            var selectedRecord = TableMain.row(".ui-selected", { page: "current" }).data();
             $("#DBRolesViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
         }
-        else { $("#DBRolesViewPanel").text("_MULTIPLE_"); }
+        else {
+            $("#DBRolesViewPanel").text("_MULTIPLE_");
+        }
 
-        showModalWait();
-        fillFormForRelatedGeneric(
+        modalWaitWrapper(function () {
+            return fillFormForRelatedGeneric(
                 TableDBRolesAdd, TableDBRolesRemove, CurrIds,
                 "GET", "/DBUserSrv/GetUserRoles", { id: CurrIds[0] },
                 "GET", "/DBUserSrv/GetUserRolesNot", { id: CurrIds[0] },
                 "GET", "/DBUserSrv/GetAllRoles",
-                null, 0)
-            .always(hideModalWait)
+                null, 0);
+        })
             .done(function () {
                 saveViewSettings(TableMain);
                 switchView("MainView", "DBRolesView", "tdo-btngroup-dbroles");
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+            });
     });
-
-    
+        
     //---------------------------------------DataTables------------
 
-    //wire up BtnTableMainExport
-    $("#BtnTableMainExport").click(function (event) {
-        exportTableToTxt(TableMain);
-    });
+    //TableMainColumnSets
+    TableMainColumnSets = [
+        [1],
+        [2, 3, 4, 5]
+    ];
 
     //TableMain DBUsers
     TableMain = $("#TableMain").DataTable({
         columns: [
-            { data: "Id", name: "Id" },
-            { data: "LastName", name: "LastName" },
-            { data: "FirstName", name: "FirstName" },
-            { data: "UserName", name: "UserName" },
-            { data: "Email", name: "Email" },
-            { data: "LDAPAuthenticated_bl", name: "LDAPAuthenticated_bl" }
+            { data: "Id", name: "Id" }, //0
+            { data: "LastName", name: "LastName" }, //1
+            { data: "FirstName", name: "FirstName" }, //2
+            { data: "UserName", name: "UserName" }, //3
+            { data: "Email", name: "Email" }, //4
+            { data: "LDAPAuthenticated_bl", name: "LDAPAuthenticated_bl" } //5
         ],
         columnDefs: [
-            { targets: [0, 5], searchable: false },  //"orderable": false, "visible": false
-            { targets: [0], visible: false },
+            //searchable: false
+            { targets: [0, 5], searchable: false },
+            // - first set of columns
             { targets: [4, 5], className: "hidden-xs hidden-sm" }
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
+        lengthMenu: [10, 25, 50, 100, 200],
         language: {
             search: "",
             lengthMenu: "_MENU_",
@@ -146,46 +133,14 @@ $(document).ready(function () {
         }
     });
 
+    //showing the first Set of columns on startup;
+    showColumnSet(TableMainColumnSets, 1);
+
     //---------------------------------------EditFormView----------------------------------------//
 
     ///Initialize MagicSuggest Array
     msAddToMsArray(MagicSuggests, "Id", "/PersonSrv/PersonsWoDBUser", 1);
-
-    //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel").click(function () {
-        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
-    });
-
-    //Wire Up EditFormBtnOk
-    $("#EditFormBtnOk").click(function () {
-        msValidate(MagicSuggests);
-        if (!formIsValid("EditForm", CurrIds.length == 0) || !msIsValid(MagicSuggests)) {
-            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
-            return;
-        }
-
-        //Id not handled by submitEditsGeneric, has to be set
-        if (CurrRecords.length == 1) { CurrRecords[0].Id = MagicSuggests[0].getValue()[0]; }
-
-        //Password and PasswordConf not returned in CurrentRecords by server, needs to be added manually
-        for (var i = 0; i < CurrRecords.length; i++) {
-            CurrRecords[i].Password = "";
-            CurrRecords[i].PasswordConf = "";
-        }
-
-        showModalWait();
-        submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/DbUserSrv/Edit")
-            .always(hideModalWait)
-            .done(function () {
-                refreshMainView()
-                    .done(function () {
-                        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
-                    });
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error) });
-
-    });
-    
+   
     //----------------------------------------DBRolesView----------------------------------------//
 
     //Wire Up DBRolesViewBtnCancel
@@ -195,26 +150,22 @@ $(document).ready(function () {
 
     //Wire Up DBRolesViewBtnOk
     $("#DBRolesViewBtnOk").click(function () {
-        if (TableDBRolesAdd.rows(".ui-selected", { page: "current" }).data().length +
-            TableDBRolesRemove.rows(".ui-selected", { page: "current" }).data().length == 0) {
+        var idsAdd = TableDBRolesAdd.cells(".ui-selected", "Name:name", { page: "current" }).data().toArray(),
+            idsRemove = TableDBRolesRemove.cells(".ui-selected", "Name:name", { page: "current" }).data().toArray();
+        
+        if (idsAdd.length + idsRemove.length === 0) {
             showModalNothingSelected();
             return;
         }
-        showModalWait();
-        submitEditsForRelatedGeneric(
-		CurrIds, 
-                TableDBRolesAdd.cells(".ui-selected", "Name:name", { page: "current"}).data().toArray(),
-                TableDBRolesRemove.cells(".ui-selected", "Name:name", { page: "current"}).data().toArray(),
-                "/DBUserSrv/EditRoles")
-            .always(hideModalWait)
-            .done(function () {
-                refreshMainView()
-                    .done(function () {
-                        switchView("DBRolesView", "MainView", "tdo-btngroup-main", TableMain);
-                    });
+        modalWaitWrapper(function () {
+            return submitEditsForRelatedGeneric(CurrIds, idsAdd, idsRemove, "/DBUserSrv/EditRoles");
+        })
+            .then(function () {
+                return refreshMainView();
             })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-
+            .done(function () {
+                switchView("DBRolesView", "MainView", "tdo-btngroup-main", TableMain);
+            });
     });
 
     //---------------------------------------DataTables------------
@@ -256,20 +207,13 @@ $(document).ready(function () {
     //--------------------------------------View Initialization------------------------------------//
 
     refreshMainView();
-    $("#InitialView").addClass("hidden");
-    $("#MainView").removeClass("hidden");
+    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });
 
 
 //--------------------------------------Main Methods---------------------------------------//
-
-//Delete Records from DB
-function deleteRecords() {
-    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-    deleteRecordsGenericWrp(CurrIds, "/DbUserSrv/Delete", refreshMainView);
-}
 
 //refresh Main view 
 function refreshMainView() {

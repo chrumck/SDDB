@@ -120,6 +120,7 @@
     <Compile Include="Abstract_Infrastructure\ILogger.cs" />
     <Compile Include="Abstract_Services\IAppRoleManager.cs" />
     <Compile Include="Abstract_Services\IAppUserManager.cs" />
+    <Compile Include="Concrete_HelperEntities\JSONEntities.cs" />
     <Compile Include="Concrete_HelperEntities\LastEntrySummary.cs" />
     <Compile Include="Concrete_HelperEntities\ExtAttrTypes.cs" />
     <Compile Include="Concrete_HelperEntities\ActivitySummary.cs" />
@@ -459,6 +460,10 @@
     <Compile Include="Migrations\201511111649176_QcPersonLogEntry.Designer.cs">
       <DependentUpon>201511111649176_QcPersonLogEntry.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201511242235053_LogEntryDateIndex.cs" />
+    <Compile Include="Migrations\201511242235053_LogEntryDateIndex.Designer.cs">
+      <DependentUpon>201511242235053_LogEntryDateIndex.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -675,6 +680,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201511111649176_QcPersonLogEntry.resx">
       <DependentUpon>201511111649176_QcPersonLogEntry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201511242235053_LogEntryDateIndex.resx">
+      <DependentUpon>201511242235053_LogEntryDateIndex.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

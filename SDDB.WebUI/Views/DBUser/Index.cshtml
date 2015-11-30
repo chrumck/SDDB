@@ -10,32 +10,22 @@
 
 <!----- Navbar Section ----->
 @section Navbar{
-<div class="btn-group navbar-btn tdo-btngroup-main">
-    <button type="button" class="btn btn-default" id="BtnCreate">New</button>
-    <button type="button" class="btn btn-tdo-nav" id="BtnEdit">&nbsp;&nbsp;Edit&nbsp;&nbsp;</button>
-    <button type="button" class="btn btn-danger" id="BtnDelete">&nbsp;&nbsp;Del&nbsp;&nbsp;</button>
-</div>
+    @Html.Partial("_StandardEditButtons")
 
-<div class="btn-group navbar-btn tdo-btngroup-edit hidden">
-    <button type="button" class="btn btn-default" id="EditFormBtnCancel">Back</button>
-    <button type="button" class="btn btn-tdo-nav disabled">&nbsp;&nbsp;&nbsp;&nbsp;</button>
-    <button type="button" class="btn btn-success" id="EditFormBtnOk">
-        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
-    </button>
-</div>
-
-<div class="btn-group navbar-btn tdo-btngroup-dbroles hidden">
-    <button type="button" class="btn btn-default" id="DBRolesViewBtnCancel">Back</button>
-    <button type="button" class="btn btn-tdo-nav disabled">&nbsp;&nbsp;&nbsp;&nbsp;</button>
-    <button type="button" class="btn btn-success" id="DBRolesViewBtnOk">
-        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
-    </button>
-</div>
+    <div class="btn-group navbar-btn tdo-btngroup-dbroles hidden">
+        <button type="button" class="btn btn-default" id="DBRolesViewBtnCancel">Back</button>
+        <button type="button" class="btn btn-tdo-nav disabled">&nbsp;&nbsp;&nbsp;&nbsp;</button>
+        <button type="button" class="btn btn-success" id="DBRolesViewBtnOk">
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        </button>
+    </div>
 }
 @section NavbarCollapse{
-<ul class="nav navbar-nav tdo-btngroup-main">
-    <li class="margin-left-5px"><a class="collapsenav" href="#" id="BtnEditRoles">DB Roles</a></li>
-</ul> 
+    <ul class="nav navbar-nav tdo-btngroup-initial"></ul>
+
+    <ul class="nav navbar-nav tdo-btngroup-main hidden">
+        <li class="margin-left-5px"><a class="collapsenav" href="#" id="BtnEditRoles">DB Roles</a></li>
+    </ul> 
 }
 
 <!------- MainView ------->
@@ -57,7 +47,7 @@
                     <th>Last Name</th>
                     <th>First Name</th>
                     <th>SDDB Login</th>
-                    <th>SDDB User Email <br />(used for notifications)</th>
+                    <th>Notification Email</th>
                     <th>LDAP Authenticated</th>
                 </tr>
             </thead>
@@ -166,6 +156,7 @@
 @section Scripts {
     @Scripts.Render("~/bundles/DataTables")
     @Scripts.Render("~/bundles/magicsuggest")
+    @Scripts.Render("~/bundles/sddb/shared_views")
     <script src="~/Scripts/SDDB/DbUser.js?v=@Html.GetAppVersion()"></script>
 }
 

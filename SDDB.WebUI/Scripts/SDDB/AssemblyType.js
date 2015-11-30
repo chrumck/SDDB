@@ -122,7 +122,7 @@ $(document).ready(function () {
             { data: "IsActive_bl", name: "IsActive_bl" }//34
         ],
         columnDefs: [
-            //"orderable": false, "visible": false
+            //searchable: false
             { targets: [0, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34], searchable: false },
             //first set of columns - responsive
             { targets: [3], className: "hidden-xs" }, 

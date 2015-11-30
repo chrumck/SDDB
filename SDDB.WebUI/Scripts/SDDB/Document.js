@@ -9,10 +9,6 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var TableMain;
-var MsFilterByProject = {};
-var MsFilterByType = {};
-var MagicSuggests = [];
 var RecordTemplate = {
     Id: "RecordTemplateId",
     DocName: null,
@@ -28,65 +24,20 @@ var RecordTemplate = {
     RelatesToAssyType_Id: null,
     RelatesToCompType_Id: null
 };
-var CurrRecords = [];
-var CurrIds = [];
-var GetActive = true;
+
+var MsFilterByProject = {};
+var MsFilterByType = {};
+
+LabelTextCreate = "Create Document";
+LabelTextEdit = "Edit Document";
+UrlFillForEdit = "/DocumentSrv/GetByIds";
+UrlEdit = "/DocumentSrv/Edit";
+UrlDelete = "/DocumentSrv/Delete";
 
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
-
-    //Wire up BtnCreate
-    $("#BtnCreate").click(function () {
-        CurrIds = [];
-        CurrRecords = [];
-        CurrRecords[0] = $.extend(true, {}, RecordTemplate);
-        fillFormForCreateGeneric("EditForm", MagicSuggests, "Create Document", "MainView");
-        saveViewSettings(TableMain);
-        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
-    });
-
-    //Wire up BtnEdit
-    $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length === 0) {
-            showModalNothingSelected();
-            return;
-        }
-        showModalWait();
-        fillFormForEditGeneric(CurrIds, "POST", "/DocumentSrv/GetByIds", 
-                GetActive, "EditForm", "Edit Document", MagicSuggests)
-            .always(hideModalWait)
-            .done(function (currRecords) {
-                CurrRecords = currRecords;
-                saveViewSettings(TableMain);
-                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    });
-
-    //Wire up BtnDelete 
-    $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length === 0) { showModalNothingSelected(); }
-        else { showModalDelete(CurrIds.length); }
-    });
-
-    //wire up dropdownId1
-    $("#dropdownId1").click(function (event) {
-        event.preventDefault();
-        TableMain.columns([2, 3, 4, 5, 6]).visible(true);
-        TableMain.columns([7, 8, 9, 10, 11]).visible(false);
-    });
-
-    //wire up dropdownId2
-    $("#dropdownId2").click(function (event) {
-        event.preventDefault();
-        TableMain.columns([2, 3, 4, 5, 6]).visible(false);
-        TableMain.columns([7, 8, 9, 10, 11]).visible(true);
-    });
-
-
+    
     //Initialize MagicSuggest MsFilterByType
     MsFilterByType = $("#MsFilterByType").magicSuggest({
         data: "/DocumentTypeSrv/Lookup",
@@ -114,23 +65,13 @@ $(document).ready(function () {
     $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
 
     //---------------------------------------DataTables------------
-
-    //wire up BtnTableMainExport
-    $("#BtnTableMainExport").click(function (event) {
-        exportTableToTxt(TableMain);
-    });
-
-    //Wire up ChBoxShowDeleted
-    $("#ChBoxShowDeleted").change(function (event) {
-        if (!$(this).prop("checked")) {
-            GetActive = true;
-            $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
-        } else {
-            GetActive = false;
-            $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
-        }
-        refreshMainView();
-    });
+    
+    //TableMainColumnSets
+    TableMainColumnSets = [
+        [1],
+        [2, 3, 4, 5, 6],
+        [7, 8, 9, 10, 11]
+    ];
 
     //TableMain Documents
     TableMain = $("#TableMain").DataTable({
@@ -180,14 +121,15 @@ $(document).ready(function () {
             { data: "RelatesToCompType_Id", name: "RelatesToCompType_Id" }//18
         ],
         columnDefs: [
-            { targets: [0, 12, 13, 14, 15, 16, 17, 18], visible: false }, // - never show
-            { targets: [0, 12, 13, 14, 15, 16, 17, 18], searchable: false },  //"orderable": false, "visible": false
-            { targets: [2, 4, 5], className: "hidden-xs hidden-sm" }, // - first set of columns
-            { targets: [6], className: "hidden-xs hidden-sm hidden-md" }, // - first set of columns
-
-            { targets: [7, 8, 9, 10, 11], visible: false }, // - second set of columns - to toggle with options
-            { targets: [9, 10], className: "hidden-xs hidden-sm" }, // - second set of columns
-            { targets: [11], className: "hidden-xs hidden-sm hidden-md" } // - second set of columns
+            //searchable: false
+            { targets: [0, 12, 13, 14, 15, 16, 17, 18], searchable: false },
+            //1st set of columns - responsive
+            { targets: [2, 4, 5], className: "hidden-xs hidden-sm" },
+            { targets: [6], className: "hidden-xs hidden-sm hidden-md" },
+            //2nd set of columns - responsive
+            { targets: [7, 8, 9, 10, 11], visible: false }, 
+            { targets: [9, 10], className: "hidden-xs hidden-sm" },
+            { targets: [11], className: "hidden-xs hidden-sm hidden-md" }
         ],
         order: [[1, "asc"]],
         bAutoWidth: false,
@@ -201,6 +143,8 @@ $(document).ready(function () {
             paginate: { previous: "", next: "" }
         }
     });
+    //showing the first Set of columns on startup;
+    showColumnSet(TableMainColumnSets, 1);
 
     //---------------------------------------EditFormView----------------------------------------//
 
@@ -212,47 +156,14 @@ $(document).ready(function () {
     msAddToMsArray(MagicSuggests, "RelatesToAssyType_Id", "/AssemblyTypeSrv/Lookup", 1);
     msAddToMsArray(MagicSuggests, "RelatesToCompType_Id", "/ComponentTypeSrv/Lookup", 1);
     
-    //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel").click(function () {
-        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
-    });
-
-    //Wire Up EditFormBtnOk
-    $("#EditFormBtnOk").click(function () {
-        msValidate(MagicSuggests);
-        if (!formIsValid("EditForm", CurrIds.length === 0) || !msIsValid(MagicSuggests)) {
-            showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
-            return;
-        }
-        showModalWait();
-        submitEditsGeneric("EditForm", MagicSuggests, CurrRecords, "POST", "/DocumentSrv/Edit")
-            .always(hideModalWait)
-            .done(function () {
-                refreshMainView()
-                    .done(function () {
-                        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
-                    });
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
-    });
-
     //--------------------------------------View Initialization------------------------------------//
 
-    $("#InitialView").addClass("hidden");
-    $("#MainView").removeClass("hidden");
+    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });
 
-
 //--------------------------------------Main Methods---------------------------------------//
-
-
-//Delete Records from DB
-function deleteRecords() {
-    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-    deleteRecordsGenericWrp(CurrIds, "/DocumentSrv/Delete", refreshMainView);
-}
 
 //refresh view after magicsuggest update
 function refreshMainView() {

@@ -5,6 +5,7 @@
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
+/// <reference path="../FileSaver.js" />
 
 //--------------------------------------Global Properties------------------------------------//
 
@@ -101,8 +102,7 @@ $(document).ready(function () {
 //Show Modal Nothing Selected
 function showModalNothingSelected(bodyText) {
     $("#ModalInfoLabel").text("Nothing Selected");
-    if (typeof bodyText !== "undefined") { $("#ModalInfoBody").text(bodyText); }
-    else { $("#ModalInfoBody").text("Please select one or more rows."); }
+    $("#ModalInfoBody").text(bodyText || "Please select one or more rows.");
     $("#ModalInfoBodyPre").empty().addClass("hidden");
     $("#ModalInfo").modal("show");
 }
@@ -110,8 +110,7 @@ function showModalNothingSelected(bodyText) {
 //Show Modal Selected other than one row
 function showModalSelectOne(bodyText) {
     $("#ModalInfoLabel").text("Select One Row");
-    if (typeof bodyText !== "undefined") { $("#ModalInfoBody").text(bodyText); }
-    else { $("#ModalInfoBody").text("Please select one row."); }
+    $("#ModalInfoBody").text(bodyText || "Please select one row.");
     $("#ModalInfoBodyPre").empty().addClass("hidden");
     $("#ModalInfo").modal("show");
 }
@@ -144,14 +143,10 @@ function hideModalWait() {
 
 //showModalFail
 function showModalFail(label, body, bodyPre) {
-    label = (typeof label !== "undefined") ? label : "Undefined Error";
-    body = (typeof body !== "undefined") ? body : "";
-    bodyPre = (typeof bodyPre !== "undefined") ? bodyPre : "";
-  
-    $("#ModalInfoLabel").text(label);
-    $("#ModalInfoBody").html(body);
-    if (bodyPre !== "") { $("#ModalInfoBodyPre").text(bodyPre).removeClass("hidden"); }
-    else { $("#ModalInfoBodyPre").addClass("hidden"); }
+    $("#ModalInfoLabel").text(label || "Undefined Error");
+    $("#ModalInfoBody").html(body || "");
+    if (bodyPre) { $("#ModalInfoBodyPre").text(bodyPre).removeClass("hidden"); }
+    else { $("#ModalInfoBodyPre").text("").addClass("hidden"); }
     $("#ModalInfo").modal("show");
 }
 
@@ -164,7 +159,7 @@ function showModalAJAXFail(xhr, status, error) {
     $("#ModalInfoLabel").text("Server Error");
     $("#ModalInfoBody").html("Error type: <strong>" + error + "</strong> , Status: <strong>" + status + "</strong>");
     $("#ModalInfoBodyPre").text(errMessage).removeClass("hidden");
-    setTimeout(function () { $("#ModalInfo").modal("show"); }, 10);
+    setTimeout(function () { $("#ModalInfo").modal("show"); }, 100);
 }
 
 //showModalConfirm
@@ -307,7 +302,7 @@ function exportTableToTxt(table) {
         hideModalWait();
         saveAs(fileData, "SDDBdataExport_" + moment().format("YYYYMMDD_HHmmss") + ".txt");
     }, 200);
-    
+
     //convertObjectToStringHelper
     function convertObjectToStringHelper(dataObject, retrievePropNames) {
         var outputString = "";
@@ -424,7 +419,7 @@ function fillFormForCopyFromDbEntries(dbEntries, formId, labelText, msArray) {
     $("#" + formId + " [data-val-dbisunique]").each(function (index, element) {
         if ($(element).val() === "") { return true; }
         $(element).val($(element).val() + "_COPY");
-    })
+    });
     if (msArray) {
         $.each(msArray, function (i, ms) {
             if (ms.dataValDbisunique) {
@@ -516,7 +511,7 @@ function getFormInputFromDbEntriesHelper(dbEntries) {
                 else {
                     formInput[msNameProperty] = "";
                     for (var subProp in dbEntry[msNameProperty]) {
-                        if (dbEntry[msNameProperty][subProp] !== null) {
+                        if (subProp !== "Id" && dbEntry[msNameProperty][subProp] !== null) {
                             if (formInput[msNameProperty] !== "") {
                                 formInput[msNameProperty] += " ";
                             }
@@ -770,6 +765,7 @@ function submitEditsForRelatedGenericWrp(ids, idsAdd, idsRemove, url) {
 
 //-----------------------------------------------------------------------------
 
+// TODO: refactor to accept an object for ms settings, get rid of disabled (it doesn't work anyway)
 //initialize MagicSuggest and add to MagicSuggest array
 function msAddToMsArray(msArray, id, url, maxSelection, minChars, dataUrlParams, disabled, editable) {
 
@@ -1049,7 +1045,3 @@ function submitFormFromArray(verb, url, target, dataArray, parameterName) {
     document.body.appendChild(form);
     form.submit();
 }
-
-
-
-

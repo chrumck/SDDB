@@ -73,7 +73,7 @@ callBackBeforeEdit = function (currRecords) {
         .then(function () {return fillFormForEditFromDbEntries(GetActive, currRecords, ExtEditFormId); });
 };
 
-callBackBeforeSubmitEdit = function (data) {
+callBackBeforeSubmitEdit = function () {
     if (!formIsValid(ExtEditFormId, CurrIds.length === 0)) {
         showModalFail("Errors in Form", "Extended attributes have invalid inputs. Please correct.");
         return $.Deferred().reject();
@@ -225,7 +225,8 @@ $(document).ready(function () {
             { data: "AssignedToAssemblyDb_Id", name: "AssignedToAssemblyDb_Id" }//32
         ],
         columnDefs: [
-            { targets: [0, 10, 11, 28, 29, 30, 31, 32], searchable: false },  //"orderable": false, "visible": false
+            //searchable: false
+            { targets: [0, 10, 11, 28, 29, 30, 31, 32], searchable: false },
             //1st set of columns - responsive
             { targets: [4, 6], className: "hidden-xs hidden-sm" },
             { targets: [2, 3], className: "hidden-xs hidden-sm hidden-md" },

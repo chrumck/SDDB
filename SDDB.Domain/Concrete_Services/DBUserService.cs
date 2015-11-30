@@ -61,12 +61,12 @@ namespace SDDB.Domain.Services
         //-----------------------------------------------------------------------------------------------------------------------
 
         // Create and Update records given in []
-        public virtual async Task EditAsync(DBUser[] records)
+        public virtual async Task<List<string>> EditAsync(DBUser[] records)
         {
             if (records == null || records.Length == 0) { throw new ArgumentNullException("records"); }
 
             checkDbUserBeforeEditHelper(records);
-            await editDbUserHelperAsync(records).ConfigureAwait(false);
+            return await editDbUserHelperAsync(records).ConfigureAwait(false);
         }
 
         // Delete records by their Ids
@@ -158,7 +158,7 @@ namespace SDDB.Domain.Services
         }
 
         //editDbUserHelperAsync - single record
-        private async Task editDbUserHelperAsync(DBUser record)
+        private async Task<string> editDbUserHelperAsync(DBUser record)
         {
             if (record.LDAPAuthenticated_bl)
             { record.Password = Guid.NewGuid().ToString(); record.PasswordConf = record.Password; }
@@ -172,29 +172,33 @@ namespace SDDB.Domain.Services
                     throw new DbBadRequestException(
                         String.Format("Error creating user {0}:{1}\n", record.UserName, getErrorsFromIdResult(createResult)));
                 }
+                return record.Id;
             }
-            else
+
+            if (record.PropIsModified(x => x.UserName)) dbEntry.UserName = record.UserName;
+            if (record.PropIsModified(x => x.Email)) dbEntry.Email = record.Email;
+            if (record.PropIsModified(x => x.LDAPAuthenticated_bl)) dbEntry.LDAPAuthenticated_bl = record.LDAPAuthenticated_bl;
+            if (record.PropIsModified(x => x.Password)) dbEntry.PasswordHash = appUserManager.HashPassword(record.Password);
+            var updateResult = await appUserManager.UpdateAsync(dbEntry).ConfigureAwait(false);
+            if (!updateResult.Succeeded)
             {
-                if (record.PropIsModified(x => x.UserName)) dbEntry.UserName = record.UserName;
-                if (record.PropIsModified(x => x.Email)) dbEntry.Email = record.Email;
-                if (record.PropIsModified(x => x.LDAPAuthenticated_bl)) dbEntry.LDAPAuthenticated_bl = record.LDAPAuthenticated_bl;
-                if (record.PropIsModified(x => x.Password)) dbEntry.PasswordHash = appUserManager.HashPassword(record.Password);
-                var updateResult = await appUserManager.UpdateAsync(dbEntry).ConfigureAwait(false);
-                if (!updateResult.Succeeded)
-                {
-                    throw new DbBadRequestException(
-                        String.Format("Error editing user {0}:{1}\n", record.UserName, getErrorsFromIdResult(updateResult)));
-                }
+                throw new DbBadRequestException(
+                    String.Format("Error editing user {0}:{1}\n", record.UserName, getErrorsFromIdResult(updateResult)));
             }
+            return null;
         }
 
         //editDbUserHelperAsync - override for array of records
-        private async Task editDbUserHelperAsync(DBUser[] records)
+        private async Task<List<string>> editDbUserHelperAsync(DBUser[] records)
         {
+            var newEntryIds = new List<string>();
+
             for (int i = 0; i < records.Length; i++)
             {
-                await editDbUserHelperAsync(records[i]).ConfigureAwait(false);
+                var newEntryId =  await editDbUserHelperAsync(records[i]).ConfigureAwait(false);
+                if (!String.IsNullOrEmpty(newEntryId)) { newEntryIds.Add(newEntryId); }
             }
+            return newEntryIds;
         }
 
         //-----------------------------------------------------------------------------------------------------------------------

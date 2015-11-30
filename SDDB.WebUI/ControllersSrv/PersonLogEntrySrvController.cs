@@ -40,7 +40,7 @@ namespace SDDB.WebUI.ControllersSrv
         {
             ViewBag.ServiceName = "PersonLogEntryService.GetAsync";
             var records = await personLogEntryService.GetAsync(ids, getActive, filterForPLEView).ConfigureAwait(false);
-            return DbJsonDateTime(filterForJsonFull(records));
+            return DbJsonDateTime(records);
         }
 
         // POST: /PersonLogEntrySrv/GetByAltIds
@@ -53,9 +53,9 @@ namespace SDDB.WebUI.ControllersSrv
             var records = await personLogEntryService
                 .GetByAltIdsAsync(personIds, projectIds, assyIds, typeIds, startDate, endDate, getActive, filterForPLEView)
                 .ConfigureAwait(false);
-            return DbJsonDateTime(filterForJsonFull(records));
+            return DbJsonDateTime(records);
         }
-
+        
         // POST: /PersonLogEntrySrv/GetActivitySummaries
         [HttpPost]
         [DBSrvAuth("YourActivity_View,ActivitySummary_ViewOthers")]
@@ -248,61 +248,7 @@ namespace SDDB.WebUI.ControllersSrv
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
-
-        //take data and select fields for JSON - full data set
-        private object filterForJsonFull(List<PersonLogEntry> records) 
-        {
-            return records.Select(x => new {
-                x.Id,
-                x.LogEntryDateTime,
-                EnteredByPerson_ = new
-                {
-                    x.EnteredByPerson.FirstName,
-                    x.EnteredByPerson.LastName,
-                    x.EnteredByPerson.Initials
-                },
-                PersonActivityType_ = new
-                {
-                    x.PersonActivityType.ActivityTypeName
-                },
-                x.ManHours,
-                AssignedToProject_ = new
-                {
-                    x.AssignedToProject.ProjectCode,
-                    x.AssignedToProject.ProjectName
-                },
-                AssignedToLocation_ = new
-                {
-                    x.AssignedToLocation.LocName,
-                    x.AssignedToLocation.LocAltName
-                },
-                AssignedToProjectEvent_ = new
-                {
-                    x.AssignedToProjectEvent.EventName
-                },
-                QcdByPerson_ = new 
-                {
-                    x.QcdByPerson.FirstName,
-                    x.QcdByPerson.LastName,
-                    x.QcdByPerson.Initials
-                },
-                x.QcdDateTime,
-                x.Comments,
-                PersonLogEntryFilesCount = x.PersonLogEntryFiles.Count,
-                PersonLogEntryAssysCount = x.PrsLogEntryAssemblyDbs.Count,
-                PersonLogEntryPersonsInitials = x.PrsLogEntryPersons.Aggregate(
-                    "",(initials, person) => initials += String.IsNullOrEmpty(initials) ? person.Initials : " " + person.Initials
-                ),
-                x.IsActive_bl,
-                x.EnteredByPerson_Id,
-                x.PersonActivityType_Id,
-                x.AssignedToProject_Id,
-                x.AssignedToLocation_Id,
-                x.AssignedToProjectEvent_Id,
-                x.QcdByPerson_Id
-            }).ToList();
-        }
-
+                
         //filterForJsonPersons - filter data from service to be passed as response
         private object filterForJsonPersons(List<Person> records)
         {
