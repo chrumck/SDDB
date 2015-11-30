@@ -38,9 +38,110 @@ var UrlDelete = "";
 
 var callBackBeforeCreate = function () { return $.Deferred().resolve(); };
 var callBackBeforeEdit = function (currRecords) { return $.Deferred().resolve(); };
-var callBackBeforeSubmitEdit = function (data) { return $.Deferred().resolve(); };
-var callBackAfterSubmitEdit = function (data) { return $.Deferred().resolve(); };
 var callBackBeforeCopy = function (currRecords) { return $.Deferred().resolve(); };
+var callBackBeforeSubmitEdit = function () { return $.Deferred().resolve(); };
+var callBackAfterSubmitEdit = function (data) { return $.Deferred().resolve(); };
+
+//prepareFormForCreate
+var prepareFormForCreate = function (callBackBefore) {
+
+    callBackBefore = callBackBefore || callBackBeforeCreate;
+
+    CurrIds = [];
+    CurrRecords = [];
+    CurrRecords[0] = $.extend(true, {}, RecordTemplate);
+    fillFormForCreateGeneric(EditFormId, MagicSuggests, LabelTextCreate, MainViewId);
+    callBackBefore()
+        .done(function () {
+            saveViewSettings(TableMain);
+            switchView(MainViewId, EditFormViewId, EditFormBtnGroupCreateClass);
+        });
+};
+
+//prepareFormForEdit
+var prepareFormForEdit = function (callBackBefore) {
+
+    callBackBefore = callBackBefore || callBackBeforeEdit;
+
+    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+    if (CurrIds.length === 0) {
+        showModalNothingSelected();
+        return;
+    }
+    modalWaitWrapper(function () {
+        return fillFormForEditGeneric(CurrIds, HttpTypeFillForEdit, UrlFillForEdit,
+            GetActive, EditFormId, LabelTextEdit, MagicSuggests);
+    })
+        .then(function (currRecords) {
+            CurrRecords = currRecords;
+            return callBackBefore(currRecords);
+        })
+        .done(function () {
+            saveViewSettings(TableMain);
+            switchView(MainViewId, EditFormViewId, EditFormBtnGroupEditClass);
+        });
+};
+
+//prepareFormForCopy
+var prepareFormForCopy = function (callBackBefore) {
+
+    callBackBefore = callBackBefore || callBackBeforeCopy;
+
+    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+    if (CurrIds.length !== 1) {
+        showModalSelectOne();
+        return;
+    }
+    modalWaitWrapper(function () {
+        return fillFormForCopyGeneric(CurrIds, HttpTypeFillForEdit, UrlFillForEdit,
+            GetActive, EditFormId, LabelTextCopy, MagicSuggests);
+    })
+        .then(function (currRecords) {
+            CurrIds = [];
+            CurrRecords = [];
+            CurrRecords[0] = $.extend(true, {}, RecordTemplate);
+            return callBackBefore(currRecords);
+        })
+        .done(function () {
+            saveViewSettings(TableMain);
+            switchView(MainViewId, EditFormViewId, EditFormBtnGroupEditClass);
+        });
+};
+
+//submitEditForm
+var submitEditForm = function (callBackBefore, callBackAfter) {
+
+    callBackBefore = callBackBefore || callBackBeforeSubmitEdit;
+    callBackAfter = callBackAfter || callBackAfterSubmitEdit;
+
+    msValidate(MagicSuggests);
+    if (!formIsValid(EditFormId, CurrIds.length === 0) || !msIsValid(MagicSuggests)) {
+        showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
+        return;
+    }
+    callBackBefore()
+        .then(function () {
+            var createMultiple = $("#CreateMultiple").val() !== "" ? $("#CreateMultiple").val() : 1;
+            return submitEditsGenericWrp(
+                EditFormId, MagicSuggests, CurrRecords, HttpTypeEdit, UrlEdit, createMultiple);
+        })
+        .then(function (data, currRecords) {
+            CurrRecords = currRecords;
+            if (CurrIds.length === 0 && data.newEntryIds) {
+                CurrIds = data.newEntryIds;
+                for (var i = 0; i < CurrIds.length; i++) {
+                    CurrRecords[i].Id = CurrIds[i];
+                }
+            }
+            return callBackAfter(data);
+        })
+        .then(function () {
+            return refreshMainView();
+        })
+        .done(function () {
+            switchView(EditFormViewId, MainViewId, MainViewBtnGroupClass, TableMain);
+        });
+};
 
 //-------------------------------------------------------------------------------------------//
 
@@ -49,61 +150,13 @@ $(document).ready(function () {
     //-----------------------------------------MainView------------------------------------------//
 
     //Wire up BtnCreate
-    $("#BtnCreate").click(function () {
-        CurrIds = [];
-        CurrRecords = [];
-        CurrRecords[0] = $.extend(true, {}, RecordTemplate);
-        fillFormForCreateGeneric(EditFormId, MagicSuggests, LabelTextCreate, MainViewId);
-        callBackBeforeCreate()
-            .done(function () {
-                saveViewSettings(TableMain);
-                switchView(MainViewId, EditFormViewId, EditFormBtnGroupCreateClass);
-            });
-    });
+    $("#BtnCreate").click(function (event) { prepareFormForCreate(); });
 
     //Wire up BtnEdit
-    $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length === 0) {
-            showModalNothingSelected();
-            return;
-        }
-        modalWaitWrapper(function () {
-            return fillFormForEditGeneric(CurrIds, HttpTypeFillForEdit, UrlFillForEdit,
-                GetActive, EditFormId, LabelTextEdit, MagicSuggests);
-        })
-            .then(function (currRecords) {
-                CurrRecords = currRecords;
-                return callBackBeforeEdit(currRecords);
-            })
-            .done(function () {
-                saveViewSettings(TableMain);
-                switchView(MainViewId, EditFormViewId, EditFormBtnGroupEditClass);
-            });
-    });
+    $("#BtnEdit").click(function (event) { prepareFormForEdit(); });
 
     //Wire up BtnCopy
-    $("#BtnCopy").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length !== 1) {
-            showModalSelectOne();
-            return;
-        }
-        modalWaitWrapper(function () {
-            return fillFormForCopyGeneric(CurrIds, HttpTypeFillForEdit, UrlFillForEdit,
-                GetActive, EditFormId, LabelTextCopy, MagicSuggests);
-        })
-            .then(function (currRecords) {
-                CurrIds = [];
-                CurrRecords = [];
-                CurrRecords[0] = $.extend(true, {}, RecordTemplate);
-                return callBackBeforeCopy(currRecords);
-            })
-            .done(function () {
-                saveViewSettings(TableMain);
-                switchView(MainViewId, EditFormViewId, EditFormBtnGroupEditClass);
-            });
-    });
+    $("#BtnCopy").click(function (event) { prepareFormForCopy(); });
 
     //Wire up BtnDelete 
     $("#BtnDelete").click(function () {
@@ -202,34 +255,7 @@ $("#" + EditFormId + "BtnCancel").click(function () {
 });
 
 //Wire Up EditFormBtnOk
-$("#EditFormBtnOk").click(function () {
-    msValidate(MagicSuggests);
-    if (!formIsValid(EditFormId, CurrIds.length === 0) || !msIsValid(MagicSuggests)) {
-        showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
-        return;
-    }
-    callBackBeforeSubmitEdit()
-        .then(function () {
-            var createMultiple = $("#CreateMultiple").val() !== "" ? $("#CreateMultiple").val() : 1;
-            return submitEditsGenericWrp(EditFormId, MagicSuggests, CurrRecords, HttpTypeEdit, UrlEdit, createMultiple);
-        })
-        .then(function (data, currRecords) {
-            CurrRecords = currRecords;
-            if (CurrIds.length === 0 && data.newEntryIds) {
-                CurrIds = data.newEntryIds;
-                for (var i = 0; i < CurrIds.length; i++) {
-                    CurrRecords[i].Id = CurrIds[i];
-                }
-            }
-            return callBackAfterSubmitEdit(data);
-        })
-        .then(function () {
-            return refreshMainView();
-        })
-        .done(function () {
-            switchView(EditFormViewId, MainViewId, MainViewBtnGroupClass, TableMain);
-        });
-});
+$("#EditFormBtnOk").click(function (event) { submitEditForm(); });
 
 
 //--------------------------------------- Main Methods---------------------------------------//

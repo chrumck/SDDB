@@ -84,7 +84,7 @@ callBackBeforeEdit = function (currRecords) {
         .then(function () { return fillFormForEditFromDbEntries(GetActive, currRecords, ExtEditFormId); });
 };
 
-callBackBeforeSubmitEdit = function (data) {
+callBackBeforeSubmitEdit = function () {
     if (!formIsValid(ExtEditFormId, CurrIds.length === 0)) {
         showModalFail("Errors in Form", "Extended attributes have invalid inputs. Please correct.");
         return $.Deferred().reject();

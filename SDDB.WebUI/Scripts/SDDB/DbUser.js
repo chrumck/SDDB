@@ -49,7 +49,7 @@ callBackBeforeEdit = function () {
     return $.Deferred().resolve();
 };
 
-callBackBeforeSubmitEdit = function (data) {
+callBackBeforeSubmitEdit = function () {
     //Id not handled by submitEditsGeneric, has to be set
     if (CurrRecords.length == 1) { CurrRecords[0].Id = MagicSuggests[0].getValue()[0]; }
 

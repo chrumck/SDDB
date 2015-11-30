@@ -26,9 +26,7 @@ UrlDelete = "/PersonActivityTypeSrv/Delete";
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
-
-
-
+    
     //---------------------------------------DataTables------------
 
     //TableMainColumnSets

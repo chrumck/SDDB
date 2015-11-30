@@ -10,46 +10,41 @@
 
 <!----- Navbar Section ----->
 @section Navbar{
-    <div class="btn-group navbar-btn tdo-btngroup-main">
-    <button type="button" class="btn btn-default" id="BtnCreate">New</button>
-    <button type="button" class="btn btn-tdo-nav" id="BtnEdit">&nbsp;&nbsp;Edit&nbsp;&nbsp;</button>
-    <button type="button" class="btn btn-danger" id="BtnDelete">&nbsp;&nbsp;Del&nbsp;&nbsp;</button>
-</div>
+    @Html.Partial("_StandardEditButtons")
 
-<div class="btn-group navbar-btn tdo-btngroup-edit hidden">
-    <button type="button" class="btn btn-default" id="EditFormBtnCancel">Back</button>
-    <button type="button" class="btn btn-tdo-nav disabled">&nbsp;&nbsp;&nbsp;&nbsp;</button>
-    <button type="button" class="btn btn-success" id="EditFormBtnOk">
-        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
-    </button>
-</div>
+    <div class="btn-group navbar-btn tdo-btngroup-grouppersons hidden">
+        <button type="button" class="btn btn-default" id="GroupPersonsViewBtnCancel">Back</button>
+        <button type="button" class="btn btn-tdo-nav disabled">&nbsp;&nbsp;&nbsp;&nbsp;</button>
+        <button type="button" class="btn btn-success" id="GroupPersonsViewBtnOk">
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        </button>
+    </div>
 
-<div class="btn-group navbar-btn tdo-btngroup-grouppersons hidden">
-    <button type="button" class="btn btn-default" id="GroupPersonsViewBtnCancel">Back</button>
-    <button type="button" class="btn btn-tdo-nav disabled">&nbsp;&nbsp;&nbsp;&nbsp;</button>
-    <button type="button" class="btn btn-success" id="GroupPersonsViewBtnOk">
-        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
-    </button>
-</div>
-
-<div class="btn-group navbar-btn tdo-btngroup-groupmanagers hidden">
-    <button type="button" class="btn btn-default" id="GroupManagersViewBtnCancel">Back</button>
-    <button type="button" class="btn btn-tdo-nav disabled">&nbsp;&nbsp;&nbsp;&nbsp;</button>
-    <button type="button" class="btn btn-success" id="GroupManagersViewBtnOk">
-        &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
-    </button>
-</div>
+    <div class="btn-group navbar-btn tdo-btngroup-groupmanagers hidden">
+        <button type="button" class="btn btn-default" id="GroupManagersViewBtnCancel">Back</button>
+        <button type="button" class="btn btn-tdo-nav disabled">&nbsp;&nbsp;&nbsp;&nbsp;</button>
+        <button type="button" class="btn btn-success" id="GroupManagersViewBtnOk">
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        </button>
+    </div>
 }
 @section NavbarCollapse{
-<ul class="nav navbar-nav tdo-btngroup-main">
-    <li class="dropdown margin-left-5px">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Persons<span class="caret"></span></a>
-        <ul class="dropdown-menu">
-            <li><a class="collapsenav" href="#" id="BtnEditGroupPersons">Group Persons</a></li>
-            <li><a class="collapsenav" href="#" id="BtnEditGroupManagers">Group Managers</a></li>
-        </ul>
-    </li>
-</ul>
+    <ul class="nav navbar-nav tdo-btngroup-initial"></ul>
+
+    <ul class="nav navbar-nav tdo-btngroup-main hidden">
+        <li class="margin-left-10px">
+            <div class="btn-group navbar-btn">
+                <button type="button" class="btn btn-tdo-warning2 collapsenav" id="BtnCopy"> Copy </button>
+            </div>
+        </li>
+        <li class="dropdown margin-left-5px">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Persons<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li><a class="collapsenav" href="#" id="BtnEditGroupPersons">Group Persons</a></li>
+                <li><a class="collapsenav" href="#" id="BtnEditGroupManagers">Group Managers</a></li>
+            </ul>
+        </li>
+    </ul>
 }
 
 <!------- MainView ------->
@@ -236,6 +231,7 @@
 @section Scripts {
     @Scripts.Render("~/bundles/DataTables")
     @Scripts.Render("~/bundles/bootstrap-toggle")
+    @Scripts.Render("~/bundles/sddb/shared_views")
     <script src="~/Scripts/SDDB/PersonGroup.js?v=@Html.GetAppVersion()"></script>
 }
 
