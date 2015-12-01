@@ -80,12 +80,6 @@ $(document).ready(function () {
     //Wire Up ModalInfoBtnOk
     $("#ModalInfoBtnOk").click(function () { $("#ModalInfo").modal("hide"); });
 
-    //Get focus on ModalDeleteBtnCancel
-    $("#ModalDelete").on("shown.bs.modal", function () { $("#ModalDeleteBtnCancel").focus(); });
-
-    //Wire Up ModalDeleteBtnCancel
-    $("#ModalDeleteBtnCancel").click(function () { $("#ModalDelete").modal("hide"); });
-
     //Get focus on ModalConfirmBtnYes
     $("#ModalConfirm").on("shown.bs.modal", function () { $("#ModalConfirmBtnYes").focus(); });
 
@@ -114,18 +108,6 @@ function showModalSelectOne(bodyText) {
     $("#ModalInfoBodyPre").empty().addClass("hidden");
     $("#ModalInfo").modal("show");
 }
-
-//Show Modal Delete
-function showModalDelete(noOfRows) {
-    $("#ModalDeleteBody").text("Confirm deleting " + noOfRows + " row(s).");
-    $("#ModalDelete").modal("show");
-}
-
-//Wire Up ModalDeleteBtnOk
-$("#ModalDeleteBtnOk").click(function () {
-    $("#ModalDelete").modal("hide");
-    deleteRecords();
-});
 
 //showModalWait
 function showModalWait() {
@@ -163,7 +145,7 @@ function showModalAJAXFail(xhr, status, error) {
 }
 
 //showModalConfirm
-function showModalConfirm(bodyText, labelText) {
+function showModalConfirm(bodyText, labelText, focusOn, btnYesClass) {
     var deferred0 = $.Deferred();
     if (bodyText) { $("#ModalConfirmBody").text(bodyText); } 
     else { $("#ModalConfirmBody").text("Please confirm..."); }
@@ -174,6 +156,9 @@ function showModalConfirm(bodyText, labelText) {
     $("#ModalConfirmBtnNo").click(function () { return deferred0.reject(); });
     $("#ModalConfirmBtnYes").click(function () { return deferred0.resolve(); });
     $("#ModalConfirm").modal("show");
+    if (focusOn && focusOn === "no") { $("#ModalConfirmBtnNo").focus(); }
+    if (focusOn && focusOn === "yes") { $("#ModalConfirmBtnYes").focus(); }
+    $("#ModalConfirmBtnYes").removeClass().addClass(btnYesClass || "btn btn-primary");
     return deferred0.promise();
 }
 

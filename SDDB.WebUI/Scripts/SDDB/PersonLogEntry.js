@@ -132,6 +132,10 @@ $(document).ready(function () {
             .done(function () { loadViewSettings(TableMain); });
     });
 
+    //Initialize DateTimePicker FilterDateStart
+    $("#FilterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
+        .on("dp.hide", function (e) { refreshMainView(); });
+
     //Initialize DateTimePicker FilterDateEnd
     $("#FilterDateEnd").datetimepicker({ format: "YYYY-MM-DD" })
         .on("dp.hide", function (e) { refreshMainView(); });

@@ -143,6 +143,18 @@ var submitEditForm = function (callBackBefore, callBackAfter) {
         });
 };
 
+//confirmAndDelete
+var confirmAndDelete = function () {
+    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+    if (CurrIds.length === 0) {
+        showModalNothingSelected();
+        return;
+    }
+    showModalConfirm("Confirm deleting " + CurrIds.length + " row(s).", "Confirm Delete", "no", "btn btn-danger")
+        .done(deleteRecords);
+
+}
+
 //-------------------------------------------------------------------------------------------//
 
 $(document).ready(function () {
@@ -159,14 +171,7 @@ $(document).ready(function () {
     $("#BtnCopy").click(function (event) { prepareFormForCopy(); });
 
     //Wire up BtnDelete 
-    $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length === 0) {
-            showModalNothingSelected();
-            return;
-        }
-        showModalDelete(CurrIds.length);
-    });
+    $("#BtnDelete").click(function () { confirmAndDelete(); });
 
     //TODO: refactor columnSelectId so it's not repeated n times
     //wire up columnsSelectId1

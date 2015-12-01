@@ -125,6 +125,10 @@ $(document).ready(function () {
             });
         
     });
+
+    //Initialize DateTimePicker FilterDateStart
+    $("#FilterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
+        .on("dp.hide", function (e) { refreshMainView(); });
         
     //---------------------------------------DataTables------------
 

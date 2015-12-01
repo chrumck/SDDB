@@ -9,12 +9,12 @@
 /// <reference path="PersonLogEntryFiles.js" />
 
 //--------------------------------------Global Properties------------------------------------//
-var TableMain;
+
 var TableLogEntryAssysAdd;
 var TableLogEntryAssysRemove;
 var TableLogEntryPersonsAdd;
 var TableLogEntryPersonsRemove;
-var MagicSuggests = [];
+
 var RecordTemplate = {
     Id: "RecordTemplateId",
     LogEntryDateTime: null,
@@ -29,9 +29,6 @@ var RecordTemplate = {
     Comments: null,
     IsActive_bl: null
 };
-var CurrRecords = [];
-var CurrIds = [];
-var GetActive = true;
 
 var ModalChngStsMs;
 var ChngStsAssyIds = [];
@@ -40,26 +37,9 @@ $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
 
-    //Wire up BtnDelete 
-    $("#BtnDelete").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length == 0) {
-            showModalNothingSelected();
-            return;
-        }
-        showModalDelete(CurrIds.length);
-    });
-
-    //Initialize DateTimePicker FilterDateStart
-    $("#FilterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("dp.hide", function (e) { refreshMainView(); });
+       
 
     //---------------------------------------EditFormView----------------------------------------//
-
-    //Wire Up EditFormBtnCancel
-    $("#EditFormBtnCancel").click(function () {
-        switchView("EditFormView", "MainView", "tdo-btngroup-main", TableMain);
-    });
 
     //Wire Up EditFormBtnOk
     $("#EditFormBtnOk").click(function () {
