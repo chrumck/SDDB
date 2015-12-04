@@ -77,9 +77,9 @@ namespace SDDB.Domain.Entities
         public int? PrsLogEntryFilesCount { get; set; }
         public int? PrsLogEntryAssysCount { get; set; }
         public string PrsLogEntryPersonsInitials { get; set; }
-        public List<PersonJSON> PrsLogEntryPersons { get; set; }
-
         public bool IsActive_bl { get; set; }
+        
+        public List<PersonJSON> PrsLogEntryPersons { get; set; }
     }
 
 

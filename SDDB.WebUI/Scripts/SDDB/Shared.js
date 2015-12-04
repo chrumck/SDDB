@@ -312,25 +312,6 @@ function exportTableToTxt(table) {
 
 //-----------------------------------------------------------------------------
 
-//Delete Records from DB - generic version
-function deleteRecordsGenericWrp(ids, url, callback) {
-    var deferred0 = $.Deferred();
-    showModalWait();
-    $.ajax({ type: "POST", url: url, timeout: 120000, data: { ids: ids }, dataType: "json" })
-        .always(hideModalWait)
-        .done(function () {
-            callback();
-            deferred0.resolve();
-        })
-        .fail(function (xhr, status, error) {
-            showModalAJAXFail(xhr, status, error);
-            deferred0.reject(xhr, status, error);
-        });
-    return deferred0.promise();
-}
-
-//-----------------------------------------------------------------------------
-
 //checking if form is valid
 function formIsValid(id, isCreate) {
     if ($("#" + id).valid()) { return true; }

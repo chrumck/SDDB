@@ -26,6 +26,7 @@ LabelTextEdit = "Edit Group";
 UrlFillForEdit = "/PersonGroupSrv/GetByIds";
 UrlEdit = "/PersonGroupSrv/Edit";
 UrlDelete = "/PersonGroupSrv/Delete";
+urlRefreshMainView = "/PersonGroupSrv/Get";
 
 $(document).ready(function () {
 
@@ -307,13 +308,6 @@ $(document).ready(function () {
 
 
 //--------------------------------------Main Methods---------------------------------------//
-
-//refresh Main view 
-function refreshMainView() {
-    var deferred0 = $.Deferred();
-    refreshTblGenWrp(TableMain, "/PersonGroupSrv/Get", { getActive: GetActive }).done(deferred0.resolve);
-    return deferred0.promise();
-}
 
 
 //---------------------------------------Helper Methods--------------------------------------//

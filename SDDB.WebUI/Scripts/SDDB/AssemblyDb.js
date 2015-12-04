@@ -77,9 +77,9 @@ var ExtTypeHttpType = "POST";
 var ExtHttpTypeEdit = "POST";
 var ExtUrlEdit = "/AssemblyDbSrv/EditExt";
 
-callBackBeforeCreate = updateFormForSelectedType;
+callBackAfterCreate = updateFormForSelectedType;
 
-callBackBeforeEdit = function (currRecords) {
+callBackAfterEdit = function (currRecords) {
     return updateFormForSelectedType()
         .then(function () { return fillFormForEditFromDbEntries(GetActive, currRecords, ExtEditFormId); });
 };
@@ -101,7 +101,7 @@ callBackAfterSubmitEdit = function (data) {
     return submitEditsGenericWrp(ExtEditFormId, [], ExtCurrRecords, ExtHttpTypeEdit, ExtUrlEdit);
 };
 
-callBackBeforeCopy = function (currRecords) {
+callBackAfterCopy = function (currRecords) {
     return updateFormForSelectedType()
         .then(function () { return fillFormForCopyFromDbEntries(currRecords, ExtEditFormId); });
 };

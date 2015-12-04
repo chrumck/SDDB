@@ -10,7 +10,9 @@
 
 <!----- Navbar Section ----->
 @section Navbar{
-    <div class="btn-group navbar-btn tdo-btngroup-main">
+    <div class="btn-group navbar-btn tdo-btngroup-initial"></div>
+
+    <div class="btn-group navbar-btn tdo-btngroup-main hidden">
         <button type="button" class="btn btn-default" id="BtnCreate">New</button>
         <button type="button" class="btn btn-tdo-nav" id="BtnEdit">&nbsp;&nbsp;Edit&nbsp;&nbsp;</button>
         <button type="button" class="btn btn-danger" id="BtnDelete">&nbsp;Del&nbsp;</button>
@@ -31,7 +33,9 @@
     </div>
 }
 @section NavbarCollapse{
-    <ul class="nav navbar-nav tdo-btngroup-main">
+    <ul class="nav navbar-nav tdo-btngroup-initial"></ul>
+
+    <ul class="nav navbar-nav tdo-btngroup-main hidden">
         <li class="margin-left-10px">
             <div class="btn-group navbar-btn">
                 <button type="button" class="btn btn-tdo-warning2 collapsenav" id="BtnCopy"> Copy </button>
@@ -308,7 +312,7 @@
     @Scripts.Render("~/bundles/DataTables")
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
-    <script src="~/Scripts/SDDB/PersonLogEntry.js?v=@Html.GetAppVersion()"></script>
+    @Scripts.Render("~/bundles/sddb/shared_views")
     <script src="~/Scripts/SDDB/PersonLogEntryShared.js?v=@Html.GetAppVersion()"></script>
     <script src="~/Scripts/SDDB/PersonLogEntryFiles.js?v=@Html.GetAppVersion()"></script>
 }

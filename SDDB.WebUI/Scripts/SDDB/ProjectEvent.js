@@ -30,6 +30,10 @@ UrlFillForEdit = "/ProjectEventSrv/GetByIds";
 UrlEdit = "/ProjectEventSrv/Edit";
 UrlDelete = "/ProjectEventSrv/Delete";
 
+var urlRefreshMainView = "/ProjectEventSrv/GetByProjectIds";
+var dataRefreshMainView = function () { return { projectIds: MsFilterByProject.getValue(), getActive: GetActive }; };
+var httpTypeRefreshMainView = "POST";
+
 $(document).ready(function () {
 
     //-----------------------------------------MainView------------------------------------------//
@@ -130,19 +134,6 @@ $(document).ready(function () {
 
 
 //--------------------------------------Main Methods---------------------------------------//
-
-//refresh Main view 
-function refreshMainView() {
-    var deferred0 = $.Deferred();
-    refreshTblGenWrp(TableMain, "/ProjectEventSrv/GetByProjectIds",
-        {
-            projectIds: MsFilterByProject.getValue(),
-            getActive: GetActive
-        },
-        "POST")
-        .done(deferred0.resolve);
-    return deferred0.promise();	
-}
 
 
 //---------------------------------------Helper Methods--------------------------------------//

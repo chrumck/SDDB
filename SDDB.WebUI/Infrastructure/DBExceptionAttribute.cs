@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Net;
 using System.Web.Mvc;
+using System.Web.Routing;
+using System.Web;
+using MySql.Data.MySqlClient;
 
 using SDDB.Domain.Abstract;
 using SDDB.Domain.Entities;
-using System.Web.Routing;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using MySql.Data.MySqlClient;
 
 
 namespace SDDB.WebUI.Infrastructure
@@ -68,7 +67,8 @@ namespace SDDB.WebUI.Infrastructure
                 responseText = "Error(s) in submitted parameters:\n" + exceptionMessage;
                 exceptionContext.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             }
-            if (exceptionType == typeof(DbBadRequestException) || exceptionType == typeof(MySqlException))
+            if (exceptionType == typeof(DbBadRequestException) || exceptionType == typeof(MySqlException) ||
+                    exceptionType == typeof(HttpRequestValidationException))
             {
                 responseText = "Error(s) in submited request:\n" + exceptionMessage;
                 exceptionContext.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;

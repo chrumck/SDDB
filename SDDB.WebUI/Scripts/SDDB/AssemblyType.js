@@ -52,8 +52,9 @@ LabelTextEdit = "Edit Assembly Type";
 UrlFillForEdit = "/AssemblyTypeSrv/GetByIds";
 UrlEdit = "/AssemblyTypeSrv/Edit";
 UrlDelete = "/AssemblyTypeSrv/Delete";
+urlRefreshMainView = "/AssemblyTypeSrv/Get";
 
-callBackBeforeCreate = function () {
+callBackAfterCreate = function () {
     $("#EditForm select").find("option:first").prop("selected", "selected");
     return $.Deferred().resolve();
 };
@@ -169,14 +170,6 @@ $(document).ready(function () {
 
 
 //--------------------------------------Main Methods---------------------------------------//
-
-//refresh Main view 
-function refreshMainView() {
-    var deferred0 = $.Deferred();
-    refreshTblGenWrp(TableMain, "/AssemblyTypeSrv/Get", { getActive: GetActive }).done(deferred0.resolve);
-    return deferred0.promise();
-}
-
 
 
 //---------------------------------------Helper Methods--------------------------------------//

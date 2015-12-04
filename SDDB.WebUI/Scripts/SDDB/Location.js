@@ -178,13 +178,6 @@ $(document).ready(function () {
 
 //--------------------------------------Main Methods---------------------------------------//
 
-
-//Delete Records from DB
-function deleteRecords() {
-    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-    deleteRecordsGenericWrp(CurrIds, "/LocationSrv/Delete", refreshMainView);
-}
-
 //refresh view after magicsuggest update
 function refreshMainView() {
     var deferred0 = $.Deferred();

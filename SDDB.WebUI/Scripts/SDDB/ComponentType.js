@@ -52,8 +52,9 @@ LabelTextEdit = "Edit Component Type";
 UrlFillForEdit = "/ComponentTypeSrv/GetByIds";
 UrlEdit = "/ComponentTypeSrv/Edit";
 UrlDelete = "/ComponentTypeSrv/Delete";
+urlRefreshMainView = "/ComponentTypeSrv/Get";
 
-callBackBeforeCreate = function () {
+callBackAfterCreate = function () {
     $("#EditForm select").find("option:first").prop("selected", "selected");
     return $.Deferred().resolve();
 };
@@ -169,15 +170,6 @@ $(document).ready(function () {
 
 
 //--------------------------------------Main Methods---------------------------------------//
-
-//refresh Main view 
-function refreshMainView() {
-    var deferred0 = $.Deferred();
-    refreshTblGenWrp(TableMain, "/ComponentTypeSrv/Get", { getActive: GetActive }).done(deferred0.resolve);
-    return deferred0.promise();
-}
-
-
 
 //---------------------------------------Helper Methods--------------------------------------//
 

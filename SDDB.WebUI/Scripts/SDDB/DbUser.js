@@ -29,12 +29,15 @@ UrlFillForEdit = "/DBUserSrv/GetByIds";
 UrlEdit = "/DBUserSrv/Edit";
 UrlDelete = "/DBUserSrv/Delete";
 
-callBackBeforeCreate = function () {
+urlRefreshMainView = "/DbUserSrv/Get";
+dataRefreshMainView = function () { return {}; };
+
+callBackAfterCreate = function () {
     MagicSuggests[0].enable();
     return $.Deferred().resolve();
 };
 
-callBackBeforeEdit = function () {
+callBackAfterEdit = function () {
     //Id not handled by submitEditsGeneric, has to be set
     if (CurrRecords.length == 1) {
         MagicSuggests[0].addToSelection([{
@@ -214,14 +217,6 @@ $(document).ready(function () {
 
 
 //--------------------------------------Main Methods---------------------------------------//
-
-//refresh Main view 
-function refreshMainView() {
-    var deferred0 = $.Deferred();
-    refreshTblGenWrp(TableMain, "/DbUserSrv/Get").done(deferred0.resolve);
-    return deferred0.promise();
-}
-
 
 //---------------------------------------Helper Methods--------------------------------------//
 

@@ -27,6 +27,7 @@ LabelTextEdit = "Edit Project";
 UrlFillForEdit = "/ProjectSrv/GetByIds";
 UrlEdit = "/ProjectSrv/Edit";
 UrlDelete = "/ProjectSrv/Delete";
+urlRefreshMainView = "/ProjectSrv/Get";
 
 $(document).ready(function () {
 
@@ -212,13 +213,6 @@ $(document).ready(function () {
 
 
 //--------------------------------------Main Methods---------------------------------------//
-
-//refresh Main view 
-function refreshMainView() {
-    var deferred0 = $.Deferred();
-    refreshTblGenWrp(TableMain, "/ProjectSrv/Get", { getActive: GetActive }).done(deferred0.resolve);
-    return deferred0.promise();
-}
 
 
 //---------------------------------------Helper Methods--------------------------------------//

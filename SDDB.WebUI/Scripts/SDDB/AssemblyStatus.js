@@ -22,6 +22,7 @@ LabelTextEdit = "Edit Assembly Status";
 UrlFillForEdit = "/AssemblyStatusSrv/GetByIds";
 UrlEdit = "/AssemblyStatusSrv/Edit";
 UrlDelete = "/AssemblyStatusSrv/Delete";
+urlRefreshMainView = "/AssemblyStatusSrv/Get";
 
 $(document).ready(function () {
 
@@ -78,14 +79,6 @@ $(document).ready(function () {
 
 
 //--------------------------------------Main Methods---------------------------------------//
-
-//refresh Main view 
-function refreshMainView() {
-    var deferred0 = $.Deferred();
-    refreshTblGenWrp(TableMain, "/AssemblyStatusSrv/Get", { getActive: GetActive }).done(deferred0.resolve);
-    return deferred0.promise();
-}
-
 
 
 //---------------------------------------Helper Methods--------------------------------------//
