@@ -20,7 +20,7 @@
 
     <div class="btn-group navbar-btn tdo-btngroup-edit hidden">
         <button type="button" class="btn btn-default" id="EditFormBtnCancel">Back</button>
-        <button type="button" class="btn btn-tdo-success disabled" id="EditFormBtnOkFiles">
+        <button type="button" class="btn btn-tdo-success" id="EditFormBtnOkFiles">
             &nbsp;<span class="glyphicon glyphicon-cloud-upload"></span>&nbsp;
         </button>
         <button type="button" class="btn btn-success" id="EditFormBtnOk">
@@ -314,6 +314,7 @@
     @Scripts.Render("~/bundles/magicsuggest")
     @Scripts.Render("~/bundles/sddb/shared_views")
     <script src="~/Scripts/SDDB/PersonLogEntryShared.js?v=@Html.GetAppVersion()"></script>
+    <script src="~/Scripts/SDDB/PersonLogEntry.js?v=@Html.GetAppVersion()"></script>
     <script src="~/Scripts/SDDB/PersonLogEntryFiles.js?v=@Html.GetAppVersion()"></script>
 }
 

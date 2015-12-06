@@ -40,6 +40,8 @@ var urlRefreshMainView = "";
 var dataRefreshMainView = function () { return { getActive: GetActive }; };
 var httpTypeRefreshMainView = "GET";
 
+var panelTableMainClass = "panel-primary";
+
 var doNothingAndResolve = function () { return $.Deferred().resolve(); };
 var callBackAfterCreate = function () { return $.Deferred().resolve(); };
 var callBackAfterEdit = function (currRecords) { return $.Deferred().resolve(); };
@@ -291,10 +293,10 @@ $(document).ready(function () {
     $("#ChBoxShowDeleted").change(function (event) {
         if (!$(this).prop("checked")) {
             GetActive = true;
-            $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-primary");
+            $("#PanelTableMain").removeClass("panel-tdo-danger").addClass(panelTableMainClass);
         } else {
             GetActive = false;
-            $("#PanelTableMain").removeClass("panel-primary").addClass("panel-tdo-danger");
+            $("#PanelTableMain").removeClass(panelTableMainClass).addClass("panel-tdo-danger");
         }
         refreshMainView();
     });

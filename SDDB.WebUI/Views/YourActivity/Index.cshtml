@@ -279,13 +279,13 @@
 <script>var UserFullName = "@Html.GetUserFullName()";</script>
 
 
-
 @section Scripts {
     @Scripts.Render("~/bundles/DataTables")
     @Scripts.Render("~/bundles/bootstrap-toggle")
     @Scripts.Render("~/bundles/magicsuggest")
-    <script src="~/Scripts/SDDB/YourActivity.js?v=@Html.GetAppVersion()"></script>
+    <script src="~/Scripts/SDDB/Shared_Views.js?v=@Html.GetAppVersion()"></script>
     <script src="~/Scripts/SDDB/PersonLogEntryShared.js?v=@Html.GetAppVersion()"></script>
+    <script src="~/Scripts/SDDB/YourActivity.js?v=@Html.GetAppVersion()"></script>
     <script src="~/Scripts/SDDB/PersonLogEntryFiles.js?v=@Html.GetAppVersion()"></script>
 }
 

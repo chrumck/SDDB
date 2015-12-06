@@ -213,19 +213,14 @@ $(document).ready(function () {
 
 //refresh Main view 
 function refreshMainView() {
-    var deferred0 = $.Deferred();
-
     TableMain.clear().search("").draw();
-
-    if ( ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "") &&
-         (MsFilterByProject.getValue().length == 0 && MsFilterByAssembly.getValue().length == 0 &&
-                MsFilterByAssyType.getValue().length == 0 && MsFilterByPerson.getValue().length == 0)
-        ) { return deferred0.resolve(); }
+    if ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "") { return $.Deferred().resolve(); }
 
     var endDate = ($("#FilterDateEnd").val() == "") ? "" : moment($("#FilterDateEnd").val())
         .hour(23).minute(59).format("YYYY-MM-DD HH:mm");
 
-    refreshTblGenWrp(TableMain, "/AssemblyLogEntrySrv/GetByAltIds",
+    return modalWaitWrapper(function () {
+        return refreshTableGeneric(TableMain, "/AssemblyLogEntrySrv/GetByAltIds",
         {
             projectIds: MsFilterByProject.getValue(),
             assyIds: MsFilterByAssembly.getValue(),
@@ -235,39 +230,24 @@ function refreshMainView() {
             endDate: endDate,
             getActive: GetActive
         },
-        "POST")
-        .done(deferred0.resolve);
-
-    return deferred0.promise();
+        "POST");
+    });
 }
 
 //fillFiltersFromRequestParams
 function fillFiltersFromRequestParams() {
-    var deferred0 = $.Deferred();
-
-    if (typeof AssemblyId !== "undefined" && AssemblyId != "") {
-        showModalWait();
-        $.ajax({
-            type: "POST", url: "/AssemblyDbSrv/GetByIds",
-            timeout: 120000, data: { ids: [AssemblyId], getActive: true }, dataType: "json"
-        })
-            .always(hideModalWait)
-            .done(function (data) {
-                msSetSelectionSilent(MsFilterByAssembly, [{ id: data[0].Id, name: data[0].AssyName, }]);
-                return deferred0.resolve();
-            })
-            .fail(function (xhr, status, error) {
-                showModalAJAXFail(xhr, status, error); 
-                deferred0.reject(xhr, status, error);
-            });
+    $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
+    $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
+    if (AssemblyId) {
+        return modalWaitWrapper(function () {
+            return $.ajax({ type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 120000, 
+                    data: { ids: [AssemblyId], getActive: true }, dataType: "json" })
+                .then(function (data) {
+                    msSetSelectionSilent(MsFilterByAssembly, [{ id: data[0].Id, name: data[0].AssyName, }]);
+                });
+        });
     }
-    else {
-        $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
-        $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
-        return deferred0.resolve();
-    }
-
-    return deferred0.promise();
+    return $.Deferred().resolve();
 }
 
 //---------------------------------------Helper Methods--------------------------------------//

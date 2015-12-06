@@ -40,6 +40,17 @@ $(document).ready(function () {
             });
     });
 
+    //---------------------------------------EditFormView----------------------------------------//
+
+    //Wire Up EditFormBtnOkFiles
+    $("#EditFormBtnOkFiles").click(function () {
+        $("#LogEntryFilesViewPanel").text($("#LogEntryDateTime").val() +
+            " " + MagicSuggests[0].getSelection()[0].name);
+        submitEditForm()
+            .then(function () { return fillLogEntryFilesForm(); })
+            .done(function () { switchView(MainViewId, "LogEntryFilesView", "tdo-btngroup-logentryfiles"); });
+    });
+
     //--------------------------------------LogEntryFilesView---------------------------------------//
 
     //Wire Up LogEntryFilesViewBtnBack

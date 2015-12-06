@@ -238,22 +238,13 @@ function loadViewSettings(dataTable) {
 
 //Refresh  table from AJAX - generic version
 function refreshTableGeneric(table, url, data, httpType) {
-
-    var deferred0 = $.Deferred(); 
-
-    httpType = (typeof httpType !== "undefined") ? httpType : "GET";
-    data = (typeof data !== "undefined") ? data : {};
-
+    httpType = httpType || "GET";
+    data = data || {};
     table.clear().search("").draw();
-
-    $.ajax({ type: httpType, url: url, timeout: 120000, data: data, dataType: "json" })
-        .done(function (dbEntries) {
+    return $.ajax({ type: httpType, url: url, timeout: 120000, data: data, dataType: "json" })
+        .then(function (dbEntries) {
             table.rows.add(dbEntries).order([1, "asc"]).draw();
-            return deferred0.resolve();
-        })
-        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
-
-    return deferred0.promise();
+        });
 }
 
 //Refresh  table from AJAX - generic version - showing wait dialogs
@@ -855,9 +846,8 @@ function msSetSelectionSilent(ms, itemsArray) {
 
 //Pulls type information and formats table column names
 function updateTableForExtended(httpType, url, data, table) {
-    var deferred0 = $.Deferred();
-    $.ajax({ type: httpType, url: url, data: data, timeout: 120000, dataType: "json" })
-        .done(function (data) {
+    return $.ajax({ type: httpType, url: url, data: data, timeout: 120000, dataType: "json" })
+        .then(function (data) {
             var typeHasAttrs = false;
             var entityType = data[0];
             for (var prop in entityType) {
@@ -865,24 +855,8 @@ function updateTableForExtended(httpType, url, data, table) {
                 if (entityType[prop] !== null && entityType[prop] !== "") { typeHasAttrs = true; }
                 $(table.column(prop.slice(prop.indexOf("Attr"), 6) + ":name").header()).text(entityType[prop]);
             }
-            deferred0.resolve(typeHasAttrs);
-        })
-        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
-    return deferred0.promise();
-}
-
-//updateTableForExtendedWrp
-function updateTableForExtendedWrp(httpType, url, data, table) {
-    var deferred0 = $.Deferred();
-    showModalWait();
-    updateTableForExtended(httpType, url, data, table)
-        .always(hideModalWait)
-        .done(deferred0.resolve)
-        .fail(function (xhr, status, error) {
-            showModalAJAXFail(xhr, status, error);
-            deferred0.reject(xhr, status, error);
+            return typeHasAttrs;
         });
-    return deferred0.promise();
 }
 
 //pulls type information and formats form fields including validation reset
