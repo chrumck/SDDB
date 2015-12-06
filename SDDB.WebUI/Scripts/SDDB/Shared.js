@@ -80,12 +80,6 @@ $(document).ready(function () {
     //Wire Up ModalInfoBtnOk
     $("#ModalInfoBtnOk").click(function () { $("#ModalInfo").modal("hide"); });
 
-    //Get focus on ModalDeleteBtnCancel
-    $("#ModalDelete").on("shown.bs.modal", function () { $("#ModalDeleteBtnCancel").focus(); });
-
-    //Wire Up ModalDeleteBtnCancel
-    $("#ModalDeleteBtnCancel").click(function () { $("#ModalDelete").modal("hide"); });
-
     //Get focus on ModalConfirmBtnYes
     $("#ModalConfirm").on("shown.bs.modal", function () { $("#ModalConfirmBtnYes").focus(); });
 
@@ -114,18 +108,6 @@ function showModalSelectOne(bodyText) {
     $("#ModalInfoBodyPre").empty().addClass("hidden");
     $("#ModalInfo").modal("show");
 }
-
-//Show Modal Delete
-function showModalDelete(noOfRows) {
-    $("#ModalDeleteBody").text("Confirm deleting " + noOfRows + " row(s).");
-    $("#ModalDelete").modal("show");
-}
-
-//Wire Up ModalDeleteBtnOk
-$("#ModalDeleteBtnOk").click(function () {
-    $("#ModalDelete").modal("hide");
-    deleteRecords();
-});
 
 //showModalWait
 function showModalWait() {
@@ -163,7 +145,7 @@ function showModalAJAXFail(xhr, status, error) {
 }
 
 //showModalConfirm
-function showModalConfirm(bodyText, labelText) {
+function showModalConfirm(bodyText, labelText, focusOn, btnYesClass) {
     var deferred0 = $.Deferred();
     if (bodyText) { $("#ModalConfirmBody").text(bodyText); } 
     else { $("#ModalConfirmBody").text("Please confirm..."); }
@@ -174,6 +156,9 @@ function showModalConfirm(bodyText, labelText) {
     $("#ModalConfirmBtnNo").click(function () { return deferred0.reject(); });
     $("#ModalConfirmBtnYes").click(function () { return deferred0.resolve(); });
     $("#ModalConfirm").modal("show");
+    if (focusOn && focusOn === "no") { $("#ModalConfirmBtnNo").focus(); }
+    if (focusOn && focusOn === "yes") { $("#ModalConfirmBtnYes").focus(); }
+    $("#ModalConfirmBtnYes").removeClass().addClass(btnYesClass || "btn btn-primary");
     return deferred0.promise();
 }
 
@@ -253,22 +238,13 @@ function loadViewSettings(dataTable) {
 
 //Refresh  table from AJAX - generic version
 function refreshTableGeneric(table, url, data, httpType) {
-
-    var deferred0 = $.Deferred(); 
-
-    httpType = (typeof httpType !== "undefined") ? httpType : "GET";
-    data = (typeof data !== "undefined") ? data : {};
-
+    httpType = httpType || "GET";
+    data = data || {};
     table.clear().search("").draw();
-
-    $.ajax({ type: httpType, url: url, timeout: 120000, data: data, dataType: "json" })
-        .done(function (dbEntries) {
+    return $.ajax({ type: httpType, url: url, timeout: 120000, data: data, dataType: "json" })
+        .then(function (dbEntries) {
             table.rows.add(dbEntries).order([1, "asc"]).draw();
-            return deferred0.resolve();
-        })
-        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
-
-    return deferred0.promise();
+        });
 }
 
 //Refresh  table from AJAX - generic version - showing wait dialogs
@@ -323,25 +299,6 @@ function exportTableToTxt(table) {
         outputString = outputString.replace(/\n/g, " ");
         return outputString;
     }
-}
-
-//-----------------------------------------------------------------------------
-
-//Delete Records from DB - generic version
-function deleteRecordsGenericWrp(ids, url, callback) {
-    var deferred0 = $.Deferred();
-    showModalWait();
-    $.ajax({ type: "POST", url: url, timeout: 120000, data: { ids: ids }, dataType: "json" })
-        .always(hideModalWait)
-        .done(function () {
-            callback();
-            deferred0.resolve();
-        })
-        .fail(function (xhr, status, error) {
-            showModalAJAXFail(xhr, status, error);
-            deferred0.reject(xhr, status, error);
-        });
-    return deferred0.promise();
 }
 
 //-----------------------------------------------------------------------------
@@ -889,9 +846,8 @@ function msSetSelectionSilent(ms, itemsArray) {
 
 //Pulls type information and formats table column names
 function updateTableForExtended(httpType, url, data, table) {
-    var deferred0 = $.Deferred();
-    $.ajax({ type: httpType, url: url, data: data, timeout: 120000, dataType: "json" })
-        .done(function (data) {
+    return $.ajax({ type: httpType, url: url, data: data, timeout: 120000, dataType: "json" })
+        .then(function (data) {
             var typeHasAttrs = false;
             var entityType = data[0];
             for (var prop in entityType) {
@@ -899,24 +855,8 @@ function updateTableForExtended(httpType, url, data, table) {
                 if (entityType[prop] !== null && entityType[prop] !== "") { typeHasAttrs = true; }
                 $(table.column(prop.slice(prop.indexOf("Attr"), 6) + ":name").header()).text(entityType[prop]);
             }
-            deferred0.resolve(typeHasAttrs);
-        })
-        .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
-    return deferred0.promise();
-}
-
-//updateTableForExtendedWrp
-function updateTableForExtendedWrp(httpType, url, data, table) {
-    var deferred0 = $.Deferred();
-    showModalWait();
-    updateTableForExtended(httpType, url, data, table)
-        .always(hideModalWait)
-        .done(deferred0.resolve)
-        .fail(function (xhr, status, error) {
-            showModalAJAXFail(xhr, status, error);
-            deferred0.reject(xhr, status, error);
+            return typeHasAttrs;
         });
-    return deferred0.promise();
 }
 
 //pulls type information and formats form fields including validation reset

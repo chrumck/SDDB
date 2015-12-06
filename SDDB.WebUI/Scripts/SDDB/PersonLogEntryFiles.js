@@ -28,11 +28,27 @@ $(document).ready(function () {
             showModalSelectOne();
             return;
         }
+
+        var selectedRecord = TableMain.row(".ui-selected", { page: "current" }).data();
+        $("#LogEntryFilesViewPanel").text(selectedRecord.EnteredByPerson_.FirstName +
+            " " + selectedRecord.EnteredByPerson_.LastName + " - " +selectedRecord.LogEntryDateTime);
+        
         fillLogEntryFilesForm()
             .done(function () {
                 saveViewSettings(TableMain);
                 switchView("MainView", "LogEntryFilesView", "tdo-btngroup-logentryfiles");
             });
+    });
+
+    //---------------------------------------EditFormView----------------------------------------//
+
+    //Wire Up EditFormBtnOkFiles
+    $("#EditFormBtnOkFiles").click(function () {
+        $("#LogEntryFilesViewPanel").text($("#LogEntryDateTime").val() +
+            " " + MagicSuggests[0].getSelection()[0].name);
+        submitEditForm()
+            .then(function () { return fillLogEntryFilesForm(); })
+            .done(function () { switchView(MainViewId, "LogEntryFilesView", "tdo-btngroup-logentryfiles"); });
     });
 
     //--------------------------------------LogEntryFilesView---------------------------------------//
@@ -115,9 +131,7 @@ $(document).ready(function () {
                     }
                 })
                     .always(function () { $("#ModalUpload").modal("hide"); })
-                    .done(function () {
-                        setTimeout(fillLogEntryFilesForm, 200);
-                    })
+                    .done(function () { fillLogEntryFilesForm(); })
                     .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 
             } else showModalFail("Browser Error", "This browser doesn't support HTML5 file uploads!");
@@ -188,9 +202,7 @@ $(document).ready(function () {
             data: { logEntryId: CurrIds[0], ids: FileCurrIds }, dataType: "json"
         })
             .always(hideModalWait)
-            .done(function () {
-                setTimeout(fillLogEntryFilesForm, 200);
-            })
+            .done(function () { fillLogEntryFilesForm(); })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
 
@@ -201,28 +213,11 @@ $(document).ready(function () {
 //--------------------------------------Main Methods---------------------------------------//
 
 //Fill form showing log entry files
-function fillLogEntryFilesForm(panelText) {
-    var deferred0 = $.Deferred();
-
-    $("#LogEntryFilesViewPanel").text("New Log Entry");
-    if (panelText) { $("#LogEntryFilesViewPanel").text(panelText); }
-    else {
-        var selectedRecord = TableMain.row(".ui-selected", { page: "current"}).data();
-        if (selectedRecord) {
-            $("#LogEntryFilesViewPanel").text(selectedRecord.EnteredByPerson_.FirstName + " " +
-                selectedRecord.EnteredByPerson_.LastName + " - " + selectedRecord.LogEntryDateTime);
-        }
-    }
-    showModalWait();
-    refreshTableGeneric(TableLogEntryFiles, "/PersonLogEntrySrv/ListFiles", { logEntryId: CurrIds[0] }, "GET")
-        .always(hideModalWait)
-        .done(function () { return deferred0.resolve(); })
-        .fail(function (xhr, status, error) {
-            showModalAJAXFail(xhr, status, error);
-            deferred0.reject();
-        });
-
-    return deferred0.promise();
+function fillLogEntryFilesForm() {
+    return modalWaitWrapper(function () {
+        return refreshTableGeneric(TableLogEntryFiles,
+            "/PersonLogEntrySrv/ListFiles", { logEntryId: CurrIds[0] }, "GET");
+    });
 }
 
 //---------------------------------------Helper Methods--------------------------------------//

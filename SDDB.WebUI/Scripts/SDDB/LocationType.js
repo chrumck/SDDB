@@ -22,6 +22,7 @@ LabelTextEdit = "Edit Location Type";
 UrlFillForEdit = "/LocationTypeSrv/GetByIds";
 UrlEdit = "/LocationTypeSrv/Edit";
 UrlDelete = "/LocationTypeSrv/Delete";
+urlRefreshMainView = "/LocationTypeSrv/Get";
 
 $(document).ready(function () {
 
@@ -77,14 +78,6 @@ $(document).ready(function () {
 
 
 //--------------------------------------Main Methods---------------------------------------//
-
-//refresh Main view 
-function refreshMainView() {
-    var deferred0 = $.Deferred();
-    refreshTblGenWrp(TableMain, "/LocationTypeSrv/Get", { getActive: GetActive }).done(deferred0.resolve);
-    return deferred0.promise();
-}
-
 
 //---------------------------------------Helper Methods--------------------------------------//
 

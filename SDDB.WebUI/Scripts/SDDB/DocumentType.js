@@ -22,6 +22,7 @@ LabelTextEdit = "Edit Document Type";
 UrlFillForEdit = "/DocumentTypeSrv/GetByIds";
 UrlEdit = "/DocumentTypeSrv/Edit";
 UrlDelete = "/DocumentTypeSrv/Delete";
+urlRefreshMainView = "/DocumentTypeSrv/Get";
 
 $(document).ready(function () {
 
@@ -77,14 +78,6 @@ $(document).ready(function () {
 
 
 //--------------------------------------Main Methods---------------------------------------//
-
-//refresh Main view 
-function refreshMainView() {
-    var deferred0 = $.Deferred();
-    refreshTblGenWrp(TableMain, "/DocumentTypeSrv/Get", { getActive: GetActive }).done(deferred0.resolve);
-    return deferred0.promise();
-}
-
 
 //---------------------------------------Helper Methods--------------------------------------//
 

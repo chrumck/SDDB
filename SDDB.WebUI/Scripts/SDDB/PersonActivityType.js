@@ -22,6 +22,7 @@ LabelTextEdit = "Edit Activity Type";
 UrlFillForEdit = "/PersonActivityTypeSrv/GetByIds";
 UrlEdit = "/PersonActivityTypeSrv/Edit";
 UrlDelete = "/PersonActivityTypeSrv/Delete";
+urlRefreshMainView = "/PersonActivityTypeSrv/Get";
 
 $(document).ready(function () {
 
@@ -78,12 +79,6 @@ $(document).ready(function () {
 
 //--------------------------------------Main Methods---------------------------------------//
 
-//refresh Main view 
-function refreshMainView() {
-    var deferred0 = $.Deferred();
-    refreshTblGenWrp(TableMain, "/PersonActivityTypeSrv/Get", { getActive: GetActive }).done(deferred0.resolve);
-    return deferred0.promise();
-}
 
 //---------------------------------------Helper Methods--------------------------------------//
 

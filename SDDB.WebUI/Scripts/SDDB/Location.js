@@ -178,32 +178,21 @@ $(document).ready(function () {
 
 //--------------------------------------Main Methods---------------------------------------//
 
-
-//Delete Records from DB
-function deleteRecords() {
-    CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-    deleteRecordsGenericWrp(CurrIds, "/LocationSrv/Delete", refreshMainView);
-}
-
 //refresh view after magicsuggest update
 function refreshMainView() {
-    var deferred0 = $.Deferred();
-
     TableMain.clear().search("").draw();
-
     if (MsFilterByType.getValue().length === 0 && MsFilterByProject.getValue().length === 0) {
-        return deferred0.resolve();
+        return $.Deferred().resolve();
     }
-    refreshTblGenWrp(TableMain, "/LocationSrv/GetByAltIds",
+    return modalWaitWrapper(function () {
+        return refreshTableGeneric(TableMain, "/LocationSrv/GetByAltIds",
         {
             projectIds: MsFilterByProject.getValue(),
             typeIds: MsFilterByType.getValue(),
             getActive: GetActive
         },
-        "POST")
-        .done(deferred0.resolve);
-
-    return deferred0.promise();
+        "POST");
+    });
 }
 
 //fillFiltersFromRequestParams

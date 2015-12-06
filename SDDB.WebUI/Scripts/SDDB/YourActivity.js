@@ -6,139 +6,116 @@
 /// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
+/// <reference path="PersonLogEntryFiles.js" />
+/// <reference path="Shared_Views.js" />
+/// <reference path="PersonLogEntryShared.js" />
 
 //--------------------------------------Global Properties------------------------------------//
 
+LabelTextCreate = function () { return "New Activity for " + $("#FilterDateStart").val(); };
+LabelTextEdit = function () { return "Edit Activity for " + $("#FilterDateStart").val(); };
+LabelTextCopy = function () { return "Copy Activity to " + moveToDate.format("YYYY-MM-DD"); };
 
-$(document).ready(function () {
+var panelTableMainClass = "panel-tdo-success";
 
-    //-----------------------------------------MainView------------------------------------------//
+callBackAfterCreate = function () {
+    $("#EditFormBtnOkFiles").prop("disabled", false);
+    $("#LogEntryPersonsView").addClass("hidden");
+    var logEntryDT = moment($("#FilterDateStart").val()).hour(moment().hour()).minute(0);
+    $("#EntryDTPicker").data("DateTimePicker").date(logEntryDT);
+    $("#LogEntryDateTime").val(logEntryDT.format("YYYY-MM-DD HH:mm"));
+    $("#HoursWorkedPicker").data("DateTimePicker").date("00:00");
+    $("#ManHours").val(0);
+    MagicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
+    MagicSuggests[3].disable();
+    MagicSuggests[4].disable();
+    TableLogEntryAssysAdd.clear().search("").draw();
+    TableLogEntryAssysRemove.clear().search("").draw();
+    TableLogEntryPersonsAdd.clear().search("").draw();
+    TableLogEntryPersonsRemove.clear().search("").draw();
 
-    //Wire up BtnCreate
-    $("#BtnCreate").click(function () {
-        CurrIds = [];
-        CurrRecords = [];
-        CurrRecords[0] = $.extend(true, {}, RecordTemplate);
-        fillFormForCreateGeneric("EditForm", MagicSuggests,
-            "New Activity for " + $("#FilterDateStart").val(), "MainView");
-        MagicSuggests[3].disable();
-        MagicSuggests[4].disable();
-        TableLogEntryAssysAdd.clear().search("").draw();
-        TableLogEntryAssysRemove.clear().search("").draw();
-        TableLogEntryPersonsAdd.clear().search("").draw();
-        TableLogEntryPersonsRemove.clear().search("").draw();
-        $("#LogEntryPersonsView").addClass("hidden");
-        MagicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
-        $("#LogEntryDateTime")
-            .val(moment($("#FilterDateStart").val()).hour(moment().hour()).format("YYYY-MM-DD HH:mm"));
-        $("#EntryDTPicker").data("DateTimePicker").date(moment($("#LogEntryDateTime").val()));
-        $("#ManHours").val(0);
-        $("#HoursWorkedPicker").data("DateTimePicker").date("00:00");
+    return $.Deferred().resolve();
+};
 
-        saveViewSettings(TableMain);
-        switchView("MainView", "EditFormView", "tdo-btngroup-edit");
-    });
+callBackAfterEdit = function (currRecords) {
+    if (CurrIds.length > 1) { $("#EditFormBtnOkFiles").prop("disabled", true); }
+    else { $("#EditFormBtnOkFiles").prop("disabled", false); }
+    $("#LogEntryPersonsView").addClass("hidden");
+    TableLogEntryPersonsAdd.clear().search("").draw();
+    TableLogEntryPersonsRemove.clear().search("").draw();
+    $("#EntryDTPicker").data("DateTimePicker").date(moment($("#LogEntryDateTime").val()));
+    $("#LogEntryDateTime").data("ismodified", false);
+    $("#HoursWorkedPicker").data("DateTimePicker").date(moment($("#ManHours").val(), "HH"));
+    $("#ManHours").data("ismodified", false);
 
-    //Wire up BtnEdit
-    $("#BtnEdit").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length != 1) {
-            showModalSelectOne();
-            return;
-        }
-        TableLogEntryPersonsAdd.clear().search("").draw();
-        TableLogEntryPersonsRemove.clear().search("").draw();
-        $("#LogEntryPersonsView").addClass("hidden");
-
-        showModalWait();
-        $.when(
-            fillFormForEditGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
-                GetActive, "EditForm", "Edit Activity", MagicSuggests)
-            )
-            .then(function (currRecords) {
-                CurrRecords = currRecords;
-                return fillFormForRelatedGeneric(
+    return modalWaitWrapper(function () {
+        return fillFormForRelatedGeneric(
                     TableLogEntryAssysAdd, TableLogEntryAssysRemove, CurrIds,
                     "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys",
                     { logEntryId: CurrIds[0] },
                     "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
                     { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] },
                     "GET", "AssemblyDbSrv/LookupByLocDTables",
-                    { locId: MagicSuggests[3].getValue()[0], getActive: true }
-                );
-
-            })
-            .always(hideModalWait)
-            .done(function () {
-                $("#EntryDTPicker").data("DateTimePicker").date(moment($("#LogEntryDateTime").val()));
-                $("#LogEntryDateTime").data("ismodified", false);
-                $("#HoursWorkedPicker").data("DateTimePicker").date(moment($("#ManHours").val(), "HH"));
-                $("#ManHours").data("ismodified", false);
-                saveViewSettings(TableMain);
-                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
-            })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+                    { locId: MagicSuggests[3].getValue()[0], getActive: true } );
     });
+};
 
-    //Wire up BtnCopy
-    $("#BtnCopy").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length !== 1) {
-            showModalSelectOne();
-            return;
-        }
-        var moveToDate;
-        showModalDatePrompt("NOTE: Assemblies, People and Files are not copied!",
+callBackBeforeCopy = function () {
+    return showModalDatePrompt("NOTE: Assemblies, People and Files are not copied!",
                 "Copy To Date:", $("#FilterDateStart").val())
-            .then(function (outputDate) {
-                moveToDate = outputDate;
-                TableLogEntryPersonsAdd.clear().search("").draw();
-                TableLogEntryPersonsRemove.clear().search("").draw();
-                TableLogEntryAssysAdd.clear().search("").draw();
-                TableLogEntryAssysRemove.clear().search("").draw();
-                $("#LogEntryPersonsView").addClass("hidden");
-                return modalWaitWrapper(function () {
-                    return fillFormForCopyGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds", GetActive,
-                        "EditForm", "Copy Activity to " + moveToDate.format("YYYY-MM-DD"), MagicSuggests);
-                });
-            })
-            .then(function (currRecords) {
-                CurrIds = [];
-                CurrRecords = [];
-                CurrRecords[0] = $.extend(true, {}, RecordTemplate);
+        .then(function (outputDate) { moveToDate = outputDate; });
+};
 
-                var entryDTpickerDate = moment($("#LogEntryDateTime").val())
-                    .year(moveToDate.year()).dayOfYear(moveToDate.dayOfYear());
-                $("#EntryDTPicker").data("DateTimePicker").date(entryDTpickerDate);
-                $("#EntryDTPicker").trigger("dp.change");
-                $("#HoursWorkedPicker").data("DateTimePicker").date(moment($("#ManHours").val(), "HH"));
-                MagicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
+callBackAfterCopy = function () {
+    $("#EditFormBtnOkFiles").prop("disabled", false);
+    $("#LogEntryPersonsView").addClass("hidden");
+    TableLogEntryAssysAdd.clear().search("").draw();
+    TableLogEntryAssysRemove.clear().search("").draw();
+    TableLogEntryPersonsAdd.clear().search("").draw();
+    TableLogEntryPersonsRemove.clear().search("").draw();
 
-                return modalWaitWrapper(function () {
-                    return refreshTableGeneric(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
-                        { getActive: true, locId: MagicSuggests[3].getValue()[0] }, "GET");
-                });
-            })
-            .done(function () {
-                saveViewSettings(TableMain);
-                switchView("MainView", "EditFormView", "tdo-btngroup-edit");
-            });
-        
+    var copyToDateTime = moment($("#LogEntryDateTime").val())
+            .year(moveToDate.year()).dayOfYear(moveToDate.dayOfYear());
+    $("#EntryDTPicker").data("DateTimePicker").date(copyToDateTime);
+    $("#LogEntryDateTime").val(copyToDateTime.format("YYYY-MM-DD HH:mm"));
+    $("#HoursWorkedPicker").data("DateTimePicker").date(moment($("#ManHours").val(), "HH"));
+    MagicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
+
+    return modalWaitWrapper(function () {
+        return refreshTableGeneric(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
+            { getActive: true, locId: MagicSuggests[3].getValue()[0] }, "GET");
     });
+};
+
+refreshMainView = function () {
+    TableMain.clear().search("").draw();
+    if ($("#FilterDateStart").val() === "") { return $.Deferred().resolve(); }
+
+    var endDate = moment($("#FilterDateStart").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
+    return modalWaitWrapper(function () {
+        return refreshTableGeneric(TableMain, "/PersonLogEntrySrv/GetByAltIds",
+        {
+            personIds: [UserId],
+            startDate: $("#FilterDateStart").val(),
+            endDate: endDate,
+            getActive: GetActive,
+            filterForPLEView: false
+        },
+        "POST");
+    });
+}
+
+$(document).ready(function () {
+
+    //-----------------------------------------MainView------------------------------------------//
         
     //---------------------------------------DataTables------------
-
-    //Wire up ChBoxShowDeleted
-    $("#ChBoxShowDeleted").change(function (event) {
-        if (!$(this).prop("checked")) {
-            GetActive = true;
-            $("#PanelTableMain").removeClass("panel-tdo-danger").addClass("panel-tdo-success");
-        } else {
-            GetActive = false;
-            $("#PanelTableMain").removeClass("panel-tdo-success").addClass("panel-tdo-danger");
-        }
-        refreshMainView();
-    });
+    
+    //TableMainColumnSets
+    TableMainColumnSets = [
+        [1],
+        [2, 3, 4, 5, 6, 7, 8, 9]
+    ];
 
     //TableMain PersonLogEntrys
     TableMain = $("#TableMain").DataTable({
@@ -207,13 +184,17 @@ $(document).ready(function () {
             paginate: { previous: "", next: "" }
         }
     });
+    //showing the first Set of columns on startup;
+    showColumnSet(TableMainColumnSets, 1);
 
     //---------------------------------------EditFormView----------------------------------------//
 
     //Initialize DateTimePicker - EntryDTPicker
     $("#EntryDTPicker").datetimepicker({ format: "HH", inline: true })
         .on("dp.change", function (e) {
-            $("#LogEntryDateTime").val($("#EntryDTPicker").data("DateTimePicker").date().format("YYYY-MM-DD HH:mm"));
+            var newEntryDate = moment($("#LogEntryDateTime").val()).minute(0)
+                .hour($("#EntryDTPicker").data("DateTimePicker").date().hour());
+            $("#LogEntryDateTime").val(newEntryDate.format("YYYY-MM-DD HH:mm"));
             $("#LogEntryDateTime").data("ismodified", true);
         });
 
@@ -292,8 +273,7 @@ $(document).ready(function () {
 
     $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
     refreshMainView();
-    $("#InitialView").addClass("hidden");
-    $("#MainView").removeClass("hidden");
+    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
   
 
     //--------------------------------End of execution at Start-----------
@@ -302,28 +282,6 @@ $(document).ready(function () {
 
 //--------------------------------------Main Methods---------------------------------------//
 
-//refresh view after magicsuggest update
-function refreshMainView() {
-    var deferred0 = $.Deferred();
 
-    TableMain.clear().search("").draw();
-
-    if ($("#FilterDateStart").val() === "") { return deferred0.resolve(); }
-
-    var endDate = moment($("#FilterDateStart").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
-
-    refreshTblGenWrp(TableMain, "/PersonLogEntrySrv/GetByAltIds",
-        {
-            personIds: [UserId],
-            startDate: $("#FilterDateStart").val(),
-            endDate: endDate,
-            getActive: GetActive,
-            filterForPLEView: false
-        },
-        "POST")
-        .done(deferred0.resolve);
-
-    return deferred0.promise();
-}
 
 //---------------------------------------Helper Methods--------------------------------------//

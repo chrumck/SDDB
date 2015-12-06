@@ -66,9 +66,9 @@ var ExtTypeHttpType = "POST";
 var ExtHttpTypeEdit = "POST";
 var ExtUrlEdit = "/ComponentSrv/EditExt";
 
-callBackBeforeCreate = updateFormForSelectedType;
+callBackAfterCreate = updateFormForSelectedType;
 
-callBackBeforeEdit = function (currRecords) {
+callBackAfterEdit = function (currRecords) {
     return updateFormForSelectedType()
         .then(function () {return fillFormForEditFromDbEntries(GetActive, currRecords, ExtEditFormId); });
 };
@@ -90,7 +90,7 @@ callBackAfterSubmitEdit = function (data) {
     return submitEditsGenericWrp(ExtEditFormId, [], ExtCurrRecords, ExtHttpTypeEdit, ExtUrlEdit);
 };
 
-callBackBeforeCopy = function (currRecords) {
+callBackAfterCopy = function (currRecords) {
     return updateFormForSelectedType()
         .then(function () { return fillFormForCopyFromDbEntries(currRecords, ExtEditFormId); });
 };
@@ -289,37 +289,28 @@ $(document).ready(function () {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
-    var deferred0 = $.Deferred();
-
     TableMain.clear().search("").draw();
-    updateMainViewForSelectedType()
-        .done(function () {
-            if (MsFilterByType.getValue().length !== 0 || MsFilterByProject.getValue().length !== 0 ||
+    return modalWaitWrapper(function () {
+        return updateMainViewForSelectedType()
+            .then(function () {
+                if (MsFilterByType.getValue().length !== 0 || MsFilterByProject.getValue().length !== 0 ||
                     MsFilterByAssy.getValue().length !== 0) {
-                refreshTblGenWrp(TableMain, "/ComponentSrv/GetByAltIds2",
-                    {
-                        projectIds: MsFilterByProject.getValue(),
-                        typeIds: MsFilterByType.getValue(),
-                        assyIds: MsFilterByAssy.getValue(),
-                        getActive: GetActive
-                    },
-                    "POST")
-                    .done(deferred0.resolve);
-                return;
-            }
-            if (typeof ComponentIds !== "undefined" && ComponentIds !== null && ComponentIds.length > 0) {
-                refreshTblGenWrp(TableMain, "/ComponentSrv/GetByIds",
-                    {
-                        ids: ComponentIds,
-                        getActive: GetActive
-                    },
-                    "POST")
-                    .done(deferred0.resolve);
-            }
-        });
-    return deferred0.promise();
+                    return refreshTableGeneric(TableMain, "/ComponentSrv/GetByAltIds2",
+                        {
+                            projectIds: MsFilterByProject.getValue(),
+                            typeIds: MsFilterByType.getValue(),
+                            assyIds: MsFilterByAssy.getValue(),
+                            getActive: GetActive
+                        },
+                        "POST");
+                }
+                if (ComponentIds && ComponentIds.length > 0) {
+                    return refreshTableGeneric(TableMain, "/ComponentSrv/GetByIds",
+                        { ids: ComponentIds, getActive: GetActive }, "POST");
+                }
+            });
+    });
 }
-
 
 //fillFiltersFromRequestParams
 function fillFiltersFromRequestParams() {
