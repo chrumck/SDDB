@@ -9,7 +9,7 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var RecordTemplate = {
+var recordTemplate = {
     Id: "RecordTemplateId",
     LogEntryDateTime: null,
     Component_Id: null,
@@ -21,29 +21,29 @@ var RecordTemplate = {
     IsActive_bl: null
 };
 
-var MsFilterByProject;
-var MsFilterByComponent;
-var MsFilterByPerson;
+var msFilterByProject;
+var msFilterByComponent;
+var msFilterByPerson;
 
 
-LabelTextCreate = "Create Log Entry";
-LabelTextEdit = "Edit Log Entry";
-UrlFillForEdit = "/ComponentLogEntrySrv/GetByIds";
-UrlEdit = "/ComponentLogEntrySrv/Edit";
-UrlDelete = "/ComponentLogEntrySrv/Delete";
+labelTextCreate = "Create Log Entry";
+labelTextEdit = "Edit Log Entry";
+urlFillForEdit = "/ComponentLogEntrySrv/GetByIds";
+urlEdit = "/ComponentLogEntrySrv/Edit";
+urlDelete = "/ComponentLogEntrySrv/Delete";
 
 $(document).ready(function () {
 
-    //-----------------------------------------MainView------------------------------------------//
+    //-----------------------------------------mainView------------------------------------------//
 
-    //Initialize DateTimePicker FilterDateStart
-    $("#FilterDateStart").datetimepicker({ format: "YYYY-MM-DD" }).on("dp.hide", function (e) { refreshMainView(); });
+    //Initialize DateTimePicker filterDateStart
+    $("#filterDateStart").datetimepicker({ format: "YYYY-MM-DD" }).on("dp.hide", function (e) { refreshMainView(); });
 
-    //Initialize DateTimePicker FilterDateEnd
-    $("#FilterDateEnd").datetimepicker({ format: "YYYY-MM-DD" }).on("dp.hide", function (e) { refreshMainView(); });
+    //Initialize DateTimePicker filterDateEnd
+    $("#filterDateEnd").datetimepicker({ format: "YYYY-MM-DD" }).on("dp.hide", function (e) { refreshMainView(); });
 
-    //Initialize MagicSuggest MsFilterByProject
-    MsFilterByProject = $("#MsFilterByProject").magicSuggest({
+    //Initialize MagicSuggest msFilterByProject
+    msFilterByProject = $("#msFilterByProject").magicSuggest({
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
@@ -52,11 +52,11 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByProject
-    $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByProject
+    $(msFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
 
-    //Initialize MagicSuggest MsFilterByComponent
-    MsFilterByComponent = $("#MsFilterByComponent").magicSuggest({
+    //Initialize MagicSuggest msFilterByComponent
+    msFilterByComponent = $("#msFilterByComponent").magicSuggest({
         data: "/ComponentSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
@@ -65,11 +65,11 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByComponent
-    $(MsFilterByComponent).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByComponent
+    $(msFilterByComponent).on("selectionchange", function (e, m) { refreshMainView(); });
 
-    //Initialize MagicSuggest MsFilterByComponent
-    MsFilterByCompType = $("#MsFilterByCompType").magicSuggest({
+    //Initialize MagicSuggest msFilterByComponent
+    msFilterByCompType = $("#msFilterByCompType").magicSuggest({
         data: "/ComponentTypeSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
@@ -78,11 +78,11 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByComponent
-    $(MsFilterByCompType).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByComponent
+    $(msFilterByCompType).on("selectionchange", function (e, m) { refreshMainView(); });
 
-    //Initialize MagicSuggest MsFilterByPerson
-    MsFilterByPerson = $("#MsFilterByPerson").magicSuggest({
+    //Initialize MagicSuggest msFilterByPerson
+    msFilterByPerson = $("#msFilterByPerson").magicSuggest({
         data: "/PersonSrv/LookupFromProject",
         allowFreeEntries: false,
         ajaxConfig: {
@@ -91,20 +91,20 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByPerson
-    $(MsFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByPerson
+    $(msFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
 
 
     //---------------------------------------DataTables------------
 
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    //tableMainColumnSets
+    tableMainColumnSets = [
         [1],
         [2, 3, 4, 5, 6, 7, 8]
     ];
 
-    //TableMain PersonLogEntrys
-    TableMain = $("#TableMain").DataTable({
+    //tableMain PersonLogEntrys
+    tableMain = $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LogEntryDateTime", name: "LogEntryDateTime" },//1
@@ -160,9 +160,9 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    showColumnSet(1, tableMainColumnSets);
 
-    //---------------------------------------EditFormView----------------------------------------//
+    //---------------------------------------editFormView----------------------------------------//
 
     //Initialize DateTimePicker
     $("#LogEntryDateTime").datetimepicker({ format: "YYYY-MM-DD HH:mm" })
@@ -173,15 +173,15 @@ $(document).ready(function () {
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
-    msAddToMsArray(MagicSuggests, "Component_Id", "/ComponentSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "ComponentStatus_Id", "/ComponentStatusSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "Component_Id", "/ComponentSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "ComponentStatus_Id", "/ComponentStatusSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
 
     //--------------------------------------View Initialization------------------------------------//
 
     fillFiltersFromRequestParams().done(refreshMainView);
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
+    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });
@@ -191,22 +191,22 @@ $(document).ready(function () {
 
 //refresh Main view 
 function refreshMainView() {
-    TableMain.clear().search("").draw();
-    if ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "") { return $.Deferred().resolve(); }
+    tableMain.clear().search("").draw();
+    if ($("#filterDateStart").val() == "" || $("#filterDateEnd").val() == "") { return $.Deferred().resolve(); }
 
-    var endDate = ($("#FilterDateEnd").val() == "") ? "": moment($("#FilterDateEnd").val())
+    var endDate = ($("#filterDateEnd").val() == "") ? "": moment($("#filterDateEnd").val())
         .hour(23).minute(59).format("YYYY-MM-DD HH:mm");
 
     return modalWaitWrapper(function () {
-        return refreshTableGeneric(TableMain, "/ComponentLogEntrySrv/GetByAltIds",
+        return refreshTableGeneric(tableMain, "/ComponentLogEntrySrv/GetByAltIds",
         {
-            projectIds: MsFilterByProject.getValue(),
-            componentIds: MsFilterByComponent.getValue(),
-            compTypeIds: MsFilterByCompType.getValue(),
-            personIds: MsFilterByPerson.getValue(),
-            startDate: $("#FilterDateStart").val(),
+            projectIds: msFilterByProject.getValue(),
+            componentIds: msFilterByComponent.getValue(),
+            compTypeIds: msFilterByCompType.getValue(),
+            personIds: msFilterByPerson.getValue(),
+            startDate: $("#filterDateStart").val(),
             endDate: endDate,
-            getActive: GetActive
+            getActive: currentActive
         },
         "POST");
     });
@@ -214,14 +214,14 @@ function refreshMainView() {
 
 //fillFiltersFromRequestParams
 function fillFiltersFromRequestParams() {
-    $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
-    $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
+    $("#filterDateStart").val(moment().format("YYYY-MM-DD"));
+    $("#filterDateEnd").val(moment().format("YYYY-MM-DD"));
     if (ComponentId) {
         return modalWaitWrapper(function () {
             return $.ajax({type: "POST", url: "/ComponentSrv/GetByIds", timeout: 120000,
                     data: { ids: [ComponentId], getActive: true }, dataType: "json"})
                 .then(function (data) {
-                    msSetSelectionSilent(MsFilterByComponent, [{ id: data[0].Id, name: data[0].CompName, }]);
+                    msSetSelectionSilent(msFilterByComponent, [{ id: data[0].Id, name: data[0].CompName, }]);
                 });
             });
     }

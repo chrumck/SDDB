@@ -9,7 +9,7 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var RecordTemplate = {
+var recordTemplate = {
     Id: "RecordTemplateId",
     ActivityTypeName: null,
     ActivityTypeAltName: null,
@@ -17,27 +17,27 @@ var RecordTemplate = {
     IsActive_bl: null
 };
 
-LabelTextCreate = "Create Activity Type";
-LabelTextEdit = "Edit Activity Type";
-UrlFillForEdit = "/PersonActivityTypeSrv/GetByIds";
-UrlEdit = "/PersonActivityTypeSrv/Edit";
-UrlDelete = "/PersonActivityTypeSrv/Delete";
+labelTextCreate = "Create Activity Type";
+labelTextEdit = "Edit Activity Type";
+urlFillForEdit = "/PersonActivityTypeSrv/GetByIds";
+urlEdit = "/PersonActivityTypeSrv/Edit";
+urlDelete = "/PersonActivityTypeSrv/Delete";
 urlRefreshMainView = "/PersonActivityTypeSrv/Get";
 
 $(document).ready(function () {
 
-    //-----------------------------------------MainView------------------------------------------//
+    //-----------------------------------------mainView------------------------------------------//
     
     //---------------------------------------DataTables------------
 
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    //tableMainColumnSets
+    tableMainColumnSets = [
         [1],
         [2, 3]
     ];
 
-    //TableMain PersonActivity Types
-    TableMain = $("#TableMain").DataTable({
+    //tableMain PersonActivity Types
+    tableMain = $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "ActivityTypeName", name: "ActivityTypeName" },//1
@@ -64,14 +64,14 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    showColumnSet(1, tableMainColumnSets);
 
-    //---------------------------------------EditFormView----------------------------------------//
+    //---------------------------------------editFormView----------------------------------------//
 
     //--------------------------------------View Initialization------------------------------------//
 
     refreshMainView();
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
+    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });

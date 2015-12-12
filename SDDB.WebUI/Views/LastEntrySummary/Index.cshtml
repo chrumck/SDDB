@@ -3,32 +3,32 @@
     ViewBag.Title = "SDDB Person Last Entries Summary";
 }
 
-<!------- InitialView ------->
-<div class="container-fluid" id="InitialView">
+<!------- initialView ------->
+<div class="container-fluid" id="initialView">
     <h4>Please wait, page loading...</h4>
 </div>
 
-<!------- MainView ------->
-<div class="container-fluid hidden" id="MainView">
+<!------- mainView ------->
+<div class="container-fluid hidden" id="mainView">
 
     <div class="row">
         <div class="col-xs-12">
             <div class="btn-group margin-bottom-2px">
                 <input class="form-control input-tdo-warning" data-val="true" data-val-dbisdateiso="The field must have YYYY-MM-DD format."
-                       id="FilterDateStart" placeholder="Select Day" type="text" value="">
+                       id="filterDateStart" placeholder="Select Day" type="text" value="">
             </div>
             &nbsp; &nbsp;
             <div class="btn-group margin-bottom-2px">
-                <div id="MsFilterByActivityType" placeholder="Activity Type"></div>
+                <div id="msFilterByActivityType" placeholder="Activity Type"></div>
             </div>
         </div>
     </div>
 
-    <div class="panel panel-warning" id="PanelTableMain">
+    <div class="panel panel-warning" id="panelTableMain">
         <div class="panel-heading text-center" style="font-size:130%">
             <strong>Person Last Entries</strong>
         </div>
-        <table class="table table-striped" id="TableMain">
+        <table class="table table-striped" id="tableMain">
             <thead>
                 <tr>
                     <th id="thNo0">Project</th>

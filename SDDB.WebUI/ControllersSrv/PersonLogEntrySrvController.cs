@@ -218,11 +218,11 @@ namespace SDDB.WebUI.ControllersSrv
         // POST: /PersonLogEntrySrv/DownloadFiles
         [HttpPost]
         [DBSrvAuth("PersonLogEntry_View,YourActivity_View", false)]
-        public async Task<ActionResult> DownloadFiles(long DlToken, string logEntryId, string[] fileIds)
+        public async Task<ActionResult> DownloadFiles(long dlToken, string logEntryId, string[] fileIds)
         {
             ViewBag.ServiceName = "personLogEntryFileService.DownloadAsync";
 
-            var tokenCookie = new HttpCookie("DlToken", DlToken.ToString());
+            var tokenCookie = new HttpCookie("dlToken", dlToken.ToString());
             Response.Cookies.Set(tokenCookie);
 
             if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))

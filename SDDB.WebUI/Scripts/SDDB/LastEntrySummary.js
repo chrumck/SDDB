@@ -9,20 +9,20 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var MsFilterByActivityType;
+var msFilterByActivityType;
 
 $(document).ready(function () {
 
-    //-----------------------------------------MainView------------------------------------------//
+    //-----------------------------------------mainView------------------------------------------//
 
 
-    //Initialize DateTimePicker FilterDateStart
-    $("#FilterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
+    //Initialize DateTimePicker filterDateStart
+    $("#filterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
         .on("dp.hide", function (e) { refreshMainView(); });
 
 
-    //Initialize MagicSuggest MsFilterByActivityType
-    MsFilterByActivityType = $("#MsFilterByActivityType").magicSuggest({
+    //Initialize MagicSuggest msFilterByActivityType
+    msFilterByActivityType = $("#msFilterByActivityType").magicSuggest({
         data: "/PersonActivityTypeSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
@@ -32,17 +32,17 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByActivityType
-    $(MsFilterByActivityType).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByActivityType
+    $(msFilterByActivityType).on("selectionchange", function (e, m) { refreshMainView(); });
            
     //--------------------------------------View Initialization------------------------------------//
            
-    $("#InitialView").addClass("hidden");
-    $("#MainView").removeClass("hidden");
+    $("#initialView").addClass("hidden");
+    $("#mainView").removeClass("hidden");
 
     var weekOffset = 0
     if ($("#thNo6").is(":hidden") && $("#thNo7").is(":hidden")) { weekOffset = 1; }
-    $("#FilterDateStart").val(moment().day(weekOffset).format("YYYY-MM-DD"));
+    $("#filterDateStart").val(moment().day(weekOffset).format("YYYY-MM-DD"));
 
     refreshMainView();
 
@@ -55,13 +55,13 @@ $(document).ready(function () {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
-    var tableMain = $("#TableMain");
-    var startDate = $("#FilterDateStart").val();
+    var tableMain = $("#tableMain");
+    var startDate = $("#filterDateStart").val();
 
     tableMain.find("tbody").empty();
     clearSumTblFirstRowHelper(tableMain);
 
-    if (startDate != "" && MsFilterByActivityType.getSelection().length != 0) {
+    if (startDate != "" && msFilterByActivityType.getSelection().length != 0) {
         showModalWait();
         var endDate = moment(startDate).add(6, "days").hour(23).minute(59).format("YYYY-MM-DD HH:mm");
         $.ajax({
@@ -69,7 +69,7 @@ function refreshMainView() {
             url: "/PersonLogEntrySrv/GetLastEntrySummaries",
             timeout: 120000,
             data: {
-                activityTypeId: (MsFilterByActivityType.getSelection())[0].id,
+                activityTypeId: (msFilterByActivityType.getSelection())[0].id,
                 startDate: startDate,
                 endDate: endDate,
                 getActive: true

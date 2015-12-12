@@ -1,13 +1,13 @@
-﻿<!------- LogEntryFilesView ------->
-<div class="container-fluid hidden" id="LogEntryFilesView">
+﻿<!------- logEntryFilesView ------->
+<div class="container-fluid hidden" id="logEntryFilesView">
 
     <div class="row">
         <div class="col-xs-12 col-sm-6">
-            <h3 id="PrsProjViewLabel">Log Entry Files</h3>
+            <h3 id="prsProjViewLabel">Log Entry Files</h3>
         </div>
         <div class="col-xs-12 col-sm-6">
             <div class="panel panel-warning margin-top-10px">
-                <div class="panel-heading text-center" style="font-weight:bold" id="LogEntryFilesViewPanel"> </div>
+                <div class="panel-heading text-center" style="font-weight:bold" id="logEntryFilesViewPanel"> </div>
             </div>
         </div>
     </div>
@@ -16,9 +16,9 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="btn-group margin-bottom-2px">
-                    <span class="btn btn-default btn-file">Upload <input type="file" id="LogEntryFilesBtnUpload" multiple></span>
-                    <button class="btn btn-info" id="LogEntryFilesBtnDload">Download</button>
-                    <button class="btn btn-danger" id="LogEntryFilesBtnDelete">Delete</button>
+                    <span class="btn btn-default btn-file">Upload <input type="file" id="logEntryFilesBtnUpload" multiple></span>
+                    <button class="btn btn-info" id="logEntryFilesBtnDload">Download</button>
+                    <button class="btn btn-danger" id="logEntryFilesBtnDelete">Delete</button>
                 </div>
             </div>
         </div>
@@ -26,7 +26,7 @@
             <div class="col-xs-12">
                 <div class="panel panel-primary">
                     <div class="panel-heading text-center"><strong>Log Entry Files</strong></div>
-                    <table class="table table-striped" id="TableLogEntryFiles">
+                    <table class="table table-striped" id="tableLogEntryFiles">
                         <thead>
                             <tr>
                                 <th>Id</th>
@@ -43,39 +43,39 @@
             </div>
         </div>
     </div>
-    <iframe class="hidden" id="LogEntryFilesIframe" name="LogEntryFilesIframe"></iframe>
+    <iframe class="hidden" id="logEntryFilesIframe" name="logEntryFilesIframe"></iframe>
 </div>
 
-<!------------ ModalUpload dialog ------------>
-<div class="modal" id="ModalUpload" tabindex="-1" role="dialog">
+<!------------ modalUpload dialog ------------>
+<div class="modal" id="modalUpload" tabindex="-1" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="ModalUploadLabel">Uploading...</h4>
+                <h4 class="modal-title" id="modalUploadLabel">Uploading...</h4>
             </div>
             <div class="modal-body">
-                <div id="ModalUploadBody"></div>
+                <div id="modalUploadBody"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-warning" id="ModalUploadBtnAbort">Abort</button>
+                <button class="btn btn-warning" id="modalUploadBtnAbort">Abort</button>
             </div>
         </div>
     </div>
 </div>
 
-<!----------- ModalDeleteFiles dialog ----------->
-<div class="modal" id="ModalDeleteFiles" tabindex="-1" role="dialog">
+<!----------- modalDeleteFiles dialog ----------->
+<div class="modal" id="modalDeleteFiles" tabindex="-1" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="ModalDeleteFilesLabel">Confirm Delete</h4>
+                <h4 class="modal-title" id="modalDeleteFilesLabel">Confirm Delete</h4>
             </div>
             <div class="modal-body">
-                <div id="ModalDeleteFilesBody"></div>
+                <div id="modalDeleteFilesBody"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-default pull-left" id="ModalDeleteFilesBtnCancel">Cancel</button>
-                <button class="btn btn-warning" id="ModalDeleteFilesBtnOk">
+                <button class="btn btn-default pull-left" id="modalDeleteFilesBtnCancel">Cancel</button>
+                <button class="btn btn-warning" id="modalDeleteFilesBtnOk">
                     &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
                 </button>
             </div>
@@ -83,21 +83,21 @@
     </div>
 </div>
 
-<!------------ ModalChngSts dialog ------------>
-<div class="modal" id="ModalChngSts" tabindex="-1" role="dialog">
+<!------------ modalChngSts dialog ------------>
+<div class="modal" id="modalChngSts" tabindex="-1" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="ModalChngStsLabel">Change Status</h4>
+                <h4 class="modal-title" id="modalChngStsLabel">Change Status</h4>
             </div>
             <div class="modal-body">
-                <div id="ModalChngStsBody"></div>
+                <div id="modalChngStsBody"></div>
                 <br />
-                <div id="ModalChngStsMs" placeholder="Select Status"></div>
+                <div id="modalChngStsMs" placeholder="Select Status"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-default pull-left" id="ModalChngStsBtnCancel">Cancel</button>
-                <button class="btn btn-warning" id="ModalChngStsBtnOk">
+                <button class="btn btn-default pull-left" id="modalChngStsBtnCancel">Cancel</button>
+                <button class="btn btn-warning" id="modalChngStsBtnOk">
                     &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
                 </button>
             </div>

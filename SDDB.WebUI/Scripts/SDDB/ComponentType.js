@@ -9,7 +9,7 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var RecordTemplate = {
+var recordTemplate = {
     Id: "RecordTemplateId",
     CompTypeName: null,
     CompTypeAltName: null,
@@ -47,26 +47,26 @@ var RecordTemplate = {
     Attr15Desc: null
 };
 
-LabelTextCreate = "Create Component Type";
-LabelTextEdit = "Edit Component Type";
-UrlFillForEdit = "/ComponentTypeSrv/GetByIds";
-UrlEdit = "/ComponentTypeSrv/Edit";
-UrlDelete = "/ComponentTypeSrv/Delete";
+labelTextCreate = "Create Component Type";
+labelTextEdit = "Edit Component Type";
+urlFillForEdit = "/ComponentTypeSrv/GetByIds";
+urlEdit = "/ComponentTypeSrv/Edit";
+urlDelete = "/ComponentTypeSrv/Delete";
 urlRefreshMainView = "/ComponentTypeSrv/Get";
 
 callBackAfterCreate = function () {
-    $("#EditForm select").find("option:first").prop("selected", "selected");
+    $("#editForm select").find("option:first").prop("selected", "selected");
     return $.Deferred().resolve();
 };
 
 $(document).ready(function () {
 
-    //-----------------------------------------MainView------------------------------------------//
+    //-----------------------------------------mainView------------------------------------------//
         
     //---------------------------------------DataTables------------
     
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    //tableMainColumnSets
+    tableMainColumnSets = [
         [1],
         [2, 3],
         [4, 5, 6, 7, 8, 9],
@@ -76,8 +76,8 @@ $(document).ready(function () {
         [28, 29, 30, 31, 32, 33]
     ];
 
-    //TableMain Component Types
-    TableMain = $("#TableMain").DataTable({
+    //tableMain Component Types
+    tableMain = $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "CompTypeName", name: "CompTypeName" },//1
@@ -156,14 +156,14 @@ $(document).ready(function () {
     });
 
     //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    showColumnSet(1, tableMainColumnSets);
 
-    //---------------------------------------EditFormView----------------------------------------//
+    //---------------------------------------editFormView----------------------------------------//
 
     //--------------------------------------View Initialization------------------------------------//
 
     refreshMainView();
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
+    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });

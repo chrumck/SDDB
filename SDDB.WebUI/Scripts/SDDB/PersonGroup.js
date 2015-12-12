@@ -9,83 +9,83 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var RecordTemplate = {
+var recordTemplate = {
     Id: "RecordTemplateId",
     PrsGroupName: null,
     PrsGroupAltName: null,
     Comments: null,
     IsActive_bl: null
 },
-    TableGroupManagersAdd = {},
-    TableGroupManagersRemove = {},
-    TableGroupPersonsAdd = {},
-    TableGroupPersonsRemove = {};
+    tableGroupManagersAdd = {},
+    tableGroupManagersRemove = {},
+    tableGroupPersonsAdd = {},
+    tableGroupPersonsRemove = {};
 
-LabelTextCreate = "Create Group";
-LabelTextEdit = "Edit Group";
-UrlFillForEdit = "/PersonGroupSrv/GetByIds";
-UrlEdit = "/PersonGroupSrv/Edit";
-UrlDelete = "/PersonGroupSrv/Delete";
+labelTextCreate = "Create Group";
+labelTextEdit = "Edit Group";
+urlFillForEdit = "/PersonGroupSrv/GetByIds";
+urlEdit = "/PersonGroupSrv/Edit";
+urlDelete = "/PersonGroupSrv/Delete";
 urlRefreshMainView = "/PersonGroupSrv/Get";
 
 $(document).ready(function () {
 
-    //-----------------------------------------MainView------------------------------------------//
+    //-----------------------------------------mainView------------------------------------------//
         
-    //Wire Up BtnEditGroupPersons 
-    $("#BtnEditGroupPersons").click(function () {
+    //Wire Up btnEditGroupPersons 
+    $("#btnEditGroupPersons").click(function (event) {
         event.preventDefault();
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length === 0) {
+        currentIds = tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (currentIds.length === 0) {
             showModalNothingSelected();
             return;
         }
-        if (CurrIds.length == 1) {
-            var selectedRecord = TableMain.row(".ui-selected", { page: "current" }).data();
-            $("#GroupPersonsViewPanel").text(selectedRecord.PrsGroupName);
+        if (currentIds.length == 1) {
+            var selectedRecord = tableMain.row(".ui-selected", { page: "current" }).data();
+            $("#groupPersonsViewPanel").text(selectedRecord.PrsGroupName);
         }
-        else { $("#GroupPersonsViewPanel").text("_MULTIPLE_"); }
+        else { $("#groupPersonsViewPanel").text("_MULTIPLE_"); }
 
         showModalWait();
         fillFormForRelatedGeneric(
-                TableGroupPersonsAdd, TableGroupPersonsRemove, CurrIds,
-                "GET", "/PersonGroupSrv/GetGroupPersons", { id: CurrIds[0]},
-                "GET", "/PersonGroupSrv/GetGroupPersonsNot", { id: CurrIds[0]},
+                tableGroupPersonsAdd, tableGroupPersonsRemove, currentIds,
+                "GET", "/PersonGroupSrv/GetGroupPersons", { id: currentIds[0]},
+                "GET", "/PersonGroupSrv/GetGroupPersonsNot", { id: currentIds[0]},
                 "GET", "/PersonSrv/GetAll",
                 {getActive: true }, 1)
             .always(hideModalWait)
             .done(function () {
-                saveViewSettings(TableMain);
-                switchView("MainView", "GroupPersonsView", "tdo-btngroup-grouppersons");
+                saveViewSettings(tableMain);
+                switchView("mainView", "groupPersonsView", "tdo-btngroup-grouppersons");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 
     });
 
-    //Wire Up BtnEditGroupManagers 
-    $("#BtnEditGroupManagers").click(function () {
+    //Wire Up btnEditGroupManagers 
+    $("#btnEditGroupManagers").click(function (event) {
         event.preventDefault();
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length === 0) {
+        currentIds = tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (currentIds.length === 0) {
             showModalNothingSelected();
             return;
         }
-        if (CurrIds.length == 1) {
-            var selectedRecord = TableMain.row(".ui-selected", { page: "current" }).data();
-            $("#GroupManagersViewPanel").text(selectedRecord.PrsGroupName);
+        if (currentIds.length == 1) {
+            var selectedRecord = tableMain.row(".ui-selected", { page: "current" }).data();
+            $("#groupManagersViewPanel").text(selectedRecord.PrsGroupName);
         }
-        else { $("#GroupManagersViewPanel").text("_MULTIPLE_"); }
+        else { $("#groupManagersViewPanel").text("_MULTIPLE_"); }
 
         showModalWait();
         fillFormForRelatedGeneric(
-                TableGroupManagersAdd, TableGroupManagersRemove, CurrIds,
-                "GET", "/PersonGroupSrv/GetGroupManagers", { id: CurrIds[0] },
-                "GET", "/PersonGroupSrv/GetGroupManagersNot", { id: CurrIds[0] },
+                tableGroupManagersAdd, tableGroupManagersRemove, currentIds,
+                "GET", "/PersonGroupSrv/GetGroupManagers", { id: currentIds[0] },
+                "GET", "/PersonGroupSrv/GetGroupManagersNot", { id: currentIds[0] },
                 "GET", "/PersonSrv/GetAll", { getActive: true }, 1)
             .always(hideModalWait)
             .done(function () {
-                saveViewSettings(TableMain);
-                switchView("MainView", "GroupManagersView", "tdo-btngroup-groupmanagers");
+                saveViewSettings(tableMain);
+                switchView("mainView", "groupManagersView", "tdo-btngroup-groupmanagers");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 
@@ -93,14 +93,14 @@ $(document).ready(function () {
             
     //---------------------------------------DataTables------------
 
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    //tableMainColumnSets
+    tableMainColumnSets = [
         [1],
         [2, 3]
     ];
     
-    //TableMain PersonGroups
-    TableMain = $("#TableMain").DataTable({
+    //tableMain PersonGroups
+    tableMain = $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "PrsGroupName", name: "PrsGroupName" },//1
@@ -127,36 +127,36 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    showColumnSet(1, tableMainColumnSets);
 
-    //---------------------------------------EditFormView----------------------------------------//
+    //---------------------------------------editFormView----------------------------------------//
 
     
-    //----------------------------------------GroupPersonsView----------------------------------------//
+    //----------------------------------------groupPersonsView----------------------------------------//
 
-    //Wire Up GroupPersonsViewBtnCancel
-    $("#GroupPersonsViewBtnCancel").click(function () {
-        switchView("GroupPersonsView", "MainView", "tdo-btngroup-main", TableMain);
+    //Wire Up groupPersonsViewBtnCancel
+    $("#groupPersonsViewBtnCancel").click(function () {
+        switchView("groupPersonsView", "mainView", "tdo-btngroup-main", tableMain);
     });
 
-    //Wire Up GroupPersonsViewBtnOk
-    $("#GroupPersonsViewBtnOk").click(function () {
-        if (TableGroupPersonsAdd.rows(".ui-selected", { page: "current" }).data().length +
-            TableGroupPersonsRemove.rows(".ui-selected", { page: "current" }).data().length === 0) {
+    //Wire Up groupPersonsViewBtnOk
+    $("#groupPersonsViewBtnOk").click(function () {
+        if (tableGroupPersonsAdd.rows(".ui-selected", { page: "current" }).data().length +
+            tableGroupPersonsRemove.rows(".ui-selected", { page: "current" }).data().length === 0) {
             showModalNothingSelected();
             return;
         }
         showModalWait();
         submitEditsForRelatedGeneric(
-                CurrIds,
-                TableGroupPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-                TableGroupPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                currentIds,
+                tableGroupPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                tableGroupPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
                 "/PersonGroupSrv/EditGroupPersons")
             .always(hideModalWait)
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("GroupPersonsView", "MainView", "tdo-btngroup-main", TableMain);
+                        switchView("groupPersonsView", "mainView", "tdo-btngroup-main", tableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -165,8 +165,8 @@ $(document).ready(function () {
 
     //---------------------------------------DataTables------------
 
-    //TableGroupPersonsAdd
-    TableGroupPersonsAdd = $("#TableGroupPersonsAdd").DataTable({
+    //tableGroupPersonsAdd
+    tableGroupPersonsAdd = $("#tableGroupPersonsAdd").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LastName", name: "LastName" },//1
@@ -190,8 +190,8 @@ $(document).ready(function () {
         pageLength: 100
     });
 
-    //TableGroupPersonsRemove
-    TableGroupPersonsRemove = $("#TableGroupPersonsRemove").DataTable({
+    //tableGroupPersonsRemove
+    tableGroupPersonsRemove = $("#tableGroupPersonsRemove").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LastName", name: "LastName" },//1
@@ -215,31 +215,31 @@ $(document).ready(function () {
         pageLength: 100
     });
    
-    //----------------------------------------GroupManagersView----------------------------------------//
+    //----------------------------------------groupManagersView----------------------------------------//
 
-    //Wire Up GroupManagersViewBtnCancel
-    $("#GroupManagersViewBtnCancel").click(function () {
-        switchView("GroupManagersView", "MainView", "tdo-btngroup-main", TableMain);
+    //Wire Up groupManagersViewBtnCancel
+    $("#groupManagersViewBtnCancel").click(function () {
+        switchView("groupManagersView", "mainView", "tdo-btngroup-main", tableMain);
     });
 
-    //Wire Up GroupManagersViewBtnOk
-    $("#GroupManagersViewBtnOk").click(function () {
-        if (TableGroupManagersAdd.rows(".ui-selected", { page: "current" }).data().length +
-            TableGroupManagersRemove.rows(".ui-selected", { page: "current" }).data().length === 0) {
+    //Wire Up groupManagersViewBtnOk
+    $("#groupManagersViewBtnOk").click(function () {
+        if (tableGroupManagersAdd.rows(".ui-selected", { page: "current" }).data().length +
+            tableGroupManagersRemove.rows(".ui-selected", { page: "current" }).data().length === 0) {
             showModalNothingSelected();
             return;
         }
         showModalWait();
         submitEditsForRelatedGeneric(
-                CurrIds,
-                TableGroupManagersAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-                TableGroupManagersRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                currentIds,
+                tableGroupManagersAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                tableGroupManagersRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
                 "/PersonGroupSrv/EditGroupManagers")
             .always(hideModalWait)
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("GroupManagersView", "MainView", "tdo-btngroup-main", TableMain);
+                        switchView("groupManagersView", "mainView", "tdo-btngroup-main", tableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -248,8 +248,8 @@ $(document).ready(function () {
 
     //---------------------------------------DataTables------------
 
-    //TableGroupManagersAdd
-    TableGroupManagersAdd = $("#TableGroupManagersAdd").DataTable({
+    //tableGroupManagersAdd
+    tableGroupManagersAdd = $("#tableGroupManagersAdd").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LastName", name: "LastName" },//1
@@ -273,8 +273,8 @@ $(document).ready(function () {
         pageLength: 100
     });
 
-    //TableGroupManagersRemove
-    TableGroupManagersRemove = $("#TableGroupManagersRemove").DataTable({
+    //tableGroupManagersRemove
+    tableGroupManagersRemove = $("#tableGroupManagersRemove").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LastName", name: "LastName" },//1
@@ -301,7 +301,7 @@ $(document).ready(function () {
     //--------------------------------------View Initialization------------------------------------//
 
     refreshMainView();
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
+    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });

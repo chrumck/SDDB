@@ -9,7 +9,7 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var RecordTemplate = {
+var recordTemplate = {
     Id: "RecordTemplateId",
     CompName: null,
     CompAltName: null,
@@ -26,8 +26,8 @@ var RecordTemplate = {
     AssignedToAssemblyDb_Id: null
 };
 
-var ExtCurrRecords = [];
-var ExtRecordTemplate = {
+var extCurrRecords = [];
+var extRecordTemplate = {
     Id: "RecordTemplateId",
     Attr01: null,
     Attr02: null,
@@ -46,35 +46,33 @@ var ExtRecordTemplate = {
     Attr15: null
 };
 
-var MsFilterByProject = {};
-var MsFilterByType = {};
-var MsFilterByAssy = {};
+var msFilterByProject = {};
+var msFilterByType = {};
+var msFilterByAssy = {};
 
-var DatePickers = [];
+labelTextCreate = "Create Component";
+labelTextEdit = "Edit Component";
+urlFillForEdit = "/ComponentSrv/GetByIds";
+urlEdit = "/ComponentSrv/Edit";
+urlDelete = "/ComponentSrv/Delete";
 
-LabelTextCreate = "Create Component";
-LabelTextEdit = "Edit Component";
-UrlFillForEdit = "/ComponentSrv/GetByIds";
-UrlEdit = "/ComponentSrv/Edit";
-UrlDelete = "/ComponentSrv/Delete";
-
-var ExtEditFormId = "EditFormExtended";
-var ExtColumnSelectClass = ".extColumnSelect";
-var ExtColumnSetNos = [3, 4, 5];
-var ExtTypeUrl = "/ComponentTypeSrv/GetByIds";
-var ExtTypeHttpType = "POST";
-var ExtHttpTypeEdit = "POST";
-var ExtUrlEdit = "/ComponentSrv/EditExt";
+var extEditFormId = "editFormExtended";
+var extColumnSelectClass = ".extColumnSelect";
+var extColumnSetNos = [3, 4, 5];
+var extUrlTypeUpd = "/ComponentTypeSrv/GetByIds";
+var extHttpTypeTypeUpd = "POST";
+var extHttpTypeEdit = "POST";
+var extUrlEdit = "/ComponentSrv/EditExt";
 
 callBackAfterCreate = updateFormForSelectedType;
 
 callBackAfterEdit = function (currRecords) {
     return updateFormForSelectedType()
-        .then(function () {return fillFormForEditFromDbEntries(GetActive, currRecords, ExtEditFormId); });
+        .then(function () {return fillFormForEditFromDbEntries(currentActive, currRecords, extEditFormId); });
 };
 
 callBackBeforeSubmitEdit = function () {
-    if (!formIsValid(ExtEditFormId, CurrIds.length === 0)) {
+    if (!formIsValid(extEditFormId, currentIds.length === 0)) {
         showModalFail("Errors in Form", "Extended attributes have invalid inputs. Please correct.");
         return $.Deferred().reject();
     }
@@ -82,38 +80,38 @@ callBackBeforeSubmitEdit = function () {
 };
 
 callBackAfterSubmitEdit = function (data) {
-    ExtCurrRecords = [];
-    for (var i = 0; i < CurrIds.length; i++) {
-        ExtCurrRecords[i] = $.extend(true, {}, ExtRecordTemplate);
-        ExtCurrRecords[i].Id = CurrIds[i];
+    extCurrRecords = [];
+    for (var i = 0; i < currentIds.length; i++) {
+        extCurrRecords[i] = $.extend(true, {}, extRecordTemplate);
+        extCurrRecords[i].Id = currentIds[i];
     }
-    return submitEditsGenericWrp(ExtEditFormId, [], ExtCurrRecords, ExtHttpTypeEdit, ExtUrlEdit);
+    return submitEditsGenericWrp(extEditFormId, [], extCurrRecords, extHttpTypeEdit, extUrlEdit);
 };
 
 callBackAfterCopy = function (currRecords) {
     return updateFormForSelectedType()
-        .then(function () { return fillFormForCopyFromDbEntries(currRecords, ExtEditFormId); });
+        .then(function () { return fillFormForCopyFromDbEntries(currRecords, extEditFormId); });
 };
 //-------------------------------------------------------------------------------------------//
 
 $(document).ready(function () {
 
-    //-----------------------------------------MainView------------------------------------------//
+    //-----------------------------------------mainView------------------------------------------//
 
     //wire up dropdownId1 - Show Comp. Log
     $("#dropdownId1").click(function (event) {
         event.preventDefault();
-        var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
+        var noOfRows = tableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) {
             showModalSelectOne();
             return;
         }
         window.open("/ComponentLogEntry?ComponentId=" +
-            TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data());
+            tableMain.cell(".ui-selected", "Id:name", { page: "current" }).data());
     });
 
-    //Initialize MagicSuggest MsFilterByType
-    MsFilterByType = $("#MsFilterByType").magicSuggest({
+    //Initialize MagicSuggest msFilterByType
+    msFilterByType = $("#msFilterByType").magicSuggest({
         data: "/ComponentTypeSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
@@ -122,11 +120,11 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByType
-    $(MsFilterByType).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByType
+    $(msFilterByType).on("selectionchange", function (e, m) { refreshMainView(); });
 
-    //Initialize MagicSuggest MsFilterByProject
-    MsFilterByProject = $("#MsFilterByProject").magicSuggest({
+    //Initialize MagicSuggest msFilterByProject
+    msFilterByProject = $("#msFilterByProject").magicSuggest({
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
@@ -135,28 +133,28 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByProject
-    $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByProject
+    $(msFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
 
-    //Initialize MagicSuggest MsFilterByAssy
-    MsFilterByAssy = $("#MsFilterByAssy").magicSuggest({
+    //Initialize MagicSuggest msFilterByAssy
+    msFilterByAssy = $("#msFilterByAssy").magicSuggest({
         data: "/AssemblyDbSrv/LookupByProj",
         allowFreeEntries: false,
-        dataUrlParams: { projectIds: MsFilterByProject.getValue },
+        dataUrlParams: { projectIds: msFilterByProject.getValue },
         ajaxConfig: {
             error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByAssy
-    $(MsFilterByAssy).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByAssy
+    $(msFilterByAssy).on("selectionchange", function (e, m) { refreshMainView(); });
 
 
     //---------------------------------------DataTables------------
 
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    //tableMainColumnSets
+    tableMainColumnSets = [
         [1],
         [2, 3, 4, 5, 6],
         [7, 8, 9, 10, 11, 12],
@@ -165,8 +163,8 @@ $(document).ready(function () {
         [23, 24, 25, 26, 27]
     ];
 
-    //TableMain Components
-    TableMain = $("#TableMain").DataTable({
+    //tableMain Components
+    tableMain = $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "CompName", name: "CompName" },//1
@@ -256,30 +254,30 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    showColumnSet(1, tableMainColumnSets);
 
-    //---------------------------------------EditFormView----------------------------------------//
+    //---------------------------------------editFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    msAddToMsArray(MagicSuggests, "ComponentType_Id", "/ComponentTypeSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "ComponentStatus_Id", "/ComponentStatusSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "ComponentType_Id", "/ComponentTypeSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "ComponentStatus_Id", "/ComponentStatusSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
 
     //Initialize MagicSuggest Array Event - ComponentType_Id
-    $(MagicSuggests[0]).on("selectionchange", function (e, m) {
+    $(magicSuggests[0]).on("selectionchange", function (e, m) {
         updateFormForSelectedType().done(function () { $("#ComponentType_Id input").focus(); });
     });
 
     //Enable DateTimePicker
-    $("#" + EditFormId + " [data-val-dbisdateiso]").datetimepicker({ format: "YYYY-MM-DD" })
+    $("#" + editFormId + " [data-val-dbisdateiso]").datetimepicker({ format: "YYYY-MM-DD" })
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
 
 
     //--------------------------------------View Initialization------------------------------------//
 
     fillFiltersFromRequestParams().done(refreshMainView);
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
+    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });
@@ -289,24 +287,24 @@ $(document).ready(function () {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
-    TableMain.clear().search("").draw();
+    tableMain.clear().search("").draw();
     return modalWaitWrapper(function () {
         return updateMainViewForSelectedType()
             .then(function () {
-                if (MsFilterByType.getValue().length !== 0 || MsFilterByProject.getValue().length !== 0 ||
-                    MsFilterByAssy.getValue().length !== 0) {
-                    return refreshTableGeneric(TableMain, "/ComponentSrv/GetByAltIds2",
+                if (msFilterByType.getValue().length !== 0 || msFilterByProject.getValue().length !== 0 ||
+                    msFilterByAssy.getValue().length !== 0) {
+                    return refreshTableGeneric(tableMain, "/ComponentSrv/GetByAltIds2",
                         {
-                            projectIds: MsFilterByProject.getValue(),
-                            typeIds: MsFilterByType.getValue(),
-                            assyIds: MsFilterByAssy.getValue(),
-                            getActive: GetActive
+                            projectIds: msFilterByProject.getValue(),
+                            typeIds: msFilterByType.getValue(),
+                            assyIds: msFilterByAssy.getValue(),
+                            getActive: currentActive
                         },
                         "POST");
                 }
                 if (ComponentIds && ComponentIds.length > 0) {
-                    return refreshTableGeneric(TableMain, "/ComponentSrv/GetByIds",
-                        { ids: ComponentIds, getActive: GetActive }, "POST");
+                    return refreshTableGeneric(tableMain, "/ComponentSrv/GetByIds",
+                        { ids: ComponentIds, getActive: currentActive }, "POST");
                 }
             });
     });
@@ -326,7 +324,7 @@ function fillFiltersFromRequestParams() {
         })
             .always(hideModalWait)
             .done(function (data) {
-                msSetSelectionSilent(MsFilterByAssy, [{ id: data[0].Id, name: data[0].AssyName }]);
+                msSetSelectionSilent(msFilterByAssy, [{ id: data[0].Id, name: data[0].AssyName }]);
                 return deferred0.resolve();
             })
             .fail(function (xhr, status, error) {
@@ -343,11 +341,11 @@ function fillFiltersFromRequestParams() {
 function updateMainViewForSelectedType() {
     var deferred0 = $.Deferred();
 
-    if (MsFilterByType.getValue().length != 1) {
+    if (msFilterByType.getValue().length != 1) {
         switchMainViewForExtendedHelper(false);
         return deferred0.resolve();
     }
-    updateTableForExtended(ExtTypeHttpType, ExtTypeUrl, { ids: MsFilterByType.getValue()[0] }, TableMain)
+    updateTableForExtended(extHttpTypeTypeUpd, extUrlTypeUpd, { ids: msFilterByType.getValue()[0] }, tableMain)
         .done(function (typeHasAttrs) {
             switchMainViewForExtendedHelper(typeHasAttrs);
             return deferred0.resolve();
@@ -357,24 +355,24 @@ function updateMainViewForSelectedType() {
     //switchMainViewForExtendedHelper
     function switchMainViewForExtendedHelper(switchOn) {
         if (switchOn) {
-            $(ExtColumnSelectClass).removeClass("disabled");
+            $(extColumnSelectClass).removeClass("disabled");
             return;
         }
-        if ($.inArray(SelectedColumnSet, ExtColumnSetNos) != -1) { showColumnSet(TableMainColumnSets, 1); }
-        $(ExtColumnSelectClass).addClass("disabled");
+        if ($.inArray(selectedColumnSet, extColumnSetNos) != -1) { showColumnSet(1, tableMainColumnSets); }
+        $(extColumnSelectClass).addClass("disabled");
     }
 }
 
 //updateFormForSelectedType
 function updateFormForSelectedType() {
-    clearFormInputs(ExtEditFormId);
-    $("#" + ExtEditFormId + " .modifiable").data("ismodified", true);
-    $("#" + ExtEditFormId).addClass("hidden");
-    if (MagicSuggests[0].getValue().length == 1 && MagicSuggests[0].getValue()[0] != "_VARIES_") {
+    clearFormInputs(extEditFormId);
+    $("#" + extEditFormId + " .modifiable").data("ismodified", true);
+    $("#" + extEditFormId).addClass("hidden");
+    if (magicSuggests[0].getValue().length == 1 && magicSuggests[0].getValue()[0] != "_VARIES_") {
         var deferred0 = $.Deferred();
-        updateFormForExtendedWrp(ExtTypeHttpType, ExtTypeUrl, { ids: MagicSuggests[0].getValue()[0] }, ExtEditFormId)
+        updateFormForExtendedWrp(extHttpTypeTypeUpd, extUrlTypeUpd, { ids: magicSuggests[0].getValue()[0] }, extEditFormId)
             .done(function (typeHasAttrs) {
-                if (typeHasAttrs) { $("#" + ExtEditFormId).removeClass("hidden"); }
+                if (typeHasAttrs) { $("#" + extEditFormId).removeClass("hidden"); }
                 return deferred0.resolve();
             })
             .fail(function () { return deferred0.reject(); });

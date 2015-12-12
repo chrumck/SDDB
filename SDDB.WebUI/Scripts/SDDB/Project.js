@@ -9,10 +9,10 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var TableProjectPersonsAdd = {},
-    TableProjectPersonsRemove = {};
+var tableProjectPersonsAdd = {},
+    tableProjectPersonsRemove = {};
 
-var RecordTemplate = {
+var recordTemplate = {
     Id: "RecordTemplateId",
     ProjectName: null,
     ProjectAltName: null,
@@ -22,39 +22,39 @@ var RecordTemplate = {
     ProjectManager_Id: null
 };
 
-LabelTextCreate = "Create Project";
-LabelTextEdit = "Edit Project";
-UrlFillForEdit = "/ProjectSrv/GetByIds";
-UrlEdit = "/ProjectSrv/Edit";
-UrlDelete = "/ProjectSrv/Delete";
+labelTextCreate = "Create Project";
+labelTextEdit = "Edit Project";
+urlFillForEdit = "/ProjectSrv/GetByIds";
+urlEdit = "/ProjectSrv/Edit";
+urlDelete = "/ProjectSrv/Delete";
 urlRefreshMainView = "/ProjectSrv/Get";
 
 $(document).ready(function () {
 
-    //-----------------------------------------MainView------------------------------------------//
+    //-----------------------------------------mainView------------------------------------------//
     
-    //Wire Up BtnEditProjectPersons
-    $("#BtnEditProjectPersons").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length === 0) {
+    //Wire Up btnEditProjectPersons
+    $("#btnEditProjectPersons").click(function () {
+        currentIds = tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (currentIds.length === 0) {
             showModalNothingSelected();
             return;
         }
-        if (CurrIds.length == 1) {
-            var selectedRecord = TableMain.row(".ui-selected", { page: "current" }).data();
-            $("#ProjectPersonsViewPanel").text(selectedRecord.ProjectName + " " + selectedRecord.ProjectCode);
+        if (currentIds.length == 1) {
+            var selectedRecord = tableMain.row(".ui-selected", { page: "current" }).data();
+            $("#projectPersonsViewPanel").text(selectedRecord.ProjectName + " " + selectedRecord.ProjectCode);
         }
-        else { $("#ProjectPersonsViewPanel").text("_MULTIPLE_"); }
+        else { $("#projectPersonsViewPanel").text("_MULTIPLE_"); }
 
         showModalWait();
-        fillFormForRelatedGeneric(TableProjectPersonsAdd, TableProjectPersonsRemove, CurrIds,
-                "GET", "/ProjectSrv/GetProjectPersons", { id: CurrIds[0] },
-                "GET", "/ProjectSrv/GetProjectPersonsNot", { id: CurrIds[0] },
+        fillFormForRelatedGeneric(tableProjectPersonsAdd, tableProjectPersonsRemove, currentIds,
+                "GET", "/ProjectSrv/GetProjectPersons", { id: currentIds[0] },
+                "GET", "/ProjectSrv/GetProjectPersonsNot", { id: currentIds[0] },
                 "GET", "/PersonSrv/GetAll", { getActive: true })
             .always(hideModalWait)
             .done(function () {
-                saveViewSettings(TableMain);
-                switchView("MainView", "ProjectPersonsView", "tdo-btngroup-projectpersons");
+                saveViewSettings(tableMain);
+                switchView("mainView", "projectPersonsView", "tdo-btngroup-projectpersons");
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
     });
@@ -62,25 +62,25 @@ $(document).ready(function () {
     //wire up dropdownId1
     $("#dropdownId1").click(function (event) {
         event.preventDefault();
-        var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
+        var noOfRows = tableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) {
             showModalSelectOne();
             return;
         }
         window.open("/Location?ProjectId=" +
-            TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data());
+            tableMain.cell(".ui-selected", "Id:name", { page: "current" }).data());
     });
 
     //---------------------------------------DataTables------------
 
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    //tableMainColumnSets
+    tableMainColumnSets = [
         [1],
         [2, 3, 4, 5]
     ];
     
-    //TableMain Projects
-    TableMain = $("#TableMain").DataTable({
+    //tableMain Projects
+    tableMain = $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "ProjectName", name: "ProjectName" },//1
@@ -114,38 +114,38 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    showColumnSet(1, tableMainColumnSets);
 
-    //---------------------------------------EditFormView----------------------------------------//
+    //---------------------------------------editFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    msAddToMsArray(MagicSuggests, "ProjectManager_Id", "/PersonSrv/LookupAll", 1);
+    msAddToMsArray(magicSuggests, "ProjectManager_Id", "/PersonSrv/LookupAll", 1);
     
-    //----------------------------------------ProjectPersonsView----------------------------------------//
+    //----------------------------------------projectPersonsView----------------------------------------//
 
-    //Wire Up ProjectPersonsViewBtnCancel
-    $("#ProjectPersonsViewBtnCancel").click(function () {
-        switchView("ProjectPersonsView", "MainView", "tdo-btngroup-main", TableMain);
+    //Wire Up projectPersonsViewBtnCancel
+    $("#projectPersonsViewBtnCancel").click(function () {
+        switchView("projectPersonsView", "mainView", "tdo-btngroup-main", tableMain);
     });
 
-    //Wire Up ProjectPersonsViewBtnOk
-    $("#ProjectPersonsViewBtnOk").click(function () {
-        if (TableProjectPersonsAdd.rows(".ui-selected", { page: "current" }).data().length +
-            TableProjectPersonsRemove.rows(".ui-selected", { page: "current" }).data().length === 0) {
+    //Wire Up projectPersonsViewBtnOk
+    $("#projectPersonsViewBtnOk").click(function () {
+        if (tableProjectPersonsAdd.rows(".ui-selected", { page: "current" }).data().length +
+            tableProjectPersonsRemove.rows(".ui-selected", { page: "current" }).data().length === 0) {
             showModalNothingSelected();
             return;
         }
         showModalWait();
         submitEditsForRelatedGeneric(
-                CurrIds,
-                TableProjectPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-                TableProjectPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                currentIds,
+                tableProjectPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                tableProjectPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
                 "/ProjectSrv/EditProjectPersons")
             .always(hideModalWait)
             .done(function () {
                 refreshMainView()
                     .done(function () {
-                        switchView("ProjectPersonsView", "MainView", "tdo-btngroup-main", TableMain);
+                        switchView("projectPersonsView", "mainView", "tdo-btngroup-main", tableMain);
                     });
             })
             .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
@@ -153,8 +153,8 @@ $(document).ready(function () {
 
     //---------------------------------------DataTables------------
 
-    //TableProjectPersonsAdd
-    TableProjectPersonsAdd = $("#TableProjectPersonsAdd").DataTable({
+    //tableProjectPersonsAdd
+    tableProjectPersonsAdd = $("#tableProjectPersonsAdd").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LastName", name: "LastName" },//1
@@ -178,8 +178,8 @@ $(document).ready(function () {
         pageLength: 100
     });
 
-    //TableProjectPersonsRemove
-    TableProjectPersonsRemove = $("#TableProjectPersonsRemove").DataTable({
+    //tableProjectPersonsRemove
+    tableProjectPersonsRemove = $("#tableProjectPersonsRemove").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LastName", name: "LastName" },//1
@@ -206,7 +206,7 @@ $(document).ready(function () {
     //--------------------------------------View Initialization------------------------------------//
 
     refreshMainView();
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
+    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });

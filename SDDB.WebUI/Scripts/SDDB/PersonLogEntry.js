@@ -12,47 +12,47 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-LabelTextCreate = "Create Activity";
-LabelTextEdit = "Edit Activity";
-LabelTextCopy = "Copy Activity";
+labelTextCreate = "Create Activity";
+labelTextEdit = "Edit Activity";
+labelTextCopy = "Copy Activity";
 
 callBackAfterCreate = function () {
-    $("#EditFormBtnOkFiles").prop("disabled", false);
+    $("#editFormBtnOkFiles").prop("disabled", false);
     $("#LogEntryDateTime").val(moment().format("YYYY-MM-DD HH:mm"));
     $("#ManHours").val(0);
-    MagicSuggests[0].setValue([UserId]);
-    MagicSuggests[3].disable();
-    MagicSuggests[4].disable();
-    TableLogEntryAssysAdd.clear().search("").draw();
-    TableLogEntryAssysRemove.clear().search("").draw();
-    TableLogEntryPersonsAdd.clear().search("").draw();
-    TableLogEntryPersonsRemove.clear().search("").draw();
+    magicSuggests[0].setValue([UserId]);
+    magicSuggests[3].disable();
+    magicSuggests[4].disable();
+    tableLogEntryAssysAdd.clear().search("").draw();
+    tableLogEntryAssysRemove.clear().search("").draw();
+    tableLogEntryPersonsAdd.clear().search("").draw();
+    tableLogEntryPersonsRemove.clear().search("").draw();
 
     return modalWaitWrapper(function () {
-        return refreshTableGeneric(TableLogEntryPersonsAdd, "/PersonSrv/Get", { getActive: true }, "GET");
+        return refreshTableGeneric(tableLogEntryPersonsAdd, "/PersonSrv/Get", { getActive: true }, "GET");
     });
 };
 
 callBackAfterEdit = function (currRecords) {
-    if (CurrIds.length > 1) { $("#EditFormBtnOkFiles").prop("disabled", true); }
-    else { $("#EditFormBtnOkFiles").prop("disabled", false); }
+    if (currentIds.length > 1) { $("#editFormBtnOkFiles").prop("disabled", true); }
+    else { $("#editFormBtnOkFiles").prop("disabled", false); }
 
     return modalWaitWrapper(function () {
         return $.when(
-            fillFormForRelatedGeneric(TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
+            fillFormForRelatedGeneric(tableLogEntryPersonsAdd, tableLogEntryPersonsRemove, currentIds,
                 "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons",
-                { logEntryId: CurrIds[0] },
+                { logEntryId: currentIds[0] },
                 "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot",
-                { logEntryId: CurrIds[0] },
+                { logEntryId: currentIds[0] },
                 "GET", "/PersonSrv/Get",
                 { getActive: true }),
-            fillFormForRelatedGeneric(TableLogEntryAssysAdd, TableLogEntryAssysRemove, CurrIds,
+            fillFormForRelatedGeneric(tableLogEntryAssysAdd, tableLogEntryAssysRemove, currentIds,
                 "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys",
-                { logEntryId: CurrIds[0] },
+                { logEntryId: currentIds[0] },
                 "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
-                { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] },
+                { logEntryId: currentIds[0], locId: magicSuggests[3].getValue()[0] },
                 "GET", "AssemblyDbSrv/LookupByLocDTables",
-                { locId: MagicSuggests[3].getValue()[0], getActive: true })
+                { locId: magicSuggests[3].getValue()[0], getActive: true })
         );
     });
 };
@@ -62,41 +62,41 @@ callBackBeforeCopy = function () {
 };
 
 callBackAfterCopy = function () {
-    $("#EditFormBtnOkFiles").prop("disabled", false);
-    TableLogEntryAssysAdd.clear().search("").draw();
-    TableLogEntryAssysRemove.clear().search("").draw();
-    TableLogEntryPersonsAdd.clear().search("").draw();
-    TableLogEntryPersonsRemove.clear().search("").draw();
+    $("#editFormBtnOkFiles").prop("disabled", false);
+    tableLogEntryAssysAdd.clear().search("").draw();
+    tableLogEntryAssysRemove.clear().search("").draw();
+    tableLogEntryPersonsAdd.clear().search("").draw();
+    tableLogEntryPersonsRemove.clear().search("").draw();
 
-    MagicSuggests[5].clear();
+    magicSuggests[5].clear();
     $("#QcdDateTime").val("");
 
     return modalWaitWrapper(function () {
         return $.when(
-                refreshTableGeneric(TableLogEntryPersonsAdd,
+                refreshTableGeneric(tableLogEntryPersonsAdd,
                     "/PersonSrv/Get", { getActive: true }, "GET"),
-                refreshTableGeneric(TableLogEntryAssysAdd,
+                refreshTableGeneric(tableLogEntryAssysAdd,
                     "AssemblyDbSrv/LookupByLocDTables",
-                    { getActive: true, locId: MagicSuggests[3].getValue()[0] }, "GET")
+                    { getActive: true, locId: magicSuggests[3].getValue()[0] }, "GET")
             );
     });
 };
 
 refreshMainView = function () {
-    TableMain.clear().search("").draw();
-    if ($("#FilterDateStart").val() === "" || $("#FilterDateEnd").val() === "") { return $.Deferred().resolve(); }
+    tableMain.clear().search("").draw();
+    if ($("#filterDateStart").val() === "" || $("#filterDateEnd").val() === "") { return $.Deferred().resolve(); }
 
-    var endDate = moment($("#FilterDateEnd").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
+    var endDate = moment($("#filterDateEnd").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
     return modalWaitWrapper(function () {
-        return refreshTableGeneric(TableMain, "/PersonLogEntrySrv/GetByAltIds",
+        return refreshTableGeneric(tableMain, "/PersonLogEntrySrv/GetByAltIds",
         {
-            personIds: MsFilterByPerson.getValue(),
-            typeIds: MsFilterByType.getValue(),
-            projectIds: MsFilterByProject.getValue(),
-            assyIds: MsFilterByAssy.getValue(),
-            startDate: $("#FilterDateStart").val(),
+            personIds: msFilterByPerson.getValue(),
+            typeIds: msFilterByType.getValue(),
+            projectIds: msFilterByProject.getValue(),
+            assyIds: msFilterByAssy.getValue(),
+            startDate: $("#filterDateStart").val(),
             endDate: endDate,
-            getActive: GetActive,
+            getActive: currentActive,
             filterForPLEView: true
         },
         "POST");
@@ -107,8 +107,8 @@ refreshMainView = function () {
 fillFiltersFromRequestParams = function () {
     var deferred0 = $.Deferred();
 
-    $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
-    $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
+    $("#filterDateStart").val(moment().format("YYYY-MM-DD"));
+    $("#filterDateEnd").val(moment().format("YYYY-MM-DD"));
 
     if (PersonId) {
         showModalWait();
@@ -122,7 +122,7 @@ fillFiltersFromRequestParams = function () {
             .always(hideModalWait)
             .done(function (data) {
                 if (typeof data[0].Id !== undefined) {
-                    msSetSelectionSilent(MsFilterByPerson, [{
+                    msSetSelectionSilent(msFilterByPerson, [{
                         id: data[0].Id,
                         name: data[0].FirstName + " " + data[0].LastName + " " + data[0].Initials
                     }]);
@@ -141,24 +141,24 @@ fillFiltersFromRequestParams = function () {
 
 $(document).ready(function () {
 
-    //-----------------------------------------MainView------------------------------------------//
+    //-----------------------------------------mainView------------------------------------------//
 
     //wire up dropdownId1
     $("#dropdownId1").click(function (event) {
         event.preventDefault();
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length === 0) {
+        currentIds = tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (currentIds.length === 0) {
             showModalNothingSelected();
             return;
         }
-        saveViewSettings(TableMain);
+        saveViewSettings(tableMain);
         showModalConfirm("Confirm that you want to QC the entry(ies).", "Confirm QC")
             .then(function () { return qcSelected(); })
-            .done(function () { loadViewSettings(TableMain); });
+            .done(function () { loadViewSettings(tableMain); });
     });
 
-    //Initialize MagicSuggest MsFilterByPerson
-    MsFilterByPerson = $("#MsFilterByPerson").magicSuggest({
+    //Initialize MagicSuggest msFilterByPerson
+    msFilterByPerson = $("#msFilterByPerson").magicSuggest({
         data: "/PersonSrv/LookupFromProject",
         allowFreeEntries: false,
         ajaxConfig: {
@@ -167,11 +167,11 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByPerson
-    $(MsFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByPerson
+    $(msFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
 
-    //Initialize MagicSuggest MsFilterByType
-    MsFilterByType = $("#MsFilterByType").magicSuggest({
+    //Initialize MagicSuggest msFilterByType
+    msFilterByType = $("#msFilterByType").magicSuggest({
         data: "/PersonActivityTypeSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
@@ -180,11 +180,11 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByType
-    $(MsFilterByType).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByType
+    $(msFilterByType).on("selectionchange", function (e, m) { refreshMainView(); });
 
-    //Initialize MagicSuggest MsFilterByProject
-    MsFilterByProject = $("#MsFilterByProject").magicSuggest({
+    //Initialize MagicSuggest msFilterByProject
+    msFilterByProject = $("#msFilterByProject").magicSuggest({
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
@@ -193,33 +193,33 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByProject
-    $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByProject
+    $(msFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
 
-    //Initialize MagicSuggest MsFilterByAssy
-    MsFilterByAssy = $("#MsFilterByAssy").magicSuggest({
+    //Initialize MagicSuggest msFilterByAssy
+    msFilterByAssy = $("#msFilterByAssy").magicSuggest({
         data: "/AssemblyDbSrv/LookupByProj",
         allowFreeEntries: false,
-        dataUrlParams: { projectIds: MsFilterByProject.getValue },
+        dataUrlParams: { projectIds: msFilterByProject.getValue },
         ajaxConfig: {
             error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
         },
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByAssy
-    $(MsFilterByAssy).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByAssy
+    $(msFilterByAssy).on("selectionchange", function (e, m) { refreshMainView(); });
         
     //---------------------------------------DataTables------------
 
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    //tableMainColumnSets
+    tableMainColumnSets = [
         [1],
         [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     ];
 
-    //TableMain PersonLogEntrys
-    TableMain = $("#TableMain").DataTable({
+    //tableMain PersonLogEntrys
+    tableMain = $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LogEntryDateTime", name: "LogEntryDateTime" },//1
@@ -290,60 +290,60 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    showColumnSet(1, tableMainColumnSets);
 
-    //---------------------------------------EditFormView----------------------------------------//
+    //---------------------------------------editFormView----------------------------------------//
 
     //Initialize DateTimePicker
     $("#LogEntryDateTime").datetimepicker({ format: "YYYY-MM-DD HH:mm" })
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
-    msAddToMsArray(MagicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/LookupByProj", 1, null,
-        { projectIds: MagicSuggests[2].getValue });
-    msAddToMsArray(MagicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
-        { projectIds: MagicSuggests[2].getValue });
-    msAddToMsArray(MagicSuggests, "QcdByPerson_Id", "/PersonSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "AssignedToLocation_Id", "/LocationSrv/LookupByProj", 1, null,
+        { projectIds: magicSuggests[2].getValue });
+    msAddToMsArray(magicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
+        { projectIds: magicSuggests[2].getValue });
+    msAddToMsArray(magicSuggests, "QcdByPerson_Id", "/PersonSrv/Lookup", 1);
 
     //Initialize MagicSuggest Array Event - AssignedToProject_Id
-    $(MagicSuggests[2]).on("selectionchange", function (e, m) {
-        MagicSuggests[3].clear();
-        MagicSuggests[4].clear();
-        TableLogEntryAssysAdd.clear().search("").draw();
+    $(magicSuggests[2]).on("selectionchange", function (e, m) {
+        magicSuggests[3].clear();
+        magicSuggests[4].clear();
+        tableLogEntryAssysAdd.clear().search("").draw();
         if (this.getValue().length === 0) {
-            MagicSuggests[3].disable();
-            MagicSuggests[4].disable();
+            magicSuggests[3].disable();
+            magicSuggests[4].disable();
         }
         else {
-            MagicSuggests[3].enable();
-            MagicSuggests[4].enable();
+            magicSuggests[3].enable();
+            magicSuggests[4].enable();
         }
     });
 
     //Initialize MagicSuggest Array Event - AssignedToLocation_Id
-    $(MagicSuggests[3]).on("selectionchange", function (e, m) {
+    $(magicSuggests[3]).on("selectionchange", function (e, m) {
         if (this.getValue().length === 0) {
-            TableLogEntryAssysAdd.clear().search("").draw();
+            tableLogEntryAssysAdd.clear().search("").draw();
             return;
         }
         modalWaitWrapper(function () {
-            if (CurrIds.length == 1) {
-                return refreshTableGeneric(TableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
-                    { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] }, "GET");
+            if (currentIds.length == 1) {
+                return refreshTableGeneric(tableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
+                    { logEntryId: currentIds[0], locId: magicSuggests[3].getValue()[0] }, "GET");
             }
-            return refreshTableGeneric(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
-            { getActive: true, locId: MagicSuggests[3].getValue()[0] }, "GET");
+            return refreshTableGeneric(tableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
+            { getActive: true, locId: magicSuggests[3].getValue()[0] }, "GET");
 
         })
             .done(function () { $("#AssignedToLocation_Id input").focus(); });
     });
 
-    //Wire Up EditFormBtnQcSelected
-    $("#EditFormBtnQcSelected").click(function () {
-        if (CurrIds.length === 0) {
+    //Wire Up editFormBtnQcSelected
+    $("#editFormBtnQcSelected").click(function () {
+        if (currentIds.length === 0) {
             showModalFail("QC not possible!", "You cannot QC an entry while it is being created.");
             return;
         }
@@ -351,8 +351,8 @@ $(document).ready(function () {
             .then(qcSelected)
             .done(function () {
                 modalWaitWrapper(function () {
-                    return fillFormForEditGeneric(CurrIds, "POST", "/PersonLogEntrySrv/GetByIds",
-                            GetActive, "EditForm", "Edit Person Activity", MagicSuggests);
+                    return fillFormForEditGeneric(currentIds, "POST", "/PersonLogEntrySrv/GetByIds",
+                            currentActive, "editForm", "Edit Person Activity", magicSuggests);
                 });
             });
     });
@@ -360,7 +360,7 @@ $(document).ready(function () {
     //--------------------------------------View Initialization------------------------------------//
 
     fillFiltersFromRequestParams().done(refreshMainView);
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
+    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
 
     //--------------------------------End of execution at Start-----------

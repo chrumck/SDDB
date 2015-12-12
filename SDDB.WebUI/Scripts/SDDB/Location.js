@@ -9,7 +9,7 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var RecordTemplate = {
+var recordTemplate = {
     Id: "RecordTemplateId",
     LocName: null,
     LocAltName: null,
@@ -29,32 +29,32 @@ var RecordTemplate = {
     ContactPerson_Id: null
 };
 
-var MsFilterByProject = {};
-var MsFilterByType = {};
+var msFilterByProject = {};
+var msFilterByType = {};
 
-LabelTextCreate = "Create Location";
-LabelTextEdit = "Edit Location";
-UrlFillForEdit = "/LocationSrv/GetByIds";
-UrlEdit = "/LocationSrv/Edit";
-UrlDelete = "/LocationSrv/Delete";
+labelTextCreate = "Create Location";
+labelTextEdit = "Edit Location";
+urlFillForEdit = "/LocationSrv/GetByIds";
+urlEdit = "/LocationSrv/Edit";
+urlDelete = "/LocationSrv/Delete";
 
 $(document).ready(function () {
 
-    //-----------------------------------------MainView------------------------------------------//
+    //-----------------------------------------mainView------------------------------------------//
             
     //wire up dropdownId1
     $("#dropdownId1").click(function (event) {
         event.preventDefault();
-        var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
+        var noOfRows = tableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) { showModalSelectOne(); }
         else {
             window.open("/AssemblyDb?LocationId=" +
-                TableMain.cell(".ui-selected", "Id:name", { page: "current" }).data());
+                tableMain.cell(".ui-selected", "Id:name", { page: "current" }).data());
         }
     });
 
-    //Initialize MagicSuggest MsFilterByType
-    MsFilterByType = $("#MsFilterByType").magicSuggest({
+    //Initialize MagicSuggest msFilterByType
+    msFilterByType = $("#msFilterByType").magicSuggest({
         data: "/LocationTypeSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
@@ -63,11 +63,11 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByType
-    $(MsFilterByType).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByType
+    $(msFilterByType).on("selectionchange", function (e, m) { refreshMainView(); });
 
     //Initialize MagicSuggest msFilterByProject
-    MsFilterByProject = $("#MsFilterByProject").magicSuggest({
+    msFilterByProject = $("#msFilterByProject").magicSuggest({
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
@@ -76,22 +76,22 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByProject
-    $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByProject
+    $(msFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
     
 
     //---------------------------------------DataTables------------
 
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    //tableMainColumnSets
+    tableMainColumnSets = [
         [1],
         [2, 3, 4, 5, 6],
         [7, 8, 9, 10, 11],
         [12, 13, 14, 15]
     ];
 
-    //TableMain Locations
-    TableMain = $("#TableMain").DataTable({
+    //tableMain Locations
+    tableMain = $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LocName", name: "LocName" },//1
@@ -158,19 +158,19 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    showColumnSet(1, tableMainColumnSets);
 
-    //---------------------------------------EditFormView----------------------------------------//
+    //---------------------------------------editFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    msAddToMsArray(MagicSuggests, "LocationType_Id", "/LocationTypeSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "ContactPerson_Id", "/PersonSrv/LookupAll", 1);
+    msAddToMsArray(magicSuggests, "LocationType_Id", "/LocationTypeSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "ContactPerson_Id", "/PersonSrv/LookupFromProject", 1);
         
     //--------------------------------------View Initialization------------------------------------//
 
     fillFiltersFromRequestParams().done(refreshMainView);
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
+    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });
@@ -180,16 +180,16 @@ $(document).ready(function () {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
-    TableMain.clear().search("").draw();
-    if (MsFilterByType.getValue().length === 0 && MsFilterByProject.getValue().length === 0) {
+    tableMain.clear().search("").draw();
+    if (msFilterByType.getValue().length === 0 && msFilterByProject.getValue().length === 0) {
         return $.Deferred().resolve();
     }
     return modalWaitWrapper(function () {
-        return refreshTableGeneric(TableMain, "/LocationSrv/GetByAltIds",
+        return refreshTableGeneric(tableMain, "/LocationSrv/GetByAltIds",
         {
-            projectIds: MsFilterByProject.getValue(),
-            typeIds: MsFilterByType.getValue(),
-            getActive: GetActive
+            projectIds: msFilterByProject.getValue(),
+            typeIds: msFilterByType.getValue(),
+            getActive: currentActive
         },
         "POST");
     });
@@ -209,7 +209,7 @@ function fillFiltersFromRequestParams() {
         })
             .always(hideModalWait)
             .done(function (data) {
-                msSetSelectionSilent(MsFilterByProject, 
+                msSetSelectionSilent(msFilterByProject, 
                     [{ id: data[0].Id, name: data[0].ProjectName + " - " + data[0].ProjectCode }]);
                 return deferred0.resolve();
             })

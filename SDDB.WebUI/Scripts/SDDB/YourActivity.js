@@ -12,93 +12,93 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-LabelTextCreate = function () { return "New Activity for " + $("#FilterDateStart").val(); };
-LabelTextEdit = function () { return "Edit Activity for " + $("#FilterDateStart").val(); };
-LabelTextCopy = function () { return "Copy Activity to " + moveToDate.format("YYYY-MM-DD"); };
+labelTextCreate = function () { return "New Activity for " + $("#filterDateStart").val(); };
+labelTextEdit = function () { return "Edit Activity for " + $("#filterDateStart").val(); };
+labelTextCopy = function () { return "Copy Activity to " + moveToDate.format("YYYY-MM-DD"); };
 
 var panelTableMainClass = "panel-tdo-success";
 
 callBackAfterCreate = function () {
-    $("#EditFormBtnOkFiles").prop("disabled", false);
-    $("#LogEntryPersonsView").addClass("hidden");
-    var logEntryDT = moment($("#FilterDateStart").val()).hour(moment().hour()).minute(0);
-    $("#EntryDTPicker").data("DateTimePicker").date(logEntryDT);
+    $("#editFormBtnOkFiles").prop("disabled", false);
+    $("#logEntryPersonsView").addClass("hidden");
+    var logEntryDT = moment($("#filterDateStart").val()).hour(moment().hour()).minute(0);
+    $("#entryDTPicker").data("DateTimePicker").date(logEntryDT);
     $("#LogEntryDateTime").val(logEntryDT.format("YYYY-MM-DD HH:mm"));
-    $("#HoursWorkedPicker").data("DateTimePicker").date("00:00");
+    $("#hoursWorkedPicker").data("DateTimePicker").date("00:00");
     $("#ManHours").val(0);
-    MagicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
-    MagicSuggests[3].disable();
-    MagicSuggests[4].disable();
-    TableLogEntryAssysAdd.clear().search("").draw();
-    TableLogEntryAssysRemove.clear().search("").draw();
-    TableLogEntryPersonsAdd.clear().search("").draw();
-    TableLogEntryPersonsRemove.clear().search("").draw();
+    magicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
+    magicSuggests[3].disable();
+    magicSuggests[4].disable();
+    tableLogEntryAssysAdd.clear().search("").draw();
+    tableLogEntryAssysRemove.clear().search("").draw();
+    tableLogEntryPersonsAdd.clear().search("").draw();
+    tableLogEntryPersonsRemove.clear().search("").draw();
 
     return $.Deferred().resolve();
 };
 
 callBackAfterEdit = function (currRecords) {
-    if (CurrIds.length > 1) { $("#EditFormBtnOkFiles").prop("disabled", true); }
-    else { $("#EditFormBtnOkFiles").prop("disabled", false); }
-    $("#LogEntryPersonsView").addClass("hidden");
-    TableLogEntryPersonsAdd.clear().search("").draw();
-    TableLogEntryPersonsRemove.clear().search("").draw();
-    $("#EntryDTPicker").data("DateTimePicker").date(moment($("#LogEntryDateTime").val()));
+    if (currentIds.length > 1) { $("#editFormBtnOkFiles").prop("disabled", true); }
+    else { $("#editFormBtnOkFiles").prop("disabled", false); }
+    $("#logEntryPersonsView").addClass("hidden");
+    tableLogEntryPersonsAdd.clear().search("").draw();
+    tableLogEntryPersonsRemove.clear().search("").draw();
+    $("#entryDTPicker").data("DateTimePicker").date(moment($("#LogEntryDateTime").val()));
     $("#LogEntryDateTime").data("ismodified", false);
-    $("#HoursWorkedPicker").data("DateTimePicker").date(moment($("#ManHours").val(), "HH"));
+    $("#hoursWorkedPicker").data("DateTimePicker").date(moment($("#ManHours").val(), "HH"));
     $("#ManHours").data("ismodified", false);
 
     return modalWaitWrapper(function () {
         return fillFormForRelatedGeneric(
-                    TableLogEntryAssysAdd, TableLogEntryAssysRemove, CurrIds,
+                    tableLogEntryAssysAdd, tableLogEntryAssysRemove, currentIds,
                     "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys",
-                    { logEntryId: CurrIds[0] },
+                    { logEntryId: currentIds[0] },
                     "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
-                    { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] },
+                    { logEntryId: currentIds[0], locId: magicSuggests[3].getValue()[0] },
                     "GET", "AssemblyDbSrv/LookupByLocDTables",
-                    { locId: MagicSuggests[3].getValue()[0], getActive: true } );
+                    { locId: magicSuggests[3].getValue()[0], getActive: true } );
     });
 };
 
 callBackBeforeCopy = function () {
     return showModalDatePrompt("NOTE: Assemblies, People and Files are not copied!",
-                "Copy To Date:", $("#FilterDateStart").val())
+                "Copy To Date:", $("#filterDateStart").val())
         .then(function (outputDate) { moveToDate = outputDate; });
 };
 
 callBackAfterCopy = function () {
-    $("#EditFormBtnOkFiles").prop("disabled", false);
-    $("#LogEntryPersonsView").addClass("hidden");
-    TableLogEntryAssysAdd.clear().search("").draw();
-    TableLogEntryAssysRemove.clear().search("").draw();
-    TableLogEntryPersonsAdd.clear().search("").draw();
-    TableLogEntryPersonsRemove.clear().search("").draw();
+    $("#editFormBtnOkFiles").prop("disabled", false);
+    $("#logEntryPersonsView").addClass("hidden");
+    tableLogEntryAssysAdd.clear().search("").draw();
+    tableLogEntryAssysRemove.clear().search("").draw();
+    tableLogEntryPersonsAdd.clear().search("").draw();
+    tableLogEntryPersonsRemove.clear().search("").draw();
 
     var copyToDateTime = moment($("#LogEntryDateTime").val())
             .year(moveToDate.year()).dayOfYear(moveToDate.dayOfYear());
-    $("#EntryDTPicker").data("DateTimePicker").date(copyToDateTime);
+    $("#entryDTPicker").data("DateTimePicker").date(copyToDateTime);
     $("#LogEntryDateTime").val(copyToDateTime.format("YYYY-MM-DD HH:mm"));
-    $("#HoursWorkedPicker").data("DateTimePicker").date(moment($("#ManHours").val(), "HH"));
-    MagicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
+    $("#hoursWorkedPicker").data("DateTimePicker").date(moment($("#ManHours").val(), "HH"));
+    magicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
 
     return modalWaitWrapper(function () {
-        return refreshTableGeneric(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
-            { getActive: true, locId: MagicSuggests[3].getValue()[0] }, "GET");
+        return refreshTableGeneric(tableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
+            { getActive: true, locId: magicSuggests[3].getValue()[0] }, "GET");
     });
 };
 
 refreshMainView = function () {
-    TableMain.clear().search("").draw();
-    if ($("#FilterDateStart").val() === "") { return $.Deferred().resolve(); }
+    tableMain.clear().search("").draw();
+    if ($("#filterDateStart").val() === "") { return $.Deferred().resolve(); }
 
-    var endDate = moment($("#FilterDateStart").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
+    var endDate = moment($("#filterDateStart").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
     return modalWaitWrapper(function () {
-        return refreshTableGeneric(TableMain, "/PersonLogEntrySrv/GetByAltIds",
+        return refreshTableGeneric(tableMain, "/PersonLogEntrySrv/GetByAltIds",
         {
             personIds: [UserId],
-            startDate: $("#FilterDateStart").val(),
+            startDate: $("#filterDateStart").val(),
             endDate: endDate,
-            getActive: GetActive,
+            getActive: currentActive,
             filterForPLEView: false
         },
         "POST");
@@ -107,18 +107,18 @@ refreshMainView = function () {
 
 $(document).ready(function () {
 
-    //-----------------------------------------MainView------------------------------------------//
+    //-----------------------------------------mainView------------------------------------------//
         
     //---------------------------------------DataTables------------
     
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    //tableMainColumnSets
+    tableMainColumnSets = [
         [1],
         [2, 3, 4, 5, 6, 7, 8, 9]
     ];
 
-    //TableMain PersonLogEntrys
-    TableMain = $("#TableMain").DataTable({
+    //tableMain PersonLogEntrys
+    tableMain = $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             {
@@ -185,95 +185,95 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    showColumnSet(1, tableMainColumnSets);
 
-    //---------------------------------------EditFormView----------------------------------------//
+    //---------------------------------------editFormView----------------------------------------//
 
-    //Initialize DateTimePicker - EntryDTPicker
-    $("#EntryDTPicker").datetimepicker({ format: "HH", inline: true })
+    //Initialize DateTimePicker - entryDTPicker
+    $("#entryDTPicker").datetimepicker({ format: "HH", inline: true })
         .on("dp.change", function (e) {
             var newEntryDate = moment($("#LogEntryDateTime").val()).minute(0)
-                .hour($("#EntryDTPicker").data("DateTimePicker").date().hour());
+                .hour($("#entryDTPicker").data("DateTimePicker").date().hour());
             $("#LogEntryDateTime").val(newEntryDate.format("YYYY-MM-DD HH:mm"));
             $("#LogEntryDateTime").data("ismodified", true);
         });
 
-    //Initialize DateTimePicker - HoursWorkedPicker
-    $("#HoursWorkedPicker").datetimepicker({ format: "HH", inline: true })
+    //Initialize DateTimePicker - hoursWorkedPicker
+    $("#hoursWorkedPicker").datetimepicker({ format: "HH", inline: true })
         .on("dp.change", function (e) {
-            $("#ManHours").val($("#HoursWorkedPicker").data("DateTimePicker").date().hour());
+            $("#ManHours").val($("#hoursWorkedPicker").data("DateTimePicker").date().hour());
             $("#ManHours").data("ismodified", true);
         });
 
     //Initialize MagicSuggest Array
-    msAddToMsArray(MagicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1, null, {}, false, false);
-    msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1, null, {}, false, true);
-    msAddToMsArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/LookupByProj", 1, null,
-        { projectIds: MagicSuggests[2].getValue });
-    msAddToMsArray(MagicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
-        { projectIds: MagicSuggests[2].getValue }, false, false);
+    msAddToMsArray(magicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1, null, {}, false, false);
+    msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1, null, {}, false, true);
+    msAddToMsArray(magicSuggests, "AssignedToLocation_Id", "/LocationSrv/LookupByProj", 1, null,
+        { projectIds: magicSuggests[2].getValue });
+    msAddToMsArray(magicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
+        { projectIds: magicSuggests[2].getValue }, false, false);
     
     //Initialize MagicSuggest Array Event - AssignedToProject_Id
-    $(MagicSuggests[2]).on("selectionchange", function (e, m) {
-        MagicSuggests[3].clear();
-        MagicSuggests[4].clear();
-        TableLogEntryAssysAdd.clear().search("").draw();
+    $(magicSuggests[2]).on("selectionchange", function (e, m) {
+        magicSuggests[3].clear();
+        magicSuggests[4].clear();
+        tableLogEntryAssysAdd.clear().search("").draw();
         if (this.getValue().length === 0) {
-            MagicSuggests[3].disable(); 
-            MagicSuggests[4].disable();
+            magicSuggests[3].disable(); 
+            magicSuggests[4].disable();
         }
         else {
-            MagicSuggests[3].enable(); 
-            MagicSuggests[4].enable();
+            magicSuggests[3].enable(); 
+            magicSuggests[4].enable();
         }
     });
 
     //Initialize MagicSuggest Array Event - AssignedToLocation_Id
-    $(MagicSuggests[3]).on("selectionchange", function (e, m) {
+    $(magicSuggests[3]).on("selectionchange", function (e, m) {
         if (this.getValue().length === 0) {
-            TableLogEntryAssysAdd.clear().search("").draw();
+            tableLogEntryAssysAdd.clear().search("").draw();
             return;
         }
-        if (CurrIds.length == 1) {
-            refreshTblGenWrp(TableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
-                { logEntryId: CurrIds[0], locId: MagicSuggests[3].getValue()[0] }, "GET")
+        if (currentIds.length == 1) {
+            refreshTblGenWrp(tableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
+                { logEntryId: currentIds[0], locId: magicSuggests[3].getValue()[0] }, "GET")
                 .done(function () { $("#AssignedToLocation_Id input").focus(); });
         }
         else {
-            refreshTblGenWrp(TableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
-            { getActive: true, locId: MagicSuggests[3].getValue()[0] }, "GET")
+            refreshTblGenWrp(tableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
+            { getActive: true, locId: magicSuggests[3].getValue()[0] }, "GET")
             .done(function () { $("#AssignedToLocation_Id input").focus(); });
         }
     });
 
-    //Wire Up EditFormBtnPrsAddRemove
-    $("#EditFormBtnPrsAddRemove").click(function () {
-        TableLogEntryPersonsAdd.clear().search("").draw();
-        TableLogEntryPersonsRemove.clear().search("").draw();
+    //Wire Up editFormBtnPrsAddRemove
+    $("#editFormBtnPrsAddRemove").click(function () {
+        tableLogEntryPersonsAdd.clear().search("").draw();
+        tableLogEntryPersonsRemove.clear().search("").draw();
 
-        if ($("#LogEntryPersonsView").hasClass("hidden")) {
+        if ($("#logEntryPersonsView").hasClass("hidden")) {
             showModalWait();
-            fillFormForRelatedGeneric(TableLogEntryPersonsAdd, TableLogEntryPersonsRemove, CurrIds,
-                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { logEntryId: CurrIds[0] },
-                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { logEntryId: CurrIds[0] },
+            fillFormForRelatedGeneric(tableLogEntryPersonsAdd, tableLogEntryPersonsRemove, currentIds,
+                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { logEntryId: currentIds[0] },
+                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { logEntryId: currentIds[0] },
                 "GET", "/PersonSrv/Get", { getActive: true })
                 .always(hideModalWait)
                 .done(function () {
-                    $("#LogEntryPersonsView").removeClass("hidden");
+                    $("#logEntryPersonsView").removeClass("hidden");
                 })
                 .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
         }
         else {
-            $("#LogEntryPersonsView").addClass("hidden");
+            $("#logEntryPersonsView").addClass("hidden");
         }
     });
            
     //--------------------------------------View Initialization------------------------------------//
 
-    $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
+    $("#filterDateStart").val(moment().format("YYYY-MM-DD"));
     refreshMainView();
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
+    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
   
 
     //--------------------------------End of execution at Start-----------

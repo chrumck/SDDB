@@ -9,7 +9,7 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var RecordTemplate = {
+var recordTemplate = {
     Id: "RecordTemplateId",
     LocTypeName: null,
     LocTypeAltName: null,
@@ -17,27 +17,27 @@ var RecordTemplate = {
     IsActive_bl: null
 };
 
-LabelTextCreate = "Create Location Type";
-LabelTextEdit = "Edit Location Type";
-UrlFillForEdit = "/LocationTypeSrv/GetByIds";
-UrlEdit = "/LocationTypeSrv/Edit";
-UrlDelete = "/LocationTypeSrv/Delete";
+labelTextCreate = "Create Location Type";
+labelTextEdit = "Edit Location Type";
+urlFillForEdit = "/LocationTypeSrv/GetByIds";
+urlEdit = "/LocationTypeSrv/Edit";
+urlDelete = "/LocationTypeSrv/Delete";
 urlRefreshMainView = "/LocationTypeSrv/Get";
 
 $(document).ready(function () {
 
-    //-----------------------------------------MainView------------------------------------------//
+    //-----------------------------------------mainView------------------------------------------//
     
     //---------------------------------------DataTables------------
 
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    //tableMainColumnSets
+    tableMainColumnSets = [
         [1],
         [2, 3]
     ];
     
-    //TableMain Document Types
-    TableMain = $("#TableMain").DataTable({
+    //tableMain Document Types
+    tableMain = $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" }, //0
             { data: "LocTypeName", name: "LocTypeName" }, //1
@@ -64,14 +64,14 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    showColumnSet(1, tableMainColumnSets);
 
-    //---------------------------------------EditFormView----------------------------------------//
+    //---------------------------------------editFormView----------------------------------------//
 
     //--------------------------------------View Initialization------------------------------------//
 
     refreshMainView();
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
+    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });

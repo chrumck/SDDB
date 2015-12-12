@@ -9,7 +9,7 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var RecordTemplate = {
+var recordTemplate = {
     Id: "RecordTemplateId",
     CompStatusName: null,
     CompStatusAltName: null,
@@ -17,27 +17,27 @@ var RecordTemplate = {
     IsActive_bl: null
 };
 
-LabelTextCreate = "Create Component Status";
-LabelTextEdit = "Edit Component Status";
-UrlFillForEdit = "/ComponentStatusSrv/GetByIds";
-UrlEdit = "/ComponentStatusSrv/Edit";
-UrlDelete = "/ComponentStatusSrv/Delete";
+labelTextCreate = "Create Component Status";
+labelTextEdit = "Edit Component Status";
+urlFillForEdit = "/ComponentStatusSrv/GetByIds";
+urlEdit = "/ComponentStatusSrv/Edit";
+urlDelete = "/ComponentStatusSrv/Delete";
 urlRefreshMainView = "/ComponentStatusSrv/Get";
 
 $(document).ready(function () {
 
-    //-----------------------------------------MainView------------------------------------------//
+    //-----------------------------------------mainView------------------------------------------//
 
     //---------------------------------------DataTables------------
 
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    //tableMainColumnSets
+    tableMainColumnSets = [
         [1],
         [2, 3]
     ];
 
-    //TableMain Component Statuss
-    TableMain = $("#TableMain").DataTable({
+    //tableMain Component Statuss
+    tableMain = $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" }, //0
             { data: "CompStatusName", name: "CompStatusName" }, //1
@@ -65,14 +65,14 @@ $(document).ready(function () {
     });
 
     //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    showColumnSet(1, tableMainColumnSets);
 
-    //---------------------------------------EditFormView----------------------------------------//
+    //---------------------------------------editFormView----------------------------------------//
 
     //--------------------------------------View Initialization------------------------------------//
 
     refreshMainView();
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
+    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });

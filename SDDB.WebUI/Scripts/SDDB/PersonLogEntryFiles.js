@@ -8,99 +8,99 @@
 /// <reference path="Shared.js" />
 
 //--------------------------------------Global Properties------------------------------------//
-var TableLogEntryFiles = {};
-var FileCurrIds = [];
-var DlToken;
-var DlTimer;
-var DlAttempts;
+var tableLogEntryFiles = {};
+var filecurrIds = [];
+var dlToken;
+var dlTimer;
+var dlAttempts;
 var XHR = new window.XMLHttpRequest();
 var MAX_UPLOAD_SIZE = 20971520;
 
 $(document).ready(function () {
 
-    //-----------------------------------------MainView------------------------------------------//
+    //-----------------------------------------mainView------------------------------------------//
 
-    //Wire up BtnEditLogEntryFiles 
-    $("#BtnEditLogEntryFiles").click(function (event) {
+    //Wire up btnEditLogEntryFiles 
+    $("#btnEditLogEntryFiles").click(function (event) {
         event.preventDefault();
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length != 1) {
+        currentIds = tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (currentIds.length != 1) {
             showModalSelectOne();
             return;
         }
 
-        var selectedRecord = TableMain.row(".ui-selected", { page: "current" }).data();
-        $("#LogEntryFilesViewPanel").text(selectedRecord.EnteredByPerson_.FirstName +
+        var selectedRecord = tableMain.row(".ui-selected", { page: "current" }).data();
+        $("#logEntryFilesViewPanel").text(selectedRecord.EnteredByPerson_.FirstName +
             " " + selectedRecord.EnteredByPerson_.LastName + " - " +selectedRecord.LogEntryDateTime);
         
         fillLogEntryFilesForm()
             .done(function () {
-                saveViewSettings(TableMain);
-                switchView("MainView", "LogEntryFilesView", "tdo-btngroup-logentryfiles");
+                saveViewSettings(tableMain);
+                switchView("mainView", "logEntryFilesView", "tdo-btngroup-logentryfiles");
             });
     });
 
-    //---------------------------------------EditFormView----------------------------------------//
+    //---------------------------------------editFormView----------------------------------------//
 
-    //Wire Up EditFormBtnOkFiles
-    $("#EditFormBtnOkFiles").click(function () {
-        $("#LogEntryFilesViewPanel").text($("#LogEntryDateTime").val() +
-            " " + MagicSuggests[0].getSelection()[0].name);
+    //Wire Up editFormBtnOkFiles
+    $("#editFormBtnOkFiles").click(function () {
+        $("#logEntryFilesViewPanel").text($("#LogEntryDateTime").val() +
+            " " + magicSuggests[0].getSelection()[0].name);
         submitEditForm()
             .then(function () { return fillLogEntryFilesForm(); })
-            .done(function () { switchView(MainViewId, "LogEntryFilesView", "tdo-btngroup-logentryfiles"); });
+            .done(function () { switchView(mainViewId, "logEntryFilesView", "tdo-btngroup-logentryfiles"); });
     });
 
-    //--------------------------------------LogEntryFilesView---------------------------------------//
+    //--------------------------------------logEntryFilesView---------------------------------------//
 
-    //Wire Up LogEntryFilesViewBtnBack
-    $("#LogEntryFilesViewBtnBack").click(function() {
+    //Wire Up logEntryFilesViewBtnBack
+    $("#logEntryFilesViewBtnBack").click(function() {
         refreshMainView()
             .done(function () {
-                switchView("LogEntryFilesView", "MainView", "tdo-btngroup-main", TableMain);
+                switchView("logEntryFilesView", "mainView", "tdo-btngroup-main", tableMain);
             });
     });
 
-    //Wire Up LogEntryFilesBtnDload
-    $("#LogEntryFilesBtnDload").click(function () {
-        var fileIds = TableLogEntryFiles.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+    //Wire Up logEntryFilesBtnDload
+    $("#logEntryFilesBtnDload").click(function () {
+        var fileIds = tableLogEntryFiles.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (fileIds.length == 0) {
             showModalNothingSelected();
             return;
         }
 
         showModalWait();
-        $("#LogEntryFilesIframe").contents().find("body").html("");
+        $("#logEntryFilesIframe").contents().find("body").html("");
 
-        DlToken = new Date().getTime(); DlAttempts = 60;
-        DlTimer = window.setInterval(function () {
-            if ((getCookie("DlToken") == DlToken) || (DlAttempts == 0)) {
+        dlToken = new Date().getTime(); dlAttempts = 60;
+        dlTimer = window.setInterval(function () {
+            if ((getCookie("dlToken") == dlToken) || (dlAttempts == 0)) {
                 hideModalWait();
-                window.clearInterval(DlTimer);
-                expireCookie("DlToken");
-                if (DlAttempts == 0) {
+                window.clearInterval(dlTimer);
+                expireCookie("dlToken");
+                if (dlAttempts == 0) {
                     showModalFail("Server Error", "Server response timed out.");
                     return;
                 }
-                var iFrameBodyHtml = $("#LogEntryFilesIframe").contents().find("body").html();
+                var iFrameBodyHtml = $("#logEntryFilesIframe").contents().find("body").html();
                 if (typeof iFrameBodyHtml !== "undefined" && iFrameBodyHtml != "") {
-                    showModalFail("Server Error", $("#LogEntryFilesIframe").contents().find("body").html());
+                    showModalFail("Server Error", $("#logEntryFilesIframe").contents().find("body").html());
                     return;
                 }
             }
-            DlAttempts--
+            dlAttempts--
         }, 500);
 
-        var form = $('<form method="POST" action="/PersonLogEntrySrv/DownloadFiles" target="LogEntryFilesIframe">');
-        form.append($('<input type="hidden" name="DlToken" value="' + DlToken + '">'));
-        form.append($('<input type="hidden" name="id" value="' + CurrIds[0] + '">'));
+        var form = $('<form method="POST" action="/PersonLogEntrySrv/DownloadFiles" target="logEntryFilesIframe">');
+        form.append($('<input type="hidden" name="dlToken" value="' + dlToken + '">'));
+        form.append($('<input type="hidden" name="id" value="' + currentIds[0] + '">'));
         $.each(fileIds, function (i, name) { form.append($('<input type="hidden" name="fileIds[' + i + ']" value="' + name + '">')); });
         $("body").append(form);
         form.submit();
     });
 
-    //wire up LogEntryFilesBtnUpload
-    $("#LogEntryFilesBtnUpload").on("change", function (e) {
+    //wire up logEntryFilesBtnUpload
+    $("#logEntryFilesBtnUpload").on("change", function (e) {
         var files = e.target.files;
         if (files.length > 0) {
             if (window.FormData !== undefined) {
@@ -117,20 +117,20 @@ $(document).ready(function () {
                     }
                 }
 
-                $("#ModalUpload").modal({ show: true, backdrop: "static", keyboard: false });
+                $("#modalUpload").modal({ show: true, backdrop: "static", keyboard: false });
                 $.ajax({
-                    type: "POST", url: "/PersonLogEntrySrv/UploadFiles?logEntryId=" + CurrIds[0],
+                    type: "POST", url: "/PersonLogEntrySrv/UploadFiles?logEntryId=" + currentIds[0],
                     contentType: false, processData: false, data: data,
                     xhr: function () {
                         XHR.upload.addEventListener("progress", function (e) {
                             if (e.lengthComputable) {
                                 var PROGRESS = "Progress: " + Math.round((e.loaded / e.total) * 100) + "%";
-                                $("#ModalUploadBody").text(PROGRESS);
+                                $("#modalUploadBody").text(PROGRESS);
                             }
                         }, false); return XHR;
                     }
                 })
-                    .always(function () { $("#ModalUpload").modal("hide"); })
+                    .always(function () { $("#modalUpload").modal("hide"); })
                     .done(function () { fillLogEntryFilesForm(); })
                     .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
 
@@ -140,20 +140,20 @@ $(document).ready(function () {
     });
 
 
-    //Wire Up LogEntryFilesBtnDelete 
-    $("#LogEntryFilesBtnDelete").click(function () {
-        FileCurrIds = TableLogEntryFiles.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (FileCurrIds.length == 0) showModalNothingSelected();
+    //Wire Up logEntryFilesBtnDelete 
+    $("#logEntryFilesBtnDelete").click(function () {
+        filecurrIds = tableLogEntryFiles.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (filecurrIds.length == 0) showModalNothingSelected();
         else {
-            $("#ModalDeleteFilesBody").text("Confirm deleting " + FileCurrIds.length + " file(s).");
-            $("#ModalDeleteFiles").modal("show");
+            $("#modalDeleteFilesBody").text("Confirm deleting " + filecurrIds.length + " file(s).");
+            $("#modalDeleteFiles").modal("show");
         }
     });
 
     //------------------------------------DataTables - Log Entry Files ---
 
-    //TableLogEntryFiles
-    TableLogEntryFiles = $("#TableLogEntryFiles").DataTable({
+    //tableLogEntryFiles
+    tableLogEntryFiles = $("#tableLogEntryFiles").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "FileName", name: "FileName" },//1
@@ -180,26 +180,26 @@ $(document).ready(function () {
         pageLength: 10
     });
 
-    //-------------------------------------ModalUpload dialog---------------------------------------//
+    //-------------------------------------modalUpload dialog---------------------------------------//
 
-    //Wire Up ModalUploadBtnAbort
-    $("#ModalUploadBtnAbort").click(function () { XHR.abort(); $("#ModalUpload").modal("hide"); });
+    //Wire Up modalUploadBtnAbort
+    $("#modalUploadBtnAbort").click(function () { XHR.abort(); $("#modalUpload").modal("hide"); });
 
-    //-----------------------------------ModalDeleteFiles dialog------------------------------------//
+    //-----------------------------------modalDeleteFiles dialog------------------------------------//
 
     //Get focus on ModalDeleteBtnCancel
-    $("#ModalDeleteFiles").on("shown.bs.modal", function () { $("#ModalDeleteFilesBtnCancel").focus(); });
+    $("#modalDeleteFiles").on("shown.bs.modal", function () { $("#modalDeleteFilesBtnCancel").focus(); });
 
     //Wire Up ModalDeleteBtnCancel 
-    $("#ModalDeleteFilesBtnCancel").click(function () { $("#ModalDeleteFiles").modal("hide"); });
+    $("#modalDeleteFilesBtnCancel").click(function () { $("#modalDeleteFiles").modal("hide"); });
 
-    //Wire Up ModalDeleteFilesBtnOk
-    $("#ModalDeleteFilesBtnOk").click(function () {
-        $("#ModalDeleteFiles").modal("hide");
+    //Wire Up modalDeleteFilesBtnOk
+    $("#modalDeleteFilesBtnOk").click(function () {
+        $("#modalDeleteFiles").modal("hide");
         showModalWait();
         $.ajax({
             type: "POST", url: "/PersonLogEntrySrv/DeleteFiles", timeout: 120000,
-            data: { logEntryId: CurrIds[0], ids: FileCurrIds }, dataType: "json"
+            data: { logEntryId: currentIds[0], ids: filecurrIds }, dataType: "json"
         })
             .always(hideModalWait)
             .done(function () { fillLogEntryFilesForm(); })
@@ -215,8 +215,8 @@ $(document).ready(function () {
 //Fill form showing log entry files
 function fillLogEntryFilesForm() {
     return modalWaitWrapper(function () {
-        return refreshTableGeneric(TableLogEntryFiles,
-            "/PersonLogEntrySrv/ListFiles", { logEntryId: CurrIds[0] }, "GET");
+        return refreshTableGeneric(tableLogEntryFiles,
+            "/PersonLogEntrySrv/ListFiles", { logEntryId: currentIds[0] }, "GET");
     });
 }
 

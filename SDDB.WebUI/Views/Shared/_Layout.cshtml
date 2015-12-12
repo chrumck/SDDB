@@ -61,19 +61,19 @@
     <!------------ Main Section ---------------->
     @RenderBody()
 
-    <!------------ ModalInfo dialog ------------>
-    <div class="modal" id="ModalInfo" tabindex="-1" role="dialog">
+    <!------------ modalInfo dialog ------------>
+    <div class="modal" id="modalInfo" tabindex="-1" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="ModalInfoLabel">Information</h4>
+                    <h4 class="modal-title" id="modalInfoLabel">Information</h4>
                 </div>
                 <div class="modal-body">
-                    <div id="ModalInfoBody"></div>
-                    <pre id="ModalInfoBodyPre"></pre>
+                    <div id="modalInfoBody"></div>
+                    <pre id="modalInfoBodyPre"></pre>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-warning" id="ModalInfoBtnOk">
+                    <button class="btn btn-warning" id="modalInfoBtnOk">
                         &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
                     </button>
                 </div>
@@ -81,14 +81,14 @@
         </div>
     </div>
 
-    <!------------ ModalWait dialog ------------>
-    <div class="modal" id="ModalWait" tabindex="-1" role="dialog">
+    <!------------ modalWait dialog ------------>
+    <div class="modal" id="modalWait" tabindex="-1" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="ModalWaitLabel">Please Wait...</h4>
+                    <h4 class="modal-title" id="modalWaitLabel">Please Wait...</h4>
                 </div>
-                <div class="modal-body" id="ModalWaitBody">
+                <div class="modal-body" id="modalWaitBody">
                     <div class="text-center">
                         <img src="/Images/loading_spinner.gif" />
                     </div>
@@ -97,21 +97,21 @@
         </div>
     </div>
 
-    <!------------ ModalConfirm dialog ------------>
-    <div class="modal" id="ModalConfirm" tabindex="-1" role="dialog">
+    <!------------ modalConfirm dialog ------------>
+    <div class="modal" id="modalConfirm" tabindex="-1" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="ModalConfirmLabel">Please Confirm</h4>
+                    <h4 class="modal-title" id="modalConfirmLabel">Please Confirm</h4>
                 </div>
                 <div class="modal-body">
-                    <div id="ModalConfirmBody"></div>
+                    <div id="modalConfirmBody"></div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-tdo-primary pull-left" id="ModalConfirmBtnNo">
+                    <button class="btn btn-tdo-primary pull-left" id="modalConfirmBtnNo">
                         &nbsp;&nbsp;&nbsp;&nbsp;No&nbsp;&nbsp;&nbsp;&nbsp;
                     </button>
-                    <button class="btn btn-primary" id="ModalConfirmBtnYes">
+                    <button class="btn btn-primary" id="modalConfirmBtnYes">
                         &nbsp;&nbsp;&nbsp;Yes&nbsp;&nbsp;&nbsp;
                     </button>
                 </div>
@@ -119,28 +119,28 @@
         </div>
     </div>
 
-    <!------------ ModalDatePrompt dialog ------------>
-    <div class="modal" id="ModalDatePrompt" tabindex="-1" role="dialog">
+    <!------------ modalDatePrompt dialog ------------>
+    <div class="modal" id="modalDatePrompt" tabindex="-1" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="ModalDatePromptLabel">Please Select Date</h4>
+                    <h4 class="modal-title" id="modalDatePromptLabel">Please Select Date</h4>
                 </div>
                 <div class="modal-body">
-                    <div id="ModalDatePromptBody"></div>
-                    <form role="form" id="ModalDatePromptForm">
+                    <div id="modalDatePromptBody"></div>
+                    <form role="form" id="modalDatePromptForm">
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <div id="ModalDatePromptInput"></div>
+                                    <div id="modalDatePromptInput"></div>
                                 </div>
                             </div>
                         </div>
                     </form>                    
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-default pull-left" id="ModalDatePromptBtnCancel">Cancel</button>
-                    <button class="btn btn-warning" id="ModalDatePromptBtnOk">
+                    <button class="btn btn-default pull-left" id="modalDatePromptBtnCancel">Cancel</button>
+                    <button class="btn btn-warning" id="modalDatePromptBtnOk">
                         &nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;&nbsp;
                     </button>
                 </div>

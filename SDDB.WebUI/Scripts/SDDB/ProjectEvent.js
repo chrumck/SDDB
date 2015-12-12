@@ -9,9 +9,9 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var MsFilterByProject = {};
+var msFilterByProject = {};
 
-var RecordTemplate = {
+var recordTemplate = {
     Id: "RecordTemplateId",
     EventName: null,
     EventAltName: null,
@@ -24,22 +24,22 @@ var RecordTemplate = {
     ClosedByPerson_Id: null
 };
 
-LabelTextCreate = "Create Event";
-LabelTextEdit = "Edit Event";
-UrlFillForEdit = "/ProjectEventSrv/GetByIds";
-UrlEdit = "/ProjectEventSrv/Edit";
-UrlDelete = "/ProjectEventSrv/Delete";
+labelTextCreate = "Create Event";
+labelTextEdit = "Edit Event";
+urlFillForEdit = "/ProjectEventSrv/GetByIds";
+urlEdit = "/ProjectEventSrv/Edit";
+urlDelete = "/ProjectEventSrv/Delete";
 
 var urlRefreshMainView = "/ProjectEventSrv/GetByProjectIds";
-var dataRefreshMainView = function () { return { projectIds: MsFilterByProject.getValue(), getActive: GetActive }; };
+var dataRefreshMainView = function () { return { projectIds: msFilterByProject.getValue(), getActive: currentActive }; };
 var httpTypeRefreshMainView = "POST";
 
 $(document).ready(function () {
 
-    //-----------------------------------------MainView------------------------------------------//
+    //-----------------------------------------mainView------------------------------------------//
 
     //Initialize MagicSuggest msFilterByProject
-    MsFilterByProject = $("#MsFilterByProject").magicSuggest({
+    msFilterByProject = $("#msFilterByProject").magicSuggest({
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
@@ -48,20 +48,20 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByProject
-    $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByProject
+    $(msFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
 
 
     //---------------------------------------DataTables------------
     
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    //tableMainColumnSets
+    tableMainColumnSets = [
         [1],
         [2, 3, 4, 5, 6, 7, 8]
     ];
     
-    //TableMain ProjectEvents
-    TableMain = $("#TableMain").DataTable({
+    //tableMain ProjectEvents
+    tableMain = $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "EventName", name: "EventName" },//1
@@ -111,14 +111,14 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    showColumnSet(1, tableMainColumnSets);
 
-    //---------------------------------------EditFormView----------------------------------------//
+    //---------------------------------------editFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "CreatedByPerson_Id", "/PersonSrv/LookupFromProject", 1);
-    msAddToMsArray(MagicSuggests, "ClosedByPerson_Id", "/PersonSrv/LookupFromProject", 1);
+    msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "CreatedByPerson_Id", "/PersonSrv/LookupFromProject", 1);
+    msAddToMsArray(magicSuggests, "ClosedByPerson_Id", "/PersonSrv/LookupFromProject", 1);
 
     //Enable DateTimePicker
     $("[data-val-dbisdatetimeiso]").datetimepicker({ format: "YYYY-MM-DD HH:mm" })
@@ -127,7 +127,7 @@ $(document).ready(function () {
     //--------------------------------------View Initialization------------------------------------//
 
     refreshMainView();
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
+    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });

@@ -9,7 +9,7 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var RecordTemplate = {
+var recordTemplate = {
     Id: "RecordTemplateId",
     DocName: null,
     DocAltName: null,
@@ -25,21 +25,21 @@ var RecordTemplate = {
     RelatesToCompType_Id: null
 };
 
-var MsFilterByProject = {};
-var MsFilterByType = {};
+var msFilterByProject = {};
+var msFilterByType = {};
 
-LabelTextCreate = "Create Document";
-LabelTextEdit = "Edit Document";
-UrlFillForEdit = "/DocumentSrv/GetByIds";
-UrlEdit = "/DocumentSrv/Edit";
-UrlDelete = "/DocumentSrv/Delete";
+labelTextCreate = "Create Document";
+labelTextEdit = "Edit Document";
+urlFillForEdit = "/DocumentSrv/GetByIds";
+urlEdit = "/DocumentSrv/Edit";
+urlDelete = "/DocumentSrv/Delete";
 
 $(document).ready(function () {
 
-    //-----------------------------------------MainView------------------------------------------//
+    //-----------------------------------------mainView------------------------------------------//
     
-    //Initialize MagicSuggest MsFilterByType
-    MsFilterByType = $("#MsFilterByType").magicSuggest({
+    //Initialize MagicSuggest msFilterByType
+    msFilterByType = $("#msFilterByType").magicSuggest({
         data: "/DocumentTypeSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
@@ -48,11 +48,11 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByType
-    $(MsFilterByType).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByType
+    $(msFilterByType).on("selectionchange", function (e, m) { refreshMainView(); });
 
-    //Initialize MagicSuggest MsFilterByProject
-    MsFilterByProject = $("#MsFilterByProject").magicSuggest({
+    //Initialize MagicSuggest msFilterByProject
+    msFilterByProject = $("#msFilterByProject").magicSuggest({
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
@@ -61,20 +61,20 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByProject
-    $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByProject
+    $(msFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
 
     //---------------------------------------DataTables------------
     
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    //tableMainColumnSets
+    tableMainColumnSets = [
         [1],
         [2, 3, 4, 5, 6],
         [7, 8, 9, 10, 11]
     ];
 
-    //TableMain Documents
-    TableMain = $("#TableMain").DataTable({
+    //tableMain Documents
+    tableMain = $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "DocName", name: "DocName" },//1
@@ -144,21 +144,21 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    showColumnSet(1, tableMainColumnSets);
 
-    //---------------------------------------EditFormView----------------------------------------//
+    //---------------------------------------editFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    msAddToMsArray(MagicSuggests, "DocumentType_Id", "/DocumentTypeSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "AuthorPerson_Id", "/PersonSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "ReviewerPerson_Id", "/PersonSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "RelatesToAssyType_Id", "/AssemblyTypeSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "RelatesToCompType_Id", "/ComponentTypeSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "DocumentType_Id", "/DocumentTypeSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "AuthorPerson_Id", "/PersonSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "ReviewerPerson_Id", "/PersonSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "RelatesToAssyType_Id", "/AssemblyTypeSrv/Lookup", 1);
+    msAddToMsArray(magicSuggests, "RelatesToCompType_Id", "/ComponentTypeSrv/Lookup", 1);
     
     //--------------------------------------View Initialization------------------------------------//
 
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
+    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });
@@ -167,16 +167,16 @@ $(document).ready(function () {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
-    TableMain.clear().search("").draw();
-    if (MsFilterByType.getValue().length === 0 && MsFilterByProject.getValue().length === 0) {
+    tableMain.clear().search("").draw();
+    if (msFilterByType.getValue().length === 0 && msFilterByProject.getValue().length === 0) {
         return $.Deferred().resolve();
     }
     return modalWaitWrapper(function () {
-        return refreshTableGeneric(TableMain, "/DocumentSrv/GetByAltIds",
+        return refreshTableGeneric(tableMain, "/DocumentSrv/GetByAltIds",
         {
-            projectIds: MsFilterByProject.getValue(),
-            typeIds: MsFilterByType.getValue(),
-            getActive: GetActive
+            projectIds: msFilterByProject.getValue(),
+            typeIds: msFilterByType.getValue(),
+            getActive: currentActive
         },
         "POST");
     });

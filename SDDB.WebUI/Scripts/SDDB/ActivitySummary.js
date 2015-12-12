@@ -1,4 +1,6 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
+﻿/*global sddb, sddbConf*/
+/*global UserId, UserFullName, CanViewOthers*/
+/// <reference path="../DataTables/jquery.dataTables.js" />
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
@@ -9,20 +11,20 @@
 
 //--------------------------------------Global Properties------------------------------------//
 
-var MsFilterByPerson;
+var msFilterByPerson;
 
 $(document).ready(function () {
 
-    //-----------------------------------------MainView------------------------------------------//
+    //-----------------------------------------mainView------------------------------------------//
 
 
-    //Initialize DateTimePicker FilterDateStart
-    $("#FilterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
+    //Initialize DateTimePicker filterDateStart
+    $("#filterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
         .on("dp.hide", function (e) { refreshMainView(); });
 
 
-    //Initialize MagicSuggest MsFilterByPerson
-    MsFilterByPerson = $("#MsFilterByPerson").magicSuggest({
+    //Initialize MagicSuggest msFilterByPerson
+    msFilterByPerson = $("#msFilterByPerson").magicSuggest({
         data: "/PersonSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
@@ -32,22 +34,21 @@ $(document).ready(function () {
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
-    //Wire up on change event for MsFilterByPerson
-    $(MsFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
+    //Wire up on change event for msFilterByPerson
+    $(msFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
 
-    //Hide MsFilterByPerson if !CanViewOthers
-    if (typeof CanViewOthers === "undefined" || !CanViewOthers) { MsFilterByPerson.disable(); } 
+    //Hide msFilterByPerson if !CanViewOthers
+    if (typeof CanViewOthers === "undefined" || !CanViewOthers) { msFilterByPerson.disable(); } 
            
     //--------------------------------------View Initialization------------------------------------//
            
-    $("#InitialView").addClass("hidden");
-    $("#MainView").removeClass("hidden");
+    $("#initialView").addClass("hidden");
+    $("#mainView").removeClass("hidden");
 
-    var weekOffset = 0
-    if ($("#thNo6").is(":hidden") && $("#thNo7").is(":hidden")) { weekOffset = 1; }
-    $("#FilterDateStart").val(moment().day(weekOffset).format("YYYY-MM-DD"));
+    var weekOffset = $("#thNo6").is(":hidden") && $("#thNo7").is(":hidden") ? 1: 0;
+    $("#filterDateStart").val(moment().day(weekOffset).format("YYYY-MM-DD"));
 
-    MsFilterByPerson.setSelection([{ id: UserId, name: UserFullName }]);
+    msFilterByPerson.setSelection([{ id: UserId, name: UserFullName }]);
 
     //--------------------------------End of execution at Start-----------
 });
@@ -57,13 +58,13 @@ $(document).ready(function () {
 
 //refresh view after magicsuggest update
 function refreshMainView() {
-    var tableMain = $("#TableMain");
-    var startDate = $("#FilterDateStart").val();
+    var tableMain = $("#tableMain");
+    var startDate = $("#filterDateStart").val();
 
     tableMain.find("tbody").empty();
     clearSumTblFirstRowHelper(tableMain);
 
-    if (startDate != "" && MsFilterByPerson.getSelection().length != 0) {
+    if (startDate != "" && msFilterByPerson.getSelection().length != 0) {
         showModalWait();
         var endDate = moment(startDate).add(6, "days").hour(23).minute(59).format("YYYY-MM-DD HH:mm");
         $.ajax({
@@ -71,7 +72,7 @@ function refreshMainView() {
             url: "/PersonLogEntrySrv/GetActivitySummaries",
             timeout: 120000,
             data: {
-                personId: (MsFilterByPerson.getSelection())[0].id,
+                personId: (msFilterByPerson.getSelection())[0].id,
                 startDate: startDate,
                 endDate: endDate,
                 getActive: true
