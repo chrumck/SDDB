@@ -7,6 +7,8 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
+"use strict";
+
 //--------------------------------------Global Properties------------------------------------//
 var tableLogEntryFiles = {};
 var filecurrIds = [];
@@ -25,7 +27,7 @@ $(document).ready(function () {
         event.preventDefault();
         currentIds = tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (currentIds.length != 1) {
-            showModalSelectOne();
+            sddb.showModalSelectOne();
             return;
         }
 
@@ -35,8 +37,8 @@ $(document).ready(function () {
         
         fillLogEntryFilesForm()
             .done(function () {
-                saveViewSettings(tableMain);
-                switchView("mainView", "logEntryFilesView", "tdo-btngroup-logentryfiles");
+                sddb.saveViewSettings(tableMain);
+                sddb.switchView("mainView", "logEntryFilesView", "tdo-btngroup-logentryfiles");
             });
     });
 
@@ -46,18 +48,18 @@ $(document).ready(function () {
     $("#editFormBtnOkFiles").click(function () {
         $("#logEntryFilesViewPanel").text($("#LogEntryDateTime").val() +
             " " + magicSuggests[0].getSelection()[0].name);
-        submitEditForm()
+        sddb.submitEditForm()
             .then(function () { return fillLogEntryFilesForm(); })
-            .done(function () { switchView(mainViewId, "logEntryFilesView", "tdo-btngroup-logentryfiles"); });
+            .done(function () { sddb.switchView(mainViewId, "logEntryFilesView", "tdo-btngroup-logentryfiles"); });
     });
 
     //--------------------------------------logEntryFilesView---------------------------------------//
 
     //Wire Up logEntryFilesViewBtnBack
     $("#logEntryFilesViewBtnBack").click(function() {
-        refreshMainView()
+        sddb.refreshMainView()
             .done(function () {
-                switchView("logEntryFilesView", "mainView", "tdo-btngroup-main", tableMain);
+                sddb.switchView("logEntryFilesView", "mainView", "tdo-btngroup-main", tableMain);
             });
     });
 
@@ -65,26 +67,26 @@ $(document).ready(function () {
     $("#logEntryFilesBtnDload").click(function () {
         var fileIds = tableLogEntryFiles.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (fileIds.length == 0) {
-            showModalNothingSelected();
+            sddb.showModalNothingSelected();
             return;
         }
 
-        showModalWait();
+        sddb.showModalWait();
         $("#logEntryFilesIframe").contents().find("body").html("");
 
         dlToken = new Date().getTime(); dlAttempts = 60;
         dlTimer = window.setInterval(function () {
             if ((getCookie("dlToken") == dlToken) || (dlAttempts == 0)) {
-                hideModalWait();
+                sddb.hideModalWait();
                 window.clearInterval(dlTimer);
                 expireCookie("dlToken");
                 if (dlAttempts == 0) {
-                    showModalFail("Server Error", "Server response timed out.");
+                    sddb.showModalFail("Server Error", "Server response timed out.");
                     return;
                 }
                 var iFrameBodyHtml = $("#logEntryFilesIframe").contents().find("body").html();
                 if (typeof iFrameBodyHtml !== "undefined" && iFrameBodyHtml != "") {
-                    showModalFail("Server Error", $("#logEntryFilesIframe").contents().find("body").html());
+                    sddb.showModalFail("Server Error", $("#logEntryFilesIframe").contents().find("body").html());
                     return;
                 }
             }
@@ -111,7 +113,7 @@ $(document).ready(function () {
                     data.append("file" + x, files[x]);
                     dataSize += files[x].size;
                     if (dataSize > MAX_UPLOAD_SIZE) {
-                        showModalFail("Upload Too Large",
+                        sddb.showModalFail("Upload Too Large",
                             "The total single upload is limited to " + MAX_UPLOAD_SIZE / 1024 + " kB");
                         return;
                     }
@@ -132,9 +134,9 @@ $(document).ready(function () {
                 })
                     .always(function () { $("#modalUpload").modal("hide"); })
                     .done(function () { fillLogEntryFilesForm(); })
-                    .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+                    .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
 
-            } else showModalFail("Browser Error", "This browser doesn't support HTML5 file uploads!");
+            } else sddb.showModalFail("Browser Error", "This browser doesn't support HTML5 file uploads!");
         }
         $(e.target).val("");
     });
@@ -143,7 +145,7 @@ $(document).ready(function () {
     //Wire Up logEntryFilesBtnDelete 
     $("#logEntryFilesBtnDelete").click(function () {
         filecurrIds = tableLogEntryFiles.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (filecurrIds.length == 0) showModalNothingSelected();
+        if (filecurrIds.length == 0) sddb.showModalNothingSelected();
         else {
             $("#modalDeleteFilesBody").text("Confirm deleting " + filecurrIds.length + " file(s).");
             $("#modalDeleteFiles").modal("show");
@@ -196,14 +198,14 @@ $(document).ready(function () {
     //Wire Up modalDeleteFilesBtnOk
     $("#modalDeleteFilesBtnOk").click(function () {
         $("#modalDeleteFiles").modal("hide");
-        showModalWait();
+        sddb.showModalWait();
         $.ajax({
             type: "POST", url: "/PersonLogEntrySrv/DeleteFiles", timeout: 120000,
             data: { logEntryId: currentIds[0], ids: filecurrIds }, dataType: "json"
         })
-            .always(hideModalWait)
+            .always(sddb.hideModalWait)
             .done(function () { fillLogEntryFilesForm(); })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
     });
 
     //--------------------------------End of execution at Start-----------
@@ -214,8 +216,8 @@ $(document).ready(function () {
 
 //Fill form showing log entry files
 function fillLogEntryFilesForm() {
-    return modalWaitWrapper(function () {
-        return refreshTableGeneric(tableLogEntryFiles,
+    return sddb.modalWaitWrapper(function () {
+        return sddb.refreshTableGeneric(tableLogEntryFiles,
             "/PersonLogEntrySrv/ListFiles", { logEntryId: currentIds[0] }, "GET");
     });
 }

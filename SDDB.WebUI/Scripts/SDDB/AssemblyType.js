@@ -8,6 +8,8 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
+"use strict";
+
 //--------------------------------------Global Properties------------------------------------//
 
 //setting up sddb
@@ -159,7 +161,7 @@ $(document).ready(function () {
     //--------------------------------------View Initialization------------------------------------//
 
     sddb.refreshMainView();
-    sddb.switchView(sddbConf.initialViewId, sddbConf.mainViewId, sddbConf.mainViewBtnGroupClass);
+    sddb.switchView();
     
 });
 

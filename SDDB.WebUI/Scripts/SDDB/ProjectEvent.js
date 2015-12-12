@@ -7,6 +7,8 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
+"use strict";
+
 //--------------------------------------Global Properties------------------------------------//
 
 var msFilterByProject = {};
@@ -43,13 +45,13 @@ $(document).ready(function () {
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
         },
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     //Wire up on change event for msFilterByProject
-    $(msFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
+    $(msFilterByProject).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
 
 
     //---------------------------------------DataTables------------
@@ -111,14 +113,14 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(1, tableMainColumnSets);
+    sddb.showColumnSet(1, tableMainColumnSets);
 
     //---------------------------------------editFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    msAddToMsArray(magicSuggests, "CreatedByPerson_Id", "/PersonSrv/LookupFromProject", 1);
-    msAddToMsArray(magicSuggests, "ClosedByPerson_Id", "/PersonSrv/LookupFromProject", 1);
+    sddb.msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    sddb.msAddToMsArray(magicSuggests, "CreatedByPerson_Id", "/PersonSrv/LookupFromProject", 1);
+    sddb.msAddToMsArray(magicSuggests, "ClosedByPerson_Id", "/PersonSrv/LookupFromProject", 1);
 
     //Enable DateTimePicker
     $("[data-val-dbisdatetimeiso]").datetimepicker({ format: "YYYY-MM-DD HH:mm" })
@@ -126,8 +128,8 @@ $(document).ready(function () {
 
     //--------------------------------------View Initialization------------------------------------//
 
-    refreshMainView();
-    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
+    sddb.refreshMainView();
+    sddb.switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });

@@ -7,6 +7,8 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared_Views.js" />
 
+"use strict";
+
 //--------------------------------------Global Properties------------------------------------//
 
 var recordTemplate = {
@@ -46,62 +48,62 @@ $(document).ready(function () {
     //-----------------------------------------mainView------------------------------------------//
     
     //Initialize DateTimePicker filterDateStart
-    $("#filterDateStart").datetimepicker({ format: "YYYY-MM-DD" }).on("dp.hide", function (e) { refreshMainView(); });
+    $("#filterDateStart").datetimepicker({ format: "YYYY-MM-DD" }).on("dp.hide", function (e) { sddb.refreshMainView(); });
 
     //Initialize DateTimePicker filterDateEnd
-    $("#filterDateEnd").datetimepicker({ format: "YYYY-MM-DD" }).on("dp.hide", function (e) { refreshMainView(); });
+    $("#filterDateEnd").datetimepicker({ format: "YYYY-MM-DD" }).on("dp.hide", function (e) { sddb.refreshMainView(); });
 
     //Initialize MagicSuggest msFilterByProject
     msFilterByProject = $("#msFilterByProject").magicSuggest({
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
         },
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     //Wire up on change event for msFilterByProject
-    $(msFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
+    $(msFilterByProject).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
 
     //Initialize MagicSuggest msFilterByAssembly
     msFilterByAssembly = $("#msFilterByAssembly").magicSuggest({
         data: "/AssemblyDbSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
         },
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     //Wire up on change event for msFilterByAssembly
-    $(msFilterByAssembly).on("selectionchange", function (e, m) { refreshMainView(); });
+    $(msFilterByAssembly).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
 
     //Initialize MagicSuggest msFilterByAssembly
     msFilterByAssyType = $("#msFilterByAssyType").magicSuggest({
         data: "/AssemblyTypeSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
         },
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     //Wire up on change event for msFilterByAssembly
-    $(msFilterByAssyType).on("selectionchange", function (e, m) { refreshMainView(); });
+    $(msFilterByAssyType).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
 
     //Initialize MagicSuggest msFilterByPerson
     msFilterByPerson = $("#msFilterByPerson").magicSuggest({
         data: "/PersonSrv/LookupFromProject",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
         },
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     //Wire up on change event for msFilterByPerson
-    $(msFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
+    $(msFilterByPerson).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
    
         
     //---------------------------------------DataTables------------
@@ -183,7 +185,7 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(1, tableMainColumnSets);
+    sddb.showColumnSet(1, tableMainColumnSets);
 
     //---------------------------------------editFormView----------------------------------------//
 
@@ -196,14 +198,14 @@ $(document).ready(function () {
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
-    msAddToMsArray(magicSuggests, "AssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
-    msAddToMsArray(magicSuggests, "AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup", 1);
-    msAddToMsArray(magicSuggests, "AssignedToLocation_Id", "/LocationSrv/Lookup", 1);
+    sddb.msAddToMsArray(magicSuggests, "AssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
+    sddb.msAddToMsArray(magicSuggests, "AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup", 1);
+    sddb.msAddToMsArray(magicSuggests, "AssignedToLocation_Id", "/LocationSrv/Lookup", 1);
 
     //--------------------------------------View Initialization------------------------------------//
 
-    fillFiltersFromRequestParams().done(refreshMainView);
-    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
+    sddb.fillFiltersFromRequestParams().done(sddb.refreshMainView);
+    sddb.switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
     
     //--------------------------------End of execution at Start-----------
 });
@@ -212,15 +214,15 @@ $(document).ready(function () {
 //--------------------------------------Main Methods---------------------------------------//
 
 //refresh Main view 
-function refreshMainView() {
+sddb.refreshMainView = function () {
     tableMain.clear().search("").draw();
     if ($("#filterDateStart").val() == "" || $("#filterDateEnd").val() == "") { return $.Deferred().resolve(); }
 
     var endDate = ($("#filterDateEnd").val() == "") ? "" : moment($("#filterDateEnd").val())
         .hour(23).minute(59).format("YYYY-MM-DD HH:mm");
 
-    return modalWaitWrapper(function () {
-        return refreshTableGeneric(tableMain, "/AssemblyLogEntrySrv/GetByAltIds",
+    return sddb.modalWaitWrapper(function () {
+        return sddb.refreshTableGeneric(tableMain, "/AssemblyLogEntrySrv/GetByAltIds",
         {
             projectIds: msFilterByProject.getValue(),
             assyIds: msFilterByAssembly.getValue(),
@@ -235,15 +237,15 @@ function refreshMainView() {
 }
 
 //fillFiltersFromRequestParams
-function fillFiltersFromRequestParams() {
+sddb.fillFiltersFromRequestParams = function () {
     $("#filterDateStart").val(moment().format("YYYY-MM-DD"));
     $("#filterDateEnd").val(moment().format("YYYY-MM-DD"));
     if (AssemblyId) {
-        return modalWaitWrapper(function () {
+        return sddb.modalWaitWrapper(function () {
             return $.ajax({ type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 120000, 
                     data: { ids: [AssemblyId], getActive: true }, dataType: "json" })
                 .then(function (data) {
-                    msSetSelectionSilent(msFilterByAssembly, [{ id: data[0].Id, name: data[0].AssyName, }]);
+                    sddb.msSetSelectionSilent(msFilterByAssembly, [{ id: data[0].Id, name: data[0].AssyName, }]);
                 });
         });
     }

@@ -10,6 +10,8 @@
 /// <reference path="Shared_Views.js" />
 /// <reference path="PersonLogEntryShared.js" />
 
+"use strict";
+
 //--------------------------------------Global Properties------------------------------------//
 
 labelTextCreate = "Create Activity";
@@ -28,8 +30,8 @@ callBackAfterCreate = function () {
     tableLogEntryPersonsAdd.clear().search("").draw();
     tableLogEntryPersonsRemove.clear().search("").draw();
 
-    return modalWaitWrapper(function () {
-        return refreshTableGeneric(tableLogEntryPersonsAdd, "/PersonSrv/Get", { getActive: true }, "GET");
+    return sddb.modalWaitWrapper(function () {
+        return sddb.refreshTableGeneric(tableLogEntryPersonsAdd, "/PersonSrv/Get", { getActive: true }, "GET");
     });
 };
 
@@ -37,16 +39,16 @@ callBackAfterEdit = function (currRecords) {
     if (currentIds.length > 1) { $("#editFormBtnOkFiles").prop("disabled", true); }
     else { $("#editFormBtnOkFiles").prop("disabled", false); }
 
-    return modalWaitWrapper(function () {
+    return sddb.modalWaitWrapper(function () {
         return $.when(
-            fillFormForRelatedGeneric(tableLogEntryPersonsAdd, tableLogEntryPersonsRemove, currentIds,
+            sddb.fillFormForRelatedGeneric(tableLogEntryPersonsAdd, tableLogEntryPersonsRemove, currentIds,
                 "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons",
                 { logEntryId: currentIds[0] },
                 "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot",
                 { logEntryId: currentIds[0] },
                 "GET", "/PersonSrv/Get",
                 { getActive: true }),
-            fillFormForRelatedGeneric(tableLogEntryAssysAdd, tableLogEntryAssysRemove, currentIds,
+            sddb.fillFormForRelatedGeneric(tableLogEntryAssysAdd, tableLogEntryAssysRemove, currentIds,
                 "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys",
                 { logEntryId: currentIds[0] },
                 "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
@@ -58,7 +60,7 @@ callBackAfterEdit = function (currRecords) {
 };
 
 callBackBeforeCopy = function () {
-    return showModalConfirm("NOTE: Assemblies, People and Files are not copied! Continue?", "Confirm Copy");
+    return sddb.showModalFail("NOTE: Assemblies, People and Files are not copied! Continue?", "Confirm Copy");
 };
 
 callBackAfterCopy = function () {
@@ -71,11 +73,11 @@ callBackAfterCopy = function () {
     magicSuggests[5].clear();
     $("#QcdDateTime").val("");
 
-    return modalWaitWrapper(function () {
+    return sddb.modalWaitWrapper(function () {
         return $.when(
-                refreshTableGeneric(tableLogEntryPersonsAdd,
+                sddb.refreshTableGeneric(tableLogEntryPersonsAdd,
                     "/PersonSrv/Get", { getActive: true }, "GET"),
-                refreshTableGeneric(tableLogEntryAssysAdd,
+                sddb.refreshTableGeneric(tableLogEntryAssysAdd,
                     "AssemblyDbSrv/LookupByLocDTables",
                     { getActive: true, locId: magicSuggests[3].getValue()[0] }, "GET")
             );
@@ -87,8 +89,8 @@ refreshMainView = function () {
     if ($("#filterDateStart").val() === "" || $("#filterDateEnd").val() === "") { return $.Deferred().resolve(); }
 
     var endDate = moment($("#filterDateEnd").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
-    return modalWaitWrapper(function () {
-        return refreshTableGeneric(tableMain, "/PersonLogEntrySrv/GetByAltIds",
+    return sddb.modalWaitWrapper(function () {
+        return sddb.refreshTableGeneric(tableMain, "/PersonLogEntrySrv/GetByAltIds",
         {
             personIds: msFilterByPerson.getValue(),
             typeIds: msFilterByType.getValue(),
@@ -104,14 +106,14 @@ refreshMainView = function () {
 };
 
 //fillFiltersFromRequestParams
-fillFiltersFromRequestParams = function () {
+sddb.fillFiltersFromRequestParams = function () {
     var deferred0 = $.Deferred();
 
     $("#filterDateStart").val(moment().format("YYYY-MM-DD"));
     $("#filterDateEnd").val(moment().format("YYYY-MM-DD"));
 
     if (PersonId) {
-        showModalWait();
+        sddb.showModalWait();
         $.ajax({
             type: "POST",
             url: "/PersonSrv/GetAllByIds",
@@ -119,10 +121,10 @@ fillFiltersFromRequestParams = function () {
             data: { ids: [PersonId], getActive: true },
             dataType: "json"
         })
-            .always(hideModalWait)
+            .always(sddb.hideModalWait)
             .done(function (data) {
                 if (typeof data[0].Id !== undefined) {
-                    msSetSelectionSilent(msFilterByPerson, [{
+                    sddb.msSetSelectionSilent(msFilterByPerson, [{
                         id: data[0].Id,
                         name: data[0].FirstName + " " + data[0].LastName + " " + data[0].Initials
                     }]);
@@ -130,7 +132,7 @@ fillFiltersFromRequestParams = function () {
                 return deferred0.resolve();
             })
             .fail(function (xhr, status, error) {
-                showModalAJAXFail(xhr, status, error);
+                sddb.showModalFail(xhr, status, error);
                 deferred0.reject(xhr, status, error);
             });
     }
@@ -148,13 +150,13 @@ $(document).ready(function () {
         event.preventDefault();
         currentIds = tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (currentIds.length === 0) {
-            showModalNothingSelected();
+            sddb.showModalNothingSelected();
             return;
         }
-        saveViewSettings(tableMain);
-        showModalConfirm("Confirm that you want to QC the entry(ies).", "Confirm QC")
+        sddb.saveViewSettings(tableMain);
+        sddb.showModalFail("Confirm that you want to QC the entry(ies).", "Confirm QC")
             .then(function () { return qcSelected(); })
-            .done(function () { loadViewSettings(tableMain); });
+            .done(function () { sddb.loadViewSettings(tableMain); });
     });
 
     //Initialize MagicSuggest msFilterByPerson
@@ -162,39 +164,39 @@ $(document).ready(function () {
         data: "/PersonSrv/LookupFromProject",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
         },
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     //Wire up on change event for msFilterByPerson
-    $(msFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
+    $(msFilterByPerson).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
 
     //Initialize MagicSuggest msFilterByType
     msFilterByType = $("#msFilterByType").magicSuggest({
         data: "/PersonActivityTypeSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
         },
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     //Wire up on change event for msFilterByType
-    $(msFilterByType).on("selectionchange", function (e, m) { refreshMainView(); });
+    $(msFilterByType).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
 
     //Initialize MagicSuggest msFilterByProject
     msFilterByProject = $("#msFilterByProject").magicSuggest({
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
         },
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     //Wire up on change event for msFilterByProject
-    $(msFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
+    $(msFilterByProject).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
 
     //Initialize MagicSuggest msFilterByAssy
     msFilterByAssy = $("#msFilterByAssy").magicSuggest({
@@ -202,13 +204,13 @@ $(document).ready(function () {
         allowFreeEntries: false,
         dataUrlParams: { projectIds: msFilterByProject.getValue },
         ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
         },
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     //Wire up on change event for msFilterByAssy
-    $(msFilterByAssy).on("selectionchange", function (e, m) { refreshMainView(); });
+    $(msFilterByAssy).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
         
     //---------------------------------------DataTables------------
 
@@ -290,7 +292,7 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(1, tableMainColumnSets);
+    sddb.showColumnSet(1, tableMainColumnSets);
 
     //---------------------------------------editFormView----------------------------------------//
 
@@ -299,14 +301,14 @@ $(document).ready(function () {
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
-    msAddToMsArray(magicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
-    msAddToMsArray(magicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1);
-    msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    msAddToMsArray(magicSuggests, "AssignedToLocation_Id", "/LocationSrv/LookupByProj", 1, null,
+    sddb.msAddToMsArray(magicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
+    sddb.msAddToMsArray(magicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1);
+    sddb.msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    sddb.msAddToMsArray(magicSuggests, "AssignedToLocation_Id", "/LocationSrv/LookupByProj", 1, null,
         { projectIds: magicSuggests[2].getValue });
-    msAddToMsArray(magicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
+    sddb.msAddToMsArray(magicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
         { projectIds: magicSuggests[2].getValue });
-    msAddToMsArray(magicSuggests, "QcdByPerson_Id", "/PersonSrv/Lookup", 1);
+    sddb.msAddToMsArray(magicSuggests, "QcdByPerson_Id", "/PersonSrv/Lookup", 1);
 
     //Initialize MagicSuggest Array Event - AssignedToProject_Id
     $(magicSuggests[2]).on("selectionchange", function (e, m) {
@@ -329,12 +331,12 @@ $(document).ready(function () {
             tableLogEntryAssysAdd.clear().search("").draw();
             return;
         }
-        modalWaitWrapper(function () {
+        sddb.modalWaitWrapper(function () {
             if (currentIds.length == 1) {
-                return refreshTableGeneric(tableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
+                return sddb.refreshTableGeneric(tableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
                     { logEntryId: currentIds[0], locId: magicSuggests[3].getValue()[0] }, "GET");
             }
-            return refreshTableGeneric(tableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
+            return sddb.refreshTableGeneric(tableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
             { getActive: true, locId: magicSuggests[3].getValue()[0] }, "GET");
 
         })
@@ -344,14 +346,14 @@ $(document).ready(function () {
     //Wire Up editFormBtnQcSelected
     $("#editFormBtnQcSelected").click(function () {
         if (currentIds.length === 0) {
-            showModalFail("QC not possible!", "You cannot QC an entry while it is being created.");
+            sddb.showModalFail("QC not possible!", "You cannot QC an entry while it is being created.");
             return;
         }
-        showModalConfirm("Confirm that you want to QC the entry(ies).", "Confirm QC","no")
+        sddb.showModalFail("Confirm that you want to QC the entry(ies).", "Confirm QC","no")
             .then(qcSelected)
             .done(function () {
-                modalWaitWrapper(function () {
-                    return fillFormForEditGeneric(currentIds, "POST", "/PersonLogEntrySrv/GetByIds",
+                sddb.modalWaitWrapper(function () {
+                    return sddb.fillFormForEditGeneric(currentIds, "POST", "/PersonLogEntrySrv/GetByIds",
                             currentActive, "editForm", "Edit Person Activity", magicSuggests);
                 });
             });
@@ -359,8 +361,8 @@ $(document).ready(function () {
         
     //--------------------------------------View Initialization------------------------------------//
 
-    fillFiltersFromRequestParams().done(refreshMainView);
-    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
+    sddb.fillFiltersFromRequestParams().done(sddb.refreshMainView);
+    sddb.switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
 
     //--------------------------------End of execution at Start-----------

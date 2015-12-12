@@ -7,6 +7,8 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
+"use strict";
+
 //--------------------------------------Global Properties------------------------------------//
 
 var tableDBRolesAdd = {},
@@ -73,7 +75,7 @@ $(document).ready(function () {
     $("#btnEditRoles").click(function () {
         currentIds = tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (currentIds.length === 0) {
-            showModalNothingSelected();
+            sddb.showModalNothingSelected();
             return;
         }
 
@@ -85,8 +87,8 @@ $(document).ready(function () {
             $("#bBRolesViewPanel").text("_MULTIPLE_");
         }
 
-        modalWaitWrapper(function () {
-            return fillFormForRelatedGeneric(
+        sddb.modalWaitWrapper(function () {
+            return sddb.fillFormForRelatedGeneric(
                 tableDBRolesAdd, tableDBRolesRemove, currentIds,
                 "GET", "/DBUserSrv/GetUserRoles", { id: currentIds[0] },
                 "GET", "/DBUserSrv/GetUserRolesNot", { id: currentIds[0] },
@@ -94,8 +96,8 @@ $(document).ready(function () {
                 null, 0);
         })
             .done(function () {
-                saveViewSettings(tableMain);
-                switchView("mainView", "dBRolesView", "tdo-btngroup-dbroles");
+                sddb.saveViewSettings(tableMain);
+                sddb.switchView("mainView", "dBRolesView", "tdo-btngroup-dbroles");
             });
     });
         
@@ -137,18 +139,18 @@ $(document).ready(function () {
     });
 
     //showing the first Set of columns on startup;
-    showColumnSet(1, tableMainColumnSets);
+    sddb.showColumnSet(1, tableMainColumnSets);
 
     //---------------------------------------editFormView----------------------------------------//
 
     ///Initialize MagicSuggest Array
-    msAddToMsArray(magicSuggests, "Id", "/PersonSrv/PersonsWoDBUser", 1);
+    sddb.msAddToMsArray(magicSuggests, "Id", "/PersonSrv/PersonsWoDBUser", 1);
    
     //----------------------------------------dBRolesView----------------------------------------//
 
     //Wire Up dBRolesViewBtnCancel
     $("#dBRolesViewBtnCancel").click(function () {
-        switchView("dBRolesView", "mainView", "tdo-btngroup-main", tableMain);
+        sddb.switchView("dBRolesView", "mainView", "tdo-btngroup-main", tableMain);
     });
 
     //Wire Up dBRolesViewBtnOk
@@ -157,17 +159,17 @@ $(document).ready(function () {
             idsRemove = tableDBRolesRemove.cells(".ui-selected", "Name:name", { page: "current" }).data().toArray();
         
         if (idsAdd.length + idsRemove.length === 0) {
-            showModalNothingSelected();
+            sddb.showModalNothingSelected();
             return;
         }
-        modalWaitWrapper(function () {
-            return submitEditsForRelatedGeneric(currentIds, idsAdd, idsRemove, "/DBUserSrv/EditRoles");
+        sddb.modalWaitWrapper(function () {
+            return sddb.submitEditsForRelatedGeneric(currentIds, idsAdd, idsRemove, "/DBUserSrv/EditRoles");
         })
             .then(function () {
-                return refreshMainView();
+                return sddb.refreshMainView();
             })
             .done(function () {
-                switchView("dBRolesView", "mainView", "tdo-btngroup-main", tableMain);
+                sddb.switchView("dBRolesView", "mainView", "tdo-btngroup-main", tableMain);
             });
     });
 
@@ -209,8 +211,8 @@ $(document).ready(function () {
       
     //--------------------------------------View Initialization------------------------------------//
 
-    refreshMainView();
-    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
+    sddb.refreshMainView();
+    sddb.switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });

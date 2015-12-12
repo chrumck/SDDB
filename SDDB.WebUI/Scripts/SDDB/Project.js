@@ -7,6 +7,8 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
+"use strict";
+
 //--------------------------------------Global Properties------------------------------------//
 
 var tableProjectPersonsAdd = {},
@@ -37,7 +39,7 @@ $(document).ready(function () {
     $("#btnEditProjectPersons").click(function () {
         currentIds = tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (currentIds.length === 0) {
-            showModalNothingSelected();
+            sddb.showModalNothingSelected();
             return;
         }
         if (currentIds.length == 1) {
@@ -46,17 +48,17 @@ $(document).ready(function () {
         }
         else { $("#projectPersonsViewPanel").text("_MULTIPLE_"); }
 
-        showModalWait();
-        fillFormForRelatedGeneric(tableProjectPersonsAdd, tableProjectPersonsRemove, currentIds,
+        sddb.showModalWait();
+        sddb.fillFormForRelatedGeneric(tableProjectPersonsAdd, tableProjectPersonsRemove, currentIds,
                 "GET", "/ProjectSrv/GetProjectPersons", { id: currentIds[0] },
                 "GET", "/ProjectSrv/GetProjectPersonsNot", { id: currentIds[0] },
                 "GET", "/PersonSrv/GetAll", { getActive: true })
-            .always(hideModalWait)
+            .always(sddb.hideModalWait)
             .done(function () {
-                saveViewSettings(tableMain);
-                switchView("mainView", "projectPersonsView", "tdo-btngroup-projectpersons");
+                sddb.saveViewSettings(tableMain);
+                sddb.switchView("mainView", "projectPersonsView", "tdo-btngroup-projectpersons");
             })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
     });
     
     //wire up dropdownId1
@@ -64,7 +66,7 @@ $(document).ready(function () {
         event.preventDefault();
         var noOfRows = tableMain.rows(".ui-selected", { page: "current" }).data().length;
         if (noOfRows != 1) {
-            showModalSelectOne();
+            sddb.showModalSelectOne();
             return;
         }
         window.open("/Location?ProjectId=" +
@@ -114,41 +116,41 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(1, tableMainColumnSets);
+    sddb.showColumnSet(1, tableMainColumnSets);
 
     //---------------------------------------editFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    msAddToMsArray(magicSuggests, "ProjectManager_Id", "/PersonSrv/LookupAll", 1);
+    sddb.msAddToMsArray(magicSuggests, "ProjectManager_Id", "/PersonSrv/LookupAll", 1);
     
     //----------------------------------------projectPersonsView----------------------------------------//
 
     //Wire Up projectPersonsViewBtnCancel
     $("#projectPersonsViewBtnCancel").click(function () {
-        switchView("projectPersonsView", "mainView", "tdo-btngroup-main", tableMain);
+        sddb.switchView("projectPersonsView", "mainView", "tdo-btngroup-main", tableMain);
     });
 
     //Wire Up projectPersonsViewBtnOk
     $("#projectPersonsViewBtnOk").click(function () {
         if (tableProjectPersonsAdd.rows(".ui-selected", { page: "current" }).data().length +
             tableProjectPersonsRemove.rows(".ui-selected", { page: "current" }).data().length === 0) {
-            showModalNothingSelected();
+            sddb.showModalNothingSelected();
             return;
         }
-        showModalWait();
-        submitEditsForRelatedGeneric(
+        sddb.showModalWait();
+        sddb.submitEditsForRelatedGeneric(
                 currentIds,
                 tableProjectPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
                 tableProjectPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
                 "/ProjectSrv/EditProjectPersons")
-            .always(hideModalWait)
+            .always(sddb.hideModalWait)
             .done(function () {
-                refreshMainView()
+                sddb.refreshMainView()
                     .done(function () {
-                        switchView("projectPersonsView", "mainView", "tdo-btngroup-main", tableMain);
+                        sddb.switchView("projectPersonsView", "mainView", "tdo-btngroup-main", tableMain);
                     });
             })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
     });
 
     //---------------------------------------DataTables------------
@@ -205,8 +207,8 @@ $(document).ready(function () {
     
     //--------------------------------------View Initialization------------------------------------//
 
-    refreshMainView();
-    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
+    sddb.refreshMainView();
+    sddb.switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });

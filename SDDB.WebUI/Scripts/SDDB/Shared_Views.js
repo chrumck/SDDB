@@ -7,9 +7,9 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
-//--------------------------------------Global Properties------------------------------------//
-
 "use strict";
+
+//--------------------------------------Global Properties------------------------------------//
 
 //global sddb object
 var sddb,

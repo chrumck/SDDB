@@ -7,10 +7,10 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="../FileSaver.js" />
 
+"use strict";
 
 //sddbConstructor
 var sddbConstructor = function (customConfig) {
-    "use strict";
 
     //private variables----------------------------------------------------------------------------------------------//
     var windowYpos = 0,
@@ -221,7 +221,7 @@ var sddbConstructor = function (customConfig) {
     sddbObj.showModalDatePrompt = function (bodyText, labelText, promptDate) {
         var deferred0 = $.Deferred();
 
-        $("#modalDatePromptBody").text(bodyText || "")
+        $("#modalDatePromptBody").text(bodyText || "");
         $("#modalDatePromptLabel").text(labelText || "Please Select Date");
 
         if (promptDate) { $("#modalDatePromptInput").data("DateTimePicker").date(moment(promptDate)); }
@@ -252,13 +252,15 @@ var sddbConstructor = function (customConfig) {
 
     //switchView 
     sddbObj.switchView = function (fromViewId, toViewId, toBtnGroupClass, dataTable) {
-        if (toBtnGroupClass) {
-            $("[class*='tdo-btngroup']").addClass("hidden");
-            $("[class~='" + toBtnGroupClass + "']").removeClass("hidden");
-        }
+        fromViewId = fromViewId || config.initialViewId;
+        toViewId = toViewId || config.mainViewId;
+        toBtnGroupClass = toBtnGroupClass || config.mainViewBtnGroupClass;
+
         $("#" + fromViewId).addClass("hidden");
         $("#" + toViewId).removeClass("hidden");
-
+        $("[class*='tdo-btngroup']").addClass("hidden");
+        $("[class~='" + toBtnGroupClass + "']").removeClass("hidden");
+        
         if (dataTable) {
             sddbObj.loadViewSettings(dataTable);
         }
@@ -269,6 +271,7 @@ var sddbConstructor = function (customConfig) {
 
     //saveViewSettings
     sddbObj.saveViewSettings = function (dataTable) {
+        dataTable = dataTable || config.tableMain;
         windowYpos = window.pageYOffset || document.documentElement.scrollTop;
         if (dataTable) {
             tablePage = dataTable.page();
@@ -485,21 +488,7 @@ var sddbConstructor = function (customConfig) {
             .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
         return deferred0.promise();
     };
-
-    //wraps FormForEditGeneric in modalWait and shows modalAJAXFail if failed
-    sddbObj.fillFormForEditGenericWrp = function (ids, httpType, url, getActive, formId, labelText, msArray) {
-        var deferred0 = $.Deferred();
-        sddbObj.showModalWait();
-        sddbObj.fillFormForEditGeneric(ids, httpType, url, getActive, formId, labelText, msArray)
-            .always(sddbObj.hideModalWait)
-            .done(function (dbEntries) { deferred0.resolve(dbEntries); })
-            .fail(function (xhr, status, error) {
-                sddbObj.showModalAJAXFail(xhr, status, error);
-                deferred0.reject(xhr, status, error);
-            });
-        return deferred0.promise();
-    };
-
+        
     //fillFormForEditFromDbEntries - takes dbEntries instead of executing AJAX request
     sddbObj.fillFormForEditFromDbEntries = function (getActive, dbEntries, formId, labelText, msArray) {
 
@@ -623,21 +612,7 @@ var sddbConstructor = function (customConfig) {
 
         return deferred0.promise();
     };
-
-    //wraps submitEditsGeneric in modalWait and shows modalAJAXFail if failed
-    sddbObj.submitEditsGenericWrp = function (formId, msArray, currRecords, httpType, url, noOfNewRecords) {
-        var deferred0 = $.Deferred();
-        sddbObj.showModalWait();
-        sddbObj.submitEditsGeneric(formId, msArray, currRecords, httpType, url, noOfNewRecords)
-            .always(sddbObj.hideModalWait)
-            .done(function (data, currRecordsClone) { deferred0.resolve(data, currRecordsClone); })
-            .fail(function (xhr, status, error) {
-                sddbObj.showModalAJAXFail(xhr, status, error);
-                deferred0.reject(xhr, status, error);
-            });
-        return deferred0.promise();
-    };
-
+        
     //-----------------------------------------------------------------------------
 
     //Fill Form for Edit from n:n related table - generic version
@@ -674,25 +649,7 @@ var sddbConstructor = function (customConfig) {
         }
         return deferred0.promise();
     };
-
-    //wraps fillFormForRelatedGeneric in modalWait and shows modalAJAXFail if failed
-    sddbObj.fillFormForRelatedGenericWrp = function (tableAdd, tableRemove, ids,
-                httpType, url, data, httpTypeNot, urlNot, dataNot, httpTypeMany, urlMany, dataMany, sortColumn) {
-        var deferred0 = $.Deferred();
-        sddbObj.showModalWait();
-        sddbObj.fillFormForRelatedGeneric(tableAdd, tableRemove, ids,
-            httpType, url, data, httpTypeNot, urlNot, dataNot, httpTypeMany, urlMany, dataMany, sortColumn)
-            .always(sddbObj.hideModalWait)
-            .done(function () {
-                return deferred0.resolve();
-            })
-            .fail(function (xhr, status, error) {
-                sddbObj.showModalAJAXFail(xhr, status, error);
-                deferred0.reject(xhr, status, error);
-            });
-        return deferred0.promise();
-    };
-
+        
     //Submit Edits for n:n related table - generic version
     sddbObj.submitEditsForRelatedGeneric = function (ids, idsAdd, idsRemove, url) {
 
@@ -734,23 +691,7 @@ var sddbConstructor = function (customConfig) {
 
         return deferred0.promise();
     };
-
-    //wraps submitEditsForRelatedGeneric in modalWait and shows modalAJAXFail if failed
-    sddbObj.submitEditsForRelatedGenericWrp = function (ids, idsAdd, idsRemove, url) {
-        var deferred0 = $.Deferred();
-        sddbObj.showModalWait();
-        sddbObj.submitEditsForRelatedGeneric(ids, idsAdd, idsRemove, url)
-            .always(sddbObj.hideModalWait)
-            .done(function () {
-                return deferred0.resolve();
-            })
-            .fail(function (xhr, status, error) {
-                sddbObj.showModalAJAXFail(xhr, status, error);
-                deferred0.reject(xhr, status, error);
-            });
-        return deferred0.promise();
-    };
-
+        
     //-----------------------------------------------------------------------------
 
     // TODO: refactor to accept an object for ms settings, get rid of disabled (it doesn't work anyway)
@@ -994,21 +935,7 @@ var sddbConstructor = function (customConfig) {
             .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
         return deferred0.promise();
     };
-
-    //updateFormForExtendedWrp
-    sddbObj.updateFormForExtendedWrp = function (httpType, url, data, formId) {
-        var deferred0 = $.Deferred();
-        sddbObj.showModalWait();
-        sddbObj.updateFormForExtended(httpType, url, data, formId)
-            .always(sddbObj.hideModalWait)
-            .done(function (typeHasAttrs) { deferred0.resolve(typeHasAttrs); })
-            .fail(function (xhr, status, error) {
-                sddbObj.showModalAJAXFail(xhr, status, error);
-                deferred0.reject(xhr, status, error);
-            });
-        return deferred0.promise();
-    };
-
+        
     //-----------------------------------------------------------------------------
 
     //opens new window by submitting a form - needed to POST version of window.open

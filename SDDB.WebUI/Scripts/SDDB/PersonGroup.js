@@ -7,6 +7,8 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
+"use strict";
+
 //--------------------------------------Global Properties------------------------------------//
 
 var recordTemplate = {
@@ -37,7 +39,7 @@ $(document).ready(function () {
         event.preventDefault();
         currentIds = tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (currentIds.length === 0) {
-            showModalNothingSelected();
+            sddb.showModalNothingSelected();
             return;
         }
         if (currentIds.length == 1) {
@@ -46,19 +48,19 @@ $(document).ready(function () {
         }
         else { $("#groupPersonsViewPanel").text("_MULTIPLE_"); }
 
-        showModalWait();
-        fillFormForRelatedGeneric(
+        sddb.showModalWait();
+        sddb.fillFormForRelatedGeneric(
                 tableGroupPersonsAdd, tableGroupPersonsRemove, currentIds,
                 "GET", "/PersonGroupSrv/GetGroupPersons", { id: currentIds[0]},
                 "GET", "/PersonGroupSrv/GetGroupPersonsNot", { id: currentIds[0]},
                 "GET", "/PersonSrv/GetAll",
                 {getActive: true }, 1)
-            .always(hideModalWait)
+            .always(sddb.hideModalWait)
             .done(function () {
-                saveViewSettings(tableMain);
-                switchView("mainView", "groupPersonsView", "tdo-btngroup-grouppersons");
+                sddb.saveViewSettings(tableMain);
+                sddb.switchView("mainView", "groupPersonsView", "tdo-btngroup-grouppersons");
             })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
 
     });
 
@@ -67,7 +69,7 @@ $(document).ready(function () {
         event.preventDefault();
         currentIds = tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (currentIds.length === 0) {
-            showModalNothingSelected();
+            sddb.showModalNothingSelected();
             return;
         }
         if (currentIds.length == 1) {
@@ -76,18 +78,18 @@ $(document).ready(function () {
         }
         else { $("#groupManagersViewPanel").text("_MULTIPLE_"); }
 
-        showModalWait();
-        fillFormForRelatedGeneric(
+        sddb.showModalWait();
+        sddb.fillFormForRelatedGeneric(
                 tableGroupManagersAdd, tableGroupManagersRemove, currentIds,
                 "GET", "/PersonGroupSrv/GetGroupManagers", { id: currentIds[0] },
                 "GET", "/PersonGroupSrv/GetGroupManagersNot", { id: currentIds[0] },
                 "GET", "/PersonSrv/GetAll", { getActive: true }, 1)
-            .always(hideModalWait)
+            .always(sddb.hideModalWait)
             .done(function () {
-                saveViewSettings(tableMain);
-                switchView("mainView", "groupManagersView", "tdo-btngroup-groupmanagers");
+                sddb.saveViewSettings(tableMain);
+                sddb.switchView("mainView", "groupManagersView", "tdo-btngroup-groupmanagers");
             })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
 
     });
             
@@ -127,7 +129,7 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(1, tableMainColumnSets);
+    sddb.showColumnSet(1, tableMainColumnSets);
 
     //---------------------------------------editFormView----------------------------------------//
 
@@ -136,30 +138,30 @@ $(document).ready(function () {
 
     //Wire Up groupPersonsViewBtnCancel
     $("#groupPersonsViewBtnCancel").click(function () {
-        switchView("groupPersonsView", "mainView", "tdo-btngroup-main", tableMain);
+        sddb.switchView("groupPersonsView", "mainView", "tdo-btngroup-main", tableMain);
     });
 
     //Wire Up groupPersonsViewBtnOk
     $("#groupPersonsViewBtnOk").click(function () {
         if (tableGroupPersonsAdd.rows(".ui-selected", { page: "current" }).data().length +
             tableGroupPersonsRemove.rows(".ui-selected", { page: "current" }).data().length === 0) {
-            showModalNothingSelected();
+            sddb.showModalNothingSelected();
             return;
         }
-        showModalWait();
-        submitEditsForRelatedGeneric(
+        sddb.showModalWait();
+        sddb.submitEditsForRelatedGeneric(
                 currentIds,
                 tableGroupPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
                 tableGroupPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
                 "/PersonGroupSrv/EditGroupPersons")
-            .always(hideModalWait)
+            .always(sddb.hideModalWait)
             .done(function () {
-                refreshMainView()
+                sddb.refreshMainView()
                     .done(function () {
-                        switchView("groupPersonsView", "mainView", "tdo-btngroup-main", tableMain);
+                        sddb.switchView("groupPersonsView", "mainView", "tdo-btngroup-main", tableMain);
                     });
             })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
 
     });
 
@@ -219,30 +221,30 @@ $(document).ready(function () {
 
     //Wire Up groupManagersViewBtnCancel
     $("#groupManagersViewBtnCancel").click(function () {
-        switchView("groupManagersView", "mainView", "tdo-btngroup-main", tableMain);
+        sddb.switchView("groupManagersView", "mainView", "tdo-btngroup-main", tableMain);
     });
 
     //Wire Up groupManagersViewBtnOk
     $("#groupManagersViewBtnOk").click(function () {
         if (tableGroupManagersAdd.rows(".ui-selected", { page: "current" }).data().length +
             tableGroupManagersRemove.rows(".ui-selected", { page: "current" }).data().length === 0) {
-            showModalNothingSelected();
+            sddb.showModalNothingSelected();
             return;
         }
-        showModalWait();
-        submitEditsForRelatedGeneric(
+        sddb.showModalWait();
+        sddb.submitEditsForRelatedGeneric(
                 currentIds,
                 tableGroupManagersAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
                 tableGroupManagersRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
                 "/PersonGroupSrv/EditGroupManagers")
-            .always(hideModalWait)
+            .always(sddb.hideModalWait)
             .done(function () {
-                refreshMainView()
+                sddb.refreshMainView()
                     .done(function () {
-                        switchView("groupManagersView", "mainView", "tdo-btngroup-main", tableMain);
+                        sddb.switchView("groupManagersView", "mainView", "tdo-btngroup-main", tableMain);
                     });
             })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
 
     });
 
@@ -300,8 +302,8 @@ $(document).ready(function () {
         
     //--------------------------------------View Initialization------------------------------------//
 
-    refreshMainView();
-    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
+    sddb.refreshMainView();
+    sddb.switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });

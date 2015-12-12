@@ -7,6 +7,8 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
+"use strict";
+
 //--------------------------------------Global Properties------------------------------------//
 
 var msFilterByActivityType;
@@ -18,7 +20,7 @@ $(document).ready(function () {
 
     //Initialize DateTimePicker filterDateStart
     $("#filterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("dp.hide", function (e) { refreshMainView(); });
+        .on("dp.hide", function (e) { sddb.refreshMainView(); });
 
 
     //Initialize MagicSuggest msFilterByActivityType
@@ -26,14 +28,14 @@ $(document).ready(function () {
         data: "/PersonActivityTypeSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
         },
         maxSelection: 1,
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     //Wire up on change event for msFilterByActivityType
-    $(msFilterByActivityType).on("selectionchange", function (e, m) { refreshMainView(); });
+    $(msFilterByActivityType).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
            
     //--------------------------------------View Initialization------------------------------------//
            
@@ -44,7 +46,7 @@ $(document).ready(function () {
     if ($("#thNo6").is(":hidden") && $("#thNo7").is(":hidden")) { weekOffset = 1; }
     $("#filterDateStart").val(moment().day(weekOffset).format("YYYY-MM-DD"));
 
-    refreshMainView();
+    sddb.refreshMainView();
 
 
     //--------------------------------End of execution at Start-----------
@@ -54,7 +56,7 @@ $(document).ready(function () {
 //--------------------------------------Main Methods---------------------------------------//
 
 //refresh view after magicsuggest update
-function refreshMainView() {
+sddb.refreshMainView = function () {
     var tableMain = $("#tableMain");
     var startDate = $("#filterDateStart").val();
 
@@ -62,7 +64,7 @@ function refreshMainView() {
     clearSumTblFirstRowHelper(tableMain);
 
     if (startDate != "" && msFilterByActivityType.getSelection().length != 0) {
-        showModalWait();
+        sddb.showModalWait();
         var endDate = moment(startDate).add(6, "days").hour(23).minute(59).format("YYYY-MM-DD HH:mm");
         $.ajax({
             type: "POST",
@@ -76,17 +78,17 @@ function refreshMainView() {
             },
             dataType: "json"
         })
-            .always(hideModalWait)
+            .always(sddb.hideModalWait)
             .done(function (records) {
                 fillSummaryTableHelper(tableMain, startDate, records);
             })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
     }
 }
 
 //---------------------------------------Helper Methods--------------------------------------//
 
-//fillSummaryTableHelper - used by refreshMainView
+//fillSummaryTableHelper - used by sddb.refreshMainView
 function fillSummaryTableHelper(tableMain, startDate, records) {
     
     var columnDates = getColumnDatesHelper(startDate);
@@ -140,7 +142,7 @@ function fillSumTblFirstRowHelper(tableMain, columnDates) {
     });
 }
 
-//clearSumTblFirstRowHelper - used by refreshMainView
+//clearSumTblFirstRowHelper - used by sddb.refreshMainView
 function clearSumTblFirstRowHelper(tableMain) {
     tableMain.find("thead th").each(function (i) {
         if (i == 0) { return true; }
@@ -150,7 +152,7 @@ function clearSumTblFirstRowHelper(tableMain) {
 
 //getProjectNamesHelper - used by fillSummaryTableHelper
 function getCurrentProjectsHelper() {
-    showModalWait();
+    sddb.showModalWait();
     return $.ajax({
             type: "POST",
             url: "/ProjectSrv/Lookup",
@@ -158,8 +160,8 @@ function getCurrentProjectsHelper() {
             data: { getActive: true },
             dataType: "json"
         })
-        .always(hideModalWait)
-        .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+        .always(sddb.hideModalWait)
+        .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
 }
 
 

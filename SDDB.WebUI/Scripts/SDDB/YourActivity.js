@@ -10,6 +10,8 @@
 /// <reference path="Shared_Views.js" />
 /// <reference path="PersonLogEntryShared.js" />
 
+"use strict";
+
 //--------------------------------------Global Properties------------------------------------//
 
 labelTextCreate = function () { return "New Activity for " + $("#filterDateStart").val(); };
@@ -48,8 +50,8 @@ callBackAfterEdit = function (currRecords) {
     $("#hoursWorkedPicker").data("DateTimePicker").date(moment($("#ManHours").val(), "HH"));
     $("#ManHours").data("ismodified", false);
 
-    return modalWaitWrapper(function () {
-        return fillFormForRelatedGeneric(
+    return sddb.modalWaitWrapper(function () {
+        return sddb.fillFormForRelatedGeneric(
                     tableLogEntryAssysAdd, tableLogEntryAssysRemove, currentIds,
                     "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys",
                     { logEntryId: currentIds[0] },
@@ -61,7 +63,7 @@ callBackAfterEdit = function (currRecords) {
 };
 
 callBackBeforeCopy = function () {
-    return showModalDatePrompt("NOTE: Assemblies, People and Files are not copied!",
+    return sddb.showModalDatePrompt("NOTE: Assemblies, People and Files are not copied!",
                 "Copy To Date:", $("#filterDateStart").val())
         .then(function (outputDate) { moveToDate = outputDate; });
 };
@@ -81,8 +83,8 @@ callBackAfterCopy = function () {
     $("#hoursWorkedPicker").data("DateTimePicker").date(moment($("#ManHours").val(), "HH"));
     magicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
 
-    return modalWaitWrapper(function () {
-        return refreshTableGeneric(tableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
+    return sddb.modalWaitWrapper(function () {
+        return sddb.refreshTableGeneric(tableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
             { getActive: true, locId: magicSuggests[3].getValue()[0] }, "GET");
     });
 };
@@ -92,8 +94,8 @@ refreshMainView = function () {
     if ($("#filterDateStart").val() === "") { return $.Deferred().resolve(); }
 
     var endDate = moment($("#filterDateStart").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
-    return modalWaitWrapper(function () {
-        return refreshTableGeneric(tableMain, "/PersonLogEntrySrv/GetByAltIds",
+    return sddb.modalWaitWrapper(function () {
+        return sddb.refreshTableGeneric(tableMain, "/PersonLogEntrySrv/GetByAltIds",
         {
             personIds: [UserId],
             startDate: $("#filterDateStart").val(),
@@ -185,7 +187,7 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(1, tableMainColumnSets);
+    sddb.showColumnSet(1, tableMainColumnSets);
 
     //---------------------------------------editFormView----------------------------------------//
 
@@ -206,12 +208,12 @@ $(document).ready(function () {
         });
 
     //Initialize MagicSuggest Array
-    msAddToMsArray(magicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
-    msAddToMsArray(magicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1, null, {}, false, false);
-    msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1, null, {}, false, true);
-    msAddToMsArray(magicSuggests, "AssignedToLocation_Id", "/LocationSrv/LookupByProj", 1, null,
+    sddb.msAddToMsArray(magicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
+    sddb.msAddToMsArray(magicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1, null, {}, false, false);
+    sddb.msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1, null, {}, false, true);
+    sddb.msAddToMsArray(magicSuggests, "AssignedToLocation_Id", "/LocationSrv/LookupByProj", 1, null,
         { projectIds: magicSuggests[2].getValue });
-    msAddToMsArray(magicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
+    sddb.msAddToMsArray(magicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
         { projectIds: magicSuggests[2].getValue }, false, false);
     
     //Initialize MagicSuggest Array Event - AssignedToProject_Id
@@ -236,12 +238,12 @@ $(document).ready(function () {
             return;
         }
         if (currentIds.length == 1) {
-            refreshTblGenWrp(tableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
+            sddb.refreshTblGenWrp(tableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
                 { logEntryId: currentIds[0], locId: magicSuggests[3].getValue()[0] }, "GET")
                 .done(function () { $("#AssignedToLocation_Id input").focus(); });
         }
         else {
-            refreshTblGenWrp(tableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
+            sddb.refreshTblGenWrp(tableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
             { getActive: true, locId: magicSuggests[3].getValue()[0] }, "GET")
             .done(function () { $("#AssignedToLocation_Id input").focus(); });
         }
@@ -253,16 +255,16 @@ $(document).ready(function () {
         tableLogEntryPersonsRemove.clear().search("").draw();
 
         if ($("#logEntryPersonsView").hasClass("hidden")) {
-            showModalWait();
-            fillFormForRelatedGeneric(tableLogEntryPersonsAdd, tableLogEntryPersonsRemove, currentIds,
+            sddb.showModalWait();
+            sddb.fillFormForRelatedGeneric(tableLogEntryPersonsAdd, tableLogEntryPersonsRemove, currentIds,
                 "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { logEntryId: currentIds[0] },
                 "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { logEntryId: currentIds[0] },
                 "GET", "/PersonSrv/Get", { getActive: true })
-                .always(hideModalWait)
+                .always(sddb.hideModalWait)
                 .done(function () {
                     $("#logEntryPersonsView").removeClass("hidden");
                 })
-                .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+                .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
         }
         else {
             $("#logEntryPersonsView").addClass("hidden");
@@ -272,8 +274,8 @@ $(document).ready(function () {
     //--------------------------------------View Initialization------------------------------------//
 
     $("#filterDateStart").val(moment().format("YYYY-MM-DD"));
-    refreshMainView();
-    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
+    sddb.refreshMainView();
+    sddb.switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
   
 
     //--------------------------------End of execution at Start-----------

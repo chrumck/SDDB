@@ -7,6 +7,8 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
+"use strict";
+
 //--------------------------------------Global Properties------------------------------------//
 
 var recordTemplate = {
@@ -46,7 +48,7 @@ $(document).ready(function () {
     $("#dropdownId1").click(function (event) {
         event.preventDefault();
         var noOfRows = tableMain.rows(".ui-selected", { page: "current" }).data().length;
-        if (noOfRows != 1) { showModalSelectOne(); }
+        if (noOfRows != 1) { sddb.showModalSelectOne(); }
         else {
             window.open("/AssemblyDb?LocationId=" +
                 tableMain.cell(".ui-selected", "Id:name", { page: "current" }).data());
@@ -58,26 +60,26 @@ $(document).ready(function () {
         data: "/LocationTypeSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
         },
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     //Wire up on change event for msFilterByType
-    $(msFilterByType).on("selectionchange", function (e, m) { refreshMainView(); });
+    $(msFilterByType).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
 
     //Initialize MagicSuggest msFilterByProject
     msFilterByProject = $("#msFilterByProject").magicSuggest({
         data: "/ProjectSrv/Lookup",
         allowFreeEntries: false,
         ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
+            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
         },
         infoMsgCls: "hidden",
         style: "min-width: 240px;"
     });
     //Wire up on change event for msFilterByProject
-    $(msFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
+    $(msFilterByProject).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
     
 
     //---------------------------------------DataTables------------
@@ -158,19 +160,19 @@ $(document).ready(function () {
         }
     });
     //showing the first Set of columns on startup;
-    showColumnSet(1, tableMainColumnSets);
+    sddb.showColumnSet(1, tableMainColumnSets);
 
     //---------------------------------------editFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    msAddToMsArray(magicSuggests, "LocationType_Id", "/LocationTypeSrv/Lookup", 1);
-    msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    msAddToMsArray(magicSuggests, "ContactPerson_Id", "/PersonSrv/LookupFromProject", 1);
+    sddb.msAddToMsArray(magicSuggests, "LocationType_Id", "/LocationTypeSrv/Lookup", 1);
+    sddb.msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
+    sddb.msAddToMsArray(magicSuggests, "ContactPerson_Id", "/PersonSrv/LookupFromProject", 1);
         
     //--------------------------------------View Initialization------------------------------------//
 
-    fillFiltersFromRequestParams().done(refreshMainView);
-    switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
+    sddb.fillFiltersFromRequestParams().done(sddb.refreshMainView);
+    sddb.switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
 
     //--------------------------------End of execution at Start-----------
 });
@@ -179,13 +181,13 @@ $(document).ready(function () {
 //--------------------------------------Main Methods---------------------------------------//
 
 //refresh view after magicsuggest update
-function refreshMainView() {
+sddb.refreshMainView = function () {
     tableMain.clear().search("").draw();
     if (msFilterByType.getValue().length === 0 && msFilterByProject.getValue().length === 0) {
         return $.Deferred().resolve();
     }
-    return modalWaitWrapper(function () {
-        return refreshTableGeneric(tableMain, "/LocationSrv/GetByAltIds",
+    return sddb.modalWaitWrapper(function () {
+        return sddb.refreshTableGeneric(tableMain, "/LocationSrv/GetByAltIds",
         {
             projectIds: msFilterByProject.getValue(),
             typeIds: msFilterByType.getValue(),
@@ -196,10 +198,10 @@ function refreshMainView() {
 }
 
 //fillFiltersFromRequestParams
-function fillFiltersFromRequestParams() {
+sddb.fillFiltersFromRequestParams = function () {
     var deferred0 = $.Deferred();
     if (typeof ProjectId !== "undefined" && ProjectId !== "") {
-        showModalWait();
+        sddb.showModalWait();
         $.ajax({
             type: "POST",
             url: "/ProjectSrv/GetByIds",
@@ -207,14 +209,14 @@ function fillFiltersFromRequestParams() {
             data: { ids: [ProjectId], getActive: true },
             dataType: "json"
         })
-            .always(hideModalWait)
+            .always(sddb.hideModalWait)
             .done(function (data) {
-                msSetSelectionSilent(msFilterByProject, 
+                sddb.msSetSelectionSilent(msFilterByProject, 
                     [{ id: data[0].Id, name: data[0].ProjectName + " - " + data[0].ProjectCode }]);
                 return deferred0.resolve();
             })
             .fail(function (xhr, status, error) {
-                showModalAJAXFail(xhr, status, error);
+                sddb.showModalFail(xhr, status, error);
                 deferred0.reject(xhr, status, error);
             });
     }
