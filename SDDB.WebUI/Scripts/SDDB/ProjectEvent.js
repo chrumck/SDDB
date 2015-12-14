@@ -122,10 +122,6 @@ $(document).ready(function () {
     sddb.msAddToArray("CreatedByPerson_Id", "/PersonSrv/LookupFromProject");
     sddb.msAddToArray("ClosedByPerson_Id", "/PersonSrv/LookupFromProject");
 
-    //Enable DateTimePicker
-    $("[data-val-dbisdatetimeiso]").datetimepicker({ format: "YYYY-MM-DD HH:mm" })
-        .on("dp.change", function (e) { $(this).data("ismodified", true); });
-
     //--------------------------------------View Initialization------------------------------------//
 
     sddb.refreshMainView();

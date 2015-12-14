@@ -178,6 +178,14 @@ $(document).ready(function () {
     //Wire Up editFormBtnOk
     $("#editFormBtnOk").click(function (event) { sddb.submitEditForm(); });
 
+    //Enable DateTimePicker
+    $("[data-val-dbisdatetimeiso]").datetimepicker({ format: "YYYY-MM-DD HH:mm" })
+        .on("dp.change", function (e) { $(this).data("ismodified", true); });
+    
+    //Enable DateTimePicker
+    $("[data-val-dbisdateiso]").datetimepicker({ format: "YYYY-MM-DD" })
+        .on("dp.change", function (e) { $(this).data("ismodified", true); });
+
     //--------------------------------End of setup after page load---------------------------------//
 });
 

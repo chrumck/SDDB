@@ -26,7 +26,7 @@ var sddbConstructor = function (customConfig) {
         recordTemplate: {},
         magicSuggests: [],
 
-        tableMain: {},
+        tableMain: "notSetUp",
         tableMainColumnSets: [[1], [2, 3]],
         selectedColumnSet: 1,
         tableMainPanelId: "panelTableMain",
@@ -106,22 +106,30 @@ var sddbConstructor = function (customConfig) {
 
     //setFormFromFormInputHelper
     setFormFromFormInputHelper = function (formInput, formId, msArray) {
-        for (var property in formInput) {
-            if (!formInput.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") { continue; }
-            if (property.slice(-3) == "_Id" && msArray) {
-                $.each(msArray, function (i, ms) {
-                    if (ms.id == property) {
-                        if (formInput[property] !== null) {
-                            sddbObj.msSetSelectionSilent(ms,
-                                [{ id: formInput[property], name: formInput[property.slice(0, -2)] }]);
-                        }
-                        return false;
-                    }
-                });
+
+        //setMsFromFormInputHelper
+        var setMsFromFormInputHelper = function (property) {
+            $.each(msArray, function (i, ms) {
+                if (ms.id == property && formInput[property] !== null) {
+                    sddbObj.msSetSelectionSilent(ms,
+                        [{ id: formInput[property], name: formInput[property.slice(0, -2)] }]);
+                    return false;
+                }
+            });
+        },
+        property;
+        
+        //main
+        for (property in formInput) {
+            if (!formInput.hasOwnProperty(property) || property == "Id" || property.slice(-1) == "_") {
                 continue;
             }
-            if (property.slice(-3) == "_bl") {
-                if (formInput[property] === true) { $("#" + formId + " #" + property).prop("checked", true); }
+            if (property.slice(-3) == "_Id" && msArray) {
+                setMsFromFormInputHelper(property);
+                continue;
+            }
+            if (property.slice(-3) == "_bl" && formInput[property] === true) {
+                $("#" + formId + " #" + property).prop("checked", true);
                 continue;
             }
             $("#" + formId + " #" + property).val(formInput[property]);
@@ -362,7 +370,7 @@ var sddbConstructor = function (customConfig) {
     sddbObj.showColumnSet = function (columnSetIdx, columnSetArray) {
         columnSetIdx = columnSetIdx || 1;
         columnSetArray = columnSetArray || cfg.tableMainColumnSets;
-        if (!cfg.tableMain) { return; }
+        if (!cfg.tableMain || cfg.tableMain === "notSetUp") { return; }
         cfg.tableMain.columns().visible(false);
         cfg.tableMain.columns(columnSetArray[0]).visible(true);
         cfg.tableMain.columns(columnSetArray[columnSetIdx]).visible(true);
@@ -535,40 +543,73 @@ var sddbConstructor = function (customConfig) {
 
     //SubmitEdits to DB - generic version
     sddbObj.submitEditsGeneric = function (formId, msArray, dbEntries, httpType, url, noOfNewRecords) {
+        noOfNewRecords = (noOfNewRecords && noOfNewRecords >= 1 && noOfNewRecords <= 100) ? noOfNewRecords : 1;
 
+        //setDbEntriesFromFormHelper
+        var setDbEntriesFromFormHelper = function () {
+
+            //setDbEntryPropFromMsHelper
+            var setDbEntryPropFromMsHelper = function (dbEntry, property) {
+                $.each(msArray, function (i, ms) {
+                    if (ms.id == property) {
+                        dbEntry[property] = ms.getSelection().length !== 0 ? (ms.getSelection())[0].id : "";
+                        dbEntry[property.slice(0, -2)] = (function () { return; })();
+                        return false;
+                    }
+                });
+            };
+
+            //main
+            $.each(dbEntriesClone, function (i, dbEntry) {
+                for (var property in dbEntry) {
+                    if (!dbEntry.hasOwnProperty(property) || property == "Id" ||
+                            $.inArray(property, modifiedProperties) == -1) {
+                        continue;
+                    }
+                    if (property.slice(-3) == "_Id") {
+                        setDbEntryPropFromMsHelper(dbEntry, property);
+                        continue;
+                    }
+                    if (property.slice(-3) == "_bl") {
+                        dbEntry[property] = $("#" + formId + " #" + property).prop("checked");
+                        continue;
+                    }
+                    dbEntry[property] = $("#" + formId + " #" + property).val();
+                }
+                dbEntry.ModifiedProperties = modifiedProperties;
+            });
+        },
         //multiplyRecordsAndModifyUniquePropsHelper
-        var multiplyRecordsAndModifyUniquePropsHelper = function () {
+        multiplyRecordsAndModifyUniquePropsHelper = function () {
             var i;
 
             for (i = 1; i < noOfNewRecords; i += 1) {
                 dbEntriesClone[i] = $.extend(true, {}, dbEntriesClone[0]);
             }
 
-            $.each(dbEntriesClone, function (i, currRecord) {
+            $.each(dbEntriesClone, function (i, dbEntry) {
                 var property, j;
 
-                for (property in currRecord) {
-                    if (!currRecord.hasOwnProperty(property) ||
+                for (property in dbEntry) {
+                    if (!dbEntry.hasOwnProperty(property) ||
                         property === "Id" || property.slice(-3) === "_Id" ||
                         property.slice(-3) === "_bl" || property.slice(-1) === "_" ||
-                        currRecord[property] === null || currRecord[property] === "") {
+                        dbEntry[property] === null || dbEntry[property] === "") {
                         continue;
                     }
                     if ($("#" + formId + " #" + property).data("valDbisunique") === true) {
                         j = i + 1;
-                        currRecord[property] = currRecord[property] + "_" + ("00" + j).slice(-3);
+                        dbEntry[property] = dbEntry[property] + "_" + ("00" + j).slice(-3);
                     }
                 }
             });
         },
-
-        //private variables
+        //
         dbEntriesClone = $.extend(true, [], dbEntries),
         deferred0 = $.Deferred(),
         modifiedProperties = [];
 
-        noOfNewRecords = (noOfNewRecords && noOfNewRecords >= 1 && noOfNewRecords <= 100) ? noOfNewRecords : 1;
-
+        //main
         $("#" + formId + " .modifiable").each(function (index) {
             if ($(this).data("ismodified")) { modifiedProperties.push($(this).prop("id")); }
         });
@@ -576,40 +617,12 @@ var sddbConstructor = function (customConfig) {
             if (ms.isModified === true) { modifiedProperties.push(ms.id); }
         });
 
-        $.each(dbEntriesClone, function (i, currRecord) {
-            for (var property in currRecord) {
-                if (!currRecord.hasOwnProperty(property) ||
-                        property == "Id" ||
-                        $.inArray(property, modifiedProperties) == -1) {
-                    continue;
-                }
-                if (property.slice(-3) == "_Id") {
-                    $.each(msArray, function (i, ms) {
-                        if (ms.id == property) {
-                            currRecord[property] = ms.getSelection().length !== 0 ? (ms.getSelection())[0].id : "";
-                            currRecord[property.slice(0, -2)] = (function () { return; })();
-                            return false;
-                        }
-                    });
-                    continue;
-                }
-                if (property.slice(-3) == "_bl") {
-                    currRecord[property] = $("#" + formId + " #" + property).prop("checked");
-                    continue;
-                }
-                currRecord[property] = $("#" + formId + " #" + property).val();
-            }
-            currRecord.ModifiedProperties = modifiedProperties;
-        });
+        setDbEntriesFromFormHelper();
 
         if (dbEntriesClone.length == 1 && noOfNewRecords > 1) { multiplyRecordsAndModifyUniquePropsHelper(); }
 
         if (modifiedProperties.length === 0) {
-            return deferred0.resolve({
-                "Success": "True",
-                "newEntryIds": [],
-                "propsModified": false
-            }, dbEntriesClone);
+            return deferred0.resolve({ "Success": "True", "newEntryIds": [], "propsModified": false }, dbEntriesClone);
         }
 
         $.ajax({ type: httpType, url: url, timeout: 120000, data: { records: dbEntriesClone }, dataType: "json" })
@@ -705,8 +718,6 @@ var sddbConstructor = function (customConfig) {
         
     //-----------------------------------------------------------------------------
     
-    //refactor to accept an object for ms settings, get rid of disabled (it doesn't work anyway)
-    //old params (msArray, id, url, maxSelection, minChars, dataUrlParams, disabled, editable)
     //msAddToMsArrayNew
     sddbObj.msAddToArray = function (id, url, customSettings, onSelectionHandler, msArray) {
         msArray = msArray || cfg.magicSuggests;
@@ -822,6 +833,24 @@ var sddbConstructor = function (customConfig) {
     sddbObj.msSetSelectionSilent = function (ms, itemsArray) {
         ms.clear(true);
         ms.addToSelection(itemsArray, true);
+    };
+
+    //msSetFilter
+    sddbObj.msSetFilter = function (msFilterId, lookupUrl, customSettings, onSelectionHandler) {
+        onSelectionHandler = onSelectionHandler || function (event) { sddbObj.refreshMainView(); };
+
+        var defaultSettings = {
+            data: lookupUrl,
+            allowFreeEntries: false,
+            ajaxConfig: { error: function (xhr, status, error) { sddbObj.showModalFail(xhr, status, error); } },
+            infoMsgCls: "hidden",
+            style: "min-width: 240px;"
+        },
+        settings = $.extend(true, {}, defaultSettings, customSettings),
+        msFilter = $("#" + msFilterId).magicSuggest(settings);
+
+        $(msFilter).on("selectionchange", onSelectionHandler);
+        return msFilter;
     };
 
     //-----------------------------------------------------------------------------

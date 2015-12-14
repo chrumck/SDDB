@@ -1,5 +1,4 @@
-﻿/*global sddb, sddbConf*/
-/*global UserId, UserFullName, CanViewOthers*/
+﻿/*global sddb, UserId, UserFullName, CanViewOthers*/
 /// <reference path="../DataTables/jquery.dataTables.js" />
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
@@ -8,6 +7,8 @@
 /// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
+/// <reference path="Shared_Views.js" />
+
 
 //refresh view after magicsuggest update
 sddb.refreshMainView = function () {
@@ -129,24 +130,11 @@ $(document).ready(function () {
     //-----------------------------------------mainView------------------------------------------//
         
     //Initialize DateTimePicker filterDateStart
-    $("#filterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("dp.hide", function (event) { sddb.refreshMainView(); });
-
-
+    $("#filterDateStart").on("dp.hide", function (event) { sddb.refreshMainView(); });
+    
     //Initialize MagicSuggest sddb.msFilterByPerson
-    sddb.msFilterByPerson = $("#msFilterByPerson").magicSuggest({
-        data: "/PersonSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
-        },
-        maxSelection: 1,
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for sddb.msFilterByPerson
-    $(sddb.msFilterByPerson).on("selectionchange", function (event) { sddb.refreshMainView(); });
-
+    sddb.msFilterByPerson = sddb.msSetFilter("msFilterByPerson", "/PersonSrv/Lookup", { maxSelection: 1 });
+    
     //Hide sddb.msFilterByPerson if !CanViewOthers
     if (typeof CanViewOthers === "undefined" || !CanViewOthers) { sddb.msFilterByPerson.disable(); } 
            

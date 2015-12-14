@@ -264,21 +264,13 @@ $(document).ready(function () {
     //---------------------------------------editFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    sddb.msAddToArray("ComponentType_Id", "/ComponentTypeSrv/Lookup");
+    sddb.msAddToArray("ComponentType_Id", "/ComponentTypeSrv/Lookup", {}, function () { 
+            sddb.updateFormForSelectedType().done(function () { $("#ComponentType_Id input").focus(); });
+        });
     sddb.msAddToArray("ComponentStatus_Id", "/ComponentStatusSrv/Lookup");
     sddb.msAddToArray("AssignedToProject_Id", "/ProjectSrv/Lookup");
     sddb.msAddToArray("AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup");
-
-    //Initialize MagicSuggest Array Event - ComponentType_Id
-    $(magicSuggests[0]).on("selectionchange", function (e, m) {
-        sddb.updateFormForSelectedType().done(function () { $("#ComponentType_Id input").focus(); });
-    });
-
-    //Enable DateTimePicker
-    $("#" + editFormId + " [data-val-dbisdateiso]").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("dp.change", function (e) { $(this).data("ismodified", true); });
-
-
+        
     //--------------------------------------View Initialization------------------------------------//
 
     sddb.fillFiltersFromRequestParams().done(sddb.refreshMainView);

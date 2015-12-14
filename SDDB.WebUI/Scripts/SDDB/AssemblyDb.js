@@ -367,39 +367,15 @@ $(document).ready(function () {
     });
 
     //Initialize MagicSuggest sddb.msFilterByType
-    sddb.msFilterByType = $("#msFilterByType").magicSuggest({
-        data: "/AssemblyTypeSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: { error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); } },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for sddb.msFilterByType
-    $(sddb.msFilterByType).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
-
+    sddb.msFilterByType = sddb.msSetFilter("msFilterByType", "/AssemblyTypeSrv/Lookup");
+    
     //Initialize MagicSuggest sddb.msFilterByProject
-    sddb.msFilterByProject = $("#msFilterByProject").magicSuggest({
-        data: "/ProjectSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: { error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); } },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for sddb.msFilterByProject
-    $(sddb.msFilterByProject).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
-
+    sddb.msFilterByProject = sddb.msSetFilter("msFilterByProject", "/ProjectSrv/Lookup");
+    
     //Initialize MagicSuggest sddb.msFilterByLoc
-    sddb.msFilterByLoc = $("#msFilterByLoc").magicSuggest({
-        data: "/LocationSrv/LookupByProj",
-        allowFreeEntries: false,
-        dataUrlParams: { projectIds: sddb.msFilterByProject.getValue },
-        ajaxConfig: { error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); } },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for sddb.msFilterByLoc
-    $(sddb.msFilterByLoc).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
-
+    sddb.msFilterByLoc = sddb.msSetFilter("msFilterByLoc", "/LocationSrv/LookupByProj",
+        { dataUrlParams: { projectIds: sddb.msFilterByProject.getValue } });
+    
 
     //---------------------------------------editFormView----------------------------------------//
 
