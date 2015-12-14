@@ -8,7 +8,7 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
-//--------------------------------------Global Properties------------------------------------//
+//----------------------------------------------additional sddb setup------------------------------------------------//
 
 //setting up sddb
 sddb.setConfig({
@@ -149,7 +149,6 @@ sddb.setConfig({
 //callBackAfterCreate
 sddb.callBackAfterCreate = function () {
     "use strict";
-
     $("#editForm select").find("option:first").prop("selected", "selected");
     return $.Deferred().resolve();
 };
@@ -157,7 +156,6 @@ sddb.callBackAfterCreate = function () {
 //----------------------------------------------setup after page load------------------------------------------------//
 $(document).ready(function () {
     "use strict";
-    
     //--------------------------------------View Initialization------------------------------------//
 
     sddb.refreshMainView();

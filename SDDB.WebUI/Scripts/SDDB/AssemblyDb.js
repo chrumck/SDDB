@@ -170,8 +170,6 @@ sddb.setConfig({
     urlEdit: "/AssemblyDbSrv/Edit",
     urlDelete: "/AssemblyDbSrv/Delete",
     
-    //additional setup
-    extCurrRecords: [],
     extRecordTemplate: {
         Id: "RecordTemplateId",
         Attr01: null,
@@ -190,13 +188,8 @@ sddb.setConfig({
         Attr14: null,
         Attr15: null
     },
-
-    extEditFormId: "editFormExtended",
-    extColumnSelectClass: ".extColumnSelect",
     extColumnSetNos: [5, 6, 7],
     extUrlTypeUpd: "/AssemblyTypeSrv/GetByIds",
-    extHttpTypeTypeUpd: "POST",
-    extHttpTypeEdit: "POST",
     extUrlEdit: "/AssemblyDbSrv/EditExt"
 
 });
@@ -204,7 +197,6 @@ sddb.setConfig({
 //fillFiltersFromRequestParams
 sddb.fillFiltersFromRequestParams = function () {
     "use strict";
-
     var deferred0 = $.Deferred();
     if (typeof LocationId !== "undefined" && LocationId !== "") {
         sddb.showModalWait();
@@ -232,7 +224,6 @@ sddb.fillFiltersFromRequestParams = function () {
 //updateMainViewForSelectedType
 sddb.updateMainViewForSelectedType = function () {
     "use strict";
-
     //switchMainViewForExtendedHelper
     var switchMainViewForExtendedHelper = function (switchOn) {
         if (switchOn) {
@@ -262,7 +253,6 @@ sddb.updateMainViewForSelectedType = function () {
 //updateFormForSelectedType
 sddb.updateFormForSelectedType = function () {
     "use strict";
-
     sddb.clearFormInputs(sddb.cfg.extEditFormId);
     $("#" + sddb.cfg.extEditFormId + " .modifiable").data("ismodified", true);
     $("#" + sddb.cfg.extEditFormId).addClass("hidden");
@@ -345,13 +335,11 @@ sddb.refreshMainView = function () {
                 }
             });
     });
-
 };
 
 //----------------------------------------------setup after page load------------------------------------------------//
 $(document).ready(function () {
     "use strict";
-
     //-----------------------------------------mainView------------------------------------------//
     
     //wire up dropdownId1 - Show Assy Components

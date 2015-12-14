@@ -13,7 +13,6 @@
 //refresh view after magicsuggest update
 sddb.refreshMainView = function () {
     "use strict";
-
     //fillSummaryTableHelper
     var fillSummaryTableHelper = function (targetTable, startDate, records) {
 

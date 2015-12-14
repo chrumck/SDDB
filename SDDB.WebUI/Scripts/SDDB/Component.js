@@ -7,169 +7,37 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared_Views.js" />
 
-"use strict";
+//----------------------------------------------additional sddb setup------------------------------------------------//
 
-//--------------------------------------Global Properties------------------------------------//
+//setting up sddb
+sddb.setConfig({
+    recordTemplate: {
+        Id: "RecordTemplateId",
+        CompName: null,
+        CompAltName: null,
+        CompAltName2: null,
+        PositionInAssy: null,
+        ProgramAddress: null,
+        CalibrationReqd_bl: null,
+        LastCalibrationDate: null,
+        Comments: null,
+        IsActive_bl: null,
+        ComponentType_Id: null,
+        ComponentStatus_Id: null,
+        AssignedToProject_Id: null,
+        AssignedToAssemblyDb_Id: null
+    },
 
-var recordTemplate = {
-    Id: "RecordTemplateId",
-    CompName: null,
-    CompAltName: null,
-    CompAltName2: null,
-    PositionInAssy: null,
-    ProgramAddress: null,
-    CalibrationReqd_bl: null,
-    LastCalibrationDate: null,
-    Comments: null,
-    IsActive_bl: null,
-    ComponentType_Id: null,
-    ComponentStatus_Id: null,
-    AssignedToProject_Id: null,
-    AssignedToAssemblyDb_Id: null
-};
-
-var extCurrRecords = [];
-var extRecordTemplate = {
-    Id: "RecordTemplateId",
-    Attr01: null,
-    Attr02: null,
-    Attr03: null,
-    Attr04: null,
-    Attr05: null,
-    Attr06: null,
-    Attr07: null,
-    Attr08: null,
-    Attr09: null,
-    Attr10: null,
-    Attr11: null,
-    Attr12: null,
-    Attr13: null,
-    Attr14: null,
-    Attr15: null
-};
-
-var msFilterByProject = {};
-var msFilterByType = {};
-var msFilterByAssy = {};
-
-labelTextCreate = "Create Component";
-labelTextEdit = "Edit Component";
-urlFillForEdit = "/ComponentSrv/GetByIds";
-urlEdit = "/ComponentSrv/Edit";
-urlDelete = "/ComponentSrv/Delete";
-
-var extEditFormId = "editFormExtended";
-var extColumnSelectClass = ".extColumnSelect";
-var extColumnSetNos = [3, 4, 5];
-var extUrlTypeUpd = "/ComponentTypeSrv/GetByIds";
-var extHttpTypeTypeUpd = "POST";
-var extHttpTypeEdit = "POST";
-var extUrlEdit = "/ComponentSrv/EditExt";
-
-callBackAfterCreate = sddb.updateFormForSelectedType;
-
-callBackAfterEdit = function (currRecords) {
-    return sddb.updateFormForSelectedType()
-        .then(function () {return sddb.fillFormForEditFromDbEntries(currentActive, currRecords, extEditFormId); });
-};
-
-callBackBeforeSubmitEdit = function () {
-    if (!sddb.formIsValid(extEditFormId, currentIds.length === 0)) {
-        sddb.showModalFail("Errors in Form", "Extended attributes have invalid inputs. Please correct.");
-        return $.Deferred().reject();
-    }
-    return $.Deferred().resolve();
-};
-
-callBackAfterSubmitEdit = function (data) {
-    extCurrRecords = [];
-    for (var i = 0; i < currentIds.length; i++) {
-        extCurrRecords[i] = $.extend(true, {}, extRecordTemplate);
-        extCurrRecords[i].Id = currentIds[i];
-    }
-    return sddb.modalWaitWrapper(function () {
-        return sddb.submitEditsGeneric(extEditFormId, [], extCurrRecords, extHttpTypeEdit, extUrlEdit);
-    });
-    
-};
-
-callBackAfterCopy = function (currRecords) {
-    return sddb.updateFormForSelectedType()
-        .then(function () { return sddb.fillFormForCopyFromDbEntries(currRecords, extEditFormId); });
-};
-//-------------------------------------------------------------------------------------------//
-
-$(document).ready(function () {
-
-    //-----------------------------------------mainView------------------------------------------//
-
-    //wire up dropdownId1 - Show Comp. Log
-    $("#dropdownId1").click(function (event) {
-        event.preventDefault();
-        var noOfRows = tableMain.rows(".ui-selected", { page: "current" }).data().length;
-        if (noOfRows != 1) {
-            sddb.showModalSelectOne();
-            return;
-        }
-        window.open("/ComponentLogEntry?ComponentId=" +
-            tableMain.cell(".ui-selected", "Id:name", { page: "current" }).data());
-    });
-
-    //Initialize MagicSuggest msFilterByType
-    msFilterByType = $("#msFilterByType").magicSuggest({
-        data: "/ComponentTypeSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
-        },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for msFilterByType
-    $(msFilterByType).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
-
-    //Initialize MagicSuggest msFilterByProject
-    msFilterByProject = $("#msFilterByProject").magicSuggest({
-        data: "/ProjectSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
-        },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for msFilterByProject
-    $(msFilterByProject).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
-
-    //Initialize MagicSuggest msFilterByAssy
-    msFilterByAssy = $("#msFilterByAssy").magicSuggest({
-        data: "/AssemblyDbSrv/LookupByProj",
-        allowFreeEntries: false,
-        dataUrlParams: { projectIds: msFilterByProject.getValue },
-        ajaxConfig: {
-            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
-        },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for msFilterByAssy
-    $(msFilterByAssy).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
-
-
-    //---------------------------------------DataTables------------
-
-    //tableMainColumnSets
-    tableMainColumnSets = [
+    tableMainColumnSets: [
         [1],
         [2, 3, 4, 5, 6],
         [7, 8, 9, 10, 11, 12],
         [13, 14, 15, 16, 17],
         [18, 19, 20, 21, 22],
         [23, 24, 25, 26, 27]
-    ];
+    ],
 
-    //tableMain Components
-    tableMain = $("#tableMain").DataTable({
+    tableMain: $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "CompName", name: "CompName" },//1
@@ -257,58 +125,41 @@ $(document).ready(function () {
             infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
-    });
-    //showing the first Set of columns on startup;
-    sddb.showColumnSet(1, tableMainColumnSets);
+    }),
 
-    //---------------------------------------editFormView----------------------------------------//
+    labelTextCreate: "Create Component",
+    labelTextEdit: "Edit Component",
+    urlFillForEdit: "/ComponentSrv/GetByIds",
+    urlEdit: "/ComponentSrv/Edit",
+    urlDelete: "/ComponentSrv/Delete",
 
-    //Initialize MagicSuggest Array
-    sddb.msAddToArray("ComponentType_Id", "/ComponentTypeSrv/Lookup", {}, function () { 
-            sddb.updateFormForSelectedType().done(function () { $("#ComponentType_Id input").focus(); });
-        });
-    sddb.msAddToArray("ComponentStatus_Id", "/ComponentStatusSrv/Lookup");
-    sddb.msAddToArray("AssignedToProject_Id", "/ProjectSrv/Lookup");
-    sddb.msAddToArray("AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup");
-        
-    //--------------------------------------View Initialization------------------------------------//
+    extRecordTemplate: {
+        Id: "RecordTemplateId",
+        Attr01: null,
+        Attr02: null,
+        Attr03: null,
+        Attr04: null,
+        Attr05: null,
+        Attr06: null,
+        Attr07: null,
+        Attr08: null,
+        Attr09: null,
+        Attr10: null,
+        Attr11: null,
+        Attr12: null,
+        Attr13: null,
+        Attr14: null,
+        Attr15: null
+    },
+    extColumnSetNos: [3, 4, 5],
+    extUrlTypeUpd: "/ComponentTypeSrv/GetByIds",
+    extUrlEdit: "/ComponentSrv/EditExt"
 
-    sddb.fillFiltersFromRequestParams().done(sddb.refreshMainView);
-    sddb.switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
-
-    //--------------------------------End of execution at Start-----------
 });
-
-
-//--------------------------------------Main Methods---------------------------------------//
-
-//refresh view after magicsuggest update
-sddb.refreshMainView = function () {
-    tableMain.clear().search("").draw();
-    return sddb.modalWaitWrapper(function () {
-        return sddb.updateMainViewForSelectedType()
-            .then(function () {
-                if (msFilterByType.getValue().length !== 0 || msFilterByProject.getValue().length !== 0 ||
-                    msFilterByAssy.getValue().length !== 0) {
-                    return sddb.refreshTableGeneric(tableMain, "/ComponentSrv/GetByAltIds2",
-                        {
-                            projectIds: msFilterByProject.getValue(),
-                            typeIds: msFilterByType.getValue(),
-                            assyIds: msFilterByAssy.getValue(),
-                            getActive: currentActive
-                        },
-                        "POST");
-                }
-                if (ComponentIds && ComponentIds.length > 0) {
-                    return sddb.refreshTableGeneric(tableMain, "/ComponentSrv/GetByIds",
-                        { ids: ComponentIds, getActive: currentActive }, "POST");
-                }
-            });
-    });
-}
 
 //fillFiltersFromRequestParams
 sddb.fillFiltersFromRequestParams = function () {
+    "use strict";
     var deferred0 = $.Deferred();
     if (typeof AssemblyId !== "undefined" && AssemblyId !== "") {
         sddb.showModalWait();
@@ -321,7 +172,7 @@ sddb.fillFiltersFromRequestParams = function () {
         })
             .always(sddb.hideModalWait)
             .done(function (data) {
-                sddb.msSetSelectionSilent(msFilterByAssy, [{ id: data[0].Id, name: data[0].AssyName }]);
+                sddb.msSetSelectionSilent(sddb.msFilterByAssy, [{ id: data[0].Id, name: data[0].AssyName }]);
                 return deferred0.resolve();
             })
             .fail(function (xhr, status, error) {
@@ -331,52 +182,162 @@ sddb.fillFiltersFromRequestParams = function () {
     }
     else { return deferred0.resolve(); }
     return deferred0.promise();
-}
-
+};
 
 //updateMainViewForSelectedType
 sddb.updateMainViewForSelectedType = function () {
-    var deferred0 = $.Deferred();
+    "use strict";
+    //switchMainViewForExtendedHelper
+    var switchMainViewForExtendedHelper = function (switchOn) {
+        if (switchOn) {
+            $(sddb.cfg.extColumnSelectClass).removeClass("disabled");
+            return;
+        }
+        if ($.inArray(sddb.cfg.selectedColumnSet, sddb.cfg.extColumnSetNos) != -1) { sddb.showColumnSet(); }
+        $(sddb.cfg.extColumnSelectClass).addClass("disabled");
+    },
+    //
+    deferred0 = $.Deferred();
 
-    if (msFilterByType.getValue().length != 1) {
+    //main
+    if (sddb.msFilterByType.getValue().length != 1) {
         switchMainViewForExtendedHelper(false);
         return deferred0.resolve();
     }
-    sddb.updateTableForExtended(extHttpTypeTypeUpd, extUrlTypeUpd, { ids: msFilterByType.getValue()[0] }, tableMain)
+    sddb.updateTableForExtended(sddb.cfg.extHttpTypeTypeUpd, sddb.cfg.extUrlTypeUpd,
+            { ids: sddb.msFilterByType.getValue()[0] }, sddb.cfg.tableMain)
         .done(function (typeHasAttrs) {
             switchMainViewForExtendedHelper(typeHasAttrs);
             return deferred0.resolve();
         });
     return deferred0.promise();
-
-    //switchMainViewForExtendedHelper
-    function switchMainViewForExtendedHelper(switchOn) {
-        if (switchOn) {
-            $(extColumnSelectClass).removeClass("disabled");
-            return;
-        }
-        if ($.inArray(selectedColumnSet, extColumnSetNos) != -1) { sddb.showColumnSet(1, tableMainColumnSets); }
-        $(extColumnSelectClass).addClass("disabled");
-    }
-}
+};
 
 //updateFormForSelectedType
 sddb.updateFormForSelectedType = function () {
-    sddb.clearFormInputs(extEditFormId);
-    $("#" + extEditFormId + " .modifiable").data("ismodified", true);
-    $("#" + extEditFormId).addClass("hidden");
-    if (magicSuggests[0].getValue().length == 1 && magicSuggests[0].getValue()[0] != "_VARIES_") {
+    "use strict";
+    sddb.clearFormInputs(sddb.cfg.extEditFormId);
+    $("#" + sddb.cfg.extEditFormId + " .modifiable").data("ismodified", true);
+    $("#" + sddb.cfg.extEditFormId).addClass("hidden");
+    if (sddb.cfg.magicSuggests[0].getValue().length == 1 && sddb.cfg.magicSuggests[0].getValue()[0] != "_VARIES_") {
         return sddb.modalWaitWrapper(function () {
-            return sddb.updateFormForExtended(extHttpTypeTypeUpd, extUrlTypeUpd,
-                    { ids: magicSuggests[0].getValue()[0] }, extEditFormId)
+            return sddb.updateFormForExtended(sddb.cfg.extHttpTypeTypeUpd, sddb.cfg.extUrlTypeUpd,
+                    { ids: sddb.cfg.magicSuggests[0].getValue()[0] }, sddb.cfg.extEditFormId)
                 .then(function (typeHasAttrs) {
-                    if (typeHasAttrs) { $("#" + extEditFormId).removeClass("hidden"); }
+                    if (typeHasAttrs) { $("#" + sddb.cfg.extEditFormId).removeClass("hidden"); }
                 });
         });
     }
     return $.Deferred().resolve();
-}
+};
 
-//---------------------------------------Helper Methods--------------------------------------//
+//callBackAfterCreate
+sddb.callBackAfterCreate = sddb.updateFormForSelectedType;
 
+//callBackAfterEdit
+sddb.callBackAfterEdit = function (dbEntries) {
+    "use strict";
+    return sddb.updateFormForSelectedType()
+        .then(function () {
+            return sddb.fillFormForEditFromDbEntries(sddb.cfg.currentActive, dbEntries, sddb.cfg.extEditFormId);
+        });
+};
+
+//callBackBeforeSubmitEdit
+sddb.callBackBeforeSubmitEdit = function () {
+    "use strict";
+    if (!sddb.formIsValid(sddb.cfg.extEditFormId, sddb.cfg.currentIds.length === 0)) {
+        sddb.showModalFail("Errors in Form", "Extended attributes have invalid inputs. Please correct.");
+        return $.Deferred().reject();
+    }
+    return $.Deferred().resolve();
+};
+
+//callBackAfterSubmitEdit
+sddb.callBackAfterSubmitEdit = function (data) {
+    "use strict";
+    sddb.cfg.extCurrRecords = [];
+    for (var i = 0; i < sddb.cfg.currentIds.length; i += 1) {
+        sddb.cfg.extCurrRecords[i] = $.extend(true, {}, sddb.cfg.extRecordTemplate);
+        sddb.cfg.extCurrRecords[i].Id = sddb.cfg.currentIds[i];
+    }
+    return sddb.modalWaitWrapper(function () {
+        return sddb.submitEditsGeneric(sddb.cfg.extEditFormId, [],
+            sddb.cfg.extCurrRecords, sddb.cfg.extHttpTypeEdit, sddb.cfg.extUrlEdit);
+    });
+};
+
+//callBackAfterCopy
+sddb.callBackAfterCopy = function (dbEntries) {
+    "use strict";
+    return sddb.updateFormForSelectedType()
+        .then(function () { return sddb.fillFormForCopyFromDbEntries(dbEntries, sddb.cfg.extEditFormId); });
+};
+
+//refresh view after magicsuggest update
+sddb.refreshMainView = function () {
+    "use strict";
+    sddb.cfg.tableMain.clear().search("").draw();
+    return sddb.modalWaitWrapper(function () {
+        return sddb.updateMainViewForSelectedType()
+            .then(function () {
+                if (sddb.msFilterByType.getValue().length !== 0 || sddb.msFilterByProject.getValue().length !== 0 ||
+                    sddb.msFilterByAssy.getValue().length !== 0) {
+                    return sddb.refreshTableGeneric(sddb.cfg.tableMain, "/ComponentSrv/GetByAltIds2",
+                        {
+                            projectIds: sddb.msFilterByProject.getValue(),
+                            typeIds: sddb.msFilterByType.getValue(),
+                            assyIds: sddb.msFilterByAssy.getValue(),
+                            getActive: sddb.cfg.currentActive
+                        },
+                        "POST");
+                }
+                if (ComponentIds && ComponentIds.length > 0) {
+                    return sddb.refreshTableGeneric(sddb.cfg.tableMain, "/ComponentSrv/GetByIds",
+                        { ids: ComponentIds, getActive: sddb.cfg.currentActive }, "POST");
+                }
+            });
+    });
+};
+
+
+//----------------------------------------------setup after page load------------------------------------------------//
+$(document).ready(function () {
+    "use strict";
+    //-----------------------------------------mainView------------------------------------------//
+
+    //wire up dropdownId1 - Show Assy Components
+    $("#dropdownId1").click(function (event) {
+        event.preventDefault();
+        sddb.sendSingleIdToNewWindow("/ComponentLogEntry?ComponentId=");
+    });
+
+    //Initialize MagicSuggest sddb.msFilterByType
+    sddb.msFilterByType = sddb.msSetFilter("msFilterByType", "/ComponentTypeSrv/Lookup");
+
+    //Initialize MagicSuggest sddb.msFilterByProject
+    sddb.msFilterByProject = sddb.msSetFilter("msFilterByProject", "/ProjectSrv/Lookup");
+
+    //Initialize MagicSuggest sddb.msFilterByLoc
+    sddb.msFilterByAssy = sddb.msSetFilter("msFilterByAssy", "/AssemblyDbSrv/LookupByProj",
+        { dataUrlParams: { projectIds: sddb.msFilterByProject.getValue } });
+
+
+    //---------------------------------------editFormView----------------------------------------//
+
+    //Initialize MagicSuggest Array
+    sddb.msAddToArray("ComponentType_Id", "/ComponentTypeSrv/Lookup", {}, function () {
+        sddb.updateFormForSelectedType().done(function () { $("#ComponentType_Id input").focus(); });
+    });
+    sddb.msAddToArray("ComponentStatus_Id", "/ComponentStatusSrv/Lookup");
+    sddb.msAddToArray("AssignedToProject_Id", "/ProjectSrv/Lookup");
+    sddb.msAddToArray("AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup");
+
+    //--------------------------------------View Initialization------------------------------------//
+
+    sddb.fillFiltersFromRequestParams().done(sddb.refreshMainView);
+    sddb.switchView();
+
+    //--------------------------------End of setup after page load---------------------------------//   
+});
 

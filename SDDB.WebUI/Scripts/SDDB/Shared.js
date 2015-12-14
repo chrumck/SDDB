@@ -56,7 +56,17 @@ var sddbConstructor = function (customConfig) {
 
         urlRefreshMainView: "",
         dataRefreshMainView: function () { return { getActive: cfg.currentActive }; },
-        httpTypeRefreshMainView: "GET"
+        httpTypeRefreshMainView: "GET",
+
+        extCurrRecords: [],
+        extRecordTemplate: {},
+        extEditFormId: "editFormExtended",
+        extColumnSelectClass: ".extColumnSelect",
+        extColumnSetNos: [],
+        extHttpTypeTypeUpd: "POST",
+        extUrlTypeUpd: "",
+        extHttpTypeEdit: "POST",
+        extUrlEdit: ""
     },
 
     //config
@@ -855,6 +865,7 @@ var sddbConstructor = function (customConfig) {
 
     //-----------------------------------------------------------------------------
 
+    //TODO: set up default params from cfg
     //Pulls type information and formats table column names
     sddbObj.updateTableForExtended = function (httpType, url, data, table) {
         return $.ajax({ type: httpType, url: url, data: data, timeout: 120000, dataType: "json" })
@@ -973,7 +984,7 @@ var sddbConstructor = function (customConfig) {
             .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
         return deferred0.promise();
     };
-        
+            
     //-----------------------------------------------------------------------------
 
     //sendSingleIdToNewWindow

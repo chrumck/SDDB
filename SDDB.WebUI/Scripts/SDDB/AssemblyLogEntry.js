@@ -136,7 +136,6 @@ sddb.setConfig({
 //fillFiltersFromRequestParams
 sddb.fillFiltersFromRequestParams = function () {
     "use strict";
-
     $("#filterDateStart").val(moment().format("YYYY-MM-DD"));
     $("#filterDateEnd").val(moment().format("YYYY-MM-DD"));
     if (AssemblyId) {
@@ -184,7 +183,6 @@ sddb.refreshMainView = function () {
 //----------------------------------------------setup after page load------------------------------------------------//
 $(document).ready(function () {
     "use strict";
-
     //-----------------------------------------mainView------------------------------------------//
     
     //filterDateStart event dp.hide
