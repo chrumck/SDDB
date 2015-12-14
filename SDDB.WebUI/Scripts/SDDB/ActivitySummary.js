@@ -9,55 +9,12 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
-"use strict";
-
-//--------------------------------------Global Properties------------------------------------//
-
-$(document).ready(function () {
-
-    //-----------------------------------------mainView------------------------------------------//
-        
-    //Initialize DateTimePicker filterDateStart
-    $("#filterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("dp.hide", function (event) { sddb.refreshMainView(); });
-
-
-    //Initialize MagicSuggest sddb.msFilterByPerson
-    sddb.msFilterByPerson = $("#msFilterByPerson").magicSuggest({
-        data: "/PersonSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
-        },
-        maxSelection: 1,
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for sddb.msFilterByPerson
-    $(sddb.msFilterByPerson).on("selectionchange", function (event) { sddb.refreshMainView(); });
-
-    //Hide sddb.msFilterByPerson if !CanViewOthers
-    if (typeof CanViewOthers === "undefined" || !CanViewOthers) { sddb.msFilterByPerson.disable(); } 
-           
-    //--------------------------------------View Initialization------------------------------------//
-
-    sddb.switchView();
-
-    sddb.weekOffset = $("#thNo6").is(":hidden") && $("#thNo7").is(":hidden") ? 1: 0;
-    $("#filterDateStart").val(moment().day(sddb.weekOffset).format("YYYY-MM-DD"));
-
-    sddb.msFilterByPerson.setSelection([{ id: UserId, name: UserFullName }]);
-    
-    //--------------------------------End of execution at Start-----------
-});
-
-
-//--------------------------------------Main Methods---------------------------------------//
-
 //refresh view after magicsuggest update
 sddb.refreshMainView = function () {
+    "use strict";
+
     //fillSummaryTableHelper
-    var fillSummaryTableHelper = function (tableMain, startDate, records) {
+    var fillSummaryTableHelper = function (targetTable, startDate, records) {
 
         //getColumnDatesHelper for fillSummaryTableHelper
         var getColumnDatesHelper = function (startDate) {
@@ -72,8 +29,8 @@ sddb.refreshMainView = function () {
             return columnDates;
         },
         //fillSumTblFirstRowHelper for fillSummaryTableHelper
-        fillSumTblFirstRowHelper = function (tableMain, columnDates) {
-            tableMain.find("thead th").each(function (i) {
+        fillSumTblFirstRowHelper = function (targetTable, columnDates) {
+            targetTable.find("thead th").each(function (i) {
                 if (i === 0) { return true; }
                 $(this).text(columnDates[i - 1].format("dd DD"));
             });
@@ -109,11 +66,12 @@ sddb.refreshMainView = function () {
             });
             return columnHours;
         },
+        //
         columnDates = getColumnDatesHelper(startDate),
         projectNames = getProjectNamesHelper(records);
 
         //main
-        fillSumTblFirstRowHelper(tableMain, columnDates);
+        fillSumTblFirstRowHelper(targetTable, columnDates);
 
         $.each(projectNames, function (i, projectName) {
             var row = $("<tr/>");
@@ -123,24 +81,24 @@ sddb.refreshMainView = function () {
                 row.append($("<td />").text(columnHours));
                 if (j >= columnDates.length - 2) { row.find("td:last").addClass("hidden-xs"); }
             });
-            tableMain.append(row);
+            targetTable.append(row);
         });
     },
     //clearSumTblFirstRowHelper
-    clearSumTblFirstRowHelper = function (tableMain) {
-        tableMain.find("thead th").each(function (i) {
+    clearSumTblFirstRowHelper = function (targetTable) {
+        targetTable.find("thead th").each(function (i) {
             if (i === 0) { return true; }
             $(this).text(i);
         });
     },
-    //private vars
-    tableMain = $("#tableMain"),
+    //
+    targetTable = $("#tableMain"),
     startDate = $("#filterDateStart").val(),
     endDate;
 
     //main
-    tableMain.find("tbody").empty();
-    clearSumTblFirstRowHelper(tableMain);
+    targetTable.find("tbody").empty();
+    clearSumTblFirstRowHelper(targetTable);
 
     if (startDate !== "" && sddb.msFilterByPerson.getSelection().length !== 0) {
         sddb.showModalWait();
@@ -159,12 +117,53 @@ sddb.refreshMainView = function () {
         })
             .always(sddb.hideModalWait)
             .done(function (records) {
-                fillSummaryTableHelper(tableMain, startDate, records);
+                fillSummaryTableHelper(targetTable, startDate, records);
             })
             .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
     }
 };
 
-//---------------------------------------Helper Methods--------------------------------------//
+//----------------------------------------------setup after page load------------------------------------------------//
+$(document).ready(function () {
+    "use strict";
+    //-----------------------------------------mainView------------------------------------------//
+        
+    //Initialize DateTimePicker filterDateStart
+    $("#filterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
+        .on("dp.hide", function (event) { sddb.refreshMainView(); });
+
+
+    //Initialize MagicSuggest sddb.msFilterByPerson
+    sddb.msFilterByPerson = $("#msFilterByPerson").magicSuggest({
+        data: "/PersonSrv/Lookup",
+        allowFreeEntries: false,
+        ajaxConfig: {
+            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
+        },
+        maxSelection: 1,
+        infoMsgCls: "hidden",
+        style: "min-width: 240px;"
+    });
+    //Wire up on change event for sddb.msFilterByPerson
+    $(sddb.msFilterByPerson).on("selectionchange", function (event) { sddb.refreshMainView(); });
+
+    //Hide sddb.msFilterByPerson if !CanViewOthers
+    if (typeof CanViewOthers === "undefined" || !CanViewOthers) { sddb.msFilterByPerson.disable(); } 
+           
+    //--------------------------------------View Initialization------------------------------------//
+
+    sddb.switchView();
+
+    sddb.weekOffset = $("#thNo6").is(":hidden") && $("#thNo7").is(":hidden") ? 1: 0;
+    $("#filterDateStart").val(moment().day(sddb.weekOffset).format("YYYY-MM-DD"));
+
+    sddb.msFilterByPerson.setSelection([{ id: UserId, name: UserFullName }]);
+    
+    //--------------------------------End of setup after page load---------------------------------//
+});
+
+
+
+
 
 

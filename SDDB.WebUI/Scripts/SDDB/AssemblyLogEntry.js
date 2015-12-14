@@ -198,9 +198,9 @@ $(document).ready(function () {
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
-    sddb.msAddToMsArray(magicSuggests, "AssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "AssignedToLocation_Id", "/LocationSrv/Lookup", 1);
+    sddb.msAddToArray("AssemblyDb_Id", "/AssemblyDbSrv/Lookup");
+    sddb.msAddToArray("AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup");
+    sddb.msAddToArray("AssignedToLocation_Id", "/LocationSrv/Lookup");
 
     //--------------------------------------View Initialization------------------------------------//
 

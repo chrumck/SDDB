@@ -165,9 +165,9 @@ $(document).ready(function () {
     //---------------------------------------editFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    sddb.msAddToMsArray(magicSuggests, "LocationType_Id", "/LocationTypeSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "ContactPerson_Id", "/PersonSrv/LookupFromProject", 1);
+    sddb.msAddToArray("LocationType_Id", "/LocationTypeSrv/Lookup");
+    sddb.msAddToArray("AssignedToProject_Id", "/ProjectSrv/Lookup");
+    sddb.msAddToArray("ContactPerson_Id", "/PersonSrv/LookupFromProject");
         
     //--------------------------------------View Initialization------------------------------------//
 

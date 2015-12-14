@@ -264,10 +264,10 @@ $(document).ready(function () {
     //---------------------------------------editFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    sddb.msAddToMsArray(magicSuggests, "ComponentType_Id", "/ComponentTypeSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "ComponentStatus_Id", "/ComponentStatusSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
+    sddb.msAddToArray("ComponentType_Id", "/ComponentTypeSrv/Lookup");
+    sddb.msAddToArray("ComponentStatus_Id", "/ComponentStatusSrv/Lookup");
+    sddb.msAddToArray("AssignedToProject_Id", "/ProjectSrv/Lookup");
+    sddb.msAddToArray("AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup");
 
     //Initialize MagicSuggest Array Event - ComponentType_Id
     $(magicSuggests[0]).on("selectionchange", function (e, m) {

@@ -121,7 +121,7 @@ $(document).ready(function () {
     //---------------------------------------editFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    sddb.msAddToMsArray(magicSuggests, "ProjectManager_Id", "/PersonSrv/LookupAll", 1);
+    sddb.msAddToArray("ProjectManager_Id", "/PersonSrv/LookupAll");
     
     //----------------------------------------projectPersonsView----------------------------------------//
 

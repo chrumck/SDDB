@@ -18,7 +18,7 @@ labelTextCreate = function () { return "New Activity for " + $("#filterDateStart
 labelTextEdit = function () { return "Edit Activity for " + $("#filterDateStart").val(); };
 labelTextCopy = function () { return "Copy Activity to " + moveToDate.format("YYYY-MM-DD"); };
 
-var panelTableMainClass = "panel-tdo-success";
+var tableMainPanelClassActive = "panel-tdo-success";
 
 callBackAfterCreate = function () {
     $("#editFormBtnOkFiles").prop("disabled", false);
@@ -208,14 +208,18 @@ $(document).ready(function () {
         });
 
     //Initialize MagicSuggest Array
-    sddb.msAddToMsArray(magicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1, null, {}, false, false);
-    sddb.msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1, null, {}, false, true);
-    sddb.msAddToMsArray(magicSuggests, "AssignedToLocation_Id", "/LocationSrv/LookupByProj", 1, null,
-        { projectIds: magicSuggests[2].getValue });
-    sddb.msAddToMsArray(magicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
-        { projectIds: magicSuggests[2].getValue }, false, false);
-    
+    sddb.msAddToArray("EnteredByPerson_Id", "/PersonSrv/Lookup");
+    sddb.msAddToArray("PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", { editable: false });
+    sddb.msAddToArray("AssignedToProject_Id", "/ProjectSrv/Lookup", {}, function () {
+        //TODO
+        });
+    sddb.msAddToArray("AssignedToLocation_Id", "/LocationSrv/LookupByProj",
+        { dataUrlParams: { projectIds: magicSuggests[2].getValue } }, function () {
+            //TODO
+        });
+    sddb.msAddToArray("AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj",
+        { dataUrlParams: { projectIds: magicSuggests[2].getValue } });
+
     //Initialize MagicSuggest Array Event - AssignedToProject_Id
     $(magicSuggests[2]).on("selectionchange", function (e, m) {
         magicSuggests[3].clear();

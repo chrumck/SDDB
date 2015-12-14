@@ -301,14 +301,18 @@ $(document).ready(function () {
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
-    sddb.msAddToMsArray(magicSuggests, "EnteredByPerson_Id", "/PersonSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "AssignedToLocation_Id", "/LocationSrv/LookupByProj", 1, null,
-        { projectIds: magicSuggests[2].getValue });
-    sddb.msAddToMsArray(magicSuggests, "AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj", 1, null,
-        { projectIds: magicSuggests[2].getValue });
-    sddb.msAddToMsArray(magicSuggests, "QcdByPerson_Id", "/PersonSrv/Lookup", 1);
+    sddb.msAddToArray("EnteredByPerson_Id", "/PersonSrv/Lookup");
+    sddb.msAddToArray("PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup");
+    sddb.msAddToArray("AssignedToProject_Id", "/ProjectSrv/Lookup", {}, function () {
+            //TODO:not finished!
+        });
+    sddb.msAddToArray("AssignedToLocation_Id", "/LocationSrv/LookupByProj",
+        { dataUrlParams: { projectIds: sddb.cfg.magicSuggests[2].getValue } }, function () {
+            //TODO:not finished!
+        });
+    sddb.msAddToArray("AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj",
+        { dataUrlParams: { projectIds: sddb.cfg.magicSuggests[2].getValue } });
+    sddb.msAddToArray("QcdByPerson_Id", "/PersonSrv/Lookup");
 
     //Initialize MagicSuggest Array Event - AssignedToProject_Id
     $(magicSuggests[2]).on("selectionchange", function (e, m) {

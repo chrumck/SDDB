@@ -151,12 +151,12 @@ $(document).ready(function () {
     //---------------------------------------editFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    sddb.msAddToMsArray(magicSuggests, "DocumentType_Id", "/DocumentTypeSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "AuthorPerson_Id", "/PersonSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "ReviewerPerson_Id", "/PersonSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "RelatesToAssyType_Id", "/AssemblyTypeSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "RelatesToCompType_Id", "/ComponentTypeSrv/Lookup", 1);
+    sddb.msAddToArray("DocumentType_Id", "/DocumentTypeSrv/Lookup");
+    sddb.msAddToArray("AuthorPerson_Id", "/PersonSrv/Lookup");
+    sddb.msAddToArray("ReviewerPerson_Id", "/PersonSrv/Lookup");
+    sddb.msAddToArray("AssignedToProject_Id", "/ProjectSrv/Lookup");
+    sddb.msAddToArray("RelatesToAssyType_Id", "/AssemblyTypeSrv/Lookup");
+    sddb.msAddToArray("RelatesToCompType_Id", "/ComponentTypeSrv/Lookup");
     
     //--------------------------------------View Initialization------------------------------------//
 

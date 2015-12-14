@@ -184,7 +184,7 @@ $(document).ready(function () {
         if (currentIds.length === 0) {
             sddb.showModalFail("Adding/Removing Assemblies requires saving the Entry. Save Entry?",
                     "Confirm Saving Entry", "yes")
-                .done(function () { return sddb.submitEditForm(doNothingAndResolve, function () { addRemoveAssembliesNow(); }, true); });
+                .done(function () { return sddb.submitEditForm(sddb.doNothingAndResolve, function () { addRemoveAssembliesNow(); }, true); });
             return;
         }
         addRemoveAssembliesNow();
@@ -211,7 +211,7 @@ $(document).ready(function () {
         if (currentIds.length === 0) {
             sddb.showModalFail("Adding/Removing Persons requires saving the Entry. Save Entry?",
                     "Confirm Saving Entry", "yes")
-                .done(function () { return sddb.submitEditForm(doNothingAndResolve, function () { addRemovePersonsNow(); }, true); });
+                .done(function () { return sddb.submitEditForm(sddb.doNothingAndResolve, function () { addRemovePersonsNow(); }, true); });
             return;
         }
         addRemovePersonsNow();

@@ -7,10 +7,9 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="../FileSaver.js" />
 
-"use strict";
-
 //sddbConstructor
 var sddbConstructor = function (customConfig) {
+    "use strict";
 
     //private variables----------------------------------------------------------------------------------------------//
     var windowYpos = 0,
@@ -27,10 +26,12 @@ var sddbConstructor = function (customConfig) {
         recordTemplate: {},
         magicSuggests: [],
 
-        tableMain: null,
+        tableMain: {},
         tableMainColumnSets: [[1], [2, 3]],
         selectedColumnSet: 1,
-        panelTableMainClass: "panel-primary",
+        tableMainPanelId: "panelTableMain",
+        tableMainPanelClassActive: "panel-primary",
+        tableMainPanelClassInActive: "panel-tdo-danger",
 
         initialViewId: "initialView",
         mainViewId: "mainView",
@@ -54,20 +55,12 @@ var sddbConstructor = function (customConfig) {
         urlDelete: "",
 
         urlRefreshMainView: "",
-        dataRefreshMainView: function () { return { getActive: config.currentActive }; },
-        httpTypeRefreshMainView: "GET",
-
-        doNothingAndResolve: function () { return $.Deferred().resolve(); },
-        callBackAfterCreate: function () { return $.Deferred().resolve(); },
-        callBackAfterEdit: function (currRecords) { return $.Deferred().resolve(); },
-        callBackBeforeCopy: function (currRecords) { return $.Deferred().resolve(); },
-        callBackAfterCopy: function (currRecords) { return $.Deferred().resolve(); },
-        callBackBeforeSubmitEdit: function () { return $.Deferred().resolve(); },
-        callBackAfterSubmitEdit: function (data) { return $.Deferred().resolve(); }
+        dataRefreshMainView: function () { return { getActive: cfg.currentActive }; },
+        httpTypeRefreshMainView: "GET"
     },
 
     //config
-    config = $.extend(true, {}, defaultConfig, customConfig),
+    cfg = $.extend(true, {}, defaultConfig, customConfig),
 
     //private functions----------------------------------------------------------------------------------------------//
 
@@ -137,19 +130,19 @@ var sddbConstructor = function (customConfig) {
 
     //object to return-----------------------------------------------------------------------------------------------//
     sddbObj = {};
+    sddbObj.cfg = cfg;
 
-
-    //object to return public methods--------------------------------------------------------------------------------//
+    //object to return - public methods------------------------------------------------------------------------------//
 
     //setConfig
     sddbObj.setConfig = function (newConfig) {
-        config = $.extend(true, {}, config, newConfig);
+        $.extend(true, cfg, newConfig);
     };
 
-    //getConfig
-    sddbObj.getConfig = function () {
-        return $.extend(true, {}, config);
-    };
+    //-----------------------------------------------------------------------------
+
+    //doNothingAndResolve
+    sddbObj.doNothingAndResolve = function () { return $.Deferred().resolve(); };
 
     //-----------------------------------------------------------------------------
 
@@ -252,9 +245,9 @@ var sddbConstructor = function (customConfig) {
 
     //switchView 
     sddbObj.switchView = function (fromViewId, toViewId, toBtnGroupClass, dataTable) {
-        fromViewId = fromViewId || config.initialViewId;
-        toViewId = toViewId || config.mainViewId;
-        toBtnGroupClass = toBtnGroupClass || config.mainViewBtnGroupClass;
+        fromViewId = fromViewId || cfg.initialViewId;
+        toViewId = toViewId || cfg.mainViewId;
+        toBtnGroupClass = toBtnGroupClass || cfg.mainViewBtnGroupClass;
 
         $("#" + fromViewId).addClass("hidden");
         $("#" + toViewId).removeClass("hidden");
@@ -271,7 +264,7 @@ var sddbConstructor = function (customConfig) {
 
     //saveViewSettings
     sddbObj.saveViewSettings = function (dataTable) {
-        dataTable = dataTable || config.tableMain;
+        dataTable = dataTable || cfg.tableMain;
         windowYpos = window.pageYOffset || document.documentElement.scrollTop;
         if (dataTable) {
             tablePage = dataTable.page();
@@ -320,6 +313,7 @@ var sddbConstructor = function (customConfig) {
 
     //exportTableToTxt - exports table data to a txt tab separated file
     sddbObj.exportTableToTxt = function (table) {
+        table = table || cfg.tableMain;
 
         //convertObjectToStringHelper
         var convertObjectToStringHelper = function (dataObject, retrievePropNames) {
@@ -367,17 +361,34 @@ var sddbConstructor = function (customConfig) {
     //showColumnSet
     sddbObj.showColumnSet = function (columnSetIdx, columnSetArray) {
         columnSetIdx = columnSetIdx || 1;
-        columnSetArray = columnSetArray || config.tableMainColumnSets;
-        if (!config.tableMain) { return; }
-        config.tableMain.columns().visible(false);
-        config.tableMain.columns(columnSetArray[0]).visible(true);
-        config.tableMain.columns(columnSetArray[columnSetIdx]).visible(true);
-        config.selectedColumnSet = columnSetIdx;
+        columnSetArray = columnSetArray || cfg.tableMainColumnSets;
+        if (!cfg.tableMain) { return; }
+        cfg.tableMain.columns().visible(false);
+        cfg.tableMain.columns(columnSetArray[0]).visible(true);
+        cfg.tableMain.columns(columnSetArray[columnSetIdx]).visible(true);
+        cfg.selectedColumnSet = columnSetIdx;
     };
 
     //setCurrentActive
     sddbObj.setCurrentActive = function (newCurrentActive) {
-        config.currentActive = newCurrentActive;
+        cfg.currentActive = newCurrentActive;
+    };
+
+    //switchTableToActive
+    sddbObj.switchTableToActive = function (newCurrentActive) {
+        sddbObj.setCurrentActive(newCurrentActive);
+
+        if (newCurrentActive) {
+            $("#" + cfg.tableMainPanelId)
+                .removeClass(cfg.tableMainPanelClassInActive)
+                .addClass(cfg.tableMainPanelClassActive);
+        } else {
+            $("#" + cfg.tableMainPanelId)
+                .removeClass(cfg.tableMainPanelClassActive)
+                .addClass(cfg.tableMainPanelClassInActive);
+        }
+
+        sddbObj.refreshMainView();
     };
 
     //-----------------------------------------------------------------------------
@@ -523,17 +534,17 @@ var sddbConstructor = function (customConfig) {
     //-----------------------------------------------------------------------------
 
     //SubmitEdits to DB - generic version
-    sddbObj.submitEditsGeneric = function (formId, msArray, currRecords, httpType, url, noOfNewRecords) {
+    sddbObj.submitEditsGeneric = function (formId, msArray, dbEntries, httpType, url, noOfNewRecords) {
 
         //multiplyRecordsAndModifyUniquePropsHelper
         var multiplyRecordsAndModifyUniquePropsHelper = function () {
             var i;
 
             for (i = 1; i < noOfNewRecords; i += 1) {
-                currRecordsClone[i] = $.extend(true, {}, currRecordsClone[0]);
+                dbEntriesClone[i] = $.extend(true, {}, dbEntriesClone[0]);
             }
 
-            $.each(currRecordsClone, function (i, currRecord) {
+            $.each(dbEntriesClone, function (i, currRecord) {
                 var property, j;
 
                 for (property in currRecord) {
@@ -552,7 +563,7 @@ var sddbConstructor = function (customConfig) {
         },
 
         //private variables
-        currRecordsClone = $.extend(true, [], currRecords),
+        dbEntriesClone = $.extend(true, [], dbEntries),
         deferred0 = $.Deferred(),
         modifiedProperties = [];
 
@@ -565,7 +576,7 @@ var sddbConstructor = function (customConfig) {
             if (ms.isModified === true) { modifiedProperties.push(ms.id); }
         });
 
-        $.each(currRecordsClone, function (i, currRecord) {
+        $.each(dbEntriesClone, function (i, currRecord) {
             for (var property in currRecord) {
                 if (!currRecord.hasOwnProperty(property) ||
                         property == "Id" ||
@@ -591,22 +602,22 @@ var sddbConstructor = function (customConfig) {
             currRecord.ModifiedProperties = modifiedProperties;
         });
 
-        if (currRecordsClone.length == 1 && noOfNewRecords > 1) { multiplyRecordsAndModifyUniquePropsHelper(); }
+        if (dbEntriesClone.length == 1 && noOfNewRecords > 1) { multiplyRecordsAndModifyUniquePropsHelper(); }
 
         if (modifiedProperties.length === 0) {
             return deferred0.resolve({
                 "Success": "True",
                 "newEntryIds": [],
                 "propsModified": false
-            }, currRecordsClone);
+            }, dbEntriesClone);
         }
 
-        $.ajax({ type: httpType, url: url, timeout: 120000, data: { records: currRecordsClone }, dataType: "json" })
+        $.ajax({ type: httpType, url: url, timeout: 120000, data: { records: dbEntriesClone }, dataType: "json" })
             .done(function (data) {
                 $("#" + formId + " .modifiable").data("ismodified", false);
                 sddbObj.msSetAsModified(msArray, false);
                 data.propsModified = true;
-                deferred0.resolve(data, currRecordsClone);
+                deferred0.resolve(data, dbEntriesClone);
             })
             .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
 
@@ -693,38 +704,34 @@ var sddbConstructor = function (customConfig) {
     };
         
     //-----------------------------------------------------------------------------
-
-    // TODO: refactor to accept an object for ms settings, get rid of disabled (it doesn't work anyway)
-    //initialize MagicSuggest and add to MagicSuggest array
-    sddbObj.msAddToMsArray = function (msArray, id, url, maxSelection, minChars, dataUrlParams, disabled, editable) {
-
-        editable = (typeof editable !== "undefined" && editable === false) ? false : true;
+    
+    //refactor to accept an object for ms settings, get rid of disabled (it doesn't work anyway)
+    //old params (msArray, id, url, maxSelection, minChars, dataUrlParams, disabled, editable)
+    //msAddToMsArrayNew
+    sddbObj.msAddToArray = function (id, url, customSettings, onSelectionHandler, msArray) {
+        msArray = msArray || cfg.magicSuggests;
 
         var element = $("#" + id),
         dataValRequired = $(element).attr("data-val-required"),
         dataValDbisunique = $(element).attr("data-val-dbisunique"),
-
-        ms = element.magicSuggest({
-            invalidCls: "input-validation-error",
+        defaultSettings = {
             data: url,
-            dataUrlParams: dataUrlParams,
+            invalidCls: "input-validation-error",
             allowFreeEntries: false,
-            disabled: disabled,
-            editable: editable,
-            minChars: minChars,
-            maxSelection: maxSelection,
+            maxSelection: 1,
+            editable: true,
             required: (typeof dataValRequired !== "undefined") ? true : false,
             resultAsString: true,
-            ajaxConfig: {
-                error: function (xhr, status, error) { sddbObj.showModalAJAXFail(xhr, status, error); }
-            }
-        });
+            ajaxConfig: { error: function (xhr, status, error) { sddbObj.showModalAJAXFail(xhr, status, error); } }
+        },
+        settings = $.extend(true, {}, defaultSettings, customSettings),
+        ms = element.magicSuggest(settings);
 
         ms.id = id;
         ms.dataValRequired = dataValRequired;
         ms.dataValDbisunique = dataValDbisunique;
-
         ms.isModified = false;
+
         if ($(element).hasClass("modifiable")) {
             ms.modifiable = true;
             $(ms).on("selectionchange", function (e, m) { this.isModified = true; });
@@ -742,12 +749,14 @@ var sddbConstructor = function (customConfig) {
                         .removeClass("field-validation-error");
                 }
             });
-            if (!editable) { $(ms).on("focus", function (e, m) { this.expand(); }); }
+            if (!settings.editable) { $(ms).on("focus", function (e, m) { this.expand(); }); }
         }
         else {
             ms.modifiable = false;
             ms.disable();
         }
+
+        if (onSelectionHandler) { $(ms).on("selectionchange", onSelectionHandler); }
 
         msArray.push(ms);
     };
@@ -938,6 +947,16 @@ var sddbConstructor = function (customConfig) {
         
     //-----------------------------------------------------------------------------
 
+    //sendSingleIdToNewWindow
+    sddbObj.sendSingleIdToNewWindow = function (newUrl) {
+        cfg.currentIds = cfg.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (cfg.currentIds.length !== 1) {
+            sddbObj.showModalSelectOne();
+            return;
+        }
+        window.open(newUrl + cfg.currentIds[0]);
+    };
+
     //opens new window by submitting a form - needed to POST version of window.open
     sddbObj.submitFormFromArray = function (verb, url, target, dataArray, parameterName) {
         var form = document.createElement("form");
@@ -957,23 +976,40 @@ var sddbConstructor = function (customConfig) {
 
     //---------------------------------------------------------------------------------------------------------------//
 
+    //callBackAfterCreate
+    sddbObj.callBackAfterCreate = function () { return $.Deferred().resolve(); };
+
+    //callBackAfterEdit
+    sddbObj.callBackAfterEdit = function (dbEntries) { return $.Deferred().resolve(); };
+
+    //callBackBeforeCopy
+    sddbObj.callBackBeforeCopy = function (dbEntries) { return $.Deferred().resolve(); };
+
+    //callBackAfterCopy
+    sddbObj.callBackAfterCopy = function (dbEntries) { return $.Deferred().resolve(); };
+
+    //callBackBeforeSubmitEdit
+    sddbObj.callBackBeforeSubmitEdit = function () { return $.Deferred().resolve(); };
+
+    //callBackAfterSubmitEdit
+    sddbObj.callBackAfterSubmitEdit = function (data) { return $.Deferred().resolve(); };
 
     //prepareFormForCreate
     sddbObj.prepareFormForCreate = function (callBackAfter) {
 
-        callBackAfter = callBackAfter || config.callBackAfterCreate;
+        callBackAfter = callBackAfter || sddbObj.callBackAfterCreate;
 
         var deferred0 = $.Deferred();
 
-        config.currentIds = [];
-        config.currentRecords = [];
-        config.currentRecords[0] = $.extend(true, {}, config.recordTemplate);
-        sddbObj.fillFormForCreateGeneric(config.editFormId, config.magicSuggests,
-            config.labelTextCreate, config.mainViewId);
+        cfg.currentIds = [];
+        cfg.currentRecords = [];
+        cfg.currentRecords[0] = $.extend(true, {}, cfg.recordTemplate);
+        sddbObj.fillFormForCreateGeneric(cfg.editFormId, cfg.magicSuggests,
+            cfg.labelTextCreate, cfg.mainViewId);
         callBackAfter()
             .done(function () {
-                sddbObj.saveViewSettings(config.tableMain);
-                sddbObj.switchView(config.mainViewId, config.editFormViewId, config.editFormBtnGroupCreateClass);
+                sddbObj.saveViewSettings(cfg.tableMain);
+                sddbObj.switchView(cfg.mainViewId, cfg.editFormViewId, cfg.editFormBtnGroupCreateClass);
                 deferred0.resolve();
             })
             .fail(deferred0.reject);
@@ -984,26 +1020,26 @@ var sddbConstructor = function (customConfig) {
     //prepareFormForEdit
     sddbObj.prepareFormForEdit = function (callBackAfter) {
 
-        callBackAfter = callBackAfter || config.callBackAfterEdit;
+        callBackAfter = callBackAfter || sddbObj.callBackAfterEdit;
 
         var deferred0 = $.Deferred();
 
-        config.currentIds = config.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (config.currentIds.length === 0) {
+        cfg.currentIds = cfg.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (cfg.currentIds.length === 0) {
             sddbObj.showModalNothingSelected();
             return deferred0.reject();
         }
         sddbObj.modalWaitWrapper(function () {
-            return sddbObj.fillFormForEditGeneric(config.currentIds, config.httpTypeFillForEdit, config.urlFillForEdit,
-                config.currentActive, config.editFormId, config.labelTextEdit, config.magicSuggests);
+            return sddbObj.fillFormForEditGeneric(cfg.currentIds, cfg.httpTypeFillForEdit, cfg.urlFillForEdit,
+                cfg.currentActive, cfg.editFormId, cfg.labelTextEdit, cfg.magicSuggests);
         })
-            .then(function (currRecords) {
-                config.currentRecords = currRecords;
-                return callBackAfter(currRecords);
+            .then(function (dbEntries) {
+                cfg.currentRecords = dbEntries;
+                return callBackAfter(dbEntries);
             })
             .done(function () {
-                sddbObj.saveViewSettings(config.tableMain);
-                sddbObj.switchView(config.mainViewId, config.editFormViewId, config.editFormBtnGroupEditClass);
+                sddbObj.saveViewSettings(cfg.tableMain);
+                sddbObj.switchView(cfg.mainViewId, cfg.editFormViewId, cfg.editFormBtnGroupEditClass);
                 deferred0.resolve();
             })
             .fail(deferred0.reject);
@@ -1014,33 +1050,33 @@ var sddbConstructor = function (customConfig) {
     //prepareFormForCopy
     sddbObj.prepareFormForCopy = function (callBackBefore, callBackAfter) {
 
-        callBackBefore = callBackBefore || config.callBackBeforeCopy;
-        callBackAfter = callBackAfter || config.callBackAfterCopy;
+        callBackBefore = callBackBefore || sddbObj.callBackBeforeCopy;
+        callBackAfter = callBackAfter || sddbObj.callBackAfterCopy;
 
         var deferred0 = $.Deferred();
 
-        config.currentIds = config.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (config.currentIds.length !== 1) {
+        cfg.currentIds = cfg.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (cfg.currentIds.length !== 1) {
             sddbObj.showModalSelectOne();
             return deferred0.reject();
         }
         callBackBefore()
             .then(function () {
                 return sddbObj.modalWaitWrapper(function () {
-                    return sddbObj.fillFormForCopyGeneric(config.currentIds,
-                        config.httpTypeFillForEdit, config.urlFillForEdit, config.currentActive,
-                        config.editFormId, config.labelTextCopy, config.magicSuggests);
+                    return sddbObj.fillFormForCopyGeneric(cfg.currentIds,
+                        cfg.httpTypeFillForEdit, cfg.urlFillForEdit, cfg.currentActive,
+                        cfg.editFormId, cfg.labelTextCopy, cfg.magicSuggests);
                 });
             })
-            .then(function (currRecords) {
-                config.currentIds = [];
-                config.currentRecords = [];
-                config.currentRecords[0] = $.extend(true, {}, config.recordTemplate);
-                return callBackAfter(currRecords);
+            .then(function (dbEntries) {
+                cfg.currentIds = [];
+                cfg.currentRecords = [];
+                cfg.currentRecords[0] = $.extend(true, {}, cfg.recordTemplate);
+                return callBackAfter(dbEntries);
             })
             .done(function () {
-                sddbObj.saveViewSettings(config.tableMain);
-                sddbObj.switchView(config.mainViewId, config.editFormViewId, config.editFormBtnGroupEditClass);
+                sddbObj.saveViewSettings(cfg.tableMain);
+                sddbObj.switchView(cfg.mainViewId, cfg.editFormViewId, cfg.editFormBtnGroupEditClass);
                 deferred0.resolve();
             })
             .fail(deferred0.reject);
@@ -1051,14 +1087,14 @@ var sddbConstructor = function (customConfig) {
     //submitEditForm
     sddbObj.submitEditForm = function (callBackBefore, callBackAfter, doNotSwitchToMainView) {
 
-        callBackBefore = callBackBefore || config.callBackBeforeSubmitEdit;
-        callBackAfter = callBackAfter || config.callBackAfterSubmitEdit;
+        callBackBefore = callBackBefore || sddbObj.callBackBeforeSubmitEdit;
+        callBackAfter = callBackAfter || sddbObj.callBackAfterSubmitEdit;
 
         var deferred0 = $.Deferred();
 
-        sddbObj.msValidate(config.magicSuggests);
-        if (!sddbObj.formIsValid(config.editFormId, config.currentIds.length === 0) ||
-                !sddbObj.msIsValid(config.magicSuggests)) {
+        sddbObj.msValidate(cfg.magicSuggests);
+        if (!sddbObj.formIsValid(cfg.editFormId, cfg.currentIds.length === 0) ||
+                !sddbObj.msIsValid(cfg.magicSuggests)) {
             sddbObj.showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
             return deferred0.reject();
         }
@@ -1066,16 +1102,16 @@ var sddbConstructor = function (customConfig) {
             .then(function () {
                 var createMultiple = $("#createMultiple").val() !== "" ? $("#createMultiple").val() : 1;
                 return sddbObj.modalWaitWrapper(function () {
-                    return sddbObj.submitEditsGeneric(config.editFormId, config.magicSuggests,
-                        config.currentRecords, config.httpTypeEdit, config.urlEdit, createMultiple);
+                    return sddbObj.submitEditsGeneric(cfg.editFormId, cfg.magicSuggests,
+                        cfg.currentRecords, cfg.httpTypeEdit, cfg.urlEdit, createMultiple);
                 });
             })
-            .then(function (data, currRecords) {
-                config.currentRecords = currRecords;
-                if (config.currentIds.length === 0 && data.newEntryIds) {
-                    config.currentIds = data.newEntryIds;
-                    for (var i = 0; i < config.currentIds.length; i += 1) {
-                        config.currentRecords[i].Id = config.currentIds[i];
+            .then(function (data, dbEntries) {
+                cfg.currentRecords = dbEntries;
+                if (cfg.currentIds.length === 0 && data.newEntryIds) {
+                    cfg.currentIds = data.newEntryIds;
+                    for (var i = 0; i < cfg.currentIds.length; i += 1) {
+                        cfg.currentRecords[i].Id = cfg.currentIds[i];
                     }
                 }
                 return callBackAfter(data);
@@ -1083,8 +1119,8 @@ var sddbConstructor = function (customConfig) {
             .then(function () { return sddbObj.refreshMainView(); })
             .done(function () {
                 if (!doNotSwitchToMainView) {
-                    sddbObj.switchView(config.editFormViewId, config.mainViewId,
-                        config.mainViewBtnGroupClass, config.tableMain);
+                    sddbObj.switchView(cfg.editFormViewId, cfg.mainViewId,
+                        cfg.mainViewBtnGroupClass, cfg.tableMain);
                 }
                 deferred0.resolve();
             })
@@ -1093,14 +1129,19 @@ var sddbConstructor = function (customConfig) {
         return deferred0.promise();
     };
 
+    //cancelEditForm
+    sddbObj.cancelEditForm = function () {
+        sddbObj.switchView(cfg.editFormViewId, cfg.mainViewId, cfg.mainViewBtnGroupClass, cfg.tableMain);
+    };
+
     //confirmAndDelete
     sddbObj.confirmAndDelete = function () {
-        config.currentIds = config.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (config.currentIds.length === 0) {
+        cfg.currentIds = cfg.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (cfg.currentIds.length === 0) {
             sddbObj.showModalNothingSelected();
             return;
         }
-        sddbObj.showModalConfirm("Confirm deleting " + config.currentIds.length +
+        sddbObj.showModalConfirm("Confirm deleting " + cfg.currentIds.length +
                 " row(s).", "Confirm Delete", "no", "btn btn-danger")
             .done(sddbObj.deleteRecords);
     };
@@ -1110,15 +1151,15 @@ var sddbConstructor = function (customConfig) {
         sddbObj.modalWaitWrapper(function () {
             return $.ajax({
                 type: "POST",
-                url: config.urlDelete,
+                url: cfg.urlDelete,
                 timeout: 120000,
-                data: { ids: config.currentIds },
+                data: { ids: cfg.currentIds },
                 dataType: "json"
             });
         })
             .done(function () {
-                config.currentIds = [];
-                config.currentRecords = [];
+                cfg.currentIds = [];
+                cfg.currentRecords = [];
                 sddbObj.refreshMainView();
             });
     };
@@ -1126,8 +1167,8 @@ var sddbConstructor = function (customConfig) {
     //refresh Main view 
     sddbObj.refreshMainView = function () {
         return sddbObj.modalWaitWrapper(function () {
-            return sddbObj.refreshTableGeneric(config.tableMain, config.urlRefreshMainView,
-                config.dataRefreshMainView(), config.httpTypeRefreshMainView);
+            return sddbObj.refreshTableGeneric(cfg.tableMain, cfg.urlRefreshMainView,
+                cfg.dataRefreshMainView(), cfg.httpTypeRefreshMainView);
         });
     };
 

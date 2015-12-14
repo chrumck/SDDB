@@ -144,7 +144,7 @@ $(document).ready(function () {
     //---------------------------------------editFormView----------------------------------------//
 
     ///Initialize MagicSuggest Array
-    sddb.msAddToMsArray(magicSuggests, "Id", "/PersonSrv/PersonsWoDBUser", 1);
+    sddb.msAddToArray("Id", "/PersonSrv/PersonsWoDBUser");
    
     //----------------------------------------dBRolesView----------------------------------------//
 

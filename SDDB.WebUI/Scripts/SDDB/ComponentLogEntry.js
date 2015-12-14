@@ -175,10 +175,10 @@ $(document).ready(function () {
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
 
     //Initialize MagicSuggest Array
-    sddb.msAddToMsArray(magicSuggests, "Component_Id", "/ComponentSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "ComponentStatus_Id", "/ComponentStatusSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
+    sddb.msAddToArray("Component_Id", "/ComponentSrv/Lookup");
+    sddb.msAddToArray("ComponentStatus_Id", "/ComponentStatusSrv/Lookup");
+    sddb.msAddToArray("AssignedToProject_Id", "/ProjectSrv/Lookup");
+    sddb.msAddToArray("AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup");
 
     //--------------------------------------View Initialization------------------------------------//
 

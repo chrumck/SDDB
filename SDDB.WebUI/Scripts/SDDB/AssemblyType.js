@@ -1,4 +1,4 @@
-﻿/*global sddb, sddbConf*/
+﻿/*global sddb*/
 /// <reference path="../DataTables/jquery.dataTables.js" />
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
@@ -7,8 +7,6 @@
 /// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
-
-"use strict";
 
 //--------------------------------------Global Properties------------------------------------//
 
@@ -50,18 +48,6 @@ sddb.setConfig({
         Attr14Desc: null,
         Attr15Type: null,
         Attr15Desc: null
-    },
-
-    labelTextCreate: "Create Assembly Type",
-    labelTextEdit: "Edit Assembly Type",
-    urlFillForEdit: "/AssemblyTypeSrv/GetByIds",
-    urlEdit: "/AssemblyTypeSrv/Edit",
-    urlDelete: "/AssemblyTypeSrv/Delete",
-    urlRefreshMainView: "/AssemblyTypeSrv/Get",
-
-    callBackAfterCreate: function () {
-        $("#editForm select").find("option:first").prop("selected", "selected");
-        return $.Deferred().resolve();
     },
 
     tableMainColumnSets: [
@@ -149,19 +135,34 @@ sddb.setConfig({
             infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
-    })
+    }),
+
+    labelTextCreate: "Create Assembly Type",
+    labelTextEdit: "Edit Assembly Type",
+    urlFillForEdit: "/AssemblyTypeSrv/GetByIds",
+    urlEdit: "/AssemblyTypeSrv/Edit",
+    urlDelete: "/AssemblyTypeSrv/Delete",
+    urlRefreshMainView: "/AssemblyTypeSrv/Get"
+
 });
 
-//reloading config
-sddbConf = sddb.getConfig();
+//callBackAfterCreate
+sddb.callBackAfterCreate = function () {
+    "use strict";
 
+    $("#editForm select").find("option:first").prop("selected", "selected");
+    return $.Deferred().resolve();
+};
 
+//----------------------------------------------setup after page load------------------------------------------------//
 $(document).ready(function () {
-
+    "use strict";
+    
     //--------------------------------------View Initialization------------------------------------//
 
     sddb.refreshMainView();
     sddb.switchView();
-    
+
+    //--------------------------------End of setup after page load---------------------------------//   
 });
 

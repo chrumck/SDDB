@@ -9,16 +9,10 @@
 
 "use strict";
 
-//--------------------------------------Global Properties------------------------------------//
+//--------------------------------------Global Variables-------------------------------------//
 
-//global sddb object
-var sddb,
-//global sddb configuration
-sddbConf;
-
-//initialize sddb object
-sddb = sddbConstructor();
-sddbConf = sddb.getConfig();
+//set up global sddb object
+var sddb = sddbConstructor();
 
 //----------------------------------Custom Unobtrusive Validation----------------------------//
 
@@ -56,7 +50,7 @@ $.validator.addMethod("dbisdatetimeiso", function (value, element, valParams) {
 $.ajaxSetup({ cache: false });
 
 
-
+//----------------------------------------------setup after page load------------------------------------------------//
 $(document).ready(function () {
 
     //---------------------------------------Global Settings-------------------------------------//
@@ -106,7 +100,7 @@ $(document).ready(function () {
     $("#btnCopy").click(function (event) { sddb.prepareFormForCopy(); });
 
     //Wire up btnDelete 
-    $("#btnDelete").click(function () { sddb.confirmAndDelete(); });
+    $("#btnDelete").click(function (event) { sddb.confirmAndDelete(); });
 
     //TODO: refactor columnSelectId so it's not repeated n times
     //wire up columnsSelectId1
@@ -168,19 +162,10 @@ $(document).ready(function () {
     //---------------------------------------DataTables------------
 
     //wire up btnTableMainExport
-    $("#btnTableMainExport").click(function (event) { sddb.exportTableToTxt(sddbConf.tableMain); });
+    $("#btnTableMainExport").click(function (event) { sddb.exportTableToTxt(); });
 
     //Wire up chBoxShowDeleted
-    $("#chBoxShowDeleted").change(function (event) {
-        if (!$(this).prop("checked")) {
-            sddb.setCurrentActive(true);
-            $("#panelTableMain").removeClass("panel-tdo-danger").addClass(sddbConf.panelTableMainClass);
-        } else {
-            sddb.setCurrentActive(false);
-            $("#panelTableMain").removeClass(sddbConf.panelTableMainClass).addClass("panel-tdo-danger");
-        }
-        sddb.refreshMainView();
-    });
+    $("#chBoxShowDeleted").change(function (event) { sddb.switchTableToActive(!$(this).prop("checked")); });
 
     //initializing table view
     sddb.showColumnSet();
@@ -188,16 +173,12 @@ $(document).ready(function () {
     //---------------------------------------editFormView----------------------------------------//
 
     //Wire Up editFormBtnCancel
-    $("#editFormBtnCancel").click(function () {
-        sddb.switchView(sddbConf.editFormViewId, sddbConf.mainViewId,
-            sddbConf.mainViewBtnGroupClass, sddbConf.tableMain);
-    });
+    $("#editFormBtnCancel").click(function (event) { sddb.cancelEditForm(); });
 
     //Wire Up editFormBtnOk
-    $("#editFormBtnOk").click(function (event) {
-        sddb.submitEditForm();
-    });
+    $("#editFormBtnOk").click(function (event) { sddb.submitEditForm(); });
 
+    //--------------------------------End of setup after page load---------------------------------//
 });
 
 

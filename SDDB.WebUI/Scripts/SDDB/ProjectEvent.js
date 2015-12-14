@@ -118,9 +118,9 @@ $(document).ready(function () {
     //---------------------------------------editFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    sddb.msAddToMsArray(magicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    sddb.msAddToMsArray(magicSuggests, "CreatedByPerson_Id", "/PersonSrv/LookupFromProject", 1);
-    sddb.msAddToMsArray(magicSuggests, "ClosedByPerson_Id", "/PersonSrv/LookupFromProject", 1);
+    sddb.msAddToArray("AssignedToProject_Id", "/ProjectSrv/Lookup");
+    sddb.msAddToArray("CreatedByPerson_Id", "/PersonSrv/LookupFromProject");
+    sddb.msAddToArray("ClosedByPerson_Id", "/PersonSrv/LookupFromProject");
 
     //Enable DateTimePicker
     $("[data-val-dbisdatetimeiso]").datetimepicker({ format: "YYYY-MM-DD HH:mm" })
