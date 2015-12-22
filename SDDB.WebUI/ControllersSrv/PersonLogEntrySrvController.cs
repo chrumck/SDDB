@@ -35,27 +35,54 @@ namespace SDDB.WebUI.ControllersSrv
         
         // POST: /PersonLogEntrySrv/GetByIds
         [HttpPost]
-        [DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
-        public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true, bool filterForPLEView = false)
+        [DBSrvAuth("PersonLogEntry_View")]
+        public async Task<ActionResult> GetByIds(string[] ids, bool getActive = true)
         {
             ViewBag.ServiceName = "PersonLogEntryService.GetAsync";
-            var records = await personLogEntryService.GetAsync(ids, getActive, filterForPLEView).ConfigureAwait(false);
+            var records = await personLogEntryService.GetAsync(ids, getActive, true).ConfigureAwait(false);
             return DbJsonDateTime(records);
         }
 
         // POST: /PersonLogEntrySrv/GetByAltIds
         [HttpPost]
-        [DBSrvAuth("PersonLogEntry_View,YourActivity_View")]
+        [DBSrvAuth("PersonLogEntry_View")]
         public async Task<ActionResult> GetByAltIds(string[] personIds, string[] projectIds, string[] assyIds, string[] typeIds,
-            DateTime? startDate, DateTime? endDate, bool getActive = true, bool filterForPLEView = false)
+            DateTime? startDate, DateTime? endDate, bool getActive = true)
         {
             ViewBag.ServiceName = "PersonLogEntryService.GetByAltIdsAsync";
             var records = await personLogEntryService
-                .GetByAltIdsAsync(personIds, projectIds, assyIds, typeIds, startDate, endDate, getActive, filterForPLEView)
+                .GetByAltIdsAsync(personIds, projectIds, assyIds, typeIds, startDate, endDate, getActive, true)
                 .ConfigureAwait(false);
             return DbJsonDateTime(records);
         }
-        
+
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        // POST: /PersonLogEntrySrv/GetYourByIds
+        [HttpPost]
+        [DBSrvAuth("YourActivity_View")]
+        public async Task<ActionResult> GetYourByIds(string[] ids, bool getActive = true)
+        {
+            ViewBag.ServiceName = "PersonLogEntryService.GetAsync";
+            var records = await personLogEntryService.GetAsync(ids, getActive, false).ConfigureAwait(false);
+            return DbJsonDateTime(records);
+        }
+
+        // POST: /PersonLogEntrySrv/GetYourByAltIds
+        [HttpPost]
+        [DBSrvAuth("YourActivity_View")]
+        public async Task<ActionResult> GetYourByAltIds(string[] personIds, string[] projectIds, string[] assyIds, string[] typeIds,
+            DateTime? startDate, DateTime? endDate, bool getActive = true)
+        {
+            ViewBag.ServiceName = "PersonLogEntryService.GetByAltIdsAsync";
+            var records = await personLogEntryService
+                .GetByAltIdsAsync(personIds, projectIds, assyIds, typeIds, startDate, endDate, getActive, false)
+                .ConfigureAwait(false);
+            return DbJsonDateTime(records);
+        }
+
+        //-----------------------------------------------------------------------------------------------------------------------
+
         // POST: /PersonLogEntrySrv/GetActivitySummaries
         [HttpPost]
         [DBSrvAuth("YourActivity_View,ActivitySummary_ViewOthers")]
@@ -121,23 +148,23 @@ namespace SDDB.WebUI.ControllersSrv
 
         // GET: /PersonLogEntrySrv/GetPrsLogEntryAssys
         [DBSrvAuth("PersonLogEntry_View,YourActivity_View,Assembly_View")]
-        public async Task<ActionResult> GetPrsLogEntryAssys(string logEntryId)
+        public async Task<ActionResult> GetPrsLogEntryAssys(string[] logEntryIds)
         {
             ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryAssysAsync";
-            if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
+            if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(logEntryIds).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
-            var records = await personLogEntryService.GetPrsLogEntryAssysAsync(logEntryId).ConfigureAwait(false);
+            var records = await personLogEntryService.GetPrsLogEntryAssysAsync(logEntryIds).ConfigureAwait(false);
             return DbJson(filterForJsonAssys(records));
         }
 
         // GET: /PersonLogEntrySrv/GetPrsLogEntryAssysNot
         [DBSrvAuth("PersonLogEntry_View,YourActivity_View,Assembly_View")]
-        public async Task<ActionResult> GetPrsLogEntryAssysNot(string logEntryId, string locId = null)
+        public async Task<ActionResult> GetPrsLogEntryAssysNot(string[] logEntryIds, string locId = null)
         {
             ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryAssysNotAsync";
-            if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
+            if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(logEntryIds).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
-            var records = await personLogEntryService.GetPrsLogEntryAssysNotAsync(logEntryId, locId).ConfigureAwait(false);
+            var records = await personLogEntryService.GetPrsLogEntryAssysNotAsync(logEntryIds, locId).ConfigureAwait(false);
             return DbJson(filterForJsonAssys(records));
         }
 
@@ -157,23 +184,23 @@ namespace SDDB.WebUI.ControllersSrv
 
         // GET: /PersonLogEntrySrv/GetPrsLogEntryPersons
         [DBSrvAuth("PersonLogEntry_View,YourActivity_View,Person_View")]
-        public async Task<ActionResult> GetPrsLogEntryPersons(string logEntryId)
+        public async Task<ActionResult> GetPrsLogEntryPersons(string[] logEntryIds)
         {
             ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryPersonsAsync";
-            if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
+            if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(logEntryIds).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
-            var records = await personLogEntryService.GetPrsLogEntryPersonsAsync(logEntryId).ConfigureAwait(false);
+            var records = await personLogEntryService.GetPrsLogEntryPersonsAsync(logEntryIds).ConfigureAwait(false);
             return DbJson(filterForJsonPersons(records));
         }
 
         // GET: /PersonLogEntrySrv/GetPrsLogEntryPersonsNot
         [DBSrvAuth("PersonLogEntry_View,YourActivity_View,Person_View")]
-        public async Task<ActionResult> GetPrsLogEntryPersonsNot(string logEntryId)
+        public async Task<ActionResult> GetPrsLogEntryPersonsNot(string[] logEntryIds)
         {
             ViewBag.ServiceName = "PersonLogEntryService.GetPrsLogEntryPersonsNotAsync";
-            if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(new[] { logEntryId }).ConfigureAwait(false)))
+            if (!User.IsInRole("PersonLogEntry_View") && !(await isUserActivity(logEntryIds).ConfigureAwait(false)))
                 { return JsonResponseForNoRights(); }
-            var records = await personLogEntryService.GetPrsLogEntryPersonsNotAsync(UserId, logEntryId).ConfigureAwait(false);
+            var records = await personLogEntryService.GetPrsLogEntryPersonsNotAsync(logEntryIds).ConfigureAwait(false);
             return DbJson(filterForJsonPersons(records));
         }
 

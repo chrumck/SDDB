@@ -10,6 +10,11 @@
     background-repeat: no-repeat;
 }
 
+section {
+padding-top:40px;
+margin-top:-40px;
+}
+
 /* Set padding to keep content from hitting the edges */
 .body-content {
     padding-left: 15px;

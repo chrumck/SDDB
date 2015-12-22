@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Net;
-using System.Reflection;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Transactions;
 using Mehdime.Entity;
 
 using SDDB.Domain.Entities;
 using SDDB.Domain.DbContexts;
 using SDDB.Domain.Infrastructure;
+using SDDB.Domain.Abstract;
 
 namespace SDDB.Domain.Services
 {
@@ -20,10 +16,15 @@ namespace SDDB.Domain.Services
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
+        private IAppUserManager appUserManager;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
 
-        public PersonLogEntryService(IDbContextScopeFactory contextScopeFac, string userId) : base(contextScopeFac, userId) { }
+        public PersonLogEntryService(IDbContextScopeFactory contextScopeFac, string userId, IAppUserManager appUserManager) 
+            : base(contextScopeFac, userId) 
+        {
+            this.appUserManager = appUserManager;
+        }
         
         
         //Methods--------------------------------------------------------------------------------------------------------------//
@@ -49,11 +50,9 @@ namespace SDDB.Domain.Services
 
         //get by PersonLogEntry ids
         public virtual async Task<List<PersonLogEntryJSON>> GetAsync(string[] ids, bool getActive = true,
-            bool filterForPLEView = false)
+            bool filterForPLEView = true)
         {
             if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
-
-            if (!(await userIsInRoleHelperAsync("YourActivity_View").ConfigureAwait(false))) { filterForPLEView = true; }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
@@ -62,6 +61,8 @@ namespace SDDB.Domain.Services
                 var records = await dbContext.PersonLogEntrys
                     .Where(x =>
                         (!filterForPLEView || x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId)) &&
+                        (filterForPLEView || 
+                            x.EnteredByPerson_Id == userId || x.PrsLogEntryPersons.Any(y => y.Id == userId)) &&
                         ids.Contains(x.Id) &&
                         x.IsActive_bl == getActive
                         )
@@ -127,13 +128,6 @@ namespace SDDB.Domain.Services
                     })
                     .ToListAsync().ConfigureAwait(false);
 
-                if (!(await userIsInRoleHelperAsync("PersonLogEntry_View").ConfigureAwait(false)))
-                {
-                    records = records.Where(x =>
-                            x.EnteredByPerson_Id == userId || x.PrsLogEntryPersons.Any(y => y.Id == userId))
-                        .ToList();
-                }
-
                 records.ForEach(x =>
                 {
                     x.PrsLogEntryPersonsInitials = x.PrsLogEntryPersons.Aggregate("", (initials, person) =>
@@ -147,14 +141,12 @@ namespace SDDB.Domain.Services
         //get by personIds, projectIds, typeIds, startDate, endDate
         public virtual async Task<List<PersonLogEntryJSON>> GetByAltIdsAsync(string[] personIds, string[] projectIds,
             string[] assyIds, string[] typeIds, DateTime? startDate, DateTime? endDate, bool getActive = true,
-            bool filterForPLEView = false)
+            bool filterForPLEView = true)
         {
             personIds = personIds ?? new string[] { };
             projectIds = projectIds ?? new string[] { };
             assyIds = assyIds ?? new string[] { };
             typeIds = typeIds ?? new string[] { };
-
-            if (!(await userIsInRoleHelperAsync("YourActivity_View").ConfigureAwait(false))) { filterForPLEView = true; }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
@@ -163,6 +155,8 @@ namespace SDDB.Domain.Services
                 var records = await dbContext.PersonLogEntrys
                        .Where(x =>
                            (!filterForPLEView || x.AssignedToProject.ProjectPersons.Any(y => y.Id == userId)) &&
+                           (filterForPLEView ||
+                            x.EnteredByPerson_Id == userId || x.PrsLogEntryPersons.Any(y => y.Id == userId)) &&
                            (personIds.Count() == 0 || x.PrsLogEntryPersons.Any(y => personIds.Contains(y.Id)) ||
                                 personIds.Contains(x.EnteredByPerson_Id)) &&
                            (projectIds.Count() == 0 || projectIds.Contains(x.AssignedToProject_Id)) &&
@@ -229,14 +223,7 @@ namespace SDDB.Domain.Services
                             IsActive_bl = x.IsActive_bl
                         })
                        .ToListAsync().ConfigureAwait(false);
-
-                if (!(await userIsInRoleHelperAsync("PersonLogEntry_View").ConfigureAwait(false)))
-                {
-                    records = records.Where(x =>
-                            x.EnteredByPerson_Id == userId || x.PrsLogEntryPersons.Any(y => y.Id == userId))
-                        .ToList();
-                }
-
+                                
                 records.ForEach(x =>
                 {
                     x.PrsLogEntryPersonsInitials = x.PrsLogEntryPersons.Aggregate("",(initials, person) =>
@@ -246,6 +233,8 @@ namespace SDDB.Domain.Services
                 return records;
             }
         }
+
+        //-----------------------------------------------------------------------------------------------------------------------
 
         //GetActivitySummariesAsync
         public virtual async Task<List<ActivitySummary>> GetActivitySummariesAsync(string personId, 
@@ -345,35 +334,34 @@ namespace SDDB.Domain.Services
         //-----------------------------------------------------------------------------------------------------------------------
 
         //get all person log entry assemblies
-        public virtual Task<List<AssemblyDb>> GetPrsLogEntryAssysAsync(string logEntryId)
+        public virtual Task<List<AssemblyDb>> GetPrsLogEntryAssysAsync(string[] logEntryIds)
         {
-            if (String.IsNullOrEmpty(logEntryId)) { throw new ArgumentNullException("logEntryId"); }
+            if (logEntryIds == null || logEntryIds.Length == 0) { throw new ArgumentNullException("ids"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                
+
                 return dbContext.AssemblyDbs
-                    .Where(x => x.AssemblyDbPrsLogEntrys.Any(y => y.Id == logEntryId) && x.IsActive_bl)
+                    .Where(x => x.AssemblyDbPrsLogEntrys.Any(y => logEntryIds.Contains(y.Id)) && x.IsActive_bl)
                     .ToListAsync();
             }
         }
 
         //get all active assemblies from the location not assigned to log entry
-        public virtual Task<List<AssemblyDb>> GetPrsLogEntryAssysNotAsync(string logEntryId, string locId)
+        public virtual Task<List<AssemblyDb>> GetPrsLogEntryAssysNotAsync(string[] logEntryIds, string locId)
         {
-            if (String.IsNullOrEmpty(logEntryId)) { throw new ArgumentNullException("logEntryId"); }
-            
+            if (logEntryIds == null || logEntryIds.Length == 0) { throw new ArgumentNullException("ids"); }
             locId = locId ?? String.Empty;
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                
+
                 return dbContext.AssemblyDbs
                     .Where(x =>
-                        !x.AssemblyDbPrsLogEntrys.Any(y => y.Id == logEntryId) &&
-                        x.IsActive_bl && 
+                        !x.AssemblyDbPrsLogEntrys.Any(y => logEntryIds.Contains(y.Id)) &&
+                        x.IsActive_bl &&
                         (locId == String.Empty || x.AssignedToLocation_Id == locId)
                     )
                     .ToListAsync();
@@ -387,32 +375,37 @@ namespace SDDB.Domain.Services
         //-----------------------------------------------------------------------------------------------------------------------
         
         //get all person log entry persons
-        public virtual Task<List<Person>> GetPrsLogEntryPersonsAsync(string logEntryId)
+        public virtual Task<List<Person>> GetPrsLogEntryPersonsAsync(string[] logEntryIds)
         {
-            if (String.IsNullOrEmpty(logEntryId)) { throw new ArgumentNullException("logEntryId"); }
+            if (logEntryIds == null || logEntryIds.Length == 0) { throw new ArgumentNullException("ids"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 return dbContext.Persons
-                    .Where(x => x.PersonPrsLogEntrys.Any(y => y.Id == logEntryId) && x.IsActive_bl)
+                    .Where(x => x.PersonPrsLogEntrys.Any(y => logEntryIds.Contains(y.Id)) && x.IsActive_bl)
                     .ToListAsync();
             }
         }
 
         //get all active persons managed by user and not assigned to log entry
-        public virtual Task<List<Person>> GetPrsLogEntryPersonsNotAsync(string userId, string logEntryId)
+        public virtual Task<List<Person>> GetPrsLogEntryPersonsNotAsync(string[] logEntryIds)
         {
-            if (String.IsNullOrEmpty(userId)) { throw new ArgumentNullException("userId"); }
-            if (String.IsNullOrEmpty(logEntryId)) { throw new ArgumentNullException("logEntryId"); }
+            if (logEntryIds == null || logEntryIds.Length == 0) { throw new ArgumentNullException("ids"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.PersonGroups
-                    .Where(x => x.GroupManagers.Any(y => y.Id == userId)).SelectMany(x => x.GroupPersons).Distinct()
-                    .Where(x => x.IsActive_bl && !x.PersonPrsLogEntrys.Any(y => y.Id == logEntryId))
+                
+                //return dbContext.PersonGroups
+                //    .Where(x => x.GroupManagers.Any(y => y.Id == userId)).SelectMany(x => x.GroupPersons).Distinct()
+                //    .Where(x => !x.PersonPrsLogEntrys.Any(y => logEntryIds.Contains(y.Id)) && x.IsActive_bl)
+                //    .ToListAsync();
+
+                return dbContext.Persons
+                    .Where(x => x.PersonGroups.Any(y => y.GroupManagers.Any(z => z.Id == userId)) &&
+                    !x.PersonPrsLogEntrys.Any(y => logEntryIds.Contains(y.Id)) && x.IsActive_bl)
                     .ToListAsync();
             }
         }
@@ -460,18 +453,30 @@ namespace SDDB.Domain.Services
             var location = await dbContext.Locations.FindAsync(record.AssignedToLocation_Id).ConfigureAwait(false);
             if (record.AssignedToLocation_Id != null && location.AssignedToProject_Id != record.AssignedToProject_Id)
             { throw new DbBadRequestException("Log Entry and Location do not belong to the same project.\n Entry(ies) not saved."); }
+
+            var recordProject = await dbContext.Projects.Where(x => x.Id == record.AssignedToProject_Id)
+                .Include(x => x.ProjectPersons).FirstOrDefaultAsync().ConfigureAwait(false);
+            if (recordProject.ProjectPersons.All(x => x.Id != userId))
+            { throw new DbBadRequestException("Log Entry assigned to project which is not managed by you.\nEntry(ies) not saved."); }
+
+            var logEntry = await dbContext.PersonLogEntrys.Where(x => x.Id == record.Id)
+                .Include(x => x.AssignedToProject.ProjectPersons).FirstOrDefaultAsync().ConfigureAwait(false);
+            if (logEntry != null && logEntry.AssignedToProject.ProjectPersons.All(x => x.Id != userId))
+            { throw new DbBadRequestException("Log Entry you try to modify is assigned to project which is not managed by you.\nEntry(ies) not saved."); }
+
         }
 
         //checkBeforeQcHelperAsync
         private async Task checkBeforeQcHelperAsync(PersonLogEntry record)
         {
-            if (!await userIsInRoleHelperAsync("PersonLogEntry_Qc"))
+            if (!(await appUserManager.IsInRoleAsync(userId, "PersonLogEntry_Qc").ConfigureAwait(false)))
             { throw new DbBadRequestException("You do not have sufficient rights to QC Person Entries."); }
 
-            if (record.EnteredByPerson_Id == userId)
+            if (record.EnteredByPerson_Id == userId) 
             { throw new DbBadRequestException("You cannot QC your own entry."); }
         }
 
+        
         //-----------------------------------------------------------------------------------------------------------------------
 
         //checkBeforeAddRemoveHelperAsync - overriden from BaseDbService

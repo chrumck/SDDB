@@ -30,6 +30,8 @@ namespace SDDB.Domain.Abstract
         Task<IdentityResult> AddToRoleAsync(string userId, string dbRole);
         Task<IdentityResult> RemoveFromRolesAsync(string userId, params string[] roles);
         Task<IdentityResult> RemoveFromRoleAsync(string userId, string dbRole);
+        Task<bool> IsInRoleAsync(string userId, string role);
+
 
         string HashPassword(string password);
 

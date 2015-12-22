@@ -1,0 +1,88 @@
+﻿@{
+    ViewBag.Title = "SDDB Help";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-10">
+            <h2 class="text-center">SDDB Help</h2>
+            <div class="well well-tdo">
+                <section id="GeneralDescription">
+                    <h3>General Description</h3>
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <strong>SDDB</strong> is a database with a web page user interface which purpose is to help track progress of the company's projects, track hardware usage belonging to the company, as well as  record people activities and training progress.
+                        </div>
+                    </div>
+                    <p>
+                        The main logical structure of the information contained in SDDB starts with <a href="#Projects">Projects</a>. SDDB Projects usually reflect the actual projects executed by the company, but can also represent company divisions or accounts like General & Administrative or Stock.
+                        Projects are divided into smaller parts called <a href="#Locations">Locations</a>. Locations most often represent geographical areas of a Project (tunnel, excavation, building etc.), but can also split the Project into other logical parts (for example server or office).
+                        Locations are in turn collections of <a href="#Assemblies">Assemblies</a>. Assemblies are monitoring subsystems or installations which usually represent instruments or groups of instruments. The examples of an Assembly is an AMTS installation (a Total Station with a control box, a power supply) or an MPBX Assembly (with an MPBX instrument, a datalogger and a battery). An Assembly can also be a MULTIROLE system comprising of a control box collecting data from several types of instruments at once like Crack Gages, Tilt Meters, Piezometer, In-Place Inclinometers.
+                        Assemblies are also collections of <a href="#Components">Components</a>. Components represent any piece of hardware which is a part of an installation or a subsystem mentioned above and has one or more of the following attributes: is reusable and is moved between Assemblies (including changing Projects); is valuable enough to be tracked and maintained; is uniquely distinguishable by a serial number or other tag; needs to be calibrated on regular basis.
+                    </p>
+                    <hr />
+                    <p>
+                        It is worth noting that a balance is needed on how many Locations, Assemblies and Components are created for each Project. On one hand, the division has to be granular enough so the logical divisions do not become too vague. On the other hand, if the division is too detailed, the structure is very often redundant. Please remember that the structure of Project -> Location -> Assembly has to primarily meet two goals: Firstly, it has to be relatively easy to memorize and allow to quickly navigate down the tree of the division. Secondly, each recorded staff Activity is assigned to a Location and an Assembly. The assignment itself should be clear enough so little additional information or comments are needed in order to define the given activity in more detail.
+                        A sign of a structure which may be not optimal is when there is only one element in a given group (for example once Assembly in a Location). It may be useful in this case to merge this group with another one. Conversely, if there are hundreds or thousands of elements in a group (for example Components in an Assembly), it may be beneficial to split the group into smaller parts.
+                    </p>
+                </section>
+                
+                <section id="GeneralTips">
+                    <h3>General Usage Tips</h3>
+                    <p>
+                        not finished
+
+                        
+                    </p>
+                </section>
+                
+                <section id="Projects">
+                    <h3>Projects <small><a href="@Url.Action("Index","Project",null)" target="_blank"><span class="glyphicon glyphicon-new-window"></span></a></small></h3>
+                    <p>
+                        not finished
+                    </p>
+                    
+                </section>
+
+                <section id="Locations">
+                    <h3>Locations <small><a href="@Url.Action("Index","Location",null)" target="_blank"><span class="glyphicon glyphicon-new-window"></span></a></small></h3>
+                    <p>
+                        not finished
+                                                
+                    </p>
+                </section>
+
+                <section id ="Assemblies">
+                    <h3>Assemblies <small><a href="@Url.Action("Index","AssemblyDb",null)" target="_blank"><span class="glyphicon glyphicon-new-window"></span></a></small></h3>
+                    <p>
+                        not finished
+
+                        All assembled boxes have to be immediately tagged with an Assembly name, even if it’s not exactly certain that the box is going to be used for the chosen Assembly.  If you later need to move the box to another Assembly, you change the tag on it and move the Components and the related Person Activities entered during box build to the target Assembly.
+                        Remember that you will not see Assemblies of the projects you are not assigned to.
+
+
+                    </p>
+                </section>
+
+                <section id="Components">
+                    <h3>Components <small><a href="@Url.Action("Index","Component",null)" target="_blank"><span class="glyphicon glyphicon-new-window"></span></a></small></h3>
+                    <p>
+                        not finished
+                    </p>
+                </section>
+
+            </div>
+        </div>
+
+
+        @*<div class="col-xs-3">
+
+        </div>*@
+    </div>
+    
+
+</div>
+
+
+    
+

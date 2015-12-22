@@ -94,7 +94,7 @@ namespace SDDB.UnitTests
         }
 
         [TestMethod]
-        public void AssemblyLogEntryService_GetAsync_DoeNotReturnFromWrongProject()
+        public void AssemblyLogEntryService_GetAsync_ReturnsFromNotManagedProject()
         {
             //Arrange
             var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
@@ -116,7 +116,12 @@ namespace SDDB.UnitTests
                 ProjectPersons = new List<Person> { projectPerson1 }
             };
 
-            var location1 = new Location { Id = "dummyLocId1", LocName = "Loc1", AssignedToProject_Id = project1.Id, AssignedToProject = project1 };
+            var location1 = new Location {
+                Id = "dummyLocId1",
+                LocName = "Loc1",
+                AssignedToProject_Id = project1.Id,
+                AssignedToProject = project1
+            };
 
             var project2 = new Project
             {
@@ -125,10 +130,15 @@ namespace SDDB.UnitTests
                 ProjectAltName = "ProjectAlt2",
                 IsActive_bl = false,
                 ProjectCode = "CODE2",
-                ProjectPersons = new List<Person> { projectPerson2 }
+                ProjectPersons = new List<Person> { projectPerson1, projectPerson2 }
             };
 
-            var location2 = new Location { Id = "dummyLocId2", LocName = "Loc2", AssignedToProject_Id = project2.Id, AssignedToProject = project2 };
+            var location2 = new Location {
+                Id = "dummyLocId2",
+                LocName = "Loc2",
+                AssignedToProject_Id = project2.Id,
+                AssignedToProject = project2
+            };
 
             var dbEntry1 = new AssemblyLogEntry
             {
@@ -160,13 +170,13 @@ namespace SDDB.UnitTests
 
             mockEfDbContext.Setup(x => x.AssemblyLogEntrys).Returns(mockDbSet.Object);
 
-            var assyLogEntryService = new AssemblyLogEntryService(mockDbContextScopeFac.Object, projectPerson1.Id);
+            var assyLogEntryService = new AssemblyLogEntryService(mockDbContextScopeFac.Object, "dummyUserId0");
 
             //Act
             var resultAssemblyLogEntrys = assyLogEntryService.GetAsync(new[] { "dummyEntryId1", "dummyEntryId2" }).Result;
 
             //Assert
-            Assert.IsTrue(resultAssemblyLogEntrys.Count == 0);
+            Assert.IsTrue(resultAssemblyLogEntrys.Count == 1);
         }
 
         [TestMethod]
