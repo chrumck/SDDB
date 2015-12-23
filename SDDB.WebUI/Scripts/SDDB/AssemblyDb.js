@@ -241,8 +241,7 @@ sddb.updateMainViewForSelectedType = function () {
         switchMainViewForExtendedHelper(false);
         return deferred0.resolve();
     }
-    sddb.updateTableForExtended(sddb.cfg.extHttpTypeTypeUpd, sddb.cfg.extUrlTypeUpd,
-            { ids: sddb.msFilterByType.getValue()[0] }, sddb.cfg.tableMain)
+    sddb.updateTableForExtended({ ids: sddb.msFilterByType.getValue()[0] })
         .done(function (typeHasAttrs) {
             switchMainViewForExtendedHelper(typeHasAttrs);
             return deferred0.resolve();
@@ -258,8 +257,7 @@ sddb.updateFormForSelectedType = function () {
     $("#" + sddb.cfg.extEditFormId).addClass("hidden");
     if (sddb.cfg.magicSuggests[0].getValue().length == 1 && sddb.cfg.magicSuggests[0].getValue()[0] != "_VARIES_") {
         return sddb.modalWaitWrapper(function () {
-            return sddb.updateFormForExtended(sddb.cfg.extHttpTypeTypeUpd, sddb.cfg.extUrlTypeUpd,
-                    { ids: sddb.cfg.magicSuggests[0].getValue()[0] }, sddb.cfg.extEditFormId)
+            return sddb.updateFormForExtended({ ids: sddb.cfg.magicSuggests[0].getValue()[0] })
                 .then(function (typeHasAttrs) {
                     if (typeHasAttrs) { $("#" + sddb.cfg.extEditFormId).removeClass("hidden"); }
                 });

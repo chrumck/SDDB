@@ -343,7 +343,10 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 return dbContext.AssemblyDbs
-                    .Where(x => x.AssemblyDbPrsLogEntrys.Any(y => logEntryIds.Contains(y.Id)) && x.IsActive_bl)
+                    .Where(x => 
+                        x.AssemblyDbPrsLogEntrys.Any(y => logEntryIds.Contains(y.Id)) &&
+                        x.IsActive_bl
+                    )
                     .ToListAsync();
             }
         }
@@ -360,9 +363,10 @@ namespace SDDB.Domain.Services
 
                 return dbContext.AssemblyDbs
                     .Where(x =>
-                        !x.AssemblyDbPrsLogEntrys.Any(y => logEntryIds.Contains(y.Id)) &&
-                        x.IsActive_bl &&
-                        (locId == String.Empty || x.AssignedToLocation_Id == locId)
+                        x.AssignedToLocation.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
+                        !logEntryIds.All(y => x.AssemblyDbPrsLogEntrys.Select(z => z.Id).Contains(y)) &&
+                        (locId == String.Empty || x.AssignedToLocation_Id == locId) &&
+                        x.IsActive_bl
                     )
                     .ToListAsync();
             }
@@ -384,7 +388,10 @@ namespace SDDB.Domain.Services
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
 
                 return dbContext.Persons
-                    .Where(x => x.PersonPrsLogEntrys.Any(y => logEntryIds.Contains(y.Id)) && x.IsActive_bl)
+                    .Where(x => 
+                        x.PersonPrsLogEntrys.Any(y => logEntryIds.Contains(y.Id)) &&
+                        x.IsActive_bl
+                    )
                     .ToListAsync();
             }
         }
@@ -404,8 +411,10 @@ namespace SDDB.Domain.Services
                 //    .ToListAsync();
 
                 return dbContext.Persons
-                    .Where(x => x.PersonGroups.Any(y => y.GroupManagers.Any(z => z.Id == userId)) &&
-                    !x.PersonPrsLogEntrys.Any(y => logEntryIds.Contains(y.Id)) && x.IsActive_bl)
+                    .Where(x => 
+                        x.PersonGroups.Any(y => y.GroupManagers.Any(z => z.Id == userId)) &&
+                        !logEntryIds.All(y => x.PersonPrsLogEntrys.Select(z => z.Id).Contains(y)) &&
+                        x.IsActive_bl)
                     .ToListAsync();
             }
         }

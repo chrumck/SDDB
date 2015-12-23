@@ -54,11 +54,9 @@ callBackAfterEdit = function (currRecords) {
         return sddb.fillFormForRelatedGeneric(
                     tableLogEntryAssysAdd, tableLogEntryAssysRemove, currentIds,
                     "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys",
-                    { logEntryId: currentIds[0] },
+                    { ids: currentIds },
                     "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
-                    { logEntryId: currentIds[0], locId: magicSuggests[3].getValue()[0] },
-                    "GET", "AssemblyDbSrv/LookupByLocDTables",
-                    { locId: magicSuggests[3].getValue()[0], getActive: true } );
+                    { ids: currentIds, locId: magicSuggests[3].getValue()[0] });
     });
 };
 
@@ -261,9 +259,8 @@ $(document).ready(function () {
         if ($("#logEntryPersonsView").hasClass("hidden")) {
             sddb.showModalWait();
             sddb.fillFormForRelatedGeneric(tableLogEntryPersonsAdd, tableLogEntryPersonsRemove, currentIds,
-                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { logEntryId: currentIds[0] },
-                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { logEntryId: currentIds[0] },
-                "GET", "/PersonSrv/Get", { getActive: true })
+                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { ids: currentIds },
+                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { ids: currentIds })
                 .always(sddb.hideModalWait)
                 .done(function () {
                     $("#logEntryPersonsView").removeClass("hidden");

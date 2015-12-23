@@ -276,7 +276,9 @@ namespace SDDB.UnitTests
                 //Assert
                 Assert.IsTrue(exception.GetBaseException().GetType() == typeof(DbBadRequestException));
                 Assert.IsTrue(exception.GetBaseException().ToString().Contains("You do not have sufficient rights to QC Person Entries."));
+                return;
             }
+            Assert.IsFalse(true);
         }
 
         [TestMethod]
@@ -310,7 +312,9 @@ namespace SDDB.UnitTests
                 //Assert
                 Assert.IsTrue(exception.GetBaseException().GetType() == typeof(DbBadRequestException));
                 Assert.IsTrue(exception.GetBaseException().ToString().Contains("You cannot QC your own entry."));
+                return;
             }
+            Assert.IsFalse(true);
         }
 
         [TestMethod]
@@ -341,7 +345,10 @@ namespace SDDB.UnitTests
                 //Assert
                 Assert.IsTrue(exception.GetBaseException().GetType() == typeof(DbBadRequestException));
                 Assert.IsTrue(exception.GetBaseException().ToString().Contains("Log Entry and Project Event do not belong to the same project"));
+                return;
             }
+            Assert.IsFalse(true);
+
         }
 
         [TestMethod]
@@ -374,7 +381,9 @@ namespace SDDB.UnitTests
                 //Assert
                 Assert.IsTrue(exception.GetBaseException().GetType() == typeof(DbBadRequestException));
                 Assert.IsTrue(exception.GetBaseException().ToString().Contains("Log Entry and Location do not belong to the same project"));
+                return;
             }
+            Assert.IsFalse(true);
         }
 
         [TestMethod]
@@ -408,7 +417,9 @@ namespace SDDB.UnitTests
                 Assert.IsTrue(exception.GetBaseException().GetType() == typeof(DbBadRequestException));
                 Assert.IsTrue(exception.GetBaseException().ToString()
                     .Contains("Log Entry you try to modify is assigned to project which is not managed by you."));
+                return;
             }
+            Assert.IsFalse(true);
         }
 
         //-----------------------------------------------------------------------------------------------------------------------

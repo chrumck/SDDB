@@ -19,14 +19,14 @@ namespace SDDB.Domain.Services
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
-        IDbContextScopeFactory contextScopeFac;
-        private IAppUserManager appUserManager;
-        private bool ldapAuthenticationEnabled;
+        IAppRoleManager appRoleManager;
+        IAppUserManager appUserManager;
+        bool ldapAuthenticationEnabled;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
-        public DBUserService(IDbContextScopeFactory contextScopeFac, IAppUserManager appUserManager, bool ldapAuthenticationEnabled)
+        public DBUserService(IAppRoleManager appRoleManager, IAppUserManager appUserManager, bool ldapAuthenticationEnabled)
         {
-            this.contextScopeFac = contextScopeFac;
+            this.appRoleManager = appRoleManager;
             this.appUserManager = appUserManager;
             this.ldapAuthenticationEnabled = ldapAuthenticationEnabled;
         }
@@ -92,46 +92,59 @@ namespace SDDB.Domain.Services
         //get all DBRoles
         public virtual Task<List<string>> GetAllRolesAsync()
         {
-            using (var dbContextScope = contextScopeFac.CreateReadOnly())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.Roles.Select(x => x.Name).ToListAsync();
-            }
+            return appRoleManager.Roles.Select(x => x.Name).ToListAsync();
         }
 
         //get particular DBUser Roles
-        public virtual async Task<List<string>> GetUserRolesAsync(string userId)
+        public virtual async Task<List<string>> GetUserRolesAsync(string[] userIds)
         {
-            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
+            if (userIds == null || userIds.Length == 0) { throw new ArgumentNullException("userIds"); }
 
-            return (await appUserManager.GetRolesAsync(userId).ConfigureAwait(false)).ToList();
+            return await appRoleManager.Roles
+                .Where(x => x.Users.Any(y => userIds.Contains(y.UserId)))
+                .Select(x => x.Name)
+                .ToListAsync().ConfigureAwait(false);
         }
 
         //get roles not assigned to DBUser
-        public virtual async Task<List<string>> GetUserRolesNotAsync(string userId)
+        public virtual async Task<List<string>> GetUserRolesNotAsync(string[] userIds)
         {
-            if (String.IsNullOrEmpty(userId)) throw new ArgumentNullException("userId");
-
-            using (var dbContextScope = contextScopeFac.CreateReadOnly())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                var userRoles = await appUserManager.GetRolesAsync(userId).ConfigureAwait(false);
-                return dbContext.Roles.Select(x => x.Name).ToList().Except(userRoles).ToList();
-            }
+            if (userIds == null || userIds.Length == 0) { throw new ArgumentNullException("userIds"); }
+                        
+            return await appRoleManager.Roles
+                .Where(x => !userIds.All(y => x.Users.Select(z => z.UserId).Contains(y)))
+                .Select(x => x.Name)
+                .ToListAsync().ConfigureAwait(false);
         }
 
         //Add (or Remove  when set isAdd to false) roles to DBUSer
-        public virtual async Task AddRemoveRolesAsync(string[] ids, string[] idsAddRem, bool isAdd)
+        public virtual async Task AddRemoveRolesAsync(string[] ids, string[] roleNames, bool isAdd)
         {
             if (ids == null || ids.Length == 0) { throw new ArgumentNullException("ids"); }
-            if (idsAddRem == null || idsAddRem.Length == 0) { throw new ArgumentNullException("roleNames"); }
+            if (roleNames == null || roleNames.Length == 0) { throw new ArgumentNullException("roleNames"); }
 
             var users = await GetAsync(ids).ConfigureAwait(false);
             if (users.Count != ids.Length) { throw new DbBadRequestException("Error adding/removing roles. User(s) not found."); }
 
             foreach (var user in users)
             {
-                await addRemoveRolesHelper(user, idsAddRem, isAdd).ConfigureAwait(false);
+                foreach (var roleName in roleNames)
+                {
+                    var userIsInRole = await appUserManager.IsInRoleAsync(user.Id, roleName).ConfigureAwait(false);
+                    var addRemoveResult = IdentityResult.Success;
+                    if (isAdd && !userIsInRole) 
+                    { 
+                        addRemoveResult = await appUserManager.AddToRoleAsync(user.Id, roleName).ConfigureAwait(false);
+                    }
+                    if (!isAdd && userIsInRole) {
+                        addRemoveResult = await appUserManager.RemoveFromRoleAsync(user.Id, roleName).ConfigureAwait(false);
+                    }
+                    if (!addRemoveResult.Succeeded)
+                    {
+                        throw new DbBadRequestException(string.Format("Error adding role {0} to user {1}: {2}",
+                            roleName, user.UserName, getErrorsFromIdResult(addRemoveResult)));
+                    }
+                }
             }
         }
         
@@ -185,6 +198,7 @@ namespace SDDB.Domain.Services
                 throw new DbBadRequestException(
                     String.Format("Error editing user {0}:{1}\n", record.UserName, getErrorsFromIdResult(updateResult)));
             }
+
             return null;
         }
 
@@ -227,44 +241,7 @@ namespace SDDB.Domain.Services
         }
 
         //-----------------------------------------------------------------------------------------------------------------------
-
-        //helper - Add (or Remove  when set isAdd to false) roles to dbUser 
-        //taking taking single DBUser + rolenames and isAdd
-        private async Task addRemoveRolesHelper(DBUser user, string[] roleNames, bool isAdd)
-        {
-            var userRoles = await appUserManager.GetRolesAsync(user.Id).ConfigureAwait(false);
-            foreach (var dbRoleName in roleNames)
-            {
-                await addRemoveRoleHelper(user, userRoles, dbRoleName, isAdd).ConfigureAwait(false);
-            }
-        }
-
-        //helper - Add (or Remove  when set isAdd to false) role to dbUser 
-        //taking taking single roleName and dbUser + userRoles and isAdd
-        private async Task addRemoveRoleHelper(DBUser user, IList<string> userRoles, string roleName, bool isAdd)
-        {
-            if (isAdd && !userRoles.Contains(roleName))
-            {
-                var addResult = await appUserManager.AddToRoleAsync(user.Id, roleName).ConfigureAwait(false);
-                if (!addResult.Succeeded)
-                {
-                    throw new DbBadRequestException(string.Format("Error adding role {0} to user {1}: {2}",
-                        roleName, user.UserName, getErrorsFromIdResult(addResult)));
-                }
-            }
-            if (!isAdd && userRoles.Contains(roleName))
-            {
-                var removeResult = await appUserManager.RemoveFromRoleAsync(user.Id, roleName).ConfigureAwait(false);
-                if (!removeResult.Succeeded)
-                {
-                    throw new DbBadRequestException(string.Format("Error removing role {0} from user {1}: {2}",
-                        roleName, user.UserName, getErrorsFromIdResult(removeResult)));
-                }
-            }
-        }
-
-        //-----------------------------------------------------------------------------------------------------------------------
-
+        
         //getErrorsFromIdResult
         private string getErrorsFromIdResult(IdentityResult identityResult)
         {

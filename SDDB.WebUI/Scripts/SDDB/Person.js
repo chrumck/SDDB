@@ -66,9 +66,8 @@ $(document).ready(function () {
         sddb.modalWaitWrapper(function () {
             return sddb.fillFormForRelatedGeneric(
                 tableProjectsAdd, tableProjectsRemove, currentIds,
-                "GET", "/PersonSrv/GetPersonProjects", { id: currentIds[0] },
-                "GET", "/PersonSrv/GetPersonProjectsNot", { id: currentIds[0] },
-                "GET", "/ProjectSrv/Get", { getActive: true });
+                "GET", "/PersonSrv/GetPersonProjects", { ids: currentIds },
+                "GET", "/PersonSrv/GetPersonProjectsNot", { ids: currentIds } );
         })
             .done(function () {
                 sddb.saveViewSettings(tableMain);
@@ -96,9 +95,8 @@ $(document).ready(function () {
         sddb.modalWaitWrapper(function () {
             return sddb.fillFormForRelatedGeneric(
                 tablePersonGroupsAdd, tablePersonGroupsRemove, currentIds,
-                "GET", "/PersonSrv/GetPersonGroups", { id: currentIds[0] },
-                "GET", "/PersonSrv/GetPersonGroupsNot", { id: currentIds[0] },
-                "GET", "/PersonGroupSrv/Get", { getActive: true });
+                "GET", "/PersonSrv/GetPersonGroups", { ids: currentIds },
+                "GET", "/PersonSrv/GetPersonGroupsNot", { ids: currentIds } );
         })
             .done(function () {
                 sddb.saveViewSettings(tableMain);
@@ -125,9 +123,8 @@ $(document).ready(function () {
         sddb.modalWaitWrapper(function () {
             return sddb.fillFormForRelatedGeneric(
                 tableManagedGroupsAdd, tableManagedGroupsRemove, currentIds,
-                "GET", "/PersonSrv/GetManagedGroups", { id: currentIds[0] },
-                "GET", "/PersonSrv/GetManagedGroupsNot", { id: currentIds[0] },
-                "GET", "/PersonGroupSrv/Get", { getActive: true });
+                "GET", "/PersonSrv/GetManagedGroups", { ids: currentIds },
+                "GET", "/PersonSrv/GetManagedGroupsNot", { ids: currentIds });
         })
             .done(function () {
                 sddb.saveViewSettings(tableMain);

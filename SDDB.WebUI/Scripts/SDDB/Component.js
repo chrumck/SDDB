@@ -1,4 +1,5 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
+﻿/*global sddb, AssemblyId, ComponentIds */
+/// <reference path="../DataTables/jquery.dataTables.js" />
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
@@ -47,23 +48,35 @@ sddb.setConfig({
             {
                 data: "ComponentType_",
                 name: "ComponentType_",
-                render: function (data, type, full, meta) { return data.CompTypeName; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.CompTypeName;
+                }
             }, //4
             {
                 data: "ComponentStatus_",
                 name: "ComponentStatus_",
-                render: function (data, type, full, meta) { return data.CompStatusName; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.CompStatusName;
+                }
             }, //5
             {
                 data: "AssignedToProject_",
                 name: "AssignedToProject_",
-                render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.ProjectName + " " + data.ProjectCode;
+                }
             }, //6
             //------------------------------------------------2nd set of columns
             {
                 data: "AssignedToAssemblyDb_",
                 name: "AssignedToAssemblyDb_",
-                render: function (data, type, full, meta) { return data.AssyName; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.AssyName;
+                }
             }, //7
             { data: "PositionInAssy", name: "PositionInAssy" },//8
             { data: "ProgramAddress", name: "ProgramAddress" },//9
@@ -204,8 +217,7 @@ sddb.updateMainViewForSelectedType = function () {
         switchMainViewForExtendedHelper(false);
         return deferred0.resolve();
     }
-    sddb.updateTableForExtended(sddb.cfg.extHttpTypeTypeUpd, sddb.cfg.extUrlTypeUpd,
-            { ids: sddb.msFilterByType.getValue()[0] }, sddb.cfg.tableMain)
+    sddb.updateTableForExtended({ ids: sddb.msFilterByType.getValue()[0] })
         .done(function (typeHasAttrs) {
             switchMainViewForExtendedHelper(typeHasAttrs);
             return deferred0.resolve();
@@ -221,8 +233,7 @@ sddb.updateFormForSelectedType = function () {
     $("#" + sddb.cfg.extEditFormId).addClass("hidden");
     if (sddb.cfg.magicSuggests[0].getValue().length == 1 && sddb.cfg.magicSuggests[0].getValue()[0] != "_VARIES_") {
         return sddb.modalWaitWrapper(function () {
-            return sddb.updateFormForExtended(sddb.cfg.extHttpTypeTypeUpd, sddb.cfg.extUrlTypeUpd,
-                    { ids: sddb.cfg.magicSuggests[0].getValue()[0] }, sddb.cfg.extEditFormId)
+            return sddb.updateFormForExtended({ ids: sddb.cfg.magicSuggests[0].getValue()[0] })
                 .then(function (typeHasAttrs) {
                     if (typeHasAttrs) { $("#" + sddb.cfg.extEditFormId).removeClass("hidden"); }
                 });

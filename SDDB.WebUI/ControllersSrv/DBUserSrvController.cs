@@ -79,21 +79,23 @@ namespace SDDB.WebUI.ControllersSrv
             return DbJson(records);
         }
 
-        // GET: /DBUserSrv/GetUserRoles
+        // POST: /DBUserSrv/GetUserRoles
+        [HttpPost]
         [DBSrvAuth("DBUser_View")]
-        public async Task<ActionResult> GetUserRoles(string id)
+        public async Task<ActionResult> GetUserRoles(string[] ids)
         {
             ViewBag.ServiceName = "DBUserService.GetUserRolesAsync";
-            var records = (await dbUserService.GetUserRolesAsync(id).ConfigureAwait(false)).Select(x => new { Name = x });
+            var records = (await dbUserService.GetUserRolesAsync(ids).ConfigureAwait(false)).Select(x => new { Name = x });
             return DbJson(records);
         }
 
-        // GET: /DBUserSrv/GetUserRolesNot
+        // POST: /DBUserSrv/GetUserRolesNot
+        [HttpPost]
         [DBSrvAuth("DBUser_View")]
-        public async Task<ActionResult> GetUserRolesNot(string id)
+        public async Task<ActionResult> GetUserRolesNot(string[] ids)
         {
             ViewBag.ServiceName = "DBUserService.GetUserRolesNotAsync";
-            var records = (await dbUserService.GetUserRolesNotAsync(id).ConfigureAwait(false)).Select(x => new { Name = x });
+            var records = (await dbUserService.GetUserRolesNotAsync(ids).ConfigureAwait(false)).Select(x => new { Name = x });
             return DbJson(records);
         }
 

@@ -77,30 +77,33 @@ namespace SDDB.Domain.Services
         //-----------------------------------------------------------------------------------------------------------------------
 
         //get all group managers
-        public virtual Task<List<Person>> GetGroupManagersAsync(string groupId)
+        public virtual Task<List<Person>> GetGroupManagersAsync(string[] groupIds)
         {
-            if (String.IsNullOrEmpty(groupId)) { throw new ArgumentNullException("groupId"); }
+            if (groupIds == null || groupIds.Length == 0) { throw new ArgumentNullException("groupIds"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.Persons
-                    .Where(x => x.ManagedGroups.Select(y => y.Id).Contains(groupId) && x.IsActive_bl)
+                return dbContext.Persons.Where(x =>
+                        x.ManagedGroups.Any(y => groupIds.Contains(y.Id)) &&
+                        x.IsActive_bl
+                    )
                     .ToListAsync();
             }
         }
 
         //get all active persons not assigned to group managers
-        public virtual Task<List<Person>> GetGroupManagersNotAsync(string groupId)
+        public virtual Task<List<Person>> GetGroupManagersNotAsync(string[] groupIds)
         {
-            if (String.IsNullOrEmpty(groupId)) { throw new ArgumentNullException("groupId"); }
+            if (groupIds == null || groupIds.Length == 0) { throw new ArgumentNullException("groupIds"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-
-                return dbContext.Persons
-                    .Where(x => !x.ManagedGroups.Select(y => y.Id).Contains(groupId) && x.IsActive_bl)
+                return dbContext.Persons.Where(x =>
+                        !groupIds.All(y => x.ManagedGroups.Select(z => z.Id).Contains(y)) &&
+                        x.IsActive_bl
+                    )
                     .ToListAsync();
             }
         }
@@ -111,30 +114,33 @@ namespace SDDB.Domain.Services
         //-----------------------------------------------------------------------------------------------------------------------
 
         //get all group persons
-        public virtual Task<List<Person>> GetGroupPersonsAsync(string groupId)
+        public virtual Task<List<Person>> GetGroupPersonsAsync(string[] groupIds)
         {
-            if (String.IsNullOrEmpty(groupId)) { throw new ArgumentNullException("groupId"); }
+            if (groupIds == null || groupIds.Length == 0) { throw new ArgumentNullException("groupIds"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.Persons
-                    .Where(x => x.PersonGroups.Select(y => y.Id).Contains(groupId) && x.IsActive_bl)
+                return dbContext.Persons.Where(x =>
+                        x.PersonGroups.Any(y => groupIds.Contains(y.Id)) &&
+                        x.IsActive_bl
+                    )
                     .ToListAsync();
             }
         }
 
         //get all active persons not assigned to group persons
-        public virtual Task<List<Person>> GetGroupPersonsNotAsync(string groupId)
+        public virtual Task<List<Person>> GetGroupPersonsNotAsync(string[] groupIds)
         {
-            if (String.IsNullOrEmpty(groupId)) { throw new ArgumentNullException("groupId"); }
+            if (groupIds == null || groupIds.Length == 0) { throw new ArgumentNullException("groupIds"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-
-                return dbContext.Persons
-                    .Where(x => !x.PersonGroups.Select(y => y.Id).Contains(groupId) && x.IsActive_bl)
+                return dbContext.Persons.Where(x =>
+                        !groupIds.All(y => x.PersonGroups.Select(z => z.Id).Contains(y)) &&
+                        x.IsActive_bl
+                    )
                     .ToListAsync();
             }
         }

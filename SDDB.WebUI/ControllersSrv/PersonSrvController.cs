@@ -110,21 +110,23 @@ namespace SDDB.WebUI.ControllersSrv
 
         //-----------------------------------------------------------------------------------------------------------------------
 
-        // GET: /PersonSrv/GetPersonProjects
+        // POST: /PersonSrv/GetPersonProjects
+        [HttpPost]
         [DBSrvAuth("Person_View,Project_View")]
-        public async Task<ActionResult> GetPersonProjects(string id)
+        public async Task<ActionResult> GetPersonProjects(string[] ids)
         {
             ViewBag.ServiceName = "PersonService.GetPersonProjectsAsync"; 
-            var records = await personService.GetPersonProjectsAsync(id).ConfigureAwait(false);
+            var records = await personService.GetPersonProjectsAsync(ids).ConfigureAwait(false);
             return DbJson(filterForJsonProjects(records));
         }
 
-        // GET: /PersonSrv/GetPersonProjectsNot
+        // POST: /PersonSrv/GetPersonProjectsNot
+        [HttpPost]
         [DBSrvAuth("Person_View,Project_View")]
-        public async Task<ActionResult> GetPersonProjectsNot(string id)
+        public async Task<ActionResult> GetPersonProjectsNot(string[] ids)
         {
             ViewBag.ServiceName = "PersonService.GetPersonProjectsNotAsync";
-            var records = await personService.GetPersonProjectsNotAsync(id).ConfigureAwait(false);
+            var records = await personService.GetPersonProjectsNotAsync(ids).ConfigureAwait(false);
             return DbJson(filterForJsonProjects(records));
         }
 
@@ -140,21 +142,23 @@ namespace SDDB.WebUI.ControllersSrv
 
         //-----------------------------------------------------------------------------------------------------------------------
 
-        // GET: /PersonSrv/GetPersonGroups
+        // POST: /PersonSrv/GetPersonGroups
+        [HttpPost]
         [DBSrvAuth("Person_View,PersonGroup_View")]
-        public async Task<ActionResult> GetPersonGroups(string id)
+        public async Task<ActionResult> GetPersonGroups(string[] ids)
         {
             ViewBag.ServiceName = "PersonService.GetPersonGroupsAsync"; 
-            var records = await personService.GetPersonGroupsAsync(id).ConfigureAwait(false);
+            var records = await personService.GetPersonGroupsAsync(ids).ConfigureAwait(false);
             return DbJson(filterForJsonPrsGroups(records));
         }
 
-        // GET: /PersonSrv/GetPersonGroupsNot
+        // POST: /PersonSrv/GetPersonGroupsNot
+        [HttpPost]
         [DBSrvAuth("Person_View,PersonGroup_View")]
-        public async Task<ActionResult> GetPersonGroupsNot(string id)
+        public async Task<ActionResult> GetPersonGroupsNot(string[] ids)
         {
             ViewBag.ServiceName = "PersonService.GetPersonGroupsNotAsync";
-            var records = await personService.GetPersonGroupsNotAsync(id).ConfigureAwait(false);
+            var records = await personService.GetPersonGroupsNotAsync(ids).ConfigureAwait(false);
             return DbJson(filterForJsonPrsGroups(records));
         }
 
@@ -170,21 +174,23 @@ namespace SDDB.WebUI.ControllersSrv
 
         //-----------------------------------------------------------------------------------------------------------------------
 
-        // GET: /PersonSrv/GetManagedGroups
+        // POST: /PersonSrv/GetManagedGroups
+        [HttpPost]
         [DBSrvAuth("Person_View,PersonGroup_View")]
-        public async Task<ActionResult> GetManagedGroups(string id)
+        public async Task<ActionResult> GetManagedGroups(string[] ids)
         {
             ViewBag.ServiceName = "PersonService.GetManagedGroupsAsyn";
-            var records = await personService.GetManagedGroupsAsync(id).ConfigureAwait(false);
+            var records = await personService.GetManagedGroupsAsync(ids).ConfigureAwait(false);
             return DbJson(filterForJsonPrsGroups(records));
         }
 
-        // GET: /PersonSrv/GetManagedGroupsNot
+        // POST: /PersonSrv/GetManagedGroupsNot
+        [HttpPost]
         [DBSrvAuth("Person_View,PersonGroup_View")]
-        public async Task<ActionResult> GetManagedGroupsNot(string id)
+        public async Task<ActionResult> GetManagedGroupsNot(string[] ids)
         {
             ViewBag.ServiceName = "PersonService.GetManagedGroupsNotAsync";
-            var records = await personService.GetManagedGroupsNotAsync(id).ConfigureAwait(false);
+            var records = await personService.GetManagedGroupsNotAsync(ids).ConfigureAwait(false);
             return DbJson(filterForJsonPrsGroups(records));
         }
 

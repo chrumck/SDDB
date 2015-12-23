@@ -8,7 +8,7 @@
 /// <reference path="../FileSaver.js" />
 
 //sddbConstructor
-var sddbConstructor = function (customConfig) {
+var sddbConstructor = function (customCfg) {
     "use strict";
 
     //private variables----------------------------------------------------------------------------------------------//
@@ -18,8 +18,8 @@ var sddbConstructor = function (customConfig) {
     tableSearch,
     tableSelectedIds,
 
-    //defaultConfig
-    defaultConfig = {
+    //defaultCfg
+    defaultCfg = {
         currentIds: [],
         currentRecords: [],
         currentActive: true,
@@ -69,8 +69,26 @@ var sddbConstructor = function (customConfig) {
         extUrlEdit: ""
     },
 
+    //defaultCfgRelated
+    defaultCfgRelated =  {
+        tableAdd: null,
+        tableRemove: null,
+        httpType: "POST",
+        url: "",
+        data: function () { return { ids: cfg.currentIds }; },
+        httpTypeNot: "POST",
+        urlNot: "",
+        dataNot: function () { return { ids: cfg.currentIds }; },
+        sortColumn: null,
+        relatedViewId: null,
+        relatedViewBtnGroupClass: null,
+        relatedViewPanelId: null,
+        relatedViewPanelText: function () { return "Related Record"; },
+        urlEdit: ""
+    },
+
     //config
-    cfg = $.extend(true, {}, defaultConfig, customConfig),
+    cfg = $.extend(true, {}, defaultCfg, customCfg),
 
     //private functions----------------------------------------------------------------------------------------------//
 
@@ -651,84 +669,53 @@ var sddbConstructor = function (customConfig) {
 
     //Fill Form for Edit from n:n related table - generic version
     sddbObj.fillFormForRelatedGeneric = function (tableAdd, tableRemove, ids,
-            httpType, url, data, httpTypeNot, urlNot, dataNot, httpTypeMany, urlMany, dataMany, sortColumn) {
-
-        sortColumn = (typeof sortColumn !== "undefined") ? sortColumn : 1;
-
-        var deferred0 = $.Deferred();
+            httpType, url, data, httpTypeNot, urlNot, dataNot, sortColumn) {
+        sortColumn = (sortColumn || sortColumn === 0) ? sortColumn : 1;
 
         tableAdd.clear().search("").draw();
         tableRemove.clear().search("").draw();
 
-        if (ids.length == 1) {
-            $.when(
+        return sddbObj.modalWaitWrapper(function () {
+            return $.when(
                 $.ajax({ type: httpTypeNot, url: urlNot, timeout: 120000, data: dataNot, dataType: "json" }),
                 $.ajax({ type: httpType, url: url, timeout: 120000, data: data, dataType: "json" })
             )
-            .done(function (done1, done2) {
-                tableAdd.rows.add(done1[0]).order([sortColumn, "asc"]).draw();
-                tableRemove.rows.add(done2[0]).order([sortColumn, "asc"]).draw();
-                return deferred0.resolve();
-            })
-            .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
-        }
-        else {
-            $.ajax({ type: httpTypeMany, url: urlMany, timeout: 120000, data: dataMany, dataType: "json" })
-                .done(function (data) {
-                    tableAdd.rows.add(data).order([sortColumn, "asc"]).draw();
-                    if (ids.length !== 0) { tableRemove.rows.add(data).order([sortColumn, "asc"]).draw(); }
-                    return deferred0.resolve();
-                })
-                .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
-        }
-        return deferred0.promise();
+                .then(function (done1, done2) {
+                    tableAdd.rows.add(done1[0]).order([sortColumn, "asc"]).draw();
+                    tableRemove.rows.add(done2[0]).order([sortColumn, "asc"]).draw();
+                });
+        });
     };
         
     //Submit Edits for n:n related table - generic version
     sddbObj.submitEditsForRelatedGeneric = function (ids, idsAdd, idsRemove, url) {
-
-        var deferred0 = $.Deferred(),
-        deferred1 = $.Deferred(),
-        deferred2 = $.Deferred();
-
-        if (idsAdd.length === 0) { deferred1.resolve(); }
-        else {
-            $.ajax({
-                type: "POST",
-                url: url,
-                timeout: 120000,
-                data: { ids: ids, idsAddRem: idsAdd, isAdd: true },
-                dataType: "json"
-            })
-                .done(function () { deferred1.resolve(); })
-                .fail(function (xhr, status, error) { deferred1.reject(xhr, status, error); });
-        }
-
-        if (idsRemove.length === 0) { deferred2.resolve(); }
-        else {
-            setTimeout(function () {
-                $.ajax({
+        return $.when(
+            function () {
+                if (idsAdd.length === 0) { return $.Deferred().resolve(); }
+                return $.ajax({
+                    type: "POST",
+                    url: url,
+                    timeout: 120000,
+                    data: { ids: ids, idsAddRem: idsAdd, isAdd: true },
+                    dataType: "json"
+                });
+            }(),
+            function () {
+                if (idsRemove.length === 0) { return $.Deferred().resolve(); }
+                return $.ajax({
                     type: "POST",
                     url: url,
                     timeout: 120000,
                     data: { ids: ids, idsAddRem: idsRemove, isAdd: false },
                     dataType: "json"
-                })
-                    .done(function () { deferred2.resolve(); })
-                    .fail(function (xhr, status, error) { deferred2.reject(xhr, status, error); });
-            }, 500);
-        }
-
-        $.when(deferred1, deferred2)
-            .done(function () { return deferred0.resolve(); })
-            .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
-
-        return deferred0.promise();
+                });
+            }()
+        );
     };
         
     //-----------------------------------------------------------------------------
     
-    //msAddToMsArrayNew
+    //msAddToArray
     sddbObj.msAddToArray = function (id, url, customSettings, onSelectionHandler, msArray) {
         msArray = msArray || cfg.magicSuggests;
 
@@ -865,9 +852,12 @@ var sddbConstructor = function (customConfig) {
 
     //-----------------------------------------------------------------------------
 
-    //TODO: set up default params from cfg
     //Pulls type information and formats table column names
-    sddbObj.updateTableForExtended = function (httpType, url, data, table) {
+    sddbObj.updateTableForExtended = function (data, httpType, url, table) {
+        httpType = httpType || cfg.extHttpTypeTypeUpd;
+        url = url || cfg.extUrlTypeUpd;
+        table = table || cfg.tableMain;
+
         return $.ajax({ type: httpType, url: url, data: data, timeout: 120000, dataType: "json" })
             .then(function (data) {
                 var typeHasAttrs = false,
@@ -884,7 +874,10 @@ var sddbConstructor = function (customConfig) {
     };
 
     //pulls type information and formats form fields including validation reset
-    sddbObj.updateFormForExtended = function (httpType, url, data, formId) {
+    sddbObj.updateFormForExtended = function (data, httpType, url, formId) {
+        httpType = httpType || cfg.extHttpTypeTypeUpd;
+        url = url || cfg.extUrlTypeUpd;
+        formId = formId || cfg.extEditFormId;
 
         //changeFormFieldDescriptionHelper
         var changeFormFieldDescriptionHelper = function (formId, entityType, prop) {
@@ -1203,6 +1196,55 @@ var sddbConstructor = function (customConfig) {
                 sddbObj.refreshMainView();
             });
     };
+
+    //-----------------------------------------------------------------------------
+    
+    //prepareRelatedFormForEdit 
+    sddbObj.prepareRelatedFormForEdit = function (customFnCfg) {
+        var fnCfg = $.extend(true, {}, defaultCfgRelated, customFnCfg);
+
+        cfg.currentIds = cfg.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (cfg.currentIds.length === 0) {
+            sddbObj.showModalNothingSelected();
+            return;
+        }
+        $("#" + fnCfg.relatedViewPanelId).text(fnCfg.relatedViewPanelText());
+
+        sddbObj.modalWaitWrapper(function () {
+            return sddbObj.fillFormForRelatedGeneric(
+                fnCfg.tableAdd, fnCfg.tableRemove, cfg.currentIds, 
+                fnCfg.httpType, fnCfg.url, fnCfg.data(),
+                fnCfg.httpTypeNot, fnCfg.urlNot, fnCfg.dataNot(),
+                fnCfg.sortColumn);
+        })
+            .then(function () {
+                sddbObj.saveViewSettings();
+                sddbObj.switchView(cfg.mainViewId, fnCfg.relatedViewId, fnCfg.relatedViewBtnGroupClass);
+            });
+    };
+
+    //submitRelatedEditForm
+    sddbObj.submitRelatedEditForm = function (customFnCfg) {
+        var fnCfg = $.extend(true, {}, defaultCfgRelated, customFnCfg),
+            idsAdd = fnCfg.tableAdd.cells(".ui-selected", "Name:name", { page: "current" }).data().toArray(),
+            idsRemove = fnCfg.tableRemove.cells(".ui-selected", "Name:name", { page: "current" }).data().toArray();
+
+        if (idsAdd.length + idsRemove.length === 0) {
+            sddbObj.showModalNothingSelected();
+            return;
+        }
+        sddbObj.modalWaitWrapper(function () {
+            return sddbObj.submitEditsForRelatedGeneric(cfg.currentIds, idsAdd, idsRemove, fnCfg.urlEdit);
+        })
+            .then(function () {
+                return sddbObj.refreshMainView();
+            })
+            .done(function () {
+                sddbObj.switchView(fnCfg.relatedViewId, cfg.mainViewId, cfg.mainViewBtnGroupClass, cfg.tableMain);
+            });
+    };
+
+    //-----------------------------------------------------------------------------
 
     //refresh Main view 
     sddbObj.refreshMainView = function () {

@@ -43,18 +43,14 @@ callBackAfterEdit = function (currRecords) {
         return $.when(
             sddb.fillFormForRelatedGeneric(tableLogEntryPersonsAdd, tableLogEntryPersonsRemove, currentIds,
                 "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons",
-                { logEntryId: currentIds[0] },
+                { ids: currentIds },
                 "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot",
-                { logEntryId: currentIds[0] },
-                "GET", "/PersonSrv/Get",
-                { getActive: true }),
+                { ids: currentIds }),
             sddb.fillFormForRelatedGeneric(tableLogEntryAssysAdd, tableLogEntryAssysRemove, currentIds,
                 "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys",
-                { logEntryId: currentIds[0] },
+                { ids: currentIds },
                 "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
-                { logEntryId: currentIds[0], locId: magicSuggests[3].getValue()[0] },
-                "GET", "AssemblyDbSrv/LookupByLocDTables",
-                { locId: magicSuggests[3].getValue()[0], getActive: true })
+                { ids: currentIds[0], locId: magicSuggests[3].getValue()[0] })
         );
     });
 };

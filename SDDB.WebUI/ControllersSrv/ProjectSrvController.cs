@@ -79,21 +79,23 @@ namespace SDDB.WebUI.ControllersSrv
 
         //-----------------------------------------------------------------------------------------------------------------------
 
-        // GET: /ProjectSrv/GetProjectPersons
+        // POST: /ProjectSrv/GetProjectPersons
+        [HttpPost]
         [DBSrvAuth("Person_View,Project_View")]
-        public async Task<ActionResult> GetProjectPersons(string id)
+        public async Task<ActionResult> GetProjectPersons(string[] ids)
         {
             ViewBag.ServiceName = "ProjectService.GetProjectPersonsAsync";
-            var records = await projectService.GetProjectPersonsAsync(id).ConfigureAwait(false);
+            var records = await projectService.GetProjectPersonsAsync(ids).ConfigureAwait(false);
             return DbJson(filterForJsonPersons(records));
         }
 
-        // GET: /ProjectSrv/GetProjectPersonsNot
+        // POST: /ProjectSrv/GetProjectPersonsNot
+        [HttpPost]
         [DBSrvAuth("Person_View,Project_View")]
-        public async Task<ActionResult> GetProjectPersonsNot(string id)
+        public async Task<ActionResult> GetProjectPersonsNot(string[] ids)
         {
             ViewBag.ServiceName = "ProjectService.GetProjectPersonsNotAsync";
-            var records = await projectService.GetProjectPersonsNotAsync(id).ConfigureAwait(false);
+            var records = await projectService.GetProjectPersonsNotAsync(ids).ConfigureAwait(false);
             return DbJson(filterForJsonPersons(records));
         }
 

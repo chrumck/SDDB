@@ -51,10 +51,9 @@ $(document).ready(function () {
         sddb.showModalWait();
         sddb.fillFormForRelatedGeneric(
                 tableGroupPersonsAdd, tableGroupPersonsRemove, currentIds,
-                "GET", "/PersonGroupSrv/GetGroupPersons", { id: currentIds[0]},
-                "GET", "/PersonGroupSrv/GetGroupPersonsNot", { id: currentIds[0]},
-                "GET", "/PersonSrv/GetAll",
-                {getActive: true }, 1)
+                "GET", "/PersonGroupSrv/GetGroupPersons", { ids: currentIds },
+                "GET", "/PersonGroupSrv/GetGroupPersonsNot", { ids: currentIds },
+                1)
             .always(sddb.hideModalWait)
             .done(function () {
                 sddb.saveViewSettings(tableMain);
@@ -81,9 +80,9 @@ $(document).ready(function () {
         sddb.showModalWait();
         sddb.fillFormForRelatedGeneric(
                 tableGroupManagersAdd, tableGroupManagersRemove, currentIds,
-                "GET", "/PersonGroupSrv/GetGroupManagers", { id: currentIds[0] },
-                "GET", "/PersonGroupSrv/GetGroupManagersNot", { id: currentIds[0] },
-                "GET", "/PersonSrv/GetAll", { getActive: true }, 1)
+                "GET", "/PersonGroupSrv/GetGroupManagers", { ids: currentIds },
+                "GET", "/PersonGroupSrv/GetGroupManagersNot", { ids: currentIds },
+                1)
             .always(sddb.hideModalWait)
             .done(function () {
                 sddb.saveViewSettings(tableMain);

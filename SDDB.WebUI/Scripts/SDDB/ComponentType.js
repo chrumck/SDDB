@@ -1,4 +1,5 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
+﻿/*global sddb*/
+/// <reference path="../DataTables/jquery.dataTables.js" />
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
@@ -7,68 +8,49 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
-"use strict";
+//----------------------------------------------additional sddb setup------------------------------------------------//
 
-//--------------------------------------Global Properties------------------------------------//
+//setting up sddb
+sddb.setConfig({
+    recordTemplate: {
+        Id: "RecordTemplateId",
+        CompTypeName: null,
+        CompTypeAltName: null,
+        Comments: null,
+        IsActive_bl: null,
+        Attr01Type: null,
+        Attr01Desc: null,
+        Attr02Type: null,
+        Attr02Desc: null,
+        Attr03Type: null,
+        Attr03Desc: null,
+        Attr04Type: null,
+        Attr04Desc: null,
+        Attr05Type: null,
+        Attr05Desc: null,
+        Attr06Type: null,
+        Attr06Desc: null,
+        Attr07Type: null,
+        Attr07Desc: null,
+        Attr08Type: null,
+        Attr08Desc: null,
+        Attr09Type: null,
+        Attr09Desc: null,
+        Attr10Type: null,
+        Attr10Desc: null,
+        Attr11Type: null,
+        Attr11Desc: null,
+        Attr12Type: null,
+        Attr12Desc: null,
+        Attr13Type: null,
+        Attr13Desc: null,
+        Attr14Type: null,
+        Attr14Desc: null,
+        Attr15Type: null,
+        Attr15Desc: null
+    },
 
-var recordTemplate = {
-    Id: "RecordTemplateId",
-    CompTypeName: null,
-    CompTypeAltName: null,
-    Comments: null,
-    IsActive_bl: null,
-    Attr01Type: null,
-    Attr01Desc: null,
-    Attr02Type: null,
-    Attr02Desc: null,
-    Attr03Type: null,
-    Attr03Desc: null,
-    Attr04Type: null,
-    Attr04Desc: null,
-    Attr05Type: null,
-    Attr05Desc: null,
-    Attr06Type: null,
-    Attr06Desc: null,
-    Attr07Type: null,
-    Attr07Desc: null,
-    Attr08Type: null,
-    Attr08Desc: null,
-    Attr09Type: null,
-    Attr09Desc: null,
-    Attr10Type: null,
-    Attr10Desc: null,
-    Attr11Type: null,
-    Attr11Desc: null,
-    Attr12Type: null,
-    Attr12Desc: null,
-    Attr13Type: null,
-    Attr13Desc: null,
-    Attr14Type: null,
-    Attr14Desc: null,
-    Attr15Type: null,
-    Attr15Desc: null
-};
-
-labelTextCreate = "Create Component Type";
-labelTextEdit = "Edit Component Type";
-urlFillForEdit = "/ComponentTypeSrv/GetByIds";
-urlEdit = "/ComponentTypeSrv/Edit";
-urlDelete = "/ComponentTypeSrv/Delete";
-urlRefreshMainView = "/ComponentTypeSrv/Get";
-
-callBackAfterCreate = function () {
-    $("#editForm select").find("option:first").prop("selected", "selected");
-    return $.Deferred().resolve();
-};
-
-$(document).ready(function () {
-
-    //-----------------------------------------mainView------------------------------------------//
-        
-    //---------------------------------------DataTables------------
-    
-    //tableMainColumnSets
-    tableMainColumnSets = [
+    tableMainColumnSets: [
         [1],
         [2, 3],
         [4, 5, 6, 7, 8, 9],
@@ -76,10 +58,8 @@ $(document).ready(function () {
         [16, 17, 18, 19, 20, 21],
         [22, 23, 24, 25, 26, 27],
         [28, 29, 30, 31, 32, 33]
-    ];
-
-    //tableMain Component Types
-    tableMain = $("#tableMain").DataTable({
+    ],
+    tableMain: $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "CompTypeName", name: "CompTypeName" },//1
@@ -128,10 +108,10 @@ $(document).ready(function () {
             //searchable: false
             { targets: [0, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34], searchable: false },
             //first set of columns - responsive
-            { targets: [3], className: "hidden-xs" }, 
+            { targets: [3], className: "hidden-xs" },
             //second set of columns - responsive
-            { targets: [6, 7], className: "hidden-xs" }, 
-            { targets: [8, 9], className: "hidden-xs hidden-sm" }, 
+            { targets: [6, 7], className: "hidden-xs" },
+            { targets: [8, 9], className: "hidden-xs hidden-sm" },
             //third set of columns - responsive
             { targets: [12, 13], className: "hidden-xs" },
             { targets: [14, 15], className: "hidden-xs hidden-sm" },
@@ -155,23 +135,32 @@ $(document).ready(function () {
             infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
-    });
+    }),
 
-    //showing the first Set of columns on startup;
-    sddb.showColumnSet(1, tableMainColumnSets);
+    labelTextCreate: "Create Component Type",
+    labelTextEdit: "Edit Component Type",
+    urlFillForEdit: "/ComponentTypeSrv/GetByIds",
+    urlEdit: "/ComponentTypeSrv/Edit",
+    urlDelete: "/ComponentTypeSrv/Delete",
+    urlRefreshMainView: "/ComponentTypeSrv/Get"
 
-    //---------------------------------------editFormView----------------------------------------//
+});
 
+//callBackAfterCreate
+sddb.callBackAfterCreate = function () {
+    "use strict";
+    $("#editForm select").find("option:first").prop("selected", "selected");
+    return $.Deferred().resolve();
+};
+
+//----------------------------------------------setup after page load------------------------------------------------//
+$(document).ready(function () {
+    "use strict";
     //--------------------------------------View Initialization------------------------------------//
 
     sddb.refreshMainView();
-    sddb.switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
+    sddb.switchView();
 
-    //--------------------------------End of execution at Start-----------
+    //--------------------------------End of setup after page load---------------------------------//   
 });
-
-
-//--------------------------------------Main Methods---------------------------------------//
-
-//---------------------------------------Helper Methods--------------------------------------//
 

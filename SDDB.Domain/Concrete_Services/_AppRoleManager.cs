@@ -14,9 +14,7 @@ namespace SDDB.Domain.Services
     {
         //Constructors---------------------------------------------------------------------------------------------------------//
         public AppRoleManager(AppRoleStore roleStore, IdentityFactoryOptions<AppRoleManager> roleOptions)
-            : base(roleStore)
-        {
-        }
+            : base(roleStore) { }
     }
 
     public class AppRoleStore : RoleStore<DBRole>
