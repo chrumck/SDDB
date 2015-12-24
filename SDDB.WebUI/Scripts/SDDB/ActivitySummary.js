@@ -142,8 +142,7 @@ $(document).ready(function () {
     sddb.switchView();
 
     sddb.weekOffset = $("#thNo6").is(":hidden") && $("#thNo7").is(":hidden") ? 1: 0;
-    $("#filterDateStart").val(moment().day(sddb.weekOffset).format("YYYY-MM-DD"));
-
+    $("#filterDateStart").data("DateTimePicker").date(moment().day(sddb.weekOffset));
     sddb.msFilterByPerson.setSelection([{ id: UserId, name: UserFullName }]);
     
     //--------------------------------End of setup after page load---------------------------------//

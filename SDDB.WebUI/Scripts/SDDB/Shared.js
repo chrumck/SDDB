@@ -352,23 +352,25 @@ var sddbConstructor = function (customCfg) {
         table = table || cfg.tableMain;
 
         //convertObjectToStringHelper
-        var convertObjectToStringHelper = function (dataObject, retrievePropNames) {
+        var convertObjectToStringHelper = function (dataObject, retrievePropNames, namePrefix) {
             var outputString = "",
             property;
 
             for (property in dataObject) {
-                if (!dataObject.hasOwnProperty(property)) {
+                if (!dataObject.hasOwnProperty(property) || property == "Id" ||
+                        property.slice(-3) == "_Id" || property == "IsActive_bl") {
                     continue;
                 }
                 if (typeof dataObject[property] === "object" && dataObject[property] !== null) {
-                    outputString += convertObjectToStringHelper(dataObject[property], retrievePropNames);
+                    outputString += convertObjectToStringHelper(dataObject[property], retrievePropNames,
+                        (namePrefix) ? namePrefix + "_" + property : property);
                     continue;
                 }
                 if (retrievePropNames) {
-                    outputString += property + "\t";
+                    outputString += (namePrefix) ? namePrefix + "_" + property + "\t" : property + "\t";
                     continue;
                 }
-                outputString += dataObject[property] !== null ? dataObject[property] + "\t" : "\t";
+                outputString += (dataObject[property] !== null) ? dataObject[property] + "\t" : "\t";
             }
             outputString = outputString.replace(/\n/g, " ");
             return outputString;
