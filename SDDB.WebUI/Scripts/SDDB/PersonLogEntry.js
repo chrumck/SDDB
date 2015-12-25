@@ -56,7 +56,7 @@ callBackAfterEdit = function (currRecords) {
 };
 
 callBackBeforeCopy = function () {
-    return sddb.showModalFail("NOTE: Assemblies, People and Files are not copied! Continue?", "Confirm Copy");
+    return sddb.showModalConfirm("NOTE: Assemblies, People and Files are not copied! Continue?", "Confirm Copy");
 };
 
 callBackAfterCopy = function () {

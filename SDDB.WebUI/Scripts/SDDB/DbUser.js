@@ -133,7 +133,6 @@ $(document).ready(function () {
         },
         pageLength: 100
     });
-
     //tableDBRolesRemove
     sddb.tableDBRolesRemove = $("#tableDBRolesRemove").DataTable({
         columns: [
@@ -150,7 +149,6 @@ $(document).ready(function () {
         },
         pageLength: 100
     });
-
     //dbRolesCfg
     sddb.dbRolesCfg = {
         tableAdd: sddb.tableDBRolesAdd,
@@ -158,45 +156,29 @@ $(document).ready(function () {
         url: "/DBUserSrv/GetUserRoles",
         urlNot: "/DBUserSrv/GetUserRolesNot",
         sortColumn: 0,
+        selectColumn: "Name",
         relatedViewId: "dBRolesView",
         relatedViewBtnGroupClass: "tdo-btngroup-dbroles",
         relatedViewPanelId: "bBRolesViewPanel",
-        relatedViewPanelText: function () {
-            if (sddb.cfg.currentIds.length > 1) { return "_MULTIPLE_"; }
-            var selectedRecord = sddb.cfg.tableMain.row(".ui-selected", { page: "current" }).data();
+        relatedViewPanelText: function (selectedRecord) {
             return selectedRecord.FirstName + " " + selectedRecord.LastName;
         },
-        urlEdit: "/DBUserSrv/EditRoles"
+        urlEdit: "/DBUserSrv/EditRoles",
+        btnEditId: "btnEditRoles",
+        btnCancelId: "dBRolesViewBtnCancel",
+        btnOkId: "dBRolesViewBtnOk"
     };
 
+    sddb.wireButtonsForRelated(sddb.dbRolesCfg);
+    
     //-----------------------------------------mainView------------------------------------------//
- 
-    //Wire Up btnEditRoles 
-    $("#btnEditRoles").click(function (event) {
-        event.preventDefault();
-        sddb.prepareRelatedFormForEdit(sddb.dbRolesCfg);
-    });
+     
 
     //---------------------------------------editFormView----------------------------------------//
 
     ///Initialize MagicSuggest Array
     sddb.msAddToArray("Id", "/PersonSrv/PersonsWoDBUser");
    
-    //----------------------------------------dBRolesView----------------------------------------//
-
-    //Wire Up dBRolesViewBtnCancel
-    $("#dBRolesViewBtnCancel").click(function (event) {
-        event.preventDefault();
-        sddb.switchView(sddb.dbRolesCfg.relatedViewId, sddb.cfg.mainViewId,
-            sddb.cfg.mainViewBtnGroupClass, sddb.cfg.tableMain);
-    });
-
-    //Wire Up dBRolesViewBtnOk
-    $("#dBRolesViewBtnOk").click(function (event) {
-        event.preventDefault();
-        sddb.submitRelatedEditForm(sddb.dbRolesCfg);
-    });
-      
     //--------------------------------------View Initialization------------------------------------//
 
     sddb.refreshMainView();

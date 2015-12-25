@@ -138,21 +138,21 @@ sddb.fillFiltersFromRequestParams = function () {
     "use strict";
     $("#filterDateStart").val(moment().format("YYYY-MM-DD"));
     $("#filterDateEnd").val(moment().format("YYYY-MM-DD"));
-    if (AssemblyId) {
-        return sddb.modalWaitWrapper(function () {
-            return $.ajax({
-                type: "POST",
-                url: "/AssemblyDbSrv/GetByIds",
-                timeout: 120000,
-                data: { ids: [AssemblyId], getActive: true },
-                dataType: "json"
-            })
-                .then(function (data) {
-                    sddb.msSetSelectionSilent(sddb.msFilterByAssembly, [{ id: data[0].Id, name: data[0].AssyName }]);
-                });
-        });
-    }
-    return $.Deferred().resolve();
+    if (!AssemblyId) { return $.Deferred().resolve(); }
+
+    return sddb.modalWaitWrapper(function () {
+        return $.ajax({
+            type: "POST",
+            url: "/AssemblyDbSrv/GetByIds",
+            timeout: 120000,
+            data: { ids: [AssemblyId], getActive: true },
+            dataType: "json"
+        })
+            .then(function (data) {
+                if (!data || data.length === 0) { return; }
+                sddb.msSetSelectionSilent(sddb.msFilterByAssembly, [{ id: data[0].Id, name: data[0].AssyName }]);
+            });
+    });
 };
 
 //refresh Main view 

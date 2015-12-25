@@ -1,4 +1,4 @@
-﻿/*global sddb, AssemblyId */
+﻿/*global sddb, ComponentId */
 /// <reference path="../DataTables/jquery.dataTables.js" />
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
@@ -39,7 +39,7 @@ sddb.setConfig({
                 name: "Component_",
                 render: function (data, type, full, meta) {
                     "use strict";
-                    return data.CompName
+                    return data.CompName;
                 }
             }, //2
             {
@@ -47,7 +47,7 @@ sddb.setConfig({
                 name: "LastSavedByPerson_",
                 render: function (data, type, full, meta) {
                     "use strict";
-                    return data.LastName + " " + data.Initials
+                    return data.LastName + " " + data.Initials;
                 }
             }, //3
             {
@@ -55,7 +55,7 @@ sddb.setConfig({
                 name: "ComponentStatus_",
                 render: function (data, type, full, meta) {
                     "use strict";
-                    return data.CompStatusName
+                    return data.CompStatusName;
                 }
             }, //4
             {
@@ -63,7 +63,7 @@ sddb.setConfig({
                 name: "AssignedToProject_",
                 render: function (data, type, full, meta) {
                     "use strict";
-                    return data.ProjectName + " " + data.ProjectCode
+                    return data.ProjectName + " " + data.ProjectCode;
                 }
             }, //5
             {
@@ -71,7 +71,7 @@ sddb.setConfig({
                 name: "AssignedToAssemblyDb_",
                 render: function (data, type, full, meta) {
                     "use strict";
-                    return data.AssyName
+                    return data.AssyName;
                 }
             }, //6
             { data: "LastCalibrationDate", name: "LastCalibrationDate" },//7
@@ -109,7 +109,7 @@ sddb.setConfig({
     labelTextEdit: "Edit Log Entry",
     urlFillForEdit : "/ComponentLogEntrySrv/GetByIds",
     urlEdit : "/ComponentLogEntrySrv/Edit",
-    urlDelete : "/ComponentLogEntrySrv/Delete",
+    urlDelete : "/ComponentLogEntrySrv/Delete"
 });
 
 //fillFiltersFromRequestParams
@@ -117,21 +117,22 @@ sddb.fillFiltersFromRequestParams = function () {
     "use strict";
     $("#filterDateStart").val(moment().format("YYYY-MM-DD"));
     $("#filterDateEnd").val(moment().format("YYYY-MM-DD"));
-    if (ComponentId) {
-        return sddb.modalWaitWrapper(function () {
-            return $.ajax({
-                type: "POST",
-                url: "/ComponentSrv/GetByIds",
-                timeout: 120000,
-                data: { ids: [ComponentId], getActive: true },
-                dataType: "json"
-            })
-                .then(function (data) {
-                    sddb.msSetSelectionSilent(sddb.msFilterByComponent, [{ id: data[0].Id, name: data[0].CompName, }]);
-                });
-        });
-    }
-    return $.Deferred().resolve();
+
+    if (!ComponentId) { return $.Deferred().resolve(); }
+
+    return sddb.modalWaitWrapper(function () {
+        return $.ajax({
+            type: "POST",
+            url: "/ComponentSrv/GetByIds",
+            timeout: 120000,
+            data: { ids: [ComponentId], getActive: true },
+            dataType: "json"
+        })
+            .then(function (data) {
+                if (!data || data.length === 0) { return; }
+                sddb.msSetSelectionSilent(sddb.msFilterByComponent, [{ id: data[0].Id, name: data[0].CompName }]);
+            });
+    });
 };
 
 //refresh Main view 
@@ -141,7 +142,7 @@ sddb.refreshMainView = function () {
     sddb.cfg.tableMain.clear().search("").draw();
     if ($("#filterDateStart").val() === "" || $("#filterDateEnd").val() === "") { return $.Deferred().resolve(); }
 
-    var endDate = ($("#filterDateEnd").val() == "") ? "" : moment($("#filterDateEnd").val())
+    var endDate = ($("#filterDateEnd").val() === "") ? "" : moment($("#filterDateEnd").val())
         .hour(23).minute(59).format("YYYY-MM-DD HH:mm");
 
     return sddb.modalWaitWrapper(function () {

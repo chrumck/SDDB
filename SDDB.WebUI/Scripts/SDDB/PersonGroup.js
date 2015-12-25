@@ -1,107 +1,31 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
+﻿/*global sddb */
+/// <reference path="../DataTables/jquery.dataTables.js" />
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
 /// <reference path="../jquery-2.1.4.js" />
 /// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
-/// <reference path="Shared.js" />
+/// <reference path="Shared_Views.js" />
 
-"use strict";
+//----------------------------------------------additional sddb setup------------------------------------------------//
 
-//--------------------------------------Global Properties------------------------------------//
+//setting up sddb
+sddb.setConfig({
+    recordTemplate: {
+        Id: "RecordTemplateId",
+        PrsGroupName: null,
+        PrsGroupAltName: null,
+        Comments: null,
+        IsActive_bl: null
+    },
 
-var recordTemplate = {
-    Id: "RecordTemplateId",
-    PrsGroupName: null,
-    PrsGroupAltName: null,
-    Comments: null,
-    IsActive_bl: null
-},
-    tableGroupManagersAdd = {},
-    tableGroupManagersRemove = {},
-    tableGroupPersonsAdd = {},
-    tableGroupPersonsRemove = {};
-
-labelTextCreate = "Create Group";
-labelTextEdit = "Edit Group";
-urlFillForEdit = "/PersonGroupSrv/GetByIds";
-urlEdit = "/PersonGroupSrv/Edit";
-urlDelete = "/PersonGroupSrv/Delete";
-urlRefreshMainView = "/PersonGroupSrv/Get";
-
-$(document).ready(function () {
-
-    //-----------------------------------------mainView------------------------------------------//
-        
-    //Wire Up btnEditGroupPersons 
-    $("#btnEditGroupPersons").click(function (event) {
-        event.preventDefault();
-        currentIds = tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (currentIds.length === 0) {
-            sddb.showModalNothingSelected();
-            return;
-        }
-        if (currentIds.length == 1) {
-            var selectedRecord = tableMain.row(".ui-selected", { page: "current" }).data();
-            $("#groupPersonsViewPanel").text(selectedRecord.PrsGroupName);
-        }
-        else { $("#groupPersonsViewPanel").text("_MULTIPLE_"); }
-
-        sddb.showModalWait();
-        sddb.fillFormForRelatedGeneric(
-                tableGroupPersonsAdd, tableGroupPersonsRemove, currentIds,
-                "GET", "/PersonGroupSrv/GetGroupPersons", { ids: currentIds },
-                "GET", "/PersonGroupSrv/GetGroupPersonsNot", { ids: currentIds },
-                1)
-            .always(sddb.hideModalWait)
-            .done(function () {
-                sddb.saveViewSettings(tableMain);
-                sddb.switchView("mainView", "groupPersonsView", "tdo-btngroup-grouppersons");
-            })
-            .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
-
-    });
-
-    //Wire Up btnEditGroupManagers 
-    $("#btnEditGroupManagers").click(function (event) {
-        event.preventDefault();
-        currentIds = tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (currentIds.length === 0) {
-            sddb.showModalNothingSelected();
-            return;
-        }
-        if (currentIds.length == 1) {
-            var selectedRecord = tableMain.row(".ui-selected", { page: "current" }).data();
-            $("#groupManagersViewPanel").text(selectedRecord.PrsGroupName);
-        }
-        else { $("#groupManagersViewPanel").text("_MULTIPLE_"); }
-
-        sddb.showModalWait();
-        sddb.fillFormForRelatedGeneric(
-                tableGroupManagersAdd, tableGroupManagersRemove, currentIds,
-                "GET", "/PersonGroupSrv/GetGroupManagers", { ids: currentIds },
-                "GET", "/PersonGroupSrv/GetGroupManagersNot", { ids: currentIds },
-                1)
-            .always(sddb.hideModalWait)
-            .done(function () {
-                sddb.saveViewSettings(tableMain);
-                sddb.switchView("mainView", "groupManagersView", "tdo-btngroup-groupmanagers");
-            })
-            .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
-
-    });
-            
-    //---------------------------------------DataTables------------
-
-    //tableMainColumnSets
-    tableMainColumnSets = [
+    tableMainColumnSets: [
         [1],
         [2, 3]
-    ];
-    
-    //tableMain PersonGroups
-    tableMain = $("#tableMain").DataTable({
+    ],
+
+    tableMain: $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "PrsGroupName", name: "PrsGroupName" },//1
@@ -126,48 +50,30 @@ $(document).ready(function () {
             infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
-    });
-    //showing the first Set of columns on startup;
-    sddb.showColumnSet(1, tableMainColumnSets);
+    }),
 
-    //---------------------------------------editFormView----------------------------------------//
+    labelTextCreate: "Create Group",
+    labelTextEdit: "Edit Group",
+    urlFillForEdit: "/PersonGroupSrv/GetByIds",
+    urlEdit: "/PersonGroupSrv/Edit",
+    urlDelete: "/PersonGroupSrv/Delete",
+    urlRefreshMainView: "/PersonGroupSrv/Get"
 
-    
-    //----------------------------------------groupPersonsView----------------------------------------//
+});
 
-    //Wire Up groupPersonsViewBtnCancel
-    $("#groupPersonsViewBtnCancel").click(function () {
-        sddb.switchView("groupPersonsView", "mainView", "tdo-btngroup-main", tableMain);
-    });
+sddb.callBackBeforeCopy = function () {
+    "use strict";
+    return sddb.showModalConfirm("NOTE: Group People are not copied.", "Confirm Copy");
+};
 
-    //Wire Up groupPersonsViewBtnOk
-    $("#groupPersonsViewBtnOk").click(function () {
-        if (tableGroupPersonsAdd.rows(".ui-selected", { page: "current" }).data().length +
-            tableGroupPersonsRemove.rows(".ui-selected", { page: "current" }).data().length === 0) {
-            sddb.showModalNothingSelected();
-            return;
-        }
-        sddb.showModalWait();
-        sddb.submitEditsForRelatedGeneric(
-                currentIds,
-                tableGroupPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-                tableGroupPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-                "/PersonGroupSrv/EditGroupPersons")
-            .always(sddb.hideModalWait)
-            .done(function () {
-                sddb.refreshMainView()
-                    .done(function () {
-                        sddb.switchView("groupPersonsView", "mainView", "tdo-btngroup-main", tableMain);
-                    });
-            })
-            .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
+//----------------------------------------------setup after page load------------------------------------------------//
 
-    });
-
-    //---------------------------------------DataTables------------
+$(document).ready(function () {
+    "use strict";
+    //--------------------------------------groupPersonsCfg--------------------------------------//
 
     //tableGroupPersonsAdd
-    tableGroupPersonsAdd = $("#tableGroupPersonsAdd").DataTable({
+    sddb.tableGroupPersonsAdd = $("#tableGroupPersonsAdd").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LastName", name: "LastName" },//1
@@ -192,7 +98,7 @@ $(document).ready(function () {
     });
 
     //tableGroupPersonsRemove
-    tableGroupPersonsRemove = $("#tableGroupPersonsRemove").DataTable({
+    sddb.tableGroupPersonsRemove = $("#tableGroupPersonsRemove").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LastName", name: "LastName" },//1
@@ -215,42 +121,29 @@ $(document).ready(function () {
         },
         pageLength: 100
     });
-   
-    //----------------------------------------groupManagersView----------------------------------------//
 
-    //Wire Up groupManagersViewBtnCancel
-    $("#groupManagersViewBtnCancel").click(function () {
-        sddb.switchView("groupManagersView", "mainView", "tdo-btngroup-main", tableMain);
-    });
+    //groupPersonsCfg
+    sddb.groupPersonsCfg = {
+        tableAdd: sddb.tableGroupPersonsAdd,
+        tableRemove: sddb.tableGroupPersonsRemove,
+        url: "/PersonGroupSrv/GetGroupPersons",
+        urlNot: "/PersonGroupSrv/GetGroupPersonsNot",
+        relatedViewId: "groupPersonsView",
+        relatedViewBtnGroupClass: "tdo-btngroup-grouppersons",
+        relatedViewPanelId: "groupPersonsViewPanel",
+        relatedViewPanelText: function (selectedRecord) { return selectedRecord.PrsGroupName; },
+        urlEdit: "/PersonGroupSrv/EditGroupPersons",
+        btnEditId: "btnEditGroupPersons",
+        btnCancelId: "groupPersonsViewBtnCancel",
+        btnOkId: "groupPersonsViewBtnOk"
+    };
 
-    //Wire Up groupManagersViewBtnOk
-    $("#groupManagersViewBtnOk").click(function () {
-        if (tableGroupManagersAdd.rows(".ui-selected", { page: "current" }).data().length +
-            tableGroupManagersRemove.rows(".ui-selected", { page: "current" }).data().length === 0) {
-            sddb.showModalNothingSelected();
-            return;
-        }
-        sddb.showModalWait();
-        sddb.submitEditsForRelatedGeneric(
-                currentIds,
-                tableGroupManagersAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-                tableGroupManagersRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-                "/PersonGroupSrv/EditGroupManagers")
-            .always(sddb.hideModalWait)
-            .done(function () {
-                sddb.refreshMainView()
-                    .done(function () {
-                        sddb.switchView("groupManagersView", "mainView", "tdo-btngroup-main", tableMain);
-                    });
-            })
-            .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
+    sddb.wireButtonsForRelated(sddb.groupPersonsCfg);
 
-    });
-
-    //---------------------------------------DataTables------------
+    //--------------------------------------groupManagersCfg--------------------------------------//
 
     //tableGroupManagersAdd
-    tableGroupManagersAdd = $("#tableGroupManagersAdd").DataTable({
+    sddb.tableGroupManagersAdd = $("#tableGroupManagersAdd").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LastName", name: "LastName" },//1
@@ -275,7 +168,7 @@ $(document).ready(function () {
     });
 
     //tableGroupManagersRemove
-    tableGroupManagersRemove = $("#tableGroupManagersRemove").DataTable({
+    sddb.tableGroupManagersRemove = $("#tableGroupManagersRemove").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LastName", name: "LastName" },//1
@@ -298,20 +191,36 @@ $(document).ready(function () {
         },
         pageLength: 100
     });
-        
+
+    //groupManagersCfg
+    sddb.groupManagersCfg = {
+        tableAdd: sddb.tableGroupManagersAdd,
+        tableRemove: sddb.tableGroupManagersRemove,
+        url: "/PersonGroupSrv/GetGroupManagers",
+        urlNot: "/PersonGroupSrv/GetGroupManagersNot",
+        relatedViewId: "groupManagersView",
+        relatedViewBtnGroupClass: "tdo-btngroup-groupmanagers",
+        relatedViewPanelId: "groupManagersViewPanel",
+        relatedViewPanelText: function (selectedRecord) { return selectedRecord.PrsGroupName; },
+        urlEdit: "/PersonGroupSrv/EditGroupManagers",
+        btnEditId: "btnEditGroupManagers",
+        btnCancelId: "groupManagersViewBtnCancel",
+        btnOkId: "groupManagersViewBtnOk"
+    };
+
+    sddb.wireButtonsForRelated(sddb.groupManagersCfg);
+
+    //-----------------------------------------mainView------------------------------------------//
+
+
+    //---------------------------------------editFormView----------------------------------------//
+
+
     //--------------------------------------View Initialization------------------------------------//
 
     sddb.refreshMainView();
-    sddb.switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
+    sddb.switchView();
 
-    //--------------------------------End of execution at Start-----------
+    //--------------------------------End of setup after page load---------------------------------//   
 });
-
-
-//--------------------------------------Main Methods---------------------------------------//
-
-
-//---------------------------------------Helper Methods--------------------------------------//
-
-
 

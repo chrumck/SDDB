@@ -80,11 +80,15 @@ var sddbConstructor = function (customCfg) {
         urlNot: "",
         dataNot: function () { return { ids: cfg.currentIds }; },
         sortColumn: null,
+        selectColumn: "Id",
         relatedViewId: null,
         relatedViewBtnGroupClass: null,
         relatedViewPanelId: null,
-        relatedViewPanelText: function () { return "Related Record"; },
-        urlEdit: ""
+        relatedViewPanelText: function (selectedRecord) { return "Related Record"; },
+        urlEdit: "",
+        btnEditId: "",
+        btnCancelId: "",
+        btnOkId: ""
     },
 
     //config
@@ -1203,14 +1207,22 @@ var sddbConstructor = function (customCfg) {
     
     //prepareRelatedFormForEdit 
     sddbObj.prepareRelatedFormForEdit = function (customFnCfg) {
-        var fnCfg = $.extend(true, {}, defaultCfgRelated, customFnCfg);
+        var fnCfg = $.extend(true, {}, defaultCfgRelated, customFnCfg),
+        selectedRecord;
 
         cfg.currentIds = cfg.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
         if (cfg.currentIds.length === 0) {
             sddbObj.showModalNothingSelected();
             return;
         }
-        $("#" + fnCfg.relatedViewPanelId).text(fnCfg.relatedViewPanelText());
+
+        if (cfg.currentIds.length > 1) {
+            $("#" + fnCfg.relatedViewPanelId).text("_MULTIPLE_");
+        }
+        else {
+            selectedRecord = cfg.tableMain.row(".ui-selected", { page: "current" }).data();
+            $("#" + fnCfg.relatedViewPanelId).text(fnCfg.relatedViewPanelText(selectedRecord));
+        }
 
         sddbObj.modalWaitWrapper(function () {
             return sddbObj.fillFormForRelatedGeneric(
@@ -1228,8 +1240,10 @@ var sddbConstructor = function (customCfg) {
     //submitRelatedEditForm
     sddbObj.submitRelatedEditForm = function (customFnCfg) {
         var fnCfg = $.extend(true, {}, defaultCfgRelated, customFnCfg),
-            idsAdd = fnCfg.tableAdd.cells(".ui-selected", "Name:name", { page: "current" }).data().toArray(),
-            idsRemove = fnCfg.tableRemove.cells(".ui-selected", "Name:name", { page: "current" }).data().toArray();
+            idsAdd = fnCfg.tableAdd
+                .cells(".ui-selected", fnCfg.selectColumn + ":name", { page: "current" }).data().toArray(),
+            idsRemove = fnCfg.tableRemove
+                .cells(".ui-selected", fnCfg.selectColumn + ":name", { page: "current" }).data().toArray();
 
         if (idsAdd.length + idsRemove.length === 0) {
             sddbObj.showModalNothingSelected();
@@ -1244,6 +1258,25 @@ var sddbConstructor = function (customCfg) {
             .done(function () {
                 sddbObj.switchView(fnCfg.relatedViewId, cfg.mainViewId, cfg.mainViewBtnGroupClass, cfg.tableMain);
             });
+    };
+
+    sddbObj.wireButtonsForRelated = function (customFnCfg) {
+        var fnCfg = $.extend(true, {}, defaultCfgRelated, customFnCfg);
+
+        $("#" + fnCfg.btnEditId).click(function (event) {
+            event.preventDefault();
+            sddbObj.prepareRelatedFormForEdit(customFnCfg);
+        });
+
+        $("#" + fnCfg.btnCancelId).click(function (event) {
+            event.preventDefault();
+            sddbObj.switchView(fnCfg.relatedViewId, cfg.mainViewId, cfg.mainViewBtnGroupClass, cfg.tableMain);
+        });
+
+        $("#" + fnCfg.btnOkId).click(function (event) {
+            event.preventDefault();
+            sddbObj.submitRelatedEditForm(customFnCfg);
+        });
     };
 
     //-----------------------------------------------------------------------------

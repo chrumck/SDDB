@@ -173,28 +173,21 @@ sddb.setConfig({
 //fillFiltersFromRequestParams
 sddb.fillFiltersFromRequestParams = function () {
     "use strict";
-    var deferred0 = $.Deferred();
-    if (typeof AssemblyId !== "undefined" && AssemblyId !== "") {
-        sddb.showModalWait();
-        $.ajax({
+    if (!AssemblyId) { return $.Deferred().resolve(); }
+
+    return sddb.modalWaitWrapper(function () {
+        return $.ajax({
             type: "POST",
             url: "/AssemblyDbSrv/GetByIds",
             timeout: 120000,
             data: { ids: [AssemblyId], getActive: true },
             dataType: "json"
         })
-            .always(sddb.hideModalWait)
-            .done(function (data) {
+            .then(function (data) {
+                if (!data || data.length === 0) { return; }
                 sddb.msSetSelectionSilent(sddb.msFilterByAssy, [{ id: data[0].Id, name: data[0].AssyName }]);
-                return deferred0.resolve();
-            })
-            .fail(function (xhr, status, error) {
-                sddb.showModalFail(xhr, status, error);
-                deferred0.reject(xhr, status, error);
             });
-    }
-    else { return deferred0.resolve(); }
-    return deferred0.promise();
+    });
 };
 
 //updateMainViewForSelectedType
@@ -317,7 +310,7 @@ $(document).ready(function () {
     "use strict";
     //-----------------------------------------mainView------------------------------------------//
 
-    //wire up dropdownId1 - Show Assy Components
+    //wire up dropdownId1
     $("#dropdownId1").click(function (event) {
         event.preventDefault();
         sddb.sendSingleIdToNewWindow("/ComponentLogEntry?ComponentId=");

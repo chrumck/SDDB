@@ -197,28 +197,21 @@ sddb.setConfig({
 //fillFiltersFromRequestParams
 sddb.fillFiltersFromRequestParams = function () {
     "use strict";
-    var deferred0 = $.Deferred();
-    if (typeof LocationId !== "undefined" && LocationId !== "") {
-        sddb.showModalWait();
-        $.ajax({
+    if (!LocationId) { return $.Deferred().resolve(); }
+
+    return sddb.modalWaitWrapper(function () {
+        return $.ajax({
             type: "POST",
             url: "/LocationSrv/GetByIds",
             timeout: 120000,
             data: { ids: [LocationId], getActive: true },
             dataType: "json"
         })
-            .always(sddb.hideModalWait)
-            .done(function (data) {
+            .then(function (data) {
+                if (!data || data.length === 0) { return; }
                 sddb.msSetSelectionSilent(sddb.msFilterByLoc, [{ id: data[0].Id, name: data[0].LocName }]);
-                return deferred0.resolve();
-            })
-            .fail(function (xhr, status, error) {
-                sddb.showModalFail(xhr, status, error);
-                deferred0.reject(xhr, status, error);
             });
-    }
-    else { return deferred0.resolve(); }
-    return deferred0.promise();
+    });
 };
 
 //updateMainViewForSelectedType
@@ -340,13 +333,13 @@ $(document).ready(function () {
     "use strict";
     //-----------------------------------------mainView------------------------------------------//
     
-    //wire up dropdownId1 - Show Assy Components
+    //wire up dropdownId1
     $("#dropdownId1").click(function (event) {
         event.preventDefault();
         sddb.sendSingleIdToNewWindow("/Component?AssemblyId=");
     });
 
-    //wire up dropdownId2 - Show Assy Log
+    //wire up dropdownId2
     $("#dropdownId2").click(function (event) {
         event.preventDefault();
         sddb.sendSingleIdToNewWindow("/AssemblyLogEntry?AssemblyId=");

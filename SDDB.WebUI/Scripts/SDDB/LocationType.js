@@ -1,4 +1,5 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
+﻿/*global sddb*/
+/// <reference path="../DataTables/jquery.dataTables.js" />
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
@@ -7,39 +8,24 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
-"use strict";
+//----------------------------------------------additional sddb setup------------------------------------------------//
 
-//--------------------------------------Global Properties------------------------------------//
+//setting up sddb
+sddb.setConfig({
+    recordTemplate: {
+        Id: "RecordTemplateId",
+        LocTypeName: null,
+        LocTypeAltName: null,
+        Comments: null,
+        IsActive_bl: null
+    },
 
-var recordTemplate = {
-    Id: "RecordTemplateId",
-    LocTypeName: null,
-    LocTypeAltName: null,
-    Comments: null,
-    IsActive_bl: null
-};
-
-labelTextCreate = "Create Location Type";
-labelTextEdit = "Edit Location Type";
-urlFillForEdit = "/LocationTypeSrv/GetByIds";
-urlEdit = "/LocationTypeSrv/Edit";
-urlDelete = "/LocationTypeSrv/Delete";
-urlRefreshMainView = "/LocationTypeSrv/Get";
-
-$(document).ready(function () {
-
-    //-----------------------------------------mainView------------------------------------------//
-    
-    //---------------------------------------DataTables------------
-
-    //tableMainColumnSets
-    tableMainColumnSets = [
+    tableMainColumnSets: [
         [1],
         [2, 3]
-    ];
-    
-    //tableMain Document Types
-    tableMain = $("#tableMain").DataTable({
+    ],
+
+    tableMain: $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" }, //0
             { data: "LocTypeName", name: "LocTypeName" }, //1
@@ -64,22 +50,25 @@ $(document).ready(function () {
             infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
-    });
-    //showing the first Set of columns on startup;
-    sddb.showColumnSet(1, tableMainColumnSets);
+    }),
 
-    //---------------------------------------editFormView----------------------------------------//
+    labelTextCreate: "Create Location Type",
+    labelTextEdit: "Edit Location Type",
+    urlFillForEdit: "/LocationTypeSrv/GetByIds",
+    urlEdit: "/LocationTypeSrv/Edit",
+    urlDelete: "/LocationTypeSrv/Delete",
+    urlRefreshMainView: "/LocationTypeSrv/Get"
 
+});
+
+//----------------------------------------------setup after page load------------------------------------------------//
+$(document).ready(function () {
+    "use strict";
     //--------------------------------------View Initialization------------------------------------//
 
     sddb.refreshMainView();
-    sddb.switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
+    sddb.switchView();
 
-    //--------------------------------End of execution at Start-----------
+    //--------------------------------End of setup after page load---------------------------------//   
 });
-
-
-//--------------------------------------Main Methods---------------------------------------//
-
-//---------------------------------------Helper Methods--------------------------------------//
 
