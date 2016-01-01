@@ -194,12 +194,32 @@ var sddbConstructor = function (customCfg) {
         $("#modalInfo").modal("show");
     };
 
+    //updateIdsResolveIfManySelected
+    sddbObj.updateIdsResolveIfAnySelected = function (bodyText) {
+        cfg.currentIds = cfg.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (cfg.currentIds.length === 0) {
+            sddbObj.showModalNothingSelected(bodyText);
+            return $.Deferred().reject();
+        }
+        return $.Deferred().resolve();
+    };
+
     //Show Modal Selected other than one row
     sddbObj.showModalSelectOne = function (bodyText) {
         $("#modalInfoLabel").text("Select One Row");
         $("#modalInfoBody").text(bodyText || "Please select one row.");
         $("#modalInfoBodyPre").empty().addClass("hidden");
         $("#modalInfo").modal("show");
+    };
+
+    //updateIdsResolveIfOneSelected
+    sddbObj.updateIdsResolveIfOneSelected = function (bodyText) {
+        cfg.currentIds = cfg.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (cfg.currentIds.length !== 1) {
+            sddbObj.showModalSelectOne(bodyText);
+            return $.Deferred().reject();
+        }
+        return $.Deferred().resolve();
     };
 
     //showModalWait
@@ -316,6 +336,7 @@ var sddbConstructor = function (customCfg) {
 
     //loadViewSettings
     sddbObj.loadViewSettings = function (dataTable) {
+        dataTable = dataTable || cfg.tableMain;
         dataTable.order(tableOrder).search(tableSearch).page(tablePage).draw(false);
         var indexesToSelect = dataTable.rows(function (idx, data, node) {
             return $.inArray(data.Id, tableSelectedIds) != -1;
@@ -526,20 +547,16 @@ var sddbConstructor = function (customCfg) {
 
     //FillFormForEdit Generic version
     sddbObj.fillFormForEditGeneric = function (ids, httpType, url, getActive, formId, labelText, msArray) {
-        var deferred0 = $.Deferred();
-        $.ajax({
+        return $.ajax({
             type: httpType,
             url: url,
             timeout: 120000,
             data: { ids: ids, getActive: getActive },
             dataType: "json"
         })
-            .done(function (dbEntries) {
-                sddbObj.fillFormForEditFromDbEntries(getActive, dbEntries, formId, labelText, msArray)
-                    .done(function () { deferred0.resolve(dbEntries); });
-            })
-            .fail(function (xhr, status, error) { deferred0.reject(xhr, status, error); });
-        return deferred0.promise();
+            .then(function (dbEntries) {
+                return sddbObj.fillFormForEditFromDbEntries(getActive, dbEntries, formId, labelText, msArray);
+            });
     };
         
     //fillFormForEditFromDbEntries - takes dbEntries instead of executing AJAX request

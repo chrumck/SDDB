@@ -1,32 +1,18 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
+﻿/*global sddb */
+/// <reference path="../DataTables/jquery.dataTables.js" />
+/// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
 /// <reference path="../jquery-2.1.4.js" />
 /// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
-/// <reference path="Shared.js" />
-/// <reference path="PersonLogEntryFiles.js" />
 /// <reference path="Shared_Views.js" />
 
-"use strict";
+//----------------------------------------------additional sddb setup------------------------------------------------//
 
-//--------------------------------------Global Properties------------------------------------//
-
-var msFilterByPerson,
-    msFilterByType,
-    msFilterByProject,
-    msFilterByAssy,
-
-    tableLogEntryAssysAdd,
-    tableLogEntryAssysRemove,
-    tableLogEntryPersonsAdd,
-    tableLogEntryPersonsRemove,
-
-    modalChngStsMs,
-    ChngStsAssyIds = [],
-    moveToDate,
-
-    recordTemplate = {
+//setting up sddb
+sddb.setConfig({
+    recordTemplate: {
         Id: "RecordTemplateId",
         LogEntryDateTime: null,
         EnteredByPerson_Id: null,
@@ -39,28 +25,32 @@ var msFilterByPerson,
         QcdDateTime: null,
         Comments: null,
         IsActive_bl: null
-    };
+    },
 
-urlFillForEdit = "/PersonLogEntrySrv/GetByIds";
-urlEdit = "/PersonLogEntrySrv/Edit";
-urlDelete = "/PersonLogEntrySrv/Delete";
+    urlFillForEdit : "/PersonLogEntrySrv/GetByIds",
+    urlEdit : "/PersonLogEntrySrv/Edit",
+    urlDelete : "/PersonLogEntrySrv/Delete"
 
-callBackBeforeSubmitEdit = function () {
+});
+
+//callBackBeforeSubmitEdit
+sddb.callBackBeforeSubmitEdit = function () {
+    "use strict";
     //confirmSubmitAddRemoveHelper
     var confirmSubmitAddRemoveHelper = function () {
-        if (tableLogEntryAssysAdd.rows(".ui-selected", { page: "current" }).data().length +
-            tableLogEntryAssysRemove.rows(".ui-selected", { page: "current" }).data().length +
-            tableLogEntryPersonsAdd.rows(".ui-selected", { page: "current" }).data().length +
-            tableLogEntryPersonsRemove.rows(".ui-selected", { page: "current" }).data().length > 0) {
-            return sddb.showModalFail("There are Assemblies and/or People selected in the Add/Remove tables." +
+        if (sddb.tableLogEntryAssysAdd.rows(".ui-selected", { page: "current" }).data().length +
+            sddb.tableLogEntryAssysRemove.rows(".ui-selected", { page: "current" }).data().length +
+            sddb.tableLogEntryPersonsAdd.rows(".ui-selected", { page: "current" }).data().length +
+            sddb.tableLogEntryPersonsRemove.rows(".ui-selected", { page: "current" }).data().length > 0) {
+            return sddb.showModalConfirm("There are Assemblies and/or People selected in the Add/Remove tables." +
                     "Do you wish to add/remove selected?", "Confirm Add/Remove")
                 .then(
                     function () { return $.Deferred().resolve(); },
                     function () {
-                        tableLogEntryAssysAdd.rows().nodes().to$().removeClass("ui-selected");
-                        tableLogEntryAssysRemove.rows().nodes().to$().removeClass("ui-selected");
-                        tableLogEntryPersonsAdd.rows().nodes().to$().removeClass("ui-selected");
-                        tableLogEntryPersonsRemove.rows().nodes().to$().removeClass("ui-selected");
+                        sddb.tableLogEntryAssysAdd.rows().nodes().to$().removeClass("ui-selected");
+                        sddb.tableLogEntryAssysRemove.rows().nodes().to$().removeClass("ui-selected");
+                        sddb.tableLogEntryPersonsAdd.rows().nodes().to$().removeClass("ui-selected");
+                        sddb.tableLogEntryPersonsRemove.rows().nodes().to$().removeClass("ui-selected");
                         return $.Deferred().resolve();
                     }
                 );
@@ -69,72 +59,81 @@ callBackBeforeSubmitEdit = function () {
     },
     //confirmNoAssembliesHelper
     confirmNoAssembliesHelper = function () {
-        if (tableLogEntryAssysRemove.rows().data().length +
-            tableLogEntryAssysAdd.rows(".ui-selected", { page: "current" }).data().length -
-            tableLogEntryAssysRemove.rows(".ui-selected", { page: "current" }).data().length <= 0) {
-            return sddb.showModalFail("There are no Assemblies added to your entry(ies). " +
-                "Are you sure you want to proceed?", "Missing ASSEMBLIES !", "no");
+        if (sddb.tableLogEntryAssysRemove.rows().data().length +
+            sddb.tableLogEntryAssysAdd.rows(".ui-selected", { page: "current" }).data().length -
+            sddb.tableLogEntryAssysRemove.rows(".ui-selected", { page: "current" }).data().length <= 0) {
+            return sddb.showModalConfirm("There are no Assemblies added to your entry(ies). " +
+                "Are you sure you want to proceed?", "Missing ASSEMBLIES !", "no", "btn btn-danger");
         }
         return $.Deferred().resolve();
-    }
+    };
     //main
     return confirmSubmitAddRemoveHelper().then(confirmNoAssembliesHelper);
 };
-
-
-callBackAfterSubmitEdit = function () {
-    return addRemoveAssembliesNow(true).then(function () { return addRemovePersonsNow(true); });
+//callBackAfterSubmitEdit        
+sddb.callBackAfterSubmitEdit = function () {
+    "use strict";
+    return sddb.addRemoveAssembliesNow(true).then(function () { return sddb.addRemovePersonsNow(true); });
 };
 //addRemoveAssembliesNow
-addRemoveAssembliesNow = function (doNotrefreshRelatedTable) {
+sddb.addRemoveAssembliesNow = function (doNotrefreshRelatedTable) {
+    "use strict";
     return sddb.modalWaitWrapper(function () {
-        return sddb.submitEditsForRelatedGeneric(currentIds,
-                tableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-                tableLogEntryAssysRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+        return sddb.submitEditsForRelatedGeneric(sddb.cfg.currentIds,
+                sddb.tableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                sddb.tableLogEntryAssysRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
                 "/PersonLogEntrySrv/EditPrsLogEntryAssys")
             .then(function () {
                 if (doNotrefreshRelatedTable) { return $.Deferred().resolve(); }
-                return sddb.fillFormForRelatedGeneric(tableLogEntryAssysAdd, tableLogEntryAssysRemove, currentIds,
-                        "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys",
-                        { ids: currentIds },
-                        "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
-                        { ids: currentIds, locId: magicSuggests[3].getValue()[0] });
+                return sddb.fillFormForRelatedGeneric(
+                        sddb.tableLogEntryAssysAdd, sddb.tableLogEntryAssysRemove, sddb.cfg.currentIds,
+                        "POST", "/PersonLogEntrySrv/GetPrsLogEntryAssys",
+                        { ids: sddb.cfg.currentIds },
+                        "POST", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
+                        { ids: sddb.cfg.currentIds, locId: sddb.cfg.magicSuggests[3].getValue()[0] });
             });
     });
 };
 //addRemovePersonsNow
-addRemovePersonsNow = function (doNotrefreshRelatedTable) {
+sddb.addRemovePersonsNow = function (doNotrefreshRelatedTable) {
+    "use strict";
     return sddb.modalWaitWrapper(function () {
-        return submitEditsForRelatedGeneric(currentIds,
-                tableLogEntryPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-                tableLogEntryPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+        return sddb.submitEditsForRelatedGeneric(sddb.cfg.currentIds,
+                sddb.tableLogEntryPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+                sddb.tableLogEntryPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
                 "/PersonLogEntrySrv/EditPrsLogEntryPersons")
             .then(function () {
                 if (doNotrefreshRelatedTable) { return $.Deferred().resolve(); }
-                return sddb.fillFormForRelatedGeneric(tableLogEntryPersonsAdd, tableLogEntryPersonsRemove, currentIds,
-                    "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { ids: currentIds },
-                    "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { ids: currentIds });
+                return sddb.fillFormForRelatedGeneric(
+                    sddb.tableLogEntryPersonsAdd, sddb.tableLogEntryPersonsRemove, sddb.cfg.currentIds,
+                    "POST", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { ids: sddb.cfg.currentIds },
+                    "POST", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { ids: sddb.cfg.currentIds });
             });
     });
 };
 //showModalChngSts
-showModalChngSts = function () {
-    $("#modalChngStsBody").text("Chagning status of " + ChngStsAssyIds.length + " assembly(ies).");
-    modalChngStsMs.clear(true);
+sddb.showModalChngSts = function () {
+    "use strict";
+    $("#modalChngStsBody").text("Chagning status of " + sddb.chngStsAssyIds.length + " assembly(ies).");
+    sddb.modalChngStsMs.clear(true);
     $("#modalChngSts").modal("show");
 };
 //changeAssyStatus
-changeAssyStatus = function () {
-    if (modalChngStsMs.getValue().length == 1) {
-        tableLogEntryAssysAdd.rows(".ui-selected", { page: "current" }).nodes().to$().removeClass("ui-selected");
-        tableLogEntryAssysRemove.rows(".ui-selected", { page: "current" }).nodes().to$().removeClass("ui-selected");
+sddb.changeAssyStatus = function () {
+    "use strict";
+    if (sddb.modalChngStsMs.getValue().length == 1) {
+        sddb.tableLogEntryAssysAdd.rows(".ui-selected", { page: "current" }).nodes().to$()
+            .removeClass("ui-selected");
+        sddb.tableLogEntryAssysRemove.rows(".ui-selected", { page: "current" }).nodes().to$()
+            .removeClass("ui-selected");
         sddb.showModalWait();
         $.ajax({
-            type: "POST", url: "/AssemblyDbSrv/EditStatus",
+            type: "POST",
+            url: "/AssemblyDbSrv/EditStatus",
             timeout: 120000,
             data: {
-                ids: ChngStsAssyIds,
-                statusId: modalChngStsMs.getValue()[0]
+                ids: sddb.chngStsAssyIds,
+                statusId: sddb.modalChngStsMs.getValue()[0]
             },
             dataType: "json"
         })
@@ -143,81 +142,91 @@ changeAssyStatus = function () {
     }
 };
 //qcSelected
-qcSelected = function () {
+sddb.qcSelected = function () {
+    "use strict";
     return sddb.modalWaitWrapper(function () {
         return $.ajax({
             type: "POST",
             url: "/PersonLogEntrySrv/QcLogEntries",
             timeout: 120000,
-            data: { ids: currentIds },
+            data: { ids: sddb.cfg.currentIds },
             dataType: "json"
         });
     })
-        .then(sddb.refreshMainView)
+        .then(sddb.refreshMainView);
 };
 
+//----------------------------------------------setup after page load------------------------------------------------//
+
 $(document).ready(function () {
+    "use strict";
 
     //-----------------------------------------mainView------------------------------------------//
 
-    //Initialize DateTimePicker filterDateStart
-    $("#filterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("dp.hide", function (e) { sddb.refreshMainView(); });
+    //filterDateStart event dp.hide
+    $("#filterDateStart").on("dp.hide", function (e) { sddb.refreshMainView(); });
 
-    //Initialize DateTimePicker filterDateEnd
-    $("#filterDateEnd").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("dp.hide", function (e) { sddb.refreshMainView(); });
-
-
+    //filterDateEnd event dp.hide
+    $("#filterDateEnd").on("dp.hide", function (e) { sddb.refreshMainView(); });
+       
     //---------------------------------------editFormView----------------------------------------//
 
     //Wire Up editFormBtnAddRemoveAssys
     $("#editFormBtnAddRemoveAssys").click(function () {
-        if (tableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().length +
-            tableLogEntryAssysRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().length == 0) {
+        if (sddb.tableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().length +
+            sddb.tableLogEntryAssysRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().length === 0) {
             sddb.showModalNothingSelected();
             return;
         }
-        if (currentIds.length === 0) {
-            sddb.showModalFail("Adding/Removing Assemblies requires saving the Entry. Save Entry?",
+        if (sddb.cfg.currentIds.length === 0) {
+            sddb.showModalConfirm("Adding/Removing Assemblies requires saving the Entry. Save Entry?",
                     "Confirm Saving Entry", "yes")
-                .done(function () { return sddb.submitEditForm(sddb.doNothingAndResolve, function () { addRemoveAssembliesNow(); }, true); });
+                .done(function () {
+                    return sddb.submitEditForm(sddb.doNothingAndResolve, function () {
+                        sddb.addRemoveAssembliesNow();
+                    }, true);
+                });
             return;
         }
-        addRemoveAssembliesNow();
+        sddb.addRemoveAssembliesNow();
     });
 
     //Wire Up editFormBtnChngSts
     $("#editFormBtnChngSts").click(function () {
-        ChngStsAssyIds = $.merge(tableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-            tableLogEntryAssysRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray());
-        if (ChngStsAssyIds.length == 0) {
+        sddb.chngStsAssyIds = $.merge(
+            sddb.tableLogEntryAssysAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
+            sddb.tableLogEntryAssysRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray()
+        );
+        if (sddb.chngStsAssyIds.length === 0) {
             sddb.showModalNothingSelected("Please select one or more assemblies.");
             return;
         }
-        showModalChngSts();
+        sddb.showModalChngSts();
     });
 
-    //Wire Up editFormBtnAddRemoveAssys
+    //Wire Up editFormBtnAddRemovePersons
     $("#editFormBtnAddRemovePersons").click(function () {
-        if (tableLogEntryPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().length +
-            tableLogEntryPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().length == 0) {
+        if (sddb.tableLogEntryPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().length +
+            sddb.tableLogEntryPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().length === 0) {
             sddb.showModalNothingSelected();
             return;
         }
-        if (currentIds.length === 0) {
-            sddb.showModalFail("Adding/Removing Persons requires saving the Entry. Save Entry?",
+        if (sddb.cfg.currentIds.length === 0) {
+            sddb.showModalConfirm("Adding/Removing Persons requires saving the Entry. Save Entry?",
                     "Confirm Saving Entry", "yes")
-                .done(function () { return sddb.submitEditForm(sddb.doNothingAndResolve, function () { addRemovePersonsNow(); }, true); });
+                .done(function () {
+                    return sddb.submitEditForm(sddb.doNothingAndResolve,
+                        function () { sddb.addRemovePersonsNow(); }, true);
+                });
             return;
         }
-        addRemovePersonsNow();
+        sddb.addRemovePersonsNow();
     });
 
     //------------------------------------DataTables - Log Entry Assemblies ---
 
     //tableLogEntryAssysAdd
-    tableLogEntryAssysAdd = $("#tableLogEntryAssysAdd").DataTable({
+    sddb.tableLogEntryAssysAdd = $("#tableLogEntryAssysAdd").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "AssyName", name: "AssyName" }//1
@@ -239,7 +248,7 @@ $(document).ready(function () {
     });
 
     //tableLogEntryAssysRemove
-    tableLogEntryAssysRemove = $("#tableLogEntryAssysRemove").DataTable({
+    sddb.tableLogEntryAssysRemove = $("#tableLogEntryAssysRemove").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "AssyName", name: "AssyName" }//1
@@ -263,7 +272,7 @@ $(document).ready(function () {
     //------------------------------------DataTables - Log Entry Persons ---
 
     //tableLogEntryPersonsAdd
-    tableLogEntryPersonsAdd = $("#tableLogEntryPersonsAdd").DataTable({
+    sddb.tableLogEntryPersonsAdd = $("#tableLogEntryPersonsAdd").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LastName", name: "LastName" },//1
@@ -288,7 +297,7 @@ $(document).ready(function () {
     });
 
     //tableLogEntryPersonsRemove
-    tableLogEntryPersonsRemove = $("#tableLogEntryPersonsRemove").DataTable({
+    sddb.tableLogEntryPersonsRemove = $("#tableLogEntryPersonsRemove").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LastName", name: "LastName" },//1
@@ -314,6 +323,8 @@ $(document).ready(function () {
 
     //----------------------------------Modal Dialog - Change Assy Status -----------------------//
 
+    sddb.chngStsAssyIds = [];
+
     //Wire Up ModalDeleteBtnCancel 
     $("#modalChngStsBtnCancel").click(function () { $("#modalChngSts").modal("hide"); });
 
@@ -321,7 +332,7 @@ $(document).ready(function () {
     $("#modalChngSts").on("shown.bs.modal", function () { $("#modalChngStsMs :input").focus(); });
 
     //Wire up MagicSuggest modalChngStsMs
-    modalChngStsMs = $("#modalChngStsMs").magicSuggest({
+    sddb.modalChngStsMs = $("#modalChngStsMs").magicSuggest({
         data: "/AssemblyStatusSrv/Lookup",
         allowFreeEntries: false,
         maxSelection: 1,
@@ -335,7 +346,13 @@ $(document).ready(function () {
     //Wire Up modalChngStsBtnOk
     $("#modalChngStsBtnOk").click(function () {
         $("#modalChngSts").modal("hide");
-        changeAssyStatus();
+        sddb.changeAssyStatus();
     });
 
+    //--------------------------------------View Initialization------------------------------------//
+
+    
+
+    //--------------------------------End of setup after page load---------------------------------//   
 });
+    

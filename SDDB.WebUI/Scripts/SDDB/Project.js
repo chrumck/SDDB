@@ -50,8 +50,8 @@ $(document).ready(function () {
 
         sddb.showModalWait();
         sddb.fillFormForRelatedGeneric(tableProjectPersonsAdd, tableProjectPersonsRemove, currentIds,
-                "GET", "/ProjectSrv/GetProjectPersons", { ids: currentIds },
-                "GET", "/ProjectSrv/GetProjectPersonsNot", { ids: currentIds })
+                "POST", "/ProjectSrv/GetProjectPersons", { ids: currentIds },
+                "POST", "/ProjectSrv/GetProjectPersonsNot", { ids: currentIds })
             .always(sddb.hideModalWait)
             .done(function () {
                 sddb.saveViewSettings(tableMain);

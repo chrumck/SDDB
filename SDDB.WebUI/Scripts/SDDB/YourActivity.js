@@ -53,9 +53,9 @@ callBackAfterEdit = function (currRecords) {
     return sddb.modalWaitWrapper(function () {
         return sddb.fillFormForRelatedGeneric(
                     tableLogEntryAssysAdd, tableLogEntryAssysRemove, currentIds,
-                    "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssys",
+                    "POST", "/PersonLogEntrySrv/GetPrsLogEntryAssys",
                     { ids: currentIds },
-                    "GET", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
+                    "POST", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
                     { ids: currentIds, locId: magicSuggests[3].getValue()[0] });
     });
 };
@@ -259,8 +259,8 @@ $(document).ready(function () {
         if ($("#logEntryPersonsView").hasClass("hidden")) {
             sddb.showModalWait();
             sddb.fillFormForRelatedGeneric(tableLogEntryPersonsAdd, tableLogEntryPersonsRemove, currentIds,
-                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { ids: currentIds },
-                "GET", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { ids: currentIds })
+                "POST", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { ids: currentIds },
+                "POST", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { ids: currentIds })
                 .always(sddb.hideModalWait)
                 .done(function () {
                     $("#logEntryPersonsView").removeClass("hidden");
