@@ -1,16 +1,15 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
-/// <reference path="../modernizr-2.8.3.js" />
-/// <reference path="../bootstrap.js" />
-/// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
-/// <reference path="../jquery-2.1.4.js" />
-/// <reference path="../jquery-2.1.4.intellisense.js" />
-/// <reference path="../MagicSuggest/magicsuggest.js" />
-/// <reference path="Shared.js" />
+﻿/*global sddb */
+/// <reference path="Shared_Views.js" />
 
-"use strict";
+//----------------------------------------------additional sddb setup------------------------------------------------//
+
+
+//TODO:file not finished. Needs to be refactored in order to be able serve document and other files
+
+
 
 //--------------------------------------Global Properties------------------------------------//
-var tableLogEntryFiles = {};
+
 var filecurrIds = [];
 var dlToken;
 var dlTimer;
@@ -25,20 +24,16 @@ $(document).ready(function () {
     //Wire up btnEditLogEntryFiles 
     $("#btnEditLogEntryFiles").click(function (event) {
         event.preventDefault();
-        currentIds = tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (currentIds.length != 1) {
-            sddb.showModalSelectOne();
-            return;
-        }
-
-        var selectedRecord = tableMain.row(".ui-selected", { page: "current" }).data();
-        $("#logEntryFilesViewPanel").text(selectedRecord.EnteredByPerson_.FirstName +
-            " " + selectedRecord.EnteredByPerson_.LastName + " - " +selectedRecord.LogEntryDateTime);
-        
-        fillLogEntryFilesForm()
-            .done(function () {
+        sddb.updateIdsResolveIfOneSelected()
+            .then(function () {
+                var selectedRecord = sddb.cfg.tableMain.row(".ui-selected", { page: "current" }).data();
+                $("#logEntryFilesViewPanel").text(selectedRecord.EnteredByPerson_.FirstName + " " +
+                    selectedRecord.EnteredByPerson_.LastName + " - " + selectedRecord.LogEntryDateTime);
+                return sddb.fillLogEntryFilesForm();
+            })
+            .then(function () {
                 sddb.saveViewSettings(tableMain);
-                sddb.switchView("mainView", "logEntryFilesView", "tdo-btngroup-logentryfiles");
+                sddb.switchView(sddb.cfg.mainViewId, "logEntryFilesView", "tdo-btngroup-logentryfiles");
             });
     });
 
@@ -49,8 +44,12 @@ $(document).ready(function () {
         $("#logEntryFilesViewPanel").text($("#LogEntryDateTime").val() +
             " " + magicSuggests[0].getSelection()[0].name);
         sddb.submitEditForm()
-            .then(function () { return fillLogEntryFilesForm(); })
-            .done(function () { sddb.switchView(mainViewId, "logEntryFilesView", "tdo-btngroup-logentryfiles"); });
+            .then(function () {
+                return sddb.fillLogEntryFilesForm();
+            })
+            .done(function () {
+                sddb.switchView(sddb.cfg.mainViewId, "logEntryFilesView", "tdo-btngroup-logentryfiles");
+            });
     });
 
     //--------------------------------------logEntryFilesView---------------------------------------//
@@ -155,7 +154,7 @@ $(document).ready(function () {
     //------------------------------------DataTables - Log Entry Files ---
 
     //tableLogEntryFiles
-    tableLogEntryFiles = $("#tableLogEntryFiles").DataTable({
+    sddb.tableLogEntryFiles = $("#tableLogEntryFiles").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "FileName", name: "FileName" },//1
@@ -215,7 +214,7 @@ $(document).ready(function () {
 //--------------------------------------Main Methods---------------------------------------//
 
 //Fill form showing log entry files
-function fillLogEntryFilesForm() {
+sddb.fillLogEntryFilesForm = function () {
     return sddb.modalWaitWrapper(function () {
         return sddb.refreshTableGeneric(tableLogEntryFiles,
             "/PersonLogEntrySrv/ListFiles", { logEntryId: currentIds[0] }, "GET");
