@@ -1,20 +1,14 @@
 ﻿using System;
 using System.Data.Entity;
-using System.Diagnostics;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net;
-using System.Reflection;
 using System.Threading.Tasks;
-using System.Transactions;
 using Mehdime.Entity;
 
 using SDDB.Domain.Entities;
 using SDDB.Domain.DbContexts;
-using SDDB.Domain.Infrastructure;
 
 namespace SDDB.Domain.Services
 {
@@ -38,9 +32,9 @@ namespace SDDB.Domain.Services
 
 
         //list files by PersonLogEntry_Id 
-        public virtual async Task<List<PersonLogEntryFile>> ListAsync(string logEntryId)
+        public virtual async Task<List<PersonLogEntryFile>> ListAsync(string id)
         {
-            if (String.IsNullOrEmpty(logEntryId)) { throw new ArgumentNullException("logEntryId"); }
+            if (String.IsNullOrEmpty(id)) { throw new ArgumentNullException("id"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
@@ -49,7 +43,7 @@ namespace SDDB.Domain.Services
                 var records = await dbContext.PersonLogEntryFiles
                     .Where(x => 
                         x.AssignedToPersonLogEntry.AssignedToProject.ProjectPersons.Any(y => y.Id == userId) &&
-                        x.AssignedToPersonLogEntry_Id == logEntryId
+                        x.AssignedToPersonLogEntry_Id == id
                     )
                     .Include(x => x.LastSavedByPerson)
                     .ToListAsync().ConfigureAwait(false);
@@ -62,13 +56,13 @@ namespace SDDB.Domain.Services
         //Create and Update records given in [] - same as BaseDbService
 
         //Upload PersonLogEntryFile[]
-        public virtual async Task<List<String>> UploadFilesAsync(List<PersonLogEntryFile> records)
+        public virtual async Task<List<String>> UploadFilesAsync(List<PersonLogEntryFile> files)
         {
-            if (records == null || records.Count == 0) { throw new ArgumentNullException("records"); }
+            if (files == null || files.Count == 0) { throw new ArgumentNullException("files"); }
 
             var newEntryIds = await dbScopeHelperAsync(dbContext =>
             {
-                return addPersonLogEntryFile(dbContext, records);
+                return addPersonLogEntryFile(dbContext, files);
             })
             .ConfigureAwait(false);
             return newEntryIds;
@@ -98,79 +92,79 @@ namespace SDDB.Domain.Services
         #region Helpers
 
         //upload (save to database) PersonLogEntryFile - overload for PersonLogEntryFile[]
-        private async Task<List<string>> addPersonLogEntryFile(EFDbContext dbContext, List<PersonLogEntryFile> records)
+        private async Task<List<string>> addPersonLogEntryFile(EFDbContext dbContext, List<PersonLogEntryFile> files)
         {
             var newEntryIds = new List<string>();
-            foreach (PersonLogEntryFile record in records)
+            foreach (var file in files)
             {
-                var newEntryId = await addPersonLogEntryFile(dbContext, record).ConfigureAwait(false);
+                var newEntryId = await addPersonLogEntryFile(dbContext, file).ConfigureAwait(false);
                 newEntryIds.Add(newEntryId);
             }
             return newEntryIds;
         }
 
         //upload (save to database) PersonLogEntryFile
-        private async Task<string> addPersonLogEntryFile(EFDbContext dbContext, PersonLogEntryFile record)
+        private async Task<string> addPersonLogEntryFile(EFDbContext dbContext, PersonLogEntryFile file)
         {
-            if (record == null) { throw new ArgumentNullException("record"); }
+            if (file == null) { throw new ArgumentNullException("file"); }
             
-            record.FileName = await getNewFileNameIfDuplicate(dbContext,
-                record.AssignedToPersonLogEntry_Id, record.FileName).ConfigureAwait(false);
-            record.Id = Guid.NewGuid().ToString();
-            record.LastSavedByPerson_Id = userId;
-            dbContext.PersonLogEntryFiles.Add(record);
+            file.FileName = await getNewFileNameIfDuplicate(dbContext,
+                file.AssignedToPersonLogEntry_Id, file.FileName).ConfigureAwait(false);
+            file.Id = Guid.NewGuid().ToString();
+            file.LastSavedByPerson_Id = userId;
+            dbContext.PersonLogEntryFiles.Add(file);
 
-            await addPersonLogEntryFileData(dbContext, record).ConfigureAwait(false);
-            return record.Id;
+            await addPersonLogEntryFileData(dbContext, file).ConfigureAwait(false);
+            return file.Id;
         }
 
         //add data from PersonLogEntryFile.FileData to PersonLogEntryFileDatas
-        private async Task addPersonLogEntryFileData(EFDbContext dbContext, PersonLogEntryFile record)
+        private async Task addPersonLogEntryFileData(EFDbContext dbContext, PersonLogEntryFile file)
         {
-            int lastChunkLength = record.FileSize % dataChunkLength;
-            int noOfChunks = (lastChunkLength == 0) ? record.FileSize / dataChunkLength : record.FileSize / dataChunkLength + 1;
+            int lastChunkLength = file.FileSize % dataChunkLength;
+            int noOfChunks = (lastChunkLength == 0) ? file.FileSize / dataChunkLength : file.FileSize / dataChunkLength + 1;
 
-            record.FileData.Position = 0;
+            file.FileData.Position = 0;
             for (int i = 0; i < noOfChunks; i++)
             {
-                byte[] chunkDataBuffer = new byte[dataChunkLength];
+                var chunkDataBuffer = new byte[dataChunkLength];
                 if (i == noOfChunks - 1 && lastChunkLength > 0) { chunkDataBuffer = new byte[lastChunkLength]; }
-                await record.FileData.ReadAsync(chunkDataBuffer, 0, chunkDataBuffer.Length).ConfigureAwait(false);
+                await file.FileData.ReadAsync(chunkDataBuffer, 0, chunkDataBuffer.Length).ConfigureAwait(false);
                 dbContext.PersonLogEntryFileDatas.Add(new PersonLogEntryFileData
                 {
                     Id = Guid.NewGuid().ToString(),
                     ChunkNumber = i,
                     Data = chunkDataBuffer,
-                    PersonLogEntryFile_Id = record.Id
+                    PersonLogEntryFile_Id = file.Id
                 });
             }
-            record.FileData.Dispose();
+            file.FileData.Dispose();
         }
 
         //getPersonLogEntryFile - get all data chunks and merge them into getPersonLogEntryFile.FileData 
         private async Task<PersonLogEntryFile> getPersonLogEntryFile(EFDbContext dbContext, string fileId)
         {
-            PersonLogEntryFile record = await dbContext.PersonLogEntryFiles.FirstOrDefaultAsync(x => x.Id == fileId)
+            var file = await dbContext.PersonLogEntryFiles.FirstOrDefaultAsync(x => x.Id == fileId)
                 .ConfigureAwait(false);
-            if (record == null)
+            if (file == null)
                 { throw new DbBadRequestException( String.Format("Log Entry File with Id={0} not found", fileId)); }
 
-            int noOfChunks = (record.FileSize % dataChunkLength == 0) ?
-                record.FileSize / dataChunkLength : record.FileSize / dataChunkLength + 1;
+            int noOfChunks = (file.FileSize % dataChunkLength == 0) ?
+                file.FileSize / dataChunkLength : file.FileSize / dataChunkLength + 1;
 
             for (int i = 0; i < noOfChunks; i++)
             {
-                PersonLogEntryFileData fileDataChunk = await dbContext.PersonLogEntryFileDatas.FirstOrDefaultAsync(x =>
+                var fileDataChunk = await dbContext.PersonLogEntryFileDatas.FirstOrDefaultAsync(x =>
                         x.PersonLogEntryFile_Id == fileId && x.ChunkNumber == i).ConfigureAwait(false);
                 if (fileDataChunk == null)
                 {
-                    record.FileData.Dispose();
+                    file.FileData.Dispose();
                     throw new DbBadRequestException(
-                        String.Format("Data Chunk for Log Entry File {0} not found", record.FileName)); 
+                        String.Format("Data Chunk for Log Entry File {0} not found", file.FileName)); 
                 }
-                await record.FileData.WriteAsync(fileDataChunk.Data, 0, fileDataChunk.Data.Length).ConfigureAwait(false);
+                await file.FileData.WriteAsync(fileDataChunk.Data, 0, fileDataChunk.Data.Length).ConfigureAwait(false);
             }
-            return record;
+            return file;
         }
 
         //getZipFileFromEntryFiles - get all files from fileIds and zip them into getPersonLogEntryFile.FileData
@@ -180,14 +174,14 @@ namespace SDDB.Domain.Services
             zipFile.FileType = System.Net.Mime.MediaTypeNames.Application.Octet;
             zipFile.FileName = "SDDBFiles_" + String.Format("_{0:yyyyMMdd_HHmm}", DateTime.Now) + ".zip";
 
-            using (ZipArchive zip = new ZipArchive(zipFile.FileData, ZipArchiveMode.Create, true))
+            using (var zip = new ZipArchive(zipFile.FileData, ZipArchiveMode.Create, true))
             {
                 for (int i = 0; i < fileIds.Length; i++)
                 {
-                    PersonLogEntryFile record =  await getPersonLogEntryFile(dbContext, fileIds[i]).ConfigureAwait(false); 
-                    Stream newZipEntryStream = zip.CreateEntry(record.FileName).Open();
-                    record.FileData.WriteTo(newZipEntryStream);
-                    record.FileData.Dispose();
+                    var file =  await getPersonLogEntryFile(dbContext, fileIds[i]).ConfigureAwait(false); 
+                    Stream newZipEntryStream = zip.CreateEntry(file.FileName).Open();
+                    file.FileData.WriteTo(newZipEntryStream);
+                    file.FileData.Dispose();
                     newZipEntryStream.Close();
                 }
             }
@@ -205,8 +199,8 @@ namespace SDDB.Domain.Services
             var i = 1;
             while (existingFileNames.Contains(currentFileName) || newFileNames.Contains(currentFileName))
             {
-                string extension = System.IO.Path.GetExtension(currentFileName);
-                string currentFileNameWoExt = currentFileName.Substring(0, currentFileName.Length - extension.Length);
+                var extension = System.IO.Path.GetExtension(currentFileName);
+                var currentFileNameWoExt = currentFileName.Substring(0, currentFileName.Length - extension.Length);
 
                 if (currentFileNameWoExt.Substring(currentFileNameWoExt.Length - 1) == ")")
                 {

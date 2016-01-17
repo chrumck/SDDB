@@ -490,7 +490,6 @@
     <Content Include="Scripts\SDDB\AssemblyLogEntry.js" />
     <Content Include="Scripts\SDDB\ComponentLogEntry.js" />
     <Content Include="Scripts\SDDB\DbUser.js" />
-    <Content Include="Scripts\SDDB\PersonLogEntryFiles.js" />
     <Content Include="Scripts\SDDB\PersonLogEntry.js" />
     <Content Include="Scripts\SDDB\YourActivity.js" />
     <Content Include="Scripts\SDDB\Component.js" />

@@ -4,6 +4,8 @@
 /// <reference path="../jquery.validate.unobtrusive.js" />
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
+/// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
+/// <reference path="../DataTables/jquery.dataTables.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="../FileSaver.js" />
 
@@ -17,7 +19,7 @@ var sddbConstructor = function (customCfg) {
     tableOrder,
     tableSearch,
     tableSelectedIds,
-
+        
     //defaultCfg
     defaultCfg = {
         currentIds: [],
@@ -89,6 +91,41 @@ var sddbConstructor = function (customCfg) {
         btnEditId: "",
         btnCancelId: "",
         btnOkId: ""
+    },
+
+    //defaultCfgFiles
+    ulFilesXHR = new window.XMLHttpRequest(),
+    defaultCfgFiles =  {
+        filesTable: null,
+        filesTableId: "filesTable",
+        listFilesHttpType: "GET",
+        listFilesUrl: "",
+        listFilesData: function () { return { id: cfg.currentIds[0] }; },
+        dlFilesHttpType: "POST",
+        dlFilesUrl: "",
+        dlFilesRelated: function () { return "name=\"id\" value=\"" + cfg.currentIds[0] + "\" "; },
+        ulFilesHttpType: "POST",
+        ulFilesUrl: "",
+        ulFilesAppendRelated: function (formData) { formData.append("id", cfg.currentIds[0]); },
+        deleteFilesHttpType: "POST",
+        deleteFilesUrl: "",
+        deleteFilesData: function (fileIds) { return { id: cfg.currentIds[0], ids: fileIds }; },
+        filesViewId: "filesView",
+        filesViewLabelId: "filesViewLabel",
+        filesViewLabelText: "Files",
+        filesViewBtnGroupClass: "tdo-btngroup-files",
+        filesViewPanelId: "filesViewPanel",
+        filesViewPanelText: function (selectedRecord) { return "Files"; },
+        filesIframeId: "filesIframe",
+        maxUploadSize: 20971520,
+        btnFilesId: "btnFiles",
+        btnBackId: "filesViewBtnBack",
+        btnUloadId: "filesBtnUpload",
+        btnUloadAbortId: "modalUploadFilesBtnAbort",
+        btnDloadId: "filesBtnDload",
+        btnDeleteId: "filesBtnDelete",
+        filesUploadModalId: "modalUploadFiles",
+        filesUploadModalBodyId: "modalUploadFilesBody"
     },
 
     //config
@@ -194,16 +231,6 @@ var sddbConstructor = function (customCfg) {
         $("#modalInfo").modal("show");
     };
 
-    //updateIdsResolveIfManySelected
-    sddbObj.updateIdsResolveIfAnySelected = function (bodyText) {
-        cfg.currentIds = cfg.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (cfg.currentIds.length === 0) {
-            sddbObj.showModalNothingSelected(bodyText);
-            return $.Deferred().reject();
-        }
-        return $.Deferred().resolve();
-    };
-
     //Show Modal Selected other than one row
     sddbObj.showModalSelectOne = function (bodyText) {
         $("#modalInfoLabel").text("Select One Row");
@@ -212,16 +239,22 @@ var sddbConstructor = function (customCfg) {
         $("#modalInfo").modal("show");
     };
 
-    //updateIdsResolveIfOneSelected
-    sddbObj.updateIdsResolveIfOneSelected = function (bodyText) {
+    //updateIdsReturnIsManySelected
+    sddbObj.updateIdsReturnIsManySelected = function (bodyText) {
         cfg.currentIds = cfg.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (cfg.currentIds.length !== 1) {
-            sddbObj.showModalSelectOne(bodyText);
-            return $.Deferred().reject();
-        }
-        return $.Deferred().resolve();
+        if (cfg.currentIds.length > 0) { return true; }
+        sddbObj.showModalNothingSelected(bodyText);
+        return false;
     };
-
+        
+    //updateIdsReturnIsOneSelected
+    sddbObj.updateIdsReturnIsOneSelected = function (bodyText, targetIds, table) {
+        cfg.currentIds = cfg.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (cfg.currentIds.length == 1) { return true; }
+        sddbObj.showModalSelectOne(bodyText);
+        return false;
+    };
+        
     //showModalWait
     sddbObj.showModalWait = function () {
         $("#modalWait").modal({ show: true, backdrop: "static", keyboard: false });
@@ -862,7 +895,7 @@ var sddbConstructor = function (customCfg) {
         var defaultSettings = {
             data: lookupUrl,
             allowFreeEntries: false,
-            ajaxConfig: { error: function (xhr, status, error) { sddbObj.showModalFail(xhr, status, error); } },
+            ajaxConfig: { error: function (xhr, status, error) { sddbObj.showModalAJAXFail(xhr, status, error); } },
             infoMsgCls: "hidden",
             style: "min-width: 240px;"
         },
@@ -976,10 +1009,9 @@ var sddbConstructor = function (customCfg) {
             });
             $element.removeAttr(attrsToRemove);
         },
-
         //private variables
         deferred0 = $.Deferred();
-
+        //main
         $.ajax({ type: httpType, url: url, data: data, timeout: 120000, dataType: "json" })
             .done(function (data) {
                 var typeHasAttrs = false,
@@ -1075,17 +1107,11 @@ var sddbConstructor = function (customCfg) {
 
     //prepareFormForEdit
     sddbObj.prepareFormForEdit = function (callBackAfter) {
+        if (!sddbObj.updateIdsReturnIsManySelected()) { return $.Deferred().reject(); } 
 
         callBackAfter = callBackAfter || sddbObj.callBackAfterEdit;
 
-        var deferred0 = $.Deferred();
-
-        cfg.currentIds = cfg.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (cfg.currentIds.length === 0) {
-            sddbObj.showModalNothingSelected();
-            return deferred0.reject();
-        }
-        sddbObj.modalWaitWrapper(function () {
+        return sddbObj.modalWaitWrapper(function () {
             return sddbObj.fillFormForEditGeneric(cfg.currentIds, cfg.httpTypeFillForEdit, cfg.urlFillForEdit,
                 cfg.currentActive, cfg.editFormId, cfg.labelTextEdit, cfg.magicSuggests);
         })
@@ -1096,27 +1122,17 @@ var sddbConstructor = function (customCfg) {
             .done(function () {
                 sddbObj.saveViewSettings(cfg.tableMain);
                 sddbObj.switchView(cfg.mainViewId, cfg.editFormViewId, cfg.editFormBtnGroupEditClass);
-                deferred0.resolve();
-            })
-            .fail(deferred0.reject);
-
-        return deferred0.promise();
+            });
     };
 
     //prepareFormForCopy
     sddbObj.prepareFormForCopy = function (callBackBefore, callBackAfter) {
+        if (!sddbObj.updateIdsReturnIsOneSelected()) { return $.Deferred().reject(); }
 
         callBackBefore = callBackBefore || sddbObj.callBackBeforeCopy;
         callBackAfter = callBackAfter || sddbObj.callBackAfterCopy;
-
-        var deferred0 = $.Deferred();
-
-        cfg.currentIds = cfg.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (cfg.currentIds.length !== 1) {
-            sddbObj.showModalSelectOne();
-            return deferred0.reject();
-        }
-        callBackBefore()
+      
+        return callBackBefore()
             .then(function () {
                 return sddbObj.modalWaitWrapper(function () {
                     return sddbObj.fillFormForCopyGeneric(cfg.currentIds,
@@ -1133,28 +1149,23 @@ var sddbConstructor = function (customCfg) {
             .done(function () {
                 sddbObj.saveViewSettings(cfg.tableMain);
                 sddbObj.switchView(cfg.mainViewId, cfg.editFormViewId, cfg.editFormBtnGroupEditClass);
-                deferred0.resolve();
-            })
-            .fail(deferred0.reject);
-
-        return deferred0.promise();
+            });
     };
 
     //submitEditForm
     sddbObj.submitEditForm = function (callBackBefore, callBackAfter, doNotSwitchToMainView) {
 
-        callBackBefore = callBackBefore || sddbObj.callBackBeforeSubmitEdit;
-        callBackAfter = callBackAfter || sddbObj.callBackAfterSubmitEdit;
-
-        var deferred0 = $.Deferred();
-
         sddbObj.msValidate(cfg.magicSuggests);
         if (!sddbObj.formIsValid(cfg.editFormId, cfg.currentIds.length === 0) ||
                 !sddbObj.msIsValid(cfg.magicSuggests)) {
             sddbObj.showModalFail("Errors in Form", "The form has missing or invalid inputs. Please correct.");
-            return deferred0.reject();
+            return $.Deferred().reject();
         }
-        callBackBefore()
+
+        callBackBefore = callBackBefore || sddbObj.callBackBeforeSubmitEdit;
+        callBackAfter = callBackAfter || sddbObj.callBackAfterSubmitEdit;
+
+        return callBackBefore()
             .then(function () {
                 var createMultiple = $("#createMultiple").val() !== "" ? $("#createMultiple").val() : 1;
                 return sddbObj.modalWaitWrapper(function () {
@@ -1172,17 +1183,15 @@ var sddbConstructor = function (customCfg) {
                 }
                 return callBackAfter(data);
             })
-            .then(function () { return sddbObj.refreshMainView(); })
+            .then(function () {
+                if (!doNotSwitchToMainView) { return sddbObj.refreshMainView(); }
+            })
             .done(function () {
                 if (!doNotSwitchToMainView) {
                     sddbObj.switchView(cfg.editFormViewId, cfg.mainViewId,
                         cfg.mainViewBtnGroupClass, cfg.tableMain);
                 }
-                deferred0.resolve();
-            })
-            .fail(deferred0.reject);
-
-        return deferred0.promise();
+            });
     };
 
     //cancelEditForm
@@ -1190,13 +1199,9 @@ var sddbConstructor = function (customCfg) {
         sddbObj.switchView(cfg.editFormViewId, cfg.mainViewId, cfg.mainViewBtnGroupClass, cfg.tableMain);
     };
 
-    //confirmAndDelete
-    sddbObj.confirmAndDelete = function () {
-        cfg.currentIds = cfg.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (cfg.currentIds.length === 0) {
-            sddbObj.showModalNothingSelected();
-            return;
-        }
+    //confirmDeleteRecords
+    sddbObj.confirmDeleteRecords = function () {
+        if (!sddbObj.updateIdsReturnIsManySelected()) { return; } 
         sddbObj.showModalConfirm("Confirm deleting " + cfg.currentIds.length +
                 " row(s).", "Confirm Delete", "no", "btn btn-danger")
             .done(sddbObj.deleteRecords);
@@ -1227,12 +1232,8 @@ var sddbConstructor = function (customCfg) {
         var fnCfg = $.extend(true, {}, defaultCfgRelated, customFnCfg),
         selectedRecord;
 
-        cfg.currentIds = cfg.tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (cfg.currentIds.length === 0) {
-            sddbObj.showModalNothingSelected();
-            return;
-        }
-
+        if (!sddbObj.updateIdsReturnIsManySelected()) { return; }
+        
         if (cfg.currentIds.length > 1) {
             $("#" + fnCfg.relatedViewPanelId).text("_MULTIPLE_");
         }
@@ -1277,6 +1278,7 @@ var sddbConstructor = function (customCfg) {
             });
     };
 
+    //wireButtonsForRelated
     sddbObj.wireButtonsForRelated = function (customFnCfg) {
         var fnCfg = $.extend(true, {}, defaultCfgRelated, customFnCfg);
 
@@ -1293,6 +1295,222 @@ var sddbConstructor = function (customCfg) {
         $("#" + fnCfg.btnOkId).click(function (event) {
             event.preventDefault();
             sddbObj.submitRelatedEditForm(customFnCfg);
+        });
+    };
+
+    //-----------------------------------------------------------------------------
+
+    //prepareFilesForm 
+    sddbObj.prepareFilesForm = function (fnCfg) {
+        var selectedRecord;
+
+        if (!sddbObj.updateIdsReturnIsOneSelected()) { return; }
+        
+        selectedRecord = cfg.tableMain.row(".ui-selected", { page: "current" }).data();
+        $("#" + fnCfg.filesViewPanelId).text(fnCfg.filesViewPanelText(selectedRecord));
+        $("#" + fnCfg.filesViewLabelId).text(fnCfg.filesViewLabelText);
+
+        sddbObj.modalWaitWrapper(function () {
+            return sddbObj.refreshTableGeneric(fnCfg.filesTable, fnCfg.listFilesUrl,
+                fnCfg.listFilesData(), fnCfg.listFilesHttpType);
+        })
+            .then(function () {
+                sddbObj.saveViewSettings();
+                sddbObj.switchView(cfg.mainViewId, fnCfg.filesViewId, fnCfg.filesViewBtnGroupClass);
+            });
+    };
+
+    //uploadFiles
+    sddbObj.uploadFiles = function (fnCfg, event) {
+        //getDataSizeHelper
+        var getDataSizeHelper = function () {
+            var dataSize = 0;
+            $.each(event.target.files, function (index, file) { dataSize += file.size; });
+            return dataSize;
+        },
+        //getDataHelper
+        getDataHelper = function () {
+            var data = new FormData();
+            $.each(event.target.files, function (index, file) { data.append("file" + index, file); });
+            fnCfg.ulFilesAppendRelated(data);
+            return data;
+        };
+        //main
+        if (!window.FormData) {
+            sddbObj.showModalFail("Browser Error", "This browser doesn't support HTML5 file uploads!");
+            return $.Deferred().reject();
+        }
+        if (!event.target.files.length) {
+            return $.Deferred().reject();
+        }
+        if (getDataSizeHelper() > fnCfg.maxUploadSize) {
+            sddbObj.showModalFail("Upload Too Large",
+                "The total single upload is limited to " + fnCfg.maxUploadSize / 1024 + " kB");
+            return $.Deferred().reject();
+        }
+
+        $("#" + fnCfg.filesUploadModalId).modal({ show: true, backdrop: "static", keyboard: false });
+        return $.ajax({
+            type: fnCfg.ulFilesHttpType,
+            url: fnCfg.ulFilesUrl,
+            contentType: false,
+            processData: false,
+            data: getDataHelper(),
+            xhr: function () {
+                ulFilesXHR.upload.addEventListener("progress", function (event) {
+                    if (!event.lengthComputable) { return; }
+                    $("#" + fnCfg.filesUploadModalBodyId).text("Progress: " +
+                        Math.round((event.loaded / event.total) * 100) + "%");
+                }, false);
+                return ulFilesXHR;
+            }
+        })
+            .always(function () {
+                $("#" + fnCfg.filesUploadModalId).modal("hide");
+                $(event.target).val("");
+            })
+            .done(function () {
+                sddbObj.refreshTableGeneric(fnCfg.filesTable, fnCfg.listFilesUrl,
+                            fnCfg.listFilesData(), fnCfg.listFilesHttpType);
+            })
+            .fail(sddbObj.showModalAJAXFail);
+    };
+
+    //abortUploadFiles
+    sddbObj.abortUploadFiles = function (fnCfg) {
+        ulFilesXHR.abort();
+        $("#" + fnCfg.filesUploadModalId).modal("hide");
+        sddbObj.showModalWait()
+        setTimeout(function () {
+            sddbObj.modalWaitWrapper(function () {
+                return sddbObj.refreshTableGeneric(fnCfg.filesTable, fnCfg.listFilesUrl,
+                            fnCfg.listFilesData(), fnCfg.listFilesHttpType);
+            });
+        }, 5000);
+    };
+
+    //downloadFiles
+    sddbObj.downloadFiles = function (fnCfg) {
+        var form,
+        dlToken = new Date().getTime(),
+        dlAttempts = 60,
+        dlTimer,
+        fileIds = [],
+        //dlTimerHelper
+        dlTimerHelper = function () {
+            //getCookieHelper
+            var getCookieHelper = function (name) {
+                var parts = document.cookie.split(name + "=");
+                if (parts.length === 2) { return parseInt(parts.pop().split(";").shift()); }
+            },
+            //expireCookieHelper
+            expireCookieHelper = function (name) {
+                document.cookie = encodeURIComponent(name) + "=deleted; expires=" + new Date(0).toUTCString();
+            },
+            //iFrameBodyHtml
+            iFrameBodyHtml = $("#" + fnCfg.filesIframeId).contents().find("body").html();
+            //main
+            if (getCookieHelper("dlToken") !== dlToken && dlAttempts !== 0) {
+                dlAttempts -= 1;
+                return;
+            }
+            sddbObj.hideModalWait();
+            window.clearInterval(dlTimer);
+            expireCookieHelper("dlToken");
+            if (dlAttempts === 0) {
+                sddbObj.showModalFail("Server Error", "Server response timed out.");
+                return;
+            }
+            if (iFrameBodyHtml) {
+                sddbObj.showModalFail("Server Error", iFrameBodyHtml);
+                return;
+            }
+        };
+        //main
+        fileIds = fnCfg.filesTable.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (fileIds.length === 0) {
+            sddbObj.showModalNothingSelected();
+            return;
+        }
+
+        sddbObj.showModalWait();
+        $("#" + fnCfg.filesIframeId).contents().find("body").html("");
+        dlTimer = window.setInterval(dlTimerHelper, 500);
+        form = $("<form method=\"" + fnCfg.dlFilesHttpType + "\" " +
+                 "action=\"" + fnCfg.dlFilesUrl + "\" " +
+                 "target=\"" + fnCfg.filesIframeId + "\">");
+        form.append($("<input type=\"hidden\" name=\"dlToken\" value=\"" + dlToken + "\">"));
+        form.append($("<input type=\"hidden\" " + fnCfg.dlFilesRelated() + " >"));
+        $.each(fileIds, function (i, name) {
+            form.append($("<input type=\"hidden\" name=\"fileIds[" + i + "]\" value=\"" + name + "\">"));
+        });
+        $("body").append(form);
+        form.submit();
+    };
+
+    //deleteFiles
+    sddbObj.deleteFiles = function (fnCfg) {
+        var fileIds = [],
+        //deleteFilesHelper
+        deleteFilesHelper = function () {
+            return sddbObj.modalWaitWrapper(function () {
+                return $.ajax({
+                    type: fnCfg.deleteFilesHttpType,
+                    url: fnCfg.deleteFilesUrl,
+                    data: fnCfg.deleteFilesData(fileIds),
+                    timeout: 120000,
+                    dataType: "json"
+                })
+                    .then(function () {
+                        return sddbObj.refreshTableGeneric(fnCfg.filesTable, fnCfg.listFilesUrl,
+                            fnCfg.listFilesData(), fnCfg.listFilesHttpType);
+                    });
+            });
+        };
+        //main
+        fileIds = fnCfg.filesTable.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+        if (fileIds.length === 0) {
+            sddbObj.showModalNothingSelected();
+            return;
+        }
+
+        sddbObj.showModalConfirm("Confirm deleting " + fileIds.length + " file(s).",
+                "Confirm Delete", "no", "btn btn-danger")
+            .done(deleteFilesHelper);
+    };
+        
+    //wireButtonsForFiles
+    sddbObj.wireButtonsForFiles = function (customFnCfg) {
+        var fnCfg = $.extend(true, {}, defaultCfgFiles, customFnCfg);
+
+        $("#" + fnCfg.btnFilesId).click(function (event) {
+            event.preventDefault();
+            sddbObj.prepareFilesForm(fnCfg);
+        });
+
+        $("#" + fnCfg.btnBackId).click(function (event) {
+            event.preventDefault();
+            sddbObj.switchView(fnCfg.filesViewId, cfg.mainViewId, cfg.mainViewBtnGroupClass, cfg.tableMain);
+        });
+        
+        $("#" + fnCfg.btnUloadId).on("change", function (event) {
+            event.preventDefault();
+            sddbObj.uploadFiles(fnCfg, event);
+        });
+
+        $("#" + fnCfg.btnUloadAbortId).click(function (event) {
+            event.preventDefault();
+            sddbObj.abortUploadFiles(fnCfg);
+        });
+
+        $("#" + fnCfg.btnDloadId).click(function (event) {
+            event.preventDefault();
+            sddbObj.downloadFiles(fnCfg);
+        });
+
+        $("#" + fnCfg.btnDeleteId).click(function (event) {
+            event.preventDefault();
+            sddbObj.deleteFiles(fnCfg);
         });
     };
 

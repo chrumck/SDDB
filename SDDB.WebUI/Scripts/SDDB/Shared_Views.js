@@ -1,6 +1,5 @@
-﻿/// <reference path="Shared.js" />
-
-"use strict";
+﻿/*global sddbConstructor */
+/// <reference path="Shared.js" />
 
 //--------------------------------------Global Variables-------------------------------------//
 
@@ -12,6 +11,7 @@ var sddb = sddbConstructor();
 //client validation for dbisinteger
 $.validator.unobtrusive.adapters.addBool("dbisinteger");
 $.validator.addMethod("dbisinteger", function (value, element, valParams) {
+    "use strict";
     if (value) { return value == parseInt(value, 10); }
     return true;
 });
@@ -19,6 +19,7 @@ $.validator.addMethod("dbisinteger", function (value, element, valParams) {
 //client validation for dbisbool
 $.validator.unobtrusive.adapters.addBool("dbisbool");
 $.validator.addMethod("dbisbool", function (value, element, valParams) {
+    "use strict";
     if (value) { return (value.toLowerCase() == "true" || value.toLowerCase() == "false"); }
     return true;
 });
@@ -26,6 +27,7 @@ $.validator.addMethod("dbisbool", function (value, element, valParams) {
 //client validation for dbdateiso
 $.validator.unobtrusive.adapters.addBool("dbisdateiso");
 $.validator.addMethod("dbisdateiso", function (value, element, valParams) {
+    "use strict";
     if (value) { return moment(value, "YYYY-MM-DD").isValid(); }
     return true;
 });
@@ -33,6 +35,7 @@ $.validator.addMethod("dbisdateiso", function (value, element, valParams) {
 //client validation for dbdatetimeiso
 $.validator.unobtrusive.adapters.addBool("dbisdatetimeiso");
 $.validator.addMethod("dbisdatetimeiso", function (value, element, valParams) {
+    "use strict";
     if (value) { return moment(value, "YYYY-MM-DD HH:mm").isValid(); }
     return true;
 });
@@ -45,7 +48,7 @@ $.ajaxSetup({ cache: false });
 
 //----------------------------------------------setup after page load------------------------------------------------//
 $(document).ready(function () {
-
+    "use strict";
     //---------------------------------------Global Settings-------------------------------------//
 
     //Enable jqueryUI selectable
@@ -93,7 +96,7 @@ $(document).ready(function () {
     $("#btnCopy").click(function (event) { sddb.prepareFormForCopy(); });
 
     //Wire up btnDelete 
-    $("#btnDelete").click(function (event) { sddb.confirmAndDelete(); });
+    $("#btnDelete").click(function (event) { sddb.confirmDeleteRecords(); });
 
     //TODO: refactor columnSelectId so it's not repeated n times
     //wire up columnsSelectId1
@@ -178,8 +181,9 @@ $(document).ready(function () {
     //Enable DateTimePicker
     $("[data-val-dbisdateiso]").datetimepicker({ format: "YYYY-MM-DD" })
         .on("dp.change", function (e) { $(this).data("ismodified", true); });
+    
 
-    //--------------------------------End of setup after page load---------------------------------//
+    //-------------------------------End of setup after page load--------------------------------//
 });
 
 

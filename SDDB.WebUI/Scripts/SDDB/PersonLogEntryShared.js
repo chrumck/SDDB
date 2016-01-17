@@ -342,6 +342,56 @@ $(document).ready(function () {
         sddb.changeAssyStatus();
     });
 
+    //-----------------------------------------filesView-----------------------------------------//
+
+    //filesTable
+    sddb.filesTable = $("#filesTable").DataTable({
+        columns: [
+            { data: "Id", name: "Id" },//0
+            { data: "FileName", name: "FileName" },//1
+            { data: "FileType", name: "FileType" },//2
+            { data: "FileSize", name: "FileSize" },//3
+            { data: "FileDateTime", name: "FileDateTime" },//4
+            {
+                data: "LastSavedByPerson_",
+                name: "LastSavedByPerson_",
+                render: function (data, type, full, meta) { return data.Initials; }
+            } //5
+        ],
+        columnDefs: [
+            { targets: [0], visible: false }, // - never show
+            { targets: [0], searchable: false },  //"orderable": false, "visible": false
+            { targets: [2, 5], className: "hidden-xs" }, // - first set of columns
+            { targets: [4], className: "hidden-xs hidden-sm" } // - first set of columns
+        ],
+        bAutoWidth: false,
+        language: {
+            search: "",
+            lengthMenu: "_MENU_",
+            info: "_START_ - _END_ of _TOTAL_",
+            infoEmpty: "",
+            infoFiltered: "(filtered)",
+            paginate: { previous: "", next: "" }
+        },
+        pageLength: 10
+    });
+
+    //personLogEntryFilesCfg
+    sddb.personLogEntryFilesCfg = {
+        filesTable: sddb.filesTable,
+        listFilesUrl: "/PersonLogEntrySrv/ListFiles",
+        dlFilesUrl: "/PersonLogEntrySrv/DownloadFiles",
+        ulFilesUrl: "/PersonLogEntrySrv/UploadFiles",
+        deleteFilesUrl: "/PersonLogEntrySrv/DeleteFiles",
+        filesViewLabelText: "Activity Files",
+        filesViewPanelText: function (selectedRecord) {
+            return selectedRecord.EnteredByPerson_.FirstName + " " + selectedRecord.EnteredByPerson_.LastName +
+                " - " + selectedRecord.LogEntryDateTime;
+        }
+    };
+
+    sddb.wireButtonsForFiles(sddb.personLogEntryFilesCfg);
+
     //--------------------------------------View Initialization------------------------------------//
 
     
