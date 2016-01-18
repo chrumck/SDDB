@@ -2,9 +2,10 @@
 @using SDDB.WebUI.Infrastructure
 @{
     ViewBag.Title = "SDDB Assemblies";
+    ViewBag.HelpSection = "#Assemblies";
 }
-<!------- InitialView ------->
-<div class="container-fluid" id="InitialView">
+<!------- initialView ------->
+<div class="container-fluid" id="initialView">
     <h4>Please wait, page loading...</h4>
 </div>
 
@@ -18,7 +19,7 @@
     <ul class="nav navbar-nav tdo-btngroup-main hidden">
         <li class="margin-left-10px">
             <div class="btn-group navbar-btn">
-                <button type="button" class="btn btn-tdo-warning2 collapsenav" id="BtnCopy"> Copy </button>
+                <button type="button" class="btn btn-tdo-warning2 collapsenav" id="btnCopy"> Copy </button>
             </div>
         </li>
         <li class="dropdown margin-left-5px">
@@ -40,37 +41,37 @@
     </ul> 
 }
 
-<!------- MainView ------->
+<!------- mainView ------->
 
-<div class="container-fluid hidden" id="MainView">
+<div class="container-fluid hidden" id="mainView">
     <div class="row">
         <div class="col-xs-12 margin-top-2px">
             <div class="btn-group margin-bottom-2px">
-                <div id="MsFilterByType" placeholder="Select Type"></div>
+                <div id="msFilterByType" placeholder="Select Type"></div>
             </div>
             <div class="btn-group margin-bottom-2px">
-                <div id="MsFilterByProject" placeholder="Select Project"></div>
+                <div id="msFilterByProject" placeholder="Select Project"></div>
             </div>
             <div class="btn-group margin-bottom-2px">
-                <div id="MsFilterByLoc" placeholder="Select Location"></div>
+                <div id="msFilterByLoc" placeholder="Select Location"></div>
             </div>
         </div>
     </div>
 
-    <div class="panel panel-primary" id="PanelTableMain">
+    <div class="panel panel-primary" id="panelTableMain">
         <div class="panel-heading text-center" style="font-size:130%">
             <strong>Assemblies</strong>
             <div class="pull-left">
-                <button type="button" class="btn btn-xs btn-info" id="BtnTableMainExport">
+                <button type="button" class="btn btn-xs btn-info" id="btnTableMainExport">
                     <span class="glyphicon glyphicon-download-alt"></span>
                 </button>
             </div>
             <div class="pull-right">
-                <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="65"
+                <input id="chBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="65"
                        data-onstyle="warning" data-offstyle="primary" data-on="Deleted" data-off="Active">
             </div>
         </div>
-        <table class="table table-striped" id="TableMain">
+        <table class="table table-striped" id="tableMain">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -123,26 +124,26 @@
     </div>
 </div>
 
-<!------- EditFormView ------->
-<div class="container-fluid hidden" id="EditFormView">
+<!------- editFormView ------->
+<div class="container-fluid hidden" id="editFormView">
     <div class="row">
         <div class="col-xs-12">
-            <h3 id="EditFormLabel">Create/Edit Assembly</h3>
+            <h3 id="editFormLabel">Create/Edit Assembly</h3>
         </div>
     </div>
     <div class="well well-tdo">
-        <form class="form-horizontal" role="form" id="EditForm">
+        <form class="form-horizontal" role="form" id="editForm">
 
-            <div class="row" id="EditFormCreateMultiple">
+            <div class="row" id="editFormCreateMultiple">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label col-sm-2" for="CreateMultiple">Multiple</label>
+                        <label class="control-label col-sm-2" for="createMultiple">Multiple</label>
                         <div class="col-sm-10">
                             <input class="form-control input-tdo-info"
                                    data-val="true" data-val-number="The field must be a number."
                                    data-val-range="The field must be between 1 and 100." data-val-range-max="100" data-val-range-min="1"
-                                   id="CreateMultiple" name="CreateMultiple" placeholder="Create Multiple" type="number" value="">
-                            <span class="field-validation-valid" data-valmsg-for="CreateMultiple" data-valmsg-replace="true"></span>
+                                   id="createMultiple" name="createMultiple" placeholder="Create Multiple" type="number" value="">
+                            <span class="field-validation-valid" data-valmsg-for="createMultiple" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                 </div>
@@ -314,7 +315,7 @@
                             @Html.ValidationMessageFor(x => x.Comments)
                         </div>
                     </div>
-                    <div class="form-group hidden" id="EditFormGroupIsActive">
+                    <div class="form-group hidden" id="editFormGroupIsActive">
                         <div class="col-sm-10 col-sm-offset-2">
                             @Html.CheckBoxFor(x => x.IsActive_bl, new { @class = "modifiable" }) &nbsp;&nbsp;
                             @Html.LabelFor(x => x.IsActive_bl, "Is Active") &nbsp;&nbsp; <em>(Marking as 'Active' un-deletes record.)</em>
@@ -324,56 +325,56 @@
             </div>
         </form>
     </div>
-    <!------- EditFormExtended ------->
+    <!------- editFormExtended ------->
 
-    <form class="form-horizontal hidden" role="form" id="EditFormExtended">
+    <form class="form-horizontal hidden" role="form" id="editFormExtended">
         <div class="well well-tdo">
             <div class="row">
 
                 <div class="col-md-6">
-                    <div class="form-group" id="FrmGrpAttr01">
+                    <div class="form-group" id="frmGrpAttr01">
                         <label class="control-label col-sm-2" for="Attr01">Attr01</label>
                         <div class="col-sm-10">
                             <input class="form-control modifiable" id="Attr01" name="Attr01" placeholder="Attr01" type="text" value="" />
                             <span class="field-validation-valid" data-valmsg-for="Attr01" data-valmsg-replace="true"></span>
                         </div>
                     </div>
-                    <div class="form-group" id="FrmGrpAttr02">
+                    <div class="form-group" id="frmGrpAttr02">
                         <label class="control-label col-sm-2" for="Attr02">Attr02</label>
                         <div class="col-sm-10">
                             <input class="form-control modifiable" id="Attr02" name="Attr02" placeholder="Attr02" type="text" value="" />
                             <span class="field-validation-valid" data-valmsg-for="Attr02" data-valmsg-replace="true"></span>
                         </div>
                     </div>
-                    <div class="form-group" id="FrmGrpAttr03">
+                    <div class="form-group" id="frmGrpAttr03">
                         <label class="control-label col-sm-2" for="Attr03">Attr03</label>
                         <div class="col-sm-10">
                             <input class="form-control modifiable" id="Attr03" name="Attr03" placeholder="Attr03" type="text" value="" />
                             <span class="field-validation-valid" data-valmsg-for="Attr03" data-valmsg-replace="true"></span>
                         </div>
                     </div>
-                    <div class="form-group" id="FrmGrpAttr04">
+                    <div class="form-group" id="frmGrpAttr04">
                         <label class="control-label col-sm-2" for="Attr04">Attr04</label>
                         <div class="col-sm-10">
                             <input class="form-control modifiable" id="Attr04" name="Attr04" placeholder="Attr04" type="text" value="" />
                             <span class="field-validation-valid" data-valmsg-for="Attr04" data-valmsg-replace="true"></span>
                         </div>
                     </div>
-                    <div class="form-group" id="FrmGrpAttr05">
+                    <div class="form-group" id="frmGrpAttr05">
                         <label class="control-label col-sm-2" for="Attr05">Attr05</label>
                         <div class="col-sm-10">
                             <input class="form-control modifiable" id="Attr05" name="Attr05" placeholder="Attr05" type="text" value="" />
                             <span class="field-validation-valid" data-valmsg-for="Attr05" data-valmsg-replace="true"></span>
                         </div>
                     </div>
-                    <div class="form-group" id="FrmGrpAttr06">
+                    <div class="form-group" id="frmGrpAttr06">
                         <label class="control-label col-sm-2" for="Attr06">Attr06</label>
                         <div class="col-sm-10">
                             <input class="form-control modifiable" id="Attr06" name="Attr06" placeholder="Attr06" type="text" value="" />
                             <span class="field-validation-valid" data-valmsg-for="Attr06" data-valmsg-replace="true"></span>
                         </div>
                     </div>
-                    <div class="form-group" id="FrmGrpAttr07">
+                    <div class="form-group" id="frmGrpAttr07">
                         <label class="control-label col-sm-2" for="Attr07">Attr07</label>
                         <div class="col-sm-10">
                             <input class="form-control modifiable" id="Attr07" name="Attr07" placeholder="Attr07" type="text" value="" />
@@ -383,56 +384,56 @@
                 </div>
 
                 <div class="col-md-6">
-                    <div class="form-group" id="FrmGrpAttr08">
+                    <div class="form-group" id="frmGrpAttr08">
                         <label class="control-label col-sm-2" for="Attr08">Attr08</label>
                         <div class="col-sm-10">
                             <input class="form-control modifiable" id="Attr08" name="Attr08" placeholder="Attr08" type="text" value="" />
                             <span class="field-validation-valid" data-valmsg-for="Attr08" data-valmsg-replace="true"></span>
                         </div>
                     </div>
-                    <div class="form-group" id="FrmGrpAttr09">
+                    <div class="form-group" id="frmGrpAttr09">
                         <label class="control-label col-sm-2" for="Attr09">Attr09</label>
                         <div class="col-sm-10">
                             <input class="form-control modifiable" id="Attr09" name="Attr09" placeholder="Attr09" type="text" value="" />
                             <span class="field-validation-valid" data-valmsg-for="Attr09" data-valmsg-replace="true"></span>
                         </div>
                     </div>
-                    <div class="form-group" id="FrmGrpAttr10">
+                    <div class="form-group" id="frmGrpAttr10">
                         <label class="control-label col-sm-2" for="Attr10">Attr10</label>
                         <div class="col-sm-10">
                             <input class="form-control modifiable" id="Attr10" name="Attr10" placeholder="Attr10" type="text" value="" />
                             <span class="field-validation-valid" data-valmsg-for="Attr10" data-valmsg-replace="true"></span>
                         </div>
                     </div>
-                    <div class="form-group" id="FrmGrpAttr11">
+                    <div class="form-group" id="frmGrpAttr11">
                         <label class="control-label col-sm-2" for="Attr11">Attr11</label>
                         <div class="col-sm-10">
                             <input class="form-control modifiable" id="Attr11" name="Attr11" placeholder="Attr11" type="text" value="" />
                             <span class="field-validation-valid" data-valmsg-for="Attr11" data-valmsg-replace="true"></span>
                         </div>
                     </div>
-                    <div class="form-group" id="FrmGrpAttr12">
+                    <div class="form-group" id="frmGrpAttr12">
                         <label class="control-label col-sm-2" for="Attr12">Attr12</label>
                         <div class="col-sm-10">
                             <input class="form-control modifiable" id="Attr12" name="Attr12" placeholder="Attr12" type="text" value="" />
                             <span class="field-validation-valid" data-valmsg-for="Attr12" data-valmsg-replace="true"></span>
                         </div>
                     </div>
-                    <div class="form-group" id="FrmGrpAttr13">
+                    <div class="form-group" id="frmGrpAttr13">
                         <label class="control-label col-sm-2" for="Attr13">Attr13</label>
                         <div class="col-sm-10">
                             <input class="form-control modifiable" id="Attr13" name="Attr13" placeholder="Attr13" type="text" value="" />
                             <span class="field-validation-valid" data-valmsg-for="Attr13" data-valmsg-replace="true"></span>
                         </div>
                     </div>
-                    <div class="form-group" id="FrmGrpAttr14">
+                    <div class="form-group" id="frmGrpAttr14">
                         <label class="control-label col-sm-2" for="Attr14">Attr14</label>
                         <div class="col-sm-10">
                             <input class="form-control modifiable" id="Attr14" name="Attr14" placeholder="Attr14" type="text" value="" />
                             <span class="field-validation-valid" data-valmsg-for="Attr14" data-valmsg-replace="true"></span>
                         </div>
                     </div>
-                    <div class="form-group" id="FrmGrpAttr15">
+                    <div class="form-group" id="frmGrpAttr15">
                         <label class="control-label col-sm-2" for="Attr15">Attr15</label>
                         <div class="col-sm-10">
                             <input class="form-control modifiable" id="Attr15" name="Attr15" placeholder="Attr15" type="text" value="" />

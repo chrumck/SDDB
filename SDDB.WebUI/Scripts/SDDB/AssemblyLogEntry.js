@@ -1,4 +1,5 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
+﻿/*global sddb, AssemblyId */
+/// <reference path="../DataTables/jquery.dataTables.js" />
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
@@ -7,134 +8,74 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared_Views.js" />
 
-//--------------------------------------Global Properties------------------------------------//
+//----------------------------------------------additional sddb setup------------------------------------------------//
 
-var RecordTemplate = {
-    Id: "RecordTemplateId",
-    LogEntryDateTime: null,
-    AssemblyDb_Id: null,
-    AssemblyStatus_Id: null,
-    AssignedToLocation_Id: null,
-    AssyGlobalX: null,
-    AssyGlobalY: null,
-    AssyGlobalZ: null,
-    AssyLocalXDesign: null,
-    AssyLocalYDesign: null,
-    AssyLocalZDesign: null,
-    AssyLocalXAsBuilt: null,
-    AssyLocalYAsBuilt: null,
-    AssyLocalZAsBuilt: null,
-    AssyStationing: null,
-    AssyLength: null,
-    Comments: null,
-    IsActive_bl: null
-};
+//setting up sddb
+sddb.setConfig({
+    recordTemplate : {
+        Id: "RecordTemplateId",
+        LogEntryDateTime: null,
+        AssemblyDb_Id: null,
+        AssemblyStatus_Id: null,
+        AssignedToLocation_Id: null,
+        AssyGlobalX: null,
+        AssyGlobalY: null,
+        AssyGlobalZ: null,
+        AssyLocalXDesign: null,
+        AssyLocalYDesign: null,
+        AssyLocalZDesign: null,
+        AssyLocalXAsBuilt: null,
+        AssyLocalYAsBuilt: null,
+        AssyLocalZAsBuilt: null,
+        AssyStationing: null,
+        AssyLength: null,
+        Comments: null,
+        IsActive_bl: null
+    },
 
-var MsFilterByProject;
-var MsFilterByAssembly;
-var MsFilterByPerson;
-
-
-LabelTextCreate = "Create Log Entry";
-LabelTextEdit = "Edit Log Entry";
-UrlFillForEdit = "/AssemblyLogEntrySrv/GetByIds";
-UrlEdit = "/AssemblyLogEntrySrv/Edit";
-UrlDelete = "/AssemblyLogEntrySrv/Delete";
-
-$(document).ready(function () {
-
-    //-----------------------------------------MainView------------------------------------------//
-    
-    //Initialize DateTimePicker FilterDateStart
-    $("#FilterDateStart").datetimepicker({ format: "YYYY-MM-DD" }).on("dp.hide", function (e) { refreshMainView(); });
-
-    //Initialize DateTimePicker FilterDateEnd
-    $("#FilterDateEnd").datetimepicker({ format: "YYYY-MM-DD" }).on("dp.hide", function (e) { refreshMainView(); });
-
-    //Initialize MagicSuggest MsFilterByProject
-    MsFilterByProject = $("#MsFilterByProject").magicSuggest({
-        data: "/ProjectSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
-        },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for MsFilterByProject
-    $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
-
-    //Initialize MagicSuggest MsFilterByAssembly
-    MsFilterByAssembly = $("#MsFilterByAssembly").magicSuggest({
-        data: "/AssemblyDbSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
-        },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for MsFilterByAssembly
-    $(MsFilterByAssembly).on("selectionchange", function (e, m) { refreshMainView(); });
-
-    //Initialize MagicSuggest MsFilterByAssembly
-    MsFilterByAssyType = $("#MsFilterByAssyType").magicSuggest({
-        data: "/AssemblyTypeSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
-        },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for MsFilterByAssembly
-    $(MsFilterByAssyType).on("selectionchange", function (e, m) { refreshMainView(); });
-
-    //Initialize MagicSuggest MsFilterByPerson
-    MsFilterByPerson = $("#MsFilterByPerson").magicSuggest({
-        data: "/PersonSrv/LookupFromProject",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
-        },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for MsFilterByPerson
-    $(MsFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
-   
-        
-    //---------------------------------------DataTables------------
-
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    tableMainColumnSets : [
         [1],
         [2, 3, 4, 5],
         [6, 7, 8, 9, 10, 11],
         [12, 13, 14, 15, 16, 17]
-    ];
+    ],
 
-    //TableMain PersonLogEntrys
-    TableMain = $("#TableMain").DataTable({
+    tableMain: $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LogEntryDateTime", name: "LogEntryDateTime" },//1
             //------------------------------------------------first set of columns
             {
-                data: "AssemblyDb_", name: "AssemblyDb_",
-                render: function (data, type, full, meta) { return data.AssyName },
+                data: "AssemblyDb_",
+                name: "AssemblyDb_",
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.AssyName;
+                }
             }, //2
             {
-                data: "LastSavedByPerson_", name: "LastSavedByPerson_",
-                render: function (data, type, full, meta) { return data.LastName + " " + data.Initials },
+                data: "LastSavedByPerson_",
+                name: "LastSavedByPerson_",
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.LastName + " " + data.Initials;
+                }
             }, //3
             {
-                data: "AssemblyStatus_", name: "AssemblyStatus_",
-                render: function (data, type, full, meta) { return data.AssyStatusName },
+                data: "AssemblyStatus_",
+                name: "AssemblyStatus_",
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.AssyStatusName;
+                }
             }, //4
             {
-                data: "AssignedToLocation_", name: "AssignedToLocation_",
-                render: function (data, type, full, meta) { return data.LocName + " - " + data.ProjectName },
+                data: "AssignedToLocation_",
+                name: "AssignedToLocation_",
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.LocName + " - " + data.ProjectName;
+                }
             }, //5
             //------------------------------------------------second set of columns
             { data: "AssyGlobalX", name: "AssyGlobalX" },//6
@@ -167,7 +108,7 @@ $(document).ready(function () {
             { targets: [7, 8], className: "hidden-xs" },
             { targets: [9, 10, 11], className: "hidden-xs hidden-sm" },
             // - third set of columns
-            { targets: [12, 13, 14], className: "hidden-xs" }, 
+            { targets: [12, 13, 14], className: "hidden-xs" },
             { targets: [16, 17], className: "hidden-xs hidden-sm" }
         ],
         order: [[1, "asc"]],
@@ -181,75 +122,100 @@ $(document).ready(function () {
             infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
-    });
-    //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    }),
 
-    //---------------------------------------EditFormView----------------------------------------//
 
-    //Initialize DateTimePicker
-    $("#LogEntryDateTime").datetimepicker({ format: "YYYY-MM-DD HH:mm" })
-        .on("dp.change", function (e) { $(this).data("ismodified", true); });
+    labelTextCreate: "Create Log Entry",
+    labelTextEdit: "Edit Log Entry",
+    urlFillForEdit: "/AssemblyLogEntrySrv/GetByIds",
+    urlEdit: "/AssemblyLogEntrySrv/Edit",
+    urlDelete: "/AssemblyLogEntrySrv/Delete"
 
-    //Enable DateTimePicker
-    $("#LastCalibrationDate").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("dp.change", function (e) { $(this).data("ismodified", true); });
-
-    //Initialize MagicSuggest Array
-    msAddToMsArray(MagicSuggests, "AssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "AssignedToLocation_Id", "/LocationSrv/Lookup", 1);
-
-    //--------------------------------------View Initialization------------------------------------//
-
-    fillFiltersFromRequestParams().done(refreshMainView);
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
-    
-    //--------------------------------End of execution at Start-----------
 });
 
+//fillFiltersFromRequestParams
+sddb.fillFiltersFromRequestParams = function () {
+    "use strict";
+    $("#filterDateStart").val(moment().format("YYYY-MM-DD"));
+    $("#filterDateEnd").val(moment().format("YYYY-MM-DD"));
+    if (!AssemblyId) { return $.Deferred().resolve(); }
 
-//--------------------------------------Main Methods---------------------------------------//
+    return sddb.modalWaitWrapper(function () {
+        return $.ajax({
+            type: "POST",
+            url: "/AssemblyDbSrv/GetByIds",
+            timeout: 120000,
+            data: { ids: [AssemblyId], getActive: true },
+            dataType: "json"
+        })
+            .then(function (data) {
+                if (!data || data.length === 0) { return; }
+                sddb.msSetSelectionSilent(sddb.msFilterByAssembly, [{ id: data[0].Id, name: data[0].AssyName }]);
+            });
+    });
+};
 
 //refresh Main view 
-function refreshMainView() {
-    TableMain.clear().search("").draw();
-    if ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "") { return $.Deferred().resolve(); }
+sddb.refreshMainView = function () {
+    "use strict";
 
-    var endDate = ($("#FilterDateEnd").val() == "") ? "" : moment($("#FilterDateEnd").val())
+    sddb.cfg.tableMain.clear().search("").draw();
+    if ($("#filterDateStart").val() === "" || $("#filterDateEnd").val() === "") { return $.Deferred().resolve(); }
+
+    var endDate = ($("#filterDateEnd").val() === "") ? "" : moment($("#filterDateEnd").val())
         .hour(23).minute(59).format("YYYY-MM-DD HH:mm");
 
-    return modalWaitWrapper(function () {
-        return refreshTableGeneric(TableMain, "/AssemblyLogEntrySrv/GetByAltIds",
+    return sddb.modalWaitWrapper(function () {
+        return sddb.refreshTableGeneric(sddb.cfg.tableMain, "/AssemblyLogEntrySrv/GetByAltIds",
         {
-            projectIds: MsFilterByProject.getValue(),
-            assyIds: MsFilterByAssembly.getValue(),
-            assyTypeIds: MsFilterByAssyType.getValue(),
-            personIds: MsFilterByPerson.getValue(),
-            startDate: $("#FilterDateStart").val(),
+            projectIds: sddb.msFilterByProject.getValue(),
+            assyIds: sddb.msFilterByAssembly.getValue(),
+            assyTypeIds: sddb.msFilterByAssyType.getValue(),
+            personIds: sddb.msFilterByPerson.getValue(),
+            startDate: $("#filterDateStart").val(),
             endDate: endDate,
-            getActive: GetActive
+            getActive: sddb.cfg.currentActive
         },
         "POST");
     });
-}
+};
 
-//fillFiltersFromRequestParams
-function fillFiltersFromRequestParams() {
-    $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
-    $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
-    if (AssemblyId) {
-        return modalWaitWrapper(function () {
-            return $.ajax({ type: "POST", url: "/AssemblyDbSrv/GetByIds", timeout: 120000, 
-                    data: { ids: [AssemblyId], getActive: true }, dataType: "json" })
-                .then(function (data) {
-                    msSetSelectionSilent(MsFilterByAssembly, [{ id: data[0].Id, name: data[0].AssyName, }]);
-                });
-        });
-    }
-    return $.Deferred().resolve();
-}
+//----------------------------------------------setup after page load------------------------------------------------//
+$(document).ready(function () {
+    "use strict";
+    //-----------------------------------------mainView------------------------------------------//
+    
+    //filterDateStart event dp.hide
+    $("#filterDateStart").on("dp.hide", function (e) { sddb.refreshMainView(); });
 
-//---------------------------------------Helper Methods--------------------------------------//
+    //filterDateEnd event dp.hide
+    $("#filterDateEnd").on("dp.hide", function (e) { sddb.refreshMainView(); });
+
+    //Initialize MagicSuggest sddb.msFilterByProject
+    sddb.msFilterByProject = sddb.msSetFilter("msFilterByProject", "/ProjectSrv/Lookup");
+    
+    //Initialize MagicSuggest sddb.msFilterByAssembly
+    sddb.msFilterByAssembly = sddb.msSetFilter("msFilterByAssembly", "/AssemblyDbSrv/Lookup");
+    
+    //Initialize MagicSuggest sddb.msFilterByAssyType
+    sddb.msFilterByAssyType = sddb.msSetFilter("msFilterByAssyType", "/AssemblyTypeSrv/Lookup");
+    
+    //Initialize MagicSuggest sddb.msFilterByPerson
+    sddb.msFilterByPerson = sddb.msSetFilter("msFilterByPerson", "/PersonSrv/LookupFromProject");
+    
+    //---------------------------------------editFormView----------------------------------------//
+
+    //Initialize MagicSuggest Array
+    sddb.msAddToArray("AssemblyDb_Id", "/AssemblyDbSrv/Lookup");
+    sddb.msAddToArray("AssemblyStatus_Id", "/AssemblyStatusSrv/Lookup");
+    sddb.msAddToArray("AssignedToLocation_Id", "/LocationSrv/Lookup");
+
+    //--------------------------------------View Initialization------------------------------------//
+
+    sddb.fillFiltersFromRequestParams().done(sddb.refreshMainView);
+    sddb.switchView();
+
+    //--------------------------------End of setup after page load---------------------------------//   
+});
 
 

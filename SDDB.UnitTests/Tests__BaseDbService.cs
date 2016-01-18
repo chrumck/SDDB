@@ -68,6 +68,7 @@ namespace SDDB.UnitTests
             //Assert
             var regex = new Regex(@"\w*-\w*-\w*-\w*-\w*");
             Assert.IsTrue(regex.IsMatch(dbEntry1.Id));
+            Assert.IsTrue(dbEntry1.LastSavedByPerson_Id == userId);
             mockDbContextScopeFac.Verify(x => x.Create(DbContextScopeOption.JoinExisting), Times.Once);
             mockDbContextScope.Verify(x => x.DbContexts.Get<EFDbContext>(), Times.Once);
             mockEfDbContext.Verify(x => x.Set<PersonLogEntry>().FindAsync(userId), Times.Once);

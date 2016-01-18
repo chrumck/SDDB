@@ -31,7 +31,8 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var mockAppUserManager = new Mock<IAppUserManager>();
-            var mockDbUserService = new Mock<DBUserService>(new object[] {mockDbContextScopeFac.Object, mockAppUserManager.Object,  true });
+            var mockAppRoleManager = new Mock<IAppRoleManager>();
+            var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppRoleManager.Object, mockAppUserManager.Object, true });
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
             var dbEntry1 = new PersonGroup { Id = "dummyEntryId1", PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive_bl = false  };
@@ -69,7 +70,8 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var mockAppUserManager = new Mock<IAppUserManager>();
-            var mockDbUserService = new Mock<DBUserService>(new object[] {mockDbContextScopeFac.Object, mockAppUserManager.Object,  true });
+            var mockAppRoleManager = new Mock<IAppRoleManager>();
+            var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppRoleManager.Object, mockAppUserManager.Object, true });
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
             var dbEntry1 = new PersonGroup { Id = "dummyEntryId1", PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive_bl = false };
@@ -109,7 +111,8 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var mockAppUserManager = new Mock<IAppUserManager>();
-            var mockDbUserService = new Mock<DBUserService>(new object[] {mockDbContextScopeFac.Object, mockAppUserManager.Object,  true });
+            var mockAppRoleManager = new Mock<IAppRoleManager>();
+            var mockDbUserService = new Mock<DBUserService>(new object[] {mockAppRoleManager.Object, mockAppUserManager.Object,  true });
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
             var dbEntry1 = new PersonGroup { Id = "dummyEntryId1", PrsGroupName = "PersonGroup1", PrsGroupAltName = "PersonGroupAlt1", IsActive_bl = false };
@@ -149,7 +152,9 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var mockAppUserManager = new Mock<IAppUserManager>();
-            var mockDbUserService = new Mock<DBUserService>(new object[] {mockDbContextScopeFac.Object, mockAppUserManager.Object,  true });
+            var mockAppRoleManager = new Mock<IAppRoleManager>();
+
+            var mockDbUserService = new Mock<DBUserService>(new object[] {mockAppRoleManager.Object, mockAppUserManager.Object,  true });
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
             var groupManager1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
@@ -198,7 +203,8 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var mockAppUserManager = new Mock<IAppUserManager>();
-            var mockDbUserService = new Mock<DBUserService>(new object[] {mockDbContextScopeFac.Object, mockAppUserManager.Object,  true });
+            var mockAppRoleManager = new Mock<IAppRoleManager>();
+            var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppRoleManager.Object, mockAppUserManager.Object, true });
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
             var groupManager1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };
@@ -241,7 +247,8 @@ namespace SDDB.UnitTests
             mockDbContextScope.Setup(x => x.DbContexts.Get<EFDbContext>()).Returns(mockEfDbContext.Object);
 
             var mockAppUserManager = new Mock<IAppUserManager>();
-            var mockDbUserService = new Mock<DBUserService>(new object[] {mockDbContextScopeFac.Object, mockAppUserManager.Object,  true });
+            var mockAppRoleManager = new Mock<IAppRoleManager>();
+            var mockDbUserService = new Mock<DBUserService>(new object[] { mockAppRoleManager.Object, mockAppUserManager.Object, true });
             var mockPersonService = new Mock<PersonService>(new object[] { mockDbContextScopeFac.Object, mockDbUserService.Object });
 
             var groupManager1 = new Person { Id = "dummyUserId1", FirstName = "Firs1", LastName = "Last1" };

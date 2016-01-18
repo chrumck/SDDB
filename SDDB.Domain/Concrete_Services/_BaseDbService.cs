@@ -307,25 +307,7 @@ namespace SDDB.Domain.Services
             return dbEntries;
 
         }
-
-        //helper - checks if user is in Role
-        protected async Task<bool> userIsInRoleHelperAsync(string roleName, bool refreshRoles = false)
-        {
-            if (String.IsNullOrEmpty(roleName)) { throw new ArgumentNullException("roleName"); }
-
-            using (var dbContextScope = contextScopeFac.CreateReadOnly())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-
-                if (refreshRoles || userRoles == null)
-                {
-                    userRoles = await dbContext.Roles.Where(x => x.Users.Any(y => y.UserId == userId)).ToListAsync()
-                        .ConfigureAwait(false);
-                }
-                return userRoles.Any(x => x.Name == roleName);
-            }
-        }
-
+        
         //helper - gets relatedCollectionName from expression
         protected string getRelatedCollectionNameFromLambdaHelper<TOut>(Expression<Func<T, ICollection<TOut>>> lambda) 
             where TOut: class, IDbEntity

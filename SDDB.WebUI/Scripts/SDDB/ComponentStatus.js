@@ -1,4 +1,5 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
+﻿/*global sddb*/
+/// <reference path="../DataTables/jquery.dataTables.js" />
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
@@ -7,37 +8,24 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
-//--------------------------------------Global Properties------------------------------------//
+//----------------------------------------------additional sddb setup------------------------------------------------//
 
-var RecordTemplate = {
-    Id: "RecordTemplateId",
-    CompStatusName: null,
-    CompStatusAltName: null,
-    Comments: null,
-    IsActive_bl: null
-};
+//setting up sddb
+sddb.setConfig({
+    recordTemplate: {
+        Id: "RecordTemplateId",
+        CompStatusName: null,
+        CompStatusAltName: null,
+        Comments: null,
+        IsActive_bl: null
+    },
 
-LabelTextCreate = "Create Component Status";
-LabelTextEdit = "Edit Component Status";
-UrlFillForEdit = "/ComponentStatusSrv/GetByIds";
-UrlEdit = "/ComponentStatusSrv/Edit";
-UrlDelete = "/ComponentStatusSrv/Delete";
-urlRefreshMainView = "/ComponentStatusSrv/Get";
-
-$(document).ready(function () {
-
-    //-----------------------------------------MainView------------------------------------------//
-
-    //---------------------------------------DataTables------------
-
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    tableMainColumnSets: [
         [1],
         [2, 3]
-    ];
+    ],
 
-    //TableMain Component Statuss
-    TableMain = $("#TableMain").DataTable({
+    tableMain: $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" }, //0
             { data: "CompStatusName", name: "CompStatusName" }, //1
@@ -49,7 +37,7 @@ $(document).ready(function () {
             //searchable: false
             { targets: [0, 4], searchable: false },
             // - first set of columns
-            { targets: [3], className: "hidden-xs hidden-sm" }, 
+            { targets: [3], className: "hidden-xs hidden-sm" },
             { targets: [], className: "hidden-xs hidden-sm hidden-md" }
         ],
         order: [[1, "asc"]],
@@ -62,24 +50,25 @@ $(document).ready(function () {
             infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
-    });
+    }),
 
-    //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    labelTextCreate: "Create Component Status",
+    labelTextEdit: "Edit Component Status",
+    urlFillForEdit: "/ComponentStatusSrv/GetByIds",
+    urlEdit: "/ComponentStatusSrv/Edit",
+    urlDelete: "/ComponentStatusSrv/Delete",
+    urlRefreshMainView: "/ComponentStatusSrv/Get"
 
-    //---------------------------------------EditFormView----------------------------------------//
-
-    //--------------------------------------View Initialization------------------------------------//
-
-    refreshMainView();
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
-
-    //--------------------------------End of execution at Start-----------
 });
 
 
-//--------------------------------------Main Methods---------------------------------------//
+//----------------------------------------------setup after page load------------------------------------------------//
+$(document).ready(function () {
+    "use strict";
+    //--------------------------------------View Initialization------------------------------------//
 
+    sddb.refreshMainView();
+    sddb.switchView();
 
-//---------------------------------------Helper Methods--------------------------------------//
-
+    //--------------------------------End of setup after page load---------------------------------//   
+});

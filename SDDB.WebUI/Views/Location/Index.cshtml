@@ -2,9 +2,10 @@
 @using SDDB.WebUI.Infrastructure
 @{
     ViewBag.Title = "SDDB Locations";
+    ViewBag.HelpSection = "#Locations";
 }
-<!------- InitialView ------->
-<div class="container-fluid" id="InitialView">
+<!------- initialView ------->
+<div class="container-fluid" id="initialView">
     <h4>Please wait, page loading...</h4>
 </div>
 
@@ -18,7 +19,7 @@
     <ul class="nav navbar-nav tdo-btngroup-main hidden">
         <li class="margin-left-10px">
             <div class="btn-group navbar-btn">
-                <button type="button" class="btn btn-tdo-warning2 collapsenav" id="BtnCopy"> Copy </button>
+                <button type="button" class="btn btn-tdo-warning2 collapsenav" id="btnCopy"> Copy </button>
             </div>
         </li>
         <li class="dropdown margin-left-5px">
@@ -34,34 +35,34 @@
     </ul>
 }
 
-<!------- MainView ------->
-<div class="container-fluid hidden" id="MainView">
+<!------- mainView ------->
+<div class="container-fluid hidden" id="mainView">
 
     <div class="row">
         <div class="col-xs-12">
             <div class="btn-group margin-bottom-2px">
-                <div id="MsFilterByType" placeholder="Select Type"></div>
+                <div id="msFilterByType" placeholder="Select Type"></div>
             </div>
             <div class="btn-group margin-bottom-2px">
-                <div id="MsFilterByProject" placeholder="Select Project"></div>
+                <div id="msFilterByProject" placeholder="Select Project"></div>
             </div>            
         </div>
     </div>
 
-    <div class="panel panel-primary" id="PanelTableMain">
+    <div class="panel panel-primary" id="panelTableMain">
         <div class="panel-heading text-center" style="font-size:130%">
             <strong>Locations</strong>
             <div class="pull-left">
-                <button type="button" class="btn btn-xs btn-info" id="BtnTableMainExport">
+                <button type="button" class="btn btn-xs btn-info" id="btnTableMainExport">
                     <span class="glyphicon glyphicon-download-alt"></span>
                 </button>
             </div>
             <div class="pull-right">
-                <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="65"
+                <input id="chBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="65"
                         data-onstyle="warning" data-offstyle="primary" data-on="Deleted" data-off="Active">
             </div>
         </div>
-        <table class="table table-striped" id="TableMain">
+        <table class="table table-striped" id="tableMain">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -91,26 +92,26 @@
     </div>
 </div>
 
-<!------- EditFormView ------->
-<div class="container-fluid hidden" id="EditFormView">
+<!------- editFormView ------->
+<div class="container-fluid hidden" id="editFormView">
     <div class="row">
         <div class="col-xs-12">
-            <h3 id="EditFormLabel">Create/Edit Location</h3>
+            <h3 id="editFormLabel">Create/Edit Location</h3>
         </div>
     </div>
     <div class="well well-tdo">
-        <form class="form-horizontal" role="form" id="EditForm">
+        <form class="form-horizontal" role="form" id="editForm">
             
-            <div class="row" id="EditFormCreateMultiple">
+            <div class="row" id="editFormCreateMultiple">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label col-sm-2" for="CreateMultiple">Multiple</label>
+                        <label class="control-label col-sm-2" for="createMultiple">Multiple</label>
                         <div class="col-sm-10">
                             <input class="form-control input-tdo-info"
                                    data-val="true" data-val-number="The field must be a number."
                                    data-val-range="The field must be between 1 and 100." data-val-range-max="100" data-val-range-min="1"
-                                   id="CreateMultiple" name="CreateMultiple" placeholder="Create Multiple" type="number" value="">
-                            <span class="field-validation-valid" data-valmsg-for="CreateMultiple" data-valmsg-replace="true"></span>
+                                   id="createMultiple" name="createMultiple" placeholder="Create Multiple" type="number" value="">
+                            <span class="field-validation-valid" data-valmsg-for="createMultiple" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                 </div>
@@ -225,7 +226,7 @@
                             @Html.ValidationMessageFor(x => x.Comments)
                         </div>
                     </div>
-                    <div class="form-group hidden" id="EditFormGroupIsActive">
+                    <div class="form-group hidden" id="editFormGroupIsActive">
                         <div class="col-sm-10 col-sm-offset-2">
                             @Html.CheckBoxFor(x => x.IsActive_bl, new { @class = "modifiable" }) &nbsp;&nbsp;
                             @Html.LabelFor(x => x.IsActive_bl, "Is Active") &nbsp;&nbsp; <em>(Marking as 'Active' un-deletes record.)</em>

@@ -1,4 +1,5 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
+﻿/*global sddb*/
+/// <reference path="../DataTables/jquery.dataTables.js" />
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
@@ -7,37 +8,24 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
 
-//--------------------------------------Global Properties------------------------------------//
+//----------------------------------------------additional sddb setup------------------------------------------------//
 
-var RecordTemplate = {
-    Id: "RecordTemplateId",
-    ActivityTypeName: null,
-    ActivityTypeAltName: null,
-    Comments: null,
-    IsActive_bl: null
-};
+//setting up sddb
+sddb.setConfig({
+    recordTemplate: {
+        Id: "RecordTemplateId",
+        ActivityTypeName: null,
+        ActivityTypeAltName: null,
+        Comments: null,
+        IsActive_bl: null
+    },
 
-LabelTextCreate = "Create Activity Type";
-LabelTextEdit = "Edit Activity Type";
-UrlFillForEdit = "/PersonActivityTypeSrv/GetByIds";
-UrlEdit = "/PersonActivityTypeSrv/Edit";
-UrlDelete = "/PersonActivityTypeSrv/Delete";
-urlRefreshMainView = "/PersonActivityTypeSrv/Get";
-
-$(document).ready(function () {
-
-    //-----------------------------------------MainView------------------------------------------//
-    
-    //---------------------------------------DataTables------------
-
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    tableMainColumnSets: [
         [1],
         [2, 3]
-    ];
+    ],
 
-    //TableMain PersonActivity Types
-    TableMain = $("#TableMain").DataTable({
+    tableMain: $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "ActivityTypeName", name: "ActivityTypeName" },//1
@@ -62,23 +50,25 @@ $(document).ready(function () {
             infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
-    });
-    //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    }),
 
-    //---------------------------------------EditFormView----------------------------------------//
+    labelTextCreate: "Create Activity Type",
+    labelTextEdit: "Edit Activity Type",
+    urlFillForEdit: "/PersonActivityTypeSrv/GetByIds",
+    urlEdit: "/PersonActivityTypeSrv/Edit",
+    urlDelete: "/PersonActivityTypeSrv/Delete",
+    urlRefreshMainView: "/PersonActivityTypeSrv/Get"
 
-    //--------------------------------------View Initialization------------------------------------//
-
-    refreshMainView();
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
-
-    //--------------------------------End of execution at Start-----------
 });
 
+//----------------------------------------------setup after page load------------------------------------------------//
+$(document).ready(function () {
+    "use strict";
+    //--------------------------------------View Initialization------------------------------------//
 
-//--------------------------------------Main Methods---------------------------------------//
+    sddb.refreshMainView();
+    sddb.switchView();
 
-
-//---------------------------------------Helper Methods--------------------------------------//
+    //--------------------------------End of setup after page load---------------------------------//   
+});
 

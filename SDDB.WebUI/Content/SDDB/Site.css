@@ -10,6 +10,11 @@
     background-repeat: no-repeat;
 }
 
+section {
+padding-top:40px;
+margin-top:-40px;
+}
+
 /* Set padding to keep content from hitting the edges */
 .body-content {
     padding-left: 15px;
@@ -25,8 +30,8 @@ textarea,
 }*/
 
 /*DataTables tweaks*/
-div.dataTables_filter input[type=search] {
-	width: 8em;
+div.dataTables_wrapper div.dataTables_filter input[type=search] {
+	width: 11em;
 }
 
 /*magicsuggest custom*/
@@ -100,11 +105,11 @@ input[type="checkbox"].input-validation-error {
 }
 
 /* ModalWait modal */
-#ModalWait .modal-dialog {
+#modalWait .modal-dialog {
     width: 280px;
 }
 
-/* ModalWait modal */
-#ModalDatePrompt .modal-dialog {
+/* ModalDatePrompt modal */
+#modalDatePrompt .modal-dialog {
     width: 300px;
 }

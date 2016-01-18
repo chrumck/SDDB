@@ -145,32 +145,32 @@ namespace SDDB.Domain.Services
         //-----------------------------------------------------------------------------------------------------------------------
 
         //get all person projects
-        public virtual Task<List<Project>> GetPersonProjectsAsync(string personId)
+        public virtual Task<List<Project>> GetPersonProjectsAsync(string[] personIds)
         {
-            if (String.IsNullOrEmpty(personId)) { throw new ArgumentNullException("personId"); }
-
+            if (personIds == null || personIds.Length == 0) { throw new ArgumentNullException("personIds"); }
+            
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.Projects.Where(x =>
-                        x.ProjectPersons.Any(y => y.Id == personId) &&
-                        x.IsActive_bl == true
+                        x.ProjectPersons.Any(y => personIds.Contains(y.Id)) &&
+                        x.IsActive_bl
                     )
                     .ToListAsync();
             }
         }
 
         //get all active projects not assigned to person
-        public virtual Task<List<Project>> GetPersonProjectsNotAsync(string personId)
+        public virtual Task<List<Project>> GetPersonProjectsNotAsync(string[] personIds)
         {
-            if (String.IsNullOrEmpty(personId)) { throw new ArgumentNullException("personId"); }
+            if (personIds == null || personIds.Length == 0) { throw new ArgumentNullException("personIds"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.Projects.Where(x =>
-                        !x.ProjectPersons.Any(y => y.Id == personId) &&
-                        x.IsActive_bl == true
+                        !personIds.All(y => x.ProjectPersons.Select(z => z.Id).Contains(y)) &&
+                        x.IsActive_bl
                     )
                     .ToListAsync();
             }
@@ -182,32 +182,32 @@ namespace SDDB.Domain.Services
         //-----------------------------------------------------------------------------------------------------------------------
 
         //get all person groups
-        public virtual Task<List<PersonGroup>> GetPersonGroupsAsync(string personId)
+        public virtual Task<List<PersonGroup>> GetPersonGroupsAsync(string[] personIds)
         {
-            if (String.IsNullOrEmpty(personId)) { throw new ArgumentNullException("personId"); }
+            if (personIds == null || personIds.Length == 0) { throw new ArgumentNullException("personIds"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.PersonGroups.Where(x =>
-                        x.GroupPersons.Any(y => y.Id == personId) &&
-                        x.IsActive_bl == true
+                        x.GroupPersons.Any(y => personIds.Contains(y.Id)) &&
+                        x.IsActive_bl
                     )
                     .ToListAsync();
             }
         }
 
         //get all active groups not assigned to person
-        public virtual Task<List<PersonGroup>> GetPersonGroupsNotAsync(string personId)
+        public virtual Task<List<PersonGroup>> GetPersonGroupsNotAsync(string[] personIds)
         {
-            if (String.IsNullOrEmpty(personId)) { throw new ArgumentNullException("personId"); }
+            if (personIds == null || personIds.Length == 0) { throw new ArgumentNullException("personIds"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.PersonGroups.Where(x => 
-                        !x.GroupPersons.Any(y => y.Id == personId) &&
-                        x.IsActive_bl == true
+                        !personIds.All(y => x.GroupPersons.Select(z => z.Id).Contains(y)) &&
+                        x.IsActive_bl
                     )
                     .ToListAsync();
             }
@@ -219,68 +219,33 @@ namespace SDDB.Domain.Services
         //-----------------------------------------------------------------------------------------------------------------------
 
         //get all managed groups
-        public virtual Task<List<PersonGroup>> GetManagedGroupsAsync(string personId)
+        public virtual Task<List<PersonGroup>> GetManagedGroupsAsync(string[] personIds)
         {
-            if (String.IsNullOrEmpty(personId)) { throw new ArgumentNullException("personId"); }
+            if (personIds == null || personIds.Length == 0) { throw new ArgumentNullException("personIds"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.PersonGroups.Where(x =>
-                        x.GroupManagers.Any(y => y.Id == personId) &&
-                        x.IsActive_bl == true
+                        x.GroupManagers.Any(y => personIds.Contains(y.Id)) &&
+                        x.IsActive_bl
                     )
                     .ToListAsync();
             }
         }
 
-        //get all active groups not assigned to person
-        public virtual Task<List<PersonGroup>> GetManagedGroupsNotAsync(string personId)
+        //get all active groups not managed by person
+        public virtual Task<List<PersonGroup>> GetManagedGroupsNotAsync(string[] personIds)
         {
-            if (String.IsNullOrEmpty(personId)) { throw new ArgumentNullException("personId"); }
+            if (personIds == null || personIds.Length == 0) { throw new ArgumentNullException("personIds"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.PersonGroups.Where(x =>
-                        !x.GroupManagers.Any(y => y.Id == personId) &&
-                        x.IsActive_bl == true
+                        !personIds.All(y => x.GroupManagers.Select(z => z.Id).Contains(y)) &&
+                        x.IsActive_bl
                     )
-                    .ToListAsync();
-            }
-        }
-
-        //Add (or Remove  when set isAdd to false) managed Groups to Person
-        //use generic version AddRemoveRelated from BaseDbService 
-
-
-        //-----------------------------------------------------------------------------------------------------------------------
-
-        //get all group managers
-        public virtual Task<List<Person>> GetGroupManagersAsync(string groupId)
-        {
-            if (String.IsNullOrEmpty(groupId)) { throw new ArgumentNullException("groupId"); }
-
-            using (var dbContextScope = contextScopeFac.CreateReadOnly())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-                return dbContext.Persons
-                    .Where(x => x.ManagedGroups.Select(y => y.Id).Contains(groupId) && x.IsActive_bl)
-                    .ToListAsync();
-            }
-        }
-
-        //get all active persons not assigned to group managers
-        public virtual Task<List<Person>> GetGroupManagersNotAsync(string groupId)
-        {
-            if (String.IsNullOrEmpty(groupId)) { throw new ArgumentNullException("groupId"); }
-
-            using (var dbContextScope = contextScopeFac.CreateReadOnly())
-            {
-                var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
-
-                return dbContext.Persons
-                    .Where(x => !x.ManagedGroups.Select(y => y.Id).Contains(groupId) && x.IsActive_bl)
                     .ToListAsync();
             }
         }

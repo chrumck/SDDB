@@ -1,80 +1,40 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
+﻿/*global sddb, AssemblyId, ComponentIds */
+/// <reference path="../DataTables/jquery.dataTables.js" />
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
 /// <reference path="../jquery-2.1.4.js" />
 /// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
-/// <reference path="Shared.js" />
+/// <reference path="Shared_Views.js" />
 
-//--------------------------------------Global Properties------------------------------------//
+//----------------------------------------------additional sddb setup------------------------------------------------//
 
-var RecordTemplate = {
-    Id: "RecordTemplateId",
-    DocName: null,
-    DocAltName: null,
-    DocLastVersion: null,
-    DocFilePath: null,
-    Comments: null,
-    IsActive_bl: null,
-    DocumentType_Id: null,
-    AuthorPerson_Id: null,
-    ReviewerPerson_Id: null,
-    AssignedToProject_Id: null,
-    RelatesToAssyType_Id: null,
-    RelatesToCompType_Id: null
-};
+//setting up sddb
+sddb.setConfig({
+    recordTemplate: {
+        Id: "RecordTemplateId",
+        DocName: null,
+        DocAltName: null,
+        DocLastVersion: null,
+        DocFilePath: null,
+        Comments: null,
+        IsActive_bl: null,
+        DocumentType_Id: null,
+        AuthorPerson_Id: null,
+        ReviewerPerson_Id: null,
+        AssignedToProject_Id: null,
+        RelatesToAssyType_Id: null,
+        RelatesToCompType_Id: null
+    },
 
-var MsFilterByProject = {};
-var MsFilterByType = {};
-
-LabelTextCreate = "Create Document";
-LabelTextEdit = "Edit Document";
-UrlFillForEdit = "/DocumentSrv/GetByIds";
-UrlEdit = "/DocumentSrv/Edit";
-UrlDelete = "/DocumentSrv/Delete";
-
-$(document).ready(function () {
-
-    //-----------------------------------------MainView------------------------------------------//
-    
-    //Initialize MagicSuggest MsFilterByType
-    MsFilterByType = $("#MsFilterByType").magicSuggest({
-        data: "/DocumentTypeSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
-        },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for MsFilterByType
-    $(MsFilterByType).on("selectionchange", function (e, m) { refreshMainView(); });
-
-    //Initialize MagicSuggest MsFilterByProject
-    MsFilterByProject = $("#MsFilterByProject").magicSuggest({
-        data: "/ProjectSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
-        },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for MsFilterByProject
-    $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
-
-    //---------------------------------------DataTables------------
-    
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    tableMainColumnSets: [
         [1],
         [2, 3, 4, 5, 6],
         [7, 8, 9, 10, 11]
-    ];
+    ],
 
-    //TableMain Documents
-    TableMain = $("#TableMain").DataTable({
+    tableMain: $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "DocName", name: "DocName" },//1
@@ -82,33 +42,51 @@ $(document).ready(function () {
             {
                 data: "DocumentType_",
                 name: "DocumentType_",
-                render: function (data, type, full, meta) { return data.DocTypeName; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.DocTypeName;
+                }
             }, //3
             { data: "DocLastVersion", name: "DocLastVersion" },//4
             {
                 data: "AuthorPerson_",
                 name: "AuthorPerson_",
-                render: function (data, type, full, meta) { return data.Initials; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.Initials;
+                }
             },//5
             {
                 data: "ReviewerPerson_",
                 name: "ReviewerPerson_",
-                render: function (data, type, full, meta) { return data.Initials; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.Initials;
+                }
             }, //6
             {
                 data: "AssignedToProject_",
                 name: "AssignedToProject_",
-                render: function (data, type, full, meta) { return data.ProjectName; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.ProjectName;
+                }
             }, //7
             {
                 data: "RelatesToAssyType_",
                 name: "RelatesToAssyType_",
-                render: function (data, type, full, meta) { return data.AssyTypeName; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.AssyTypeName;
+                }
             }, //8
             {
                 data: "RelatesToCompType_",
                 name: "RelatesToCompType_",
-                render: function (data, type, full, meta) { return data.CompTypeName; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.CompTypeName;
+                }
             }, //9
             { data: "DocFilePath", name: "DocFilePath" },//10
             { data: "Comments", name: "Comments" },//11
@@ -127,7 +105,7 @@ $(document).ready(function () {
             { targets: [2, 4, 5], className: "hidden-xs hidden-sm" },
             { targets: [6], className: "hidden-xs hidden-sm hidden-md" },
             //2nd set of columns - responsive
-            { targets: [7, 8, 9, 10, 11], visible: false }, 
+            { targets: [7, 8, 9, 10, 11], visible: false },
             { targets: [9, 10], className: "hidden-xs hidden-sm" },
             { targets: [11], className: "hidden-xs hidden-sm hidden-md" }
         ],
@@ -142,46 +120,60 @@ $(document).ready(function () {
             infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
-    });
-    //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    }),
 
-    //---------------------------------------EditFormView----------------------------------------//
+    labelTextCreate: "Create Document",
+    labelTextEdit: "Edit Document",
+    urlFillForEdit: "/DocumentSrv/GetByIds",
+    urlEdit: "/DocumentSrv/Edit",
+    urlDelete: "/DocumentSrv/Delete"
 
-    //Initialize MagicSuggest Array
-    msAddToMsArray(MagicSuggests, "DocumentType_Id", "/DocumentTypeSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "AuthorPerson_Id", "/PersonSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "ReviewerPerson_Id", "/PersonSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "RelatesToAssyType_Id", "/AssemblyTypeSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "RelatesToCompType_Id", "/ComponentTypeSrv/Lookup", 1);
     
-    //--------------------------------------View Initialization------------------------------------//
-
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
-
-    //--------------------------------End of execution at Start-----------
 });
 
-//--------------------------------------Main Methods---------------------------------------//
-
 //refresh view after magicsuggest update
-function refreshMainView() {
-    TableMain.clear().search("").draw();
-    if (MsFilterByType.getValue().length === 0 && MsFilterByProject.getValue().length === 0) {
+sddb.refreshMainView = function () {
+    "use strict";
+    sddb.cfg.tableMain.clear().search("").draw();
+    if (sddb.msFilterByType.getValue().length === 0 && sddb.msFilterByProject.getValue().length === 0) {
         return $.Deferred().resolve();
     }
-    return modalWaitWrapper(function () {
-        return refreshTableGeneric(TableMain, "/DocumentSrv/GetByAltIds",
+    return sddb.modalWaitWrapper(function () {
+        return sddb.refreshTableGeneric(sddb.cfg.tableMain, "/DocumentSrv/GetByAltIds",
         {
-            projectIds: MsFilterByProject.getValue(),
-            typeIds: MsFilterByType.getValue(),
-            getActive: GetActive
+            projectIds: sddb.msFilterByProject.getValue(),
+            typeIds: sddb.msFilterByType.getValue(),
+            getActive: sddb.cfg.currentActive
         },
         "POST");
     });
-}
+};
 
+//----------------------------------------------setup after page load------------------------------------------------//
+$(document).ready(function () {
+    "use strict";
+    //-----------------------------------------mainView------------------------------------------//
 
-//---------------------------------------Helper Methods--------------------------------------//
+    //Initialize MagicSuggest msFilterByType
+    sddb.msFilterByType = sddb.msSetFilter("msFilterByType", "/DocumentTypeSrv/Lookup");
+
+    //Initialize MagicSuggest sddb.msFilterByProject
+    sddb.msFilterByProject = sddb.msSetFilter("msFilterByProject", "/ProjectSrv/Lookup");
+    
+    //---------------------------------------editFormView----------------------------------------//
+
+    //Initialize MagicSuggest Array
+    sddb.msAddToArray("DocumentType_Id", "/DocumentTypeSrv/Lookup");
+    sddb.msAddToArray("AuthorPerson_Id", "/PersonSrv/Lookup");
+    sddb.msAddToArray("ReviewerPerson_Id", "/PersonSrv/Lookup");
+    sddb.msAddToArray("AssignedToProject_Id", "/ProjectSrv/Lookup");
+    sddb.msAddToArray("RelatesToAssyType_Id", "/AssemblyTypeSrv/Lookup");
+    sddb.msAddToArray("RelatesToCompType_Id", "/ComponentTypeSrv/Lookup");
+
+    //--------------------------------------View Initialization------------------------------------//
+
+    sddb.switchView();
+
+    //--------------------------------End of setup after page load---------------------------------//   
+});
 

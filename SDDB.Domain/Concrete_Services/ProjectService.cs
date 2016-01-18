@@ -91,31 +91,31 @@ namespace SDDB.Domain.Services
         //-----------------------------------------------------------------------------------------------------------------------
 
         //get all project persons
-        public virtual Task<List<Person>> GetProjectPersonsAsync(string Id)
+        public virtual Task<List<Person>> GetProjectPersonsAsync(string[] projectIds)
         {
-            if (String.IsNullOrEmpty(Id)) { throw new ArgumentNullException("Id"); }
+            if (projectIds == null || projectIds.Length == 0) { throw new ArgumentNullException("projectIds"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.Persons.Where(x =>
-                        x.PersonProjects.Any(y => y.Id == Id) &&
-                        x.IsActive_bl == true
+                        x.PersonProjects.Any(y => projectIds.Contains(y.Id)) &&
+                        x.IsActive_bl
                     )
                     .ToListAsync();
             }
         }
 
         //get all project persons
-        public virtual Task<List<Person>> GetProjectPersonsNotAsync(string Id)
+        public virtual Task<List<Person>> GetProjectPersonsNotAsync(string[] projectIds)
         {
-            if (String.IsNullOrEmpty(Id)) { throw new ArgumentNullException("Id"); }
+            if (projectIds == null || projectIds.Length == 0) { throw new ArgumentNullException("projectIds"); }
 
             using (var dbContextScope = contextScopeFac.CreateReadOnly())
             {
                 var dbContext = dbContextScope.DbContexts.Get<EFDbContext>();
                 return dbContext.Persons.Where(x =>
-                        !x.PersonProjects.Any(y => y.Id == Id) &&
+                        !projectIds.All(y => x.PersonProjects.Select(z => z.Id).Contains(y)) &&
                         x.IsActive_bl == true
                     )
                     .ToListAsync();

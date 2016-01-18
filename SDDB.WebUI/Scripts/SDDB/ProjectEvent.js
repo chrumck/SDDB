@@ -1,67 +1,29 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
-/// <reference path="../modernizr-2.8.3.js" />
-/// <reference path="../bootstrap.js" />
-/// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
-/// <reference path="../jquery-2.1.4.js" />
-/// <reference path="../jquery-2.1.4.intellisense.js" />
-/// <reference path="../MagicSuggest/magicsuggest.js" />
-/// <reference path="Shared.js" />
+﻿/*global sddb, ProjectId*/
+/// <reference path="Shared_Views.js" />
 
-//--------------------------------------Global Properties------------------------------------//
+//----------------------------------------------additional sddb setup------------------------------------------------//
 
-var MsFilterByProject = {};
+//setting up sddb
+sddb.setConfig({
+    recordTemplate: {
+        Id: "RecordTemplateId",
+        EventName: null,
+        EventAltName: null,
+        EventCreated: null,
+        EventClosed: null,
+        Comments: null,
+        IsActive_bl: null,
+        AssignedToProject_Id: null,
+        CreatedByPerson_Id: null,
+        ClosedByPerson_Id: null
+    },
 
-var RecordTemplate = {
-    Id: "RecordTemplateId",
-    EventName: null,
-    EventAltName: null,
-    EventCreated: null,
-    EventClosed: null,
-    Comments: null,
-    IsActive_bl: null,
-    AssignedToProject_Id: null,
-    CreatedByPerson_Id: null,
-    ClosedByPerson_Id: null
-};
-
-LabelTextCreate = "Create Event";
-LabelTextEdit = "Edit Event";
-UrlFillForEdit = "/ProjectEventSrv/GetByIds";
-UrlEdit = "/ProjectEventSrv/Edit";
-UrlDelete = "/ProjectEventSrv/Delete";
-
-var urlRefreshMainView = "/ProjectEventSrv/GetByProjectIds";
-var dataRefreshMainView = function () { return { projectIds: MsFilterByProject.getValue(), getActive: GetActive }; };
-var httpTypeRefreshMainView = "POST";
-
-$(document).ready(function () {
-
-    //-----------------------------------------MainView------------------------------------------//
-
-    //Initialize MagicSuggest msFilterByProject
-    MsFilterByProject = $("#MsFilterByProject").magicSuggest({
-        data: "/ProjectSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
-        },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for MsFilterByProject
-    $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
-
-
-    //---------------------------------------DataTables------------
-    
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    tableMainColumnSets: [
         [1],
         [2, 3, 4, 5, 6, 7, 8]
-    ];
-    
-    //TableMain ProjectEvents
-    TableMain = $("#TableMain").DataTable({
+    ],
+
+    tableMain: $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "EventName", name: "EventName" },//1
@@ -70,19 +32,28 @@ $(document).ready(function () {
             {
                 data: "AssignedToProject_",
                 name: "AssignedToProject_",
-                render: function (data, type, full, meta) { return data.ProjectName; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.ProjectName; 
+                }
             }, //3
             { data: "EventCreated", name: "EventCreated" },//4
             {
                 data: "CreatedByPerson_",
                 name: "CreatedByPerson_",
-                render: function (data, type, full, meta) { return data.Initials; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.Initials; 
+                }
             },//5
             { data: "EventClosed", name: "EventClosed" },//6
             {
                 data: "ClosedByPerson_",
                 name: "ClosedByPerson_",
-                render: function (data, type, full, meta) { return data.Initials; }
+                render: function (data, type, full, meta) { 
+                    "use strict";
+                    return data.Initials; 
+                }
             }, //7
             { data: "Comments", name: "Comments" },//8
             //------------------------------------------------never visible
@@ -109,32 +80,45 @@ $(document).ready(function () {
             infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
-    });
-    //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    }),
 
-    //---------------------------------------EditFormView----------------------------------------//
+    labelTextCreate: "Create Event",
+    labelTextEdit: "Edit Event",
+    urlFillForEdit: "/ProjectEventSrv/GetByIds",
+    urlEdit: "/ProjectEventSrv/Edit",
+    urlDelete: "/ProjectEventSrv/Delete",
+
+    urlRefreshMainView: "/ProjectEventSrv/GetByProjectIds",
+    dataRefreshMainView: function () {
+        "use strict";
+        return { projectIds: sddb.msFilterByProject.getValue(), getActive: sddb.cfg.currentActive };
+    },
+    httpTypeRefreshMainView: "POST"
+
+});
+
+//----------------------------------------------setup after page load------------------------------------------------//
+$(document).ready(function () {
+    "use strict";
+    //-----------------------------------------mainView------------------------------------------//
+
+    //Initialize MagicSuggest sddb.msFilterByProject
+    sddb.msFilterByProject = sddb.msSetFilter("msFilterByProject", "/ProjectSrv/Lookup");
+
+    //---------------------------------------editFormView----------------------------------------//
 
     //Initialize MagicSuggest Array
-    msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "CreatedByPerson_Id", "/PersonSrv/LookupFromProject", 1);
-    msAddToMsArray(MagicSuggests, "ClosedByPerson_Id", "/PersonSrv/LookupFromProject", 1);
-
-    //Enable DateTimePicker
-    $("[data-val-dbisdatetimeiso]").datetimepicker({ format: "YYYY-MM-DD HH:mm" })
-        .on("dp.change", function (e) { $(this).data("ismodified", true); });
+    sddb.msAddToArray("AssignedToProject_Id", "/ProjectSrv/Lookup");
+    sddb.msAddToArray("CreatedByPerson_Id", "/PersonSrv/LookupFromProject");
+    sddb.msAddToArray("ClosedByPerson_Id", "/PersonSrv/LookupFromProject");
 
     //--------------------------------------View Initialization------------------------------------//
 
-    refreshMainView();
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
+    sddb.refreshMainView();
+    sddb.switchView();
 
-    //--------------------------------End of execution at Start-----------
+    //--------------------------------End of setup after page load---------------------------------//   
 });
 
 
-//--------------------------------------Main Methods---------------------------------------//
-
-
-//---------------------------------------Helper Methods--------------------------------------//
 

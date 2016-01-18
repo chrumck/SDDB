@@ -2,68 +2,65 @@
 @using SDDB.WebUI.Infrastructure
 @{
     ViewBag.Title = "SDDB Your Activity";
+    ViewBag.HelpSection = "#YourActivity";
 }
-<!------- InitialView ------->
-<div class="container-fluid" id="InitialView">
+<!------- initialView ------->
+<div class="container-fluid" id="initialView">
     <h4>Please wait, page loading...</h4>
 </div>
 
 @section Navbar{
-    <div class="btn-group navbar-btn tdo-btngroup-main">
-        <button type="button" class="btn btn-default" id="BtnCreate">New</button>
-        <button type="button" class="btn btn-tdo-nav" id="BtnEdit">&nbsp;&nbsp;Edit&nbsp;&nbsp;</button>
-        <button type="button" class="btn btn-danger" id="BtnDelete">&nbsp;&nbsp;Del&nbsp;&nbsp;</button>
+    <div class="btn-group navbar-btn tdo-btngroup-main hidden">
+        <button type="button" class="btn btn-default" id="btnCreate">New</button>
+        <button type="button" class="btn btn-tdo-nav" id="btnEdit">&nbsp;&nbsp;Edit&nbsp;&nbsp;</button>
+        <button type="button" class="btn btn-danger" id="btnDelete">&nbsp;&nbsp;Del&nbsp;&nbsp;</button>
     </div>
 
     <div class="btn-group navbar-btn tdo-btngroup-edit hidden">
-        <button type="button" class="btn btn-default" id="EditFormBtnCancel">Back</button>
-        <button type="button" class="btn btn-tdo-success" id="EditFormBtnOkFiles">
+        <button type="button" class="btn btn-default" id="editFormBtnCancel">Back</button>
+        <button type="button" class="btn btn-tdo-success" id="editFormBtnOkFiles">
             &nbsp;<span class="glyphicon glyphicon-cloud-upload"></span>&nbsp;
         </button>
-        <button type="button" class="btn btn-success" id="EditFormBtnOk">
+        <button type="button" class="btn btn-success" id="editFormBtnOk">
             &nbsp;&nbsp;&nbsp<span class="glyphicon glyphicon-ok"></span>&nbsp;&nbsp;&nbsp;
         </button>
     </div>
-
-    <div class="btn-group navbar-btn tdo-btngroup-logentryfiles hidden">
-        <button type="button" class="btn btn-default" id="LogEntryFilesViewBtnBack">Back</button>
-    </div>
 }
 @section NavbarCollapse{
-    <ul class="nav navbar-nav tdo-btngroup-main">
+    <ul class="nav navbar-nav tdo-btngroup-main hidden">
         <li class="margin-left-10px">
             <div class="btn-group navbar-btn">
-                <button type="button" class="btn btn-tdo-warning2 collapsenav" id="BtnCopy"> Copy </button>
+                <button type="button" class="btn btn-tdo-warning2 collapsenav" id="btnCopy"> Copy </button>
             </div>
             <div class="btn-group navbar-btn margin-left-5px">
-                <button type="button" class="btn btn-success collapsenav" id="BtnEditLogEntryFiles">&nbsp; Files &nbsp;</button>
+                <button type="button" class="btn btn-success collapsenav" id="btnFiles">&nbsp; Files &nbsp;</button>
             </div>
         </li>
     </ul>
 }
 
-<!------- MainView ------->
-<div class="container-fluid hidden" id="MainView">
+<!------- mainView ------->
+<div class="container-fluid hidden" id="mainView">
 
     <div class="row">
         <div class="col-xs-12">
             <div class="btn-group margin-bottom-2px">
                 <input class="form-control input-tdo-warning" data-val="true" data-val-dbisdateiso="The field must have YYYY-MM-DD format."
-                       id="FilterDateStart" placeholder="Select Day" type="text" value="">
+                       id="filterDateStart" placeholder="Select Day" type="text" value="">
             </div>
         </div>
 
     </div>
 
-    <div class="panel panel-tdo-success " id="PanelTableMain">
+    <div class="panel panel-tdo-success " id="panelTableMain">
         <div class="panel-heading text-center" style="font-size:130%">
             <strong>Your Activity</strong>
             <div class="pull-right">
-                <input id="ChBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="65" 
+                <input id="chBoxShowDeleted" type="checkbox" data-toggle="toggle" data-size="mini" data-width="65" 
                        data-onstyle="warning" data-offstyle="success" data-on="Deleted" data-off="Active">
             </div>
         </div>
-        <table class="table table-striped" id="TableMain">
+        <table class="table table-striped" id="tableMain">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -83,15 +80,15 @@
     </div>
 </div>
 
-<!------- EditFormView ------->
-<div class="container-fluid hidden" id="EditFormView">
+<!------- editFormView ------->
+<div class="container-fluid hidden" id="editFormView">
     <div class="row">
         <div class="col-xs-12">
-            <h3 id="EditFormLabel">Create/Edit Activity</h3>
+            <h3 id="editFormLabel">Create/Edit Activity</h3>
         </div>
     </div>
     <div class="well well-tdo">
-        <form class="form-horizontal" role="form" id="EditForm">
+        <form class="form-horizontal" role="form" id="editForm">
             <div class="row">
 
                 <div class="col-md-6">
@@ -103,7 +100,7 @@
                                     <strong>Hour of the Day</strong>
                                 </div>
                                 <div class="panel-body">
-                                    <div id="EntryDTPicker"></div>
+                                    <div id="entryDTPicker"></div>
                                     <input type="text" class="modifiable" name="LogEntryDateTime" id="LogEntryDateTime" value="" hidden />
                                 </div>
                             </div>
@@ -114,7 +111,7 @@
                                     <strong>Hours Worked</strong>
                                 </div>
                                 <div class="panel-body">
-                                    <div id="HoursWorkedPicker"></div>
+                                    <div id="hoursWorkedPicker"></div>
                                     <input type="text" class="modifiable" name="ManHours" id="ManHours" value="" hidden />
                                 </div>
                             </div>
@@ -167,7 +164,7 @@
                             @Html.ValidationMessageFor(x => x.Comments)
                         </div>
                     </div>
-                    <div class="form-group hidden" id="EditFormGroupIsActive">
+                    <div class="form-group hidden" id="editFormGroupIsActive">
                         <div class="col-sm-10 col-sm-offset-2">
                             @Html.CheckBoxFor(x => x.IsActive_bl, new { @class = "modifiable" }) &nbsp;&nbsp;
                             @Html.LabelFor(x => x.IsActive_bl, "Is Active") &nbsp;&nbsp; <em>(Marking as 'Active' un-deletes record.)</em>
@@ -180,11 +177,11 @@
     </div>
 
     <div class="well well-tdo">
-        <div class="row" id="LogEntryAssysView">
+        <div class="row" id="logEntryAssysView">
             <div class="col-xs-12 col-sm-6">
                 <div class="panel panel-default">
                     <div class="panel-heading"><strong>Add Assemblies </strong><small><em> Choose Location first.</em></small></div>
-                    <table class="table table-striped" id="TableLogEntryAssysAdd">
+                    <table class="table table-striped" id="tableLogEntryAssysAdd">
                         <thead class="hidden">
                             <tr>
                                 <th>ID</th>
@@ -198,7 +195,7 @@
             <div class="col-xs-12 col-sm-6">
                 <div class="panel panel-default">
                     <div class="panel-heading"><strong>Remove Assemblies </strong><small><em> Choose Location first</em></small></div>
-                    <table class="table table-striped" id="TableLogEntryAssysRemove">
+                    <table class="table table-striped" id="tableLogEntryAssysRemove">
                         <thead class="hidden">
                             <tr>
                                 <th>ID</th>
@@ -210,10 +207,10 @@
                 </div>
             </div>
             <div class="col-xs-12">
-                <button class="btn btn-sm btn-info" id="EditFormBtnAddRemoveAssys" type="button">Add/Remove Assys</button>
+                <button class="btn btn-sm btn-info" id="editFormBtnAddRemoveAssys" type="button">Add/Remove Assys</button>
                 @if (User.IsInRole("Assembly_EditStatus"))
                 {
-                    <button class="btn btn-sm btn-warning pull-right" id="EditFormBtnChngSts" type="button">Change Status</button>
+                    <button class="btn btn-sm btn-warning pull-right" id="editFormBtnChngSts" type="button">Change Status</button>
                 }
             </div>
         </div>
@@ -224,17 +221,17 @@
         <div class="well well-tdo">
             <div class="row">
                 <div class="col-xs-12">
-                    <button class="btn btn-primary margin-bottom-5px" id="EditFormBtnPrsAddRemove" type="button">
+                    <button class="btn btn-primary margin-bottom-5px" id="editFormBtnPrsAddRemove" type="button">
                         Add/Remove Other Persons
                     </button>
                     <div class="small"><em> Adding others adds hours to their records!</em></div>
                 </div>
             </div>
-            <div class="row hidden" id="LogEntryPersonsView">
+            <div class="row hidden" id="logEntryPersonsView">
                 <div class="col-xs-12 col-sm-6">
                     <div class="panel panel-tdo-info">
                         <div class="panel-heading" style="font-weight:bold">Add People</div>
-                        <table class="table table-striped" id="TableLogEntryPersonsAdd">
+                        <table class="table table-striped" id="tableLogEntryPersonsAdd">
                             <thead class="hidden">
                                 <tr>
                                     <th>ID</th>
@@ -250,7 +247,7 @@
                 <div class="col-xs-12 col-sm-6">
                     <div class="panel panel-tdo-info">
                         <div class="panel-heading" style="font-weight:bold">Remove People</div>
-                        <table class="table table-striped" id="TableLogEntryPersonsRemove">
+                        <table class="table table-striped" id="tableLogEntryPersonsRemove">
                             <thead class="hidden">
                                 <tr>
                                     <th>ID</th>
@@ -264,7 +261,7 @@
                     </div>
                 </div>
                 <div class="col-xs-12">
-                    <button class="btn btn-sm btn-info" id="EditFormBtnAddRemovePersons" type="button">Add/Remove People</button>
+                    <button class="btn btn-sm btn-info" id="editFormBtnAddRemovePersons" type="button">Add/Remove People</button>
                 </div>
             </div>
         </div>

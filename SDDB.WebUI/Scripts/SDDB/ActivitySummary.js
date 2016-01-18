@@ -1,4 +1,5 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
+﻿/*global sddb, UserId, UserFullName, CanViewOthers*/
+/// <reference path="../DataTables/jquery.dataTables.js" />
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
@@ -6,167 +7,149 @@
 /// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared.js" />
+/// <reference path="Shared_Views.js" />
 
-//--------------------------------------Global Properties------------------------------------//
-
-var MsFilterByPerson;
-
-$(document).ready(function () {
-
-    //-----------------------------------------MainView------------------------------------------//
-
-
-    //Initialize DateTimePicker FilterDateStart
-    $("#FilterDateStart").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("dp.hide", function (e) { refreshMainView(); });
-
-
-    //Initialize MagicSuggest MsFilterByPerson
-    MsFilterByPerson = $("#MsFilterByPerson").magicSuggest({
-        data: "/PersonSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
-        },
-        maxSelection: 1,
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for MsFilterByPerson
-    $(MsFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
-
-    //Hide MsFilterByPerson if !CanViewOthers
-    if (typeof CanViewOthers === "undefined" || !CanViewOthers) { MsFilterByPerson.disable(); } 
-           
-    //--------------------------------------View Initialization------------------------------------//
-           
-    $("#InitialView").addClass("hidden");
-    $("#MainView").removeClass("hidden");
-
-    var weekOffset = 0
-    if ($("#thNo6").is(":hidden") && $("#thNo7").is(":hidden")) { weekOffset = 1; }
-    $("#FilterDateStart").val(moment().day(weekOffset).format("YYYY-MM-DD"));
-
-    MsFilterByPerson.setSelection([{ id: UserId, name: UserFullName }]);
-
-    //--------------------------------End of execution at Start-----------
-});
-
-
-//--------------------------------------Main Methods---------------------------------------//
 
 //refresh view after magicsuggest update
-function refreshMainView() {
-    var tableMain = $("#TableMain");
-    var startDate = $("#FilterDateStart").val();
+sddb.refreshMainView = function () {
+    "use strict";
+    //fillSummaryTableHelper
+    var fillSummaryTableHelper = function (targetTable, startDate, records) {
 
-    tableMain.find("tbody").empty();
-    clearSumTblFirstRowHelper(tableMain);
+        //getColumnDatesHelper for fillSummaryTableHelper
+        var getColumnDatesHelper = function (startDate) {
+            var columnDate = moment(startDate),
+            columnDates = [],
+            i;
 
-    if (startDate != "" && MsFilterByPerson.getSelection().length != 0) {
-        showModalWait();
-        var endDate = moment(startDate).add(6, "days").hour(23).minute(59).format("YYYY-MM-DD HH:mm");
+            for (i = 0; i < 7; i += 1) {
+                columnDates.push(columnDate.clone());
+                columnDate.add(1, "days");
+            }
+            return columnDates;
+        },
+        //fillSumTblFirstRowHelper for fillSummaryTableHelper
+        fillSumTblFirstRowHelper = function (targetTable, columnDates) {
+            targetTable.find("thead th").each(function (i) {
+                if (i === 0) { return true; }
+                $(this).text(columnDates[i - 1].format("dd DD"));
+            });
+        },
+        //getProjectNamesHelper for fillSummaryTableHelper
+        getProjectNamesHelper = function (records) {
+            var projectNames = [];
+            projectNames.push("_TOTAL_");
+            $.each(records, function (i, record) {
+                $.each(record.SummaryDetails, function (j, detail) {
+                    if ($.inArray(detail.ProjectName, projectNames) == -1) { projectNames.push(detail.ProjectName); }
+                });
+            });
+            return projectNames;
+        },
+        //getColumnHoursHelper for fillSummaryTableHelper
+        getColumnHoursHelper = function (records, columnDate, projectName, isTotalHoursRow) {
+            var columnHours = 0;
+            $.each(records, function (i, record) {
+                if (moment(record.SummaryDay).isSame(columnDate)) {
+                    if (isTotalHoursRow) {
+                        columnHours = record.TotalManHours;
+                        return false;
+                    }
+                    $.each(record.SummaryDetails, function (j, detail) {
+                        if (detail.ProjectName == projectName) {
+                            columnHours = detail.ManHours;
+                            return false;
+                        }
+                    });
+                    return false;
+                }
+            });
+            return columnHours;
+        },
+        //
+        columnDates = getColumnDatesHelper(startDate),
+        projectNames = getProjectNamesHelper(records);
+
+        //main
+        fillSumTblFirstRowHelper(targetTable, columnDates);
+
+        $.each(projectNames, function (i, projectName) {
+            var row = $("<tr/>");
+            row.append($("<td />").text(projectName));
+            $.each(columnDates, function (j, columnDate) {
+                var columnHours = getColumnHoursHelper(records, columnDate, projectName, i === 0);
+                row.append($("<td />").text(columnHours));
+                if (j >= columnDates.length - 2) { row.find("td:last").addClass("hidden-xs"); }
+            });
+            targetTable.append(row);
+        });
+    },
+    //clearSumTblFirstRowHelper
+    clearSumTblFirstRowHelper = function (targetTable) {
+        targetTable.find("thead th").each(function (i) {
+            if (i === 0) { return true; }
+            $(this).text(i);
+        });
+    },
+    //
+    targetTable = $("#tableMain"),
+    startDate = $("#filterDateStart").val(),
+    endDate;
+
+    //main
+    targetTable.find("tbody").empty();
+    clearSumTblFirstRowHelper(targetTable);
+
+    if (startDate !== "" && sddb.msFilterByPerson.getSelection().length !== 0) {
+        sddb.showModalWait();
+        endDate = moment(startDate).add(6, "days").hour(23).minute(59).format("YYYY-MM-DD HH:mm");
         $.ajax({
             type: "POST",
             url: "/PersonLogEntrySrv/GetActivitySummaries",
             timeout: 120000,
             data: {
-                personId: (MsFilterByPerson.getSelection())[0].id,
+                personId: (sddb.msFilterByPerson.getSelection())[0].id,
                 startDate: startDate,
                 endDate: endDate,
                 getActive: true
             },
             dataType: "json"
         })
-            .always(hideModalWait)
+            .always(sddb.hideModalWait)
             .done(function (records) {
-                fillSummaryTableHelper(tableMain, startDate, records);
+                fillSummaryTableHelper(targetTable, startDate, records);
             })
-            .fail(function (xhr, status, error) { showModalAJAXFail(xhr, status, error); });
+            .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
     }
-}
+};
 
-//---------------------------------------Helper Methods--------------------------------------//
-
-//fillSummaryTableHelper - used by refreshMainView
-function fillSummaryTableHelper(tableMain, startDate, records) {
+//----------------------------------------------setup after page load------------------------------------------------//
+$(document).ready(function () {
+    "use strict";
+    //-----------------------------------------mainView------------------------------------------//
+        
+    //Initialize DateTimePicker filterDateStart
+    $("#filterDateStart").on("dp.hide", function (event) { sddb.refreshMainView(); });
     
-    var columnDates = getColumnDatesHelper(startDate);
+    //Initialize MagicSuggest sddb.msFilterByPerson
+    sddb.msFilterByPerson = sddb.msSetFilter("msFilterByPerson", "/PersonSrv/Lookup", { maxSelection: 1 });
+    
+    //Hide sddb.msFilterByPerson if !CanViewOthers
+    if (typeof CanViewOthers === "undefined" || !CanViewOthers) { sddb.msFilterByPerson.disable(); } 
+           
+    //--------------------------------------View Initialization------------------------------------//
 
-    fillSumTblFirstRowHelper(tableMain, columnDates);
+    sddb.switchView();
 
-    var projectNames = getProjectNamesHelper(records);
+    sddb.weekOffset = $("#thNo6").is(":hidden") && $("#thNo7").is(":hidden") ? 1: 0;
+    $("#filterDateStart").data("DateTimePicker").date(moment().day(sddb.weekOffset));
+    sddb.msFilterByPerson.setSelection([{ id: UserId, name: UserFullName }]);
+    
+    //--------------------------------End of setup after page load---------------------------------//
+});
 
-    $.each(projectNames, function (i, projectName) {
 
-        var row = $("<tr/>");
-        row.append($("<td />").text(projectName));
-        $.each(columnDates, function (j, columnDate) {
-            var columnHours = getColumnHoursHelper(records, columnDate, projectName, i == 0);
-            row.append($("<td />").text(columnHours));
-            if (j >= columnDates.length - 2) { row.find("td:last").addClass("hidden-xs"); }
-        });
-        tableMain.append(row);
-    });
-}
 
-//getColumnDatesHelper - used by fillSummaryTableHelper
-function getColumnDatesHelper(startDate) {
-    var columnDate = moment(startDate);
-    var columnDates = [];
-    for (var i = 0; i < 7; i++) {
-        columnDates.push(columnDate.clone());
-        columnDate.add(1, "days");
-    }
-    return columnDates;
-}
 
-//fillSumTblFirstRowHelper - used by fillSummaryTableHelper
-function fillSumTblFirstRowHelper(tableMain, columnDates) {
-    tableMain.find("thead th").each(function (i) {
-        if (i == 0) { return true; }
-        $(this).text(columnDates[i - 1].format("dd DD"));
-    });
-}
 
-//clearSumTblFirstRowHelper - used by refreshMainView
-function clearSumTblFirstRowHelper(tableMain) {
-    tableMain.find("thead th").each(function (i) {
-        if (i == 0) { return true; }
-        $(this).text(i);
-    });
-}
-
-//getProjectNamesHelper - used by fillSummaryTableHelper
-function getProjectNamesHelper(records) {
-    var projectNames = [];
-    projectNames.push("_TOTAL_");
-    $.each(records, function (i, record) {
-        $.each(record.SummaryDetails, function (j, detail) {
-            if ($.inArray(detail.ProjectName, projectNames) == -1) { projectNames.push(detail.ProjectName); }
-        });
-    });
-    return projectNames;
-}
-
-//getColumnHoursHelper - used by fillSummaryTableHelper
-function getColumnHoursHelper(records, columnDate, projectName, isTotalHoursRow) {
-    var columnHours = 0;
-    $.each(records, function (i, record) {
-        if (moment(record.SummaryDay).isSame(columnDate)) {
-            if (isTotalHoursRow) {
-                columnHours = record.TotalManHours;
-                return false;
-            }
-            $.each(record.SummaryDetails, function (j, detail) {
-                if (detail.ProjectName == projectName) {
-                    columnHours = detail.ManHours;
-                    return false;
-                }
-            });
-            return false;
-        }
-    });
-    return columnHours;
-}
 

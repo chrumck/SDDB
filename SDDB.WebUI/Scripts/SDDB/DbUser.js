@@ -1,114 +1,34 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
+﻿/*global sddb */
+/// <reference path="../DataTables/jquery.dataTables.js" />
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
 /// <reference path="../jquery-2.1.4.js" />
 /// <reference path="../jquery-2.1.4.intellisense.js" />
 /// <reference path="../MagicSuggest/magicsuggest.js" />
-/// <reference path="Shared.js" />
+/// <reference path="Shared_Views.js" />
 
-//--------------------------------------Global Properties------------------------------------//
+//----------------------------------------------additional sddb setup------------------------------------------------//
 
-var TableDBRolesAdd = {},
-    TableDBRolesRemove = {};
+//setting up sddb
+sddb.setConfig({
+    recordTemplate: {
+        Id: "RecordTemplateId",
+        LastName: null,
+        FirstName: null,
+        UserName: null,
+        Email: null,
+        LDAPAuthenticated_bl: null,
+        Password: null,
+        PasswordConf: null
+    },
 
-var RecordTemplate = {
-    Id: "RecordTemplateId",
-    LastName: null,
-    FirstName: null,
-    UserName: null,
-    Email: null,
-    LDAPAuthenticated_bl: null,
-    Password: null,
-    PasswordConf: null
-};
-
-LabelTextCreate = "Create SDDB User";
-LabelTextEdit = "Edit SDDB User";
-UrlFillForEdit = "/DBUserSrv/GetByIds";
-UrlEdit = "/DBUserSrv/Edit";
-UrlDelete = "/DBUserSrv/Delete";
-
-urlRefreshMainView = "/DbUserSrv/Get";
-dataRefreshMainView = function () { return {}; };
-
-callBackAfterCreate = function () {
-    MagicSuggests[0].enable();
-    return $.Deferred().resolve();
-};
-
-callBackAfterEdit = function () {
-    //Id not handled by submitEditsGeneric, has to be set
-    if (CurrRecords.length == 1) {
-        MagicSuggests[0].addToSelection([{
-            id: CurrRecords[0].Id,
-            name: CurrRecords[0].FirstName + " " + CurrRecords[0].LastName
-        }], true);
-    }
-    else {
-        MagicSuggests[0].addToSelection([{ id: "_VARIES_", name: "_VARIES_" }], true);
-    }
-    MagicSuggests[0].disable();
-    return $.Deferred().resolve();
-};
-
-callBackBeforeSubmitEdit = function () {
-    //Id not handled by submitEditsGeneric, has to be set
-    if (CurrRecords.length == 1) { CurrRecords[0].Id = MagicSuggests[0].getValue()[0]; }
-
-    //Password and PasswordConf not returned in CurrentRecords by server, needs to be added manually
-    for (var i = 0; i < CurrRecords.length; i++) {
-        CurrRecords[i].Password = "";
-        CurrRecords[i].PasswordConf = "";
-    }
-
-    return $.Deferred().resolve();
-};
-
-$(document).ready(function () {
-
-    //-----------------------------------------MainView------------------------------------------//
-
-    //Wire Up BtnEditRoles 
-    $("#BtnEditRoles").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length === 0) {
-            showModalNothingSelected();
-            return;
-        }
-
-        if (CurrIds.length == 1) {
-            var selectedRecord = TableMain.row(".ui-selected", { page: "current" }).data();
-            $("#DBRolesViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
-        }
-        else {
-            $("#DBRolesViewPanel").text("_MULTIPLE_");
-        }
-
-        modalWaitWrapper(function () {
-            return fillFormForRelatedGeneric(
-                TableDBRolesAdd, TableDBRolesRemove, CurrIds,
-                "GET", "/DBUserSrv/GetUserRoles", { id: CurrIds[0] },
-                "GET", "/DBUserSrv/GetUserRolesNot", { id: CurrIds[0] },
-                "GET", "/DBUserSrv/GetAllRoles",
-                null, 0);
-        })
-            .done(function () {
-                saveViewSettings(TableMain);
-                switchView("MainView", "DBRolesView", "tdo-btngroup-dbroles");
-            });
-    });
-        
-    //---------------------------------------DataTables------------
-
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    tableMainColumnSets: [
         [1],
         [2, 3, 4, 5]
-    ];
+    ],
 
-    //TableMain DBUsers
-    TableMain = $("#TableMain").DataTable({
+    tableMain: $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" }, //0
             { data: "LastName", name: "LastName" }, //1
@@ -134,91 +54,135 @@ $(document).ready(function () {
             infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
-    });
+    }),
 
-    //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    labelTextCreate : "Create SDDB User",
+    labelTextEdit : "Edit SDDB User",
+    urlFillForEdit : "/DBUserSrv/GetByIds",
+    urlEdit : "/DBUserSrv/Edit",
+    urlDelete: "/DBUserSrv/Delete",
+    urlRefreshMainView: "/DbUserSrv/Get",
+    dataRefreshMainView: function () {
+        "use strict";
+        return {};
+    }
 
-    //---------------------------------------EditFormView----------------------------------------//
 
-    ///Initialize MagicSuggest Array
-    msAddToMsArray(MagicSuggests, "Id", "/PersonSrv/PersonsWoDBUser", 1);
-   
-    //----------------------------------------DBRolesView----------------------------------------//
-
-    //Wire Up DBRolesViewBtnCancel
-    $("#DBRolesViewBtnCancel").click(function () {
-        switchView("DBRolesView", "MainView", "tdo-btngroup-main", TableMain);
-    });
-
-    //Wire Up DBRolesViewBtnOk
-    $("#DBRolesViewBtnOk").click(function () {
-        var idsAdd = TableDBRolesAdd.cells(".ui-selected", "Name:name", { page: "current" }).data().toArray(),
-            idsRemove = TableDBRolesRemove.cells(".ui-selected", "Name:name", { page: "current" }).data().toArray();
-        
-        if (idsAdd.length + idsRemove.length === 0) {
-            showModalNothingSelected();
-            return;
-        }
-        modalWaitWrapper(function () {
-            return submitEditsForRelatedGeneric(CurrIds, idsAdd, idsRemove, "/DBUserSrv/EditRoles");
-        })
-            .then(function () {
-                return refreshMainView();
-            })
-            .done(function () {
-                switchView("DBRolesView", "MainView", "tdo-btngroup-main", TableMain);
-            });
-    });
-
-    //---------------------------------------DataTables------------
-
-    //TableDBRolesAdd
-    TableDBRolesAdd = $("#TableDBRolesAdd").DataTable({
-        columns: [
-            { data: "Name", name: "Name" }
-        ],
-        bAutoWidth: false,
-        language: {
-            search: "",
-            lengthMenu: "_MENU_",
-            info: "_START_ - _END_ of _TOTAL_",
-            infoEmpty: "",
-            infoFiltered: "(filtered)",
-            paginate: { previous: "", next: "" }
-        },
-        pageLength: 100
-    });
-
-    //TableDBRolesRemove
-    TableDBRolesRemove = $("#TableDBRolesRemove").DataTable({
-        columns: [
-            { data: "Name", name: "Name" }
-        ],
-        bAutoWidth: false,
-        language: {
-            search: "",
-            lengthMenu: "_MENU_",
-            info: "_START_ - _END_ of _TOTAL_",
-            infoEmpty: "",
-            infoFiltered: "(filtered)",
-            paginate: { previous: "", next: "" }
-        },
-        pageLength: 100
-    });
-      
-    //--------------------------------------View Initialization------------------------------------//
-
-    refreshMainView();
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
-
-    //--------------------------------End of execution at Start-----------
 });
 
+//callBackAfterCreate
+sddb.callBackAfterCreate = function () {
+    "use strict";
+    sddb.cfg.magicSuggests[0].enable();
+    return $.Deferred().resolve();
+};
 
-//--------------------------------------Main Methods---------------------------------------//
+//callBackAfterEdit
+sddb.callBackAfterEdit = function () {
+    "use strict";
+    //Id not handled by submitEditsGeneric, has to be set
+    if (sddb.cfg.currentRecords.length == 1) {
+        sddb.cfg.magicSuggests[0].addToSelection([{
+            id: sddb.cfg.currentRecords[0].Id,
+            name: sddb.cfg.currentRecords[0].FirstName + " " + sddb.cfg.currentRecords[0].LastName
+        }], true);
+    }
+    else {
+        sddb.cfg.magicSuggests[0].addToSelection([{ id: "_VARIES_", name: "_VARIES_" }], true);
+    }
+    sddb.cfg.magicSuggests[0].disable();
+    return $.Deferred().resolve();
+};
 
-//---------------------------------------Helper Methods--------------------------------------//
+//callBackBeforeSubmitEdit
+sddb.callBackBeforeSubmitEdit = function () {
+    "use strict";
+    //Id not handled by submitEditsGeneric, has to be set
+    if (sddb.cfg.currentRecords.length == 1) {
+        sddb.cfg.currentRecords[0].Id = sddb.cfg.magicSuggests[0].getValue()[0];
+    }
 
+    //Password and PasswordConf not returned in CurrentRecords by server, needs to be added manually
+    for (var i = 0; i < sddb.cfg.currentRecords.length; i += 1) {
+        sddb.cfg.currentRecords[i].Password = "";
+        sddb.cfg.currentRecords[i].PasswordConf = "";
+    }
 
+    return $.Deferred().resolve();
+};
 
+//----------------------------------------------setup after page load------------------------------------------------//
+
+$(document).ready(function () {
+    "use strict";
+    //--------------------------------------dbRolesCfg--------------------------------------//
+
+    //tableDBRolesAdd
+    sddb.tableDBRolesAdd = $("#tableDBRolesAdd").DataTable({
+        columns: [
+            { data: "Name", name: "Name" }
+        ],
+        bAutoWidth: false,
+        language: {
+            search: "",
+            lengthMenu: "_MENU_",
+            info: "_START_ - _END_ of _TOTAL_",
+            infoEmpty: "",
+            infoFiltered: "(filtered)",
+            paginate: { previous: "", next: "" }
+        },
+        pageLength: 100
+    });
+    //tableDBRolesRemove
+    sddb.tableDBRolesRemove = $("#tableDBRolesRemove").DataTable({
+        columns: [
+            { data: "Name", name: "Name" }
+        ],
+        bAutoWidth: false,
+        language: {
+            search: "",
+            lengthMenu: "_MENU_",
+            info: "_START_ - _END_ of _TOTAL_",
+            infoEmpty: "",
+            infoFiltered: "(filtered)",
+            paginate: { previous: "", next: "" }
+        },
+        pageLength: 100
+    });
+    //dbRolesCfg
+    sddb.dbRolesCfg = {
+        tableAdd: sddb.tableDBRolesAdd,
+        tableRemove: sddb.tableDBRolesRemove,
+        url: "/DBUserSrv/GetUserRoles",
+        urlNot: "/DBUserSrv/GetUserRolesNot",
+        sortColumn: 0,
+        selectColumn: "Name",
+        relatedViewId: "dBRolesView",
+        relatedViewBtnGroupClass: "tdo-btngroup-dbroles",
+        relatedViewPanelId: "bBRolesViewPanel",
+        relatedViewPanelText: function (selectedRecord) {
+            return selectedRecord.FirstName + " " + selectedRecord.LastName;
+        },
+        urlEdit: "/DBUserSrv/EditRoles",
+        btnEditId: "btnEditRoles",
+        btnCancelId: "dBRolesViewBtnCancel",
+        btnOkId: "dBRolesViewBtnOk"
+    };
+
+    sddb.wireButtonsForRelated(sddb.dbRolesCfg);
+    
+    //-----------------------------------------mainView------------------------------------------//
+     
+
+    //---------------------------------------editFormView----------------------------------------//
+
+    ///Initialize MagicSuggest Array
+    sddb.msAddToArray("Id", "/PersonSrv/PersonsWoDBUser");
+   
+    //--------------------------------------View Initialization------------------------------------//
+
+    sddb.refreshMainView();
+    sddb.switchView();
+
+    //--------------------------------End of setup after page load---------------------------------//   
+});

@@ -1,4 +1,5 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
+﻿/*global sddb, ComponentId */
+/// <reference path="../DataTables/jquery.dataTables.js" />
 /// <reference path="../modernizr-2.8.3.js" />
 /// <reference path="../bootstrap.js" />
 /// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
@@ -7,127 +8,71 @@
 /// <reference path="../MagicSuggest/magicsuggest.js" />
 /// <reference path="Shared_Views.js" />
 
-//--------------------------------------Global Properties------------------------------------//
+//----------------------------------------------additional sddb setup------------------------------------------------//
 
-var RecordTemplate = {
-    Id: "RecordTemplateId",
-    LogEntryDateTime: null,
-    Component_Id: null,
-    ComponentStatus_Id: null,
-    AssignedToProject_Id: null,
-    AssignedToAssemblyDb_Id: null,
-    LastCalibrationDate: null,
-    Comments: null,
-    IsActive_bl: null
-};
+//setting up sddb
+sddb.setConfig({
+    recordTemplate: {
+        Id: "RecordTemplateId",
+        LogEntryDateTime: null,
+        Component_Id: null,
+        ComponentStatus_Id: null,
+        AssignedToProject_Id: null,
+        AssignedToAssemblyDb_Id: null,
+        LastCalibrationDate: null,
+        Comments: null,
+        IsActive_bl: null
+    },
 
-var MsFilterByProject;
-var MsFilterByComponent;
-var MsFilterByPerson;
-
-
-LabelTextCreate = "Create Log Entry";
-LabelTextEdit = "Edit Log Entry";
-UrlFillForEdit = "/ComponentLogEntrySrv/GetByIds";
-UrlEdit = "/ComponentLogEntrySrv/Edit";
-UrlDelete = "/ComponentLogEntrySrv/Delete";
-
-$(document).ready(function () {
-
-    //-----------------------------------------MainView------------------------------------------//
-
-    //Initialize DateTimePicker FilterDateStart
-    $("#FilterDateStart").datetimepicker({ format: "YYYY-MM-DD" }).on("dp.hide", function (e) { refreshMainView(); });
-
-    //Initialize DateTimePicker FilterDateEnd
-    $("#FilterDateEnd").datetimepicker({ format: "YYYY-MM-DD" }).on("dp.hide", function (e) { refreshMainView(); });
-
-    //Initialize MagicSuggest MsFilterByProject
-    MsFilterByProject = $("#MsFilterByProject").magicSuggest({
-        data: "/ProjectSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
-        },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for MsFilterByProject
-    $(MsFilterByProject).on("selectionchange", function (e, m) { refreshMainView(); });
-
-    //Initialize MagicSuggest MsFilterByComponent
-    MsFilterByComponent = $("#MsFilterByComponent").magicSuggest({
-        data: "/ComponentSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
-        },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for MsFilterByComponent
-    $(MsFilterByComponent).on("selectionchange", function (e, m) { refreshMainView(); });
-
-    //Initialize MagicSuggest MsFilterByComponent
-    MsFilterByCompType = $("#MsFilterByCompType").magicSuggest({
-        data: "/ComponentTypeSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
-        },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for MsFilterByComponent
-    $(MsFilterByCompType).on("selectionchange", function (e, m) { refreshMainView(); });
-
-    //Initialize MagicSuggest MsFilterByPerson
-    MsFilterByPerson = $("#MsFilterByPerson").magicSuggest({
-        data: "/PersonSrv/LookupFromProject",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { showModalAJAXFail(xhr, status, error); }
-        },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for MsFilterByPerson
-    $(MsFilterByPerson).on("selectionchange", function (e, m) { refreshMainView(); });
-
-
-    //---------------------------------------DataTables------------
-
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    tableMainColumnSets: [
         [1],
         [2, 3, 4, 5, 6, 7, 8]
-    ];
+    ],
 
-    //TableMain PersonLogEntrys
-    TableMain = $("#TableMain").DataTable({
+    tableMain: $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LogEntryDateTime", name: "LogEntryDateTime" },//1
             //------------------------------------------------first set of columns
             {
-                data: "Component_", name: "Component_",
-                render: function (data, type, full, meta) { return data.CompName }
+                data: "Component_",
+                name: "Component_",
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.CompName;
+                }
             }, //2
             {
-                data: "LastSavedByPerson_", name: "LastSavedByPerson_",
-                render: function (data, type, full, meta) { return data.LastName + " " + data.Initials }
+                data: "LastSavedByPerson_",
+                name: "LastSavedByPerson_",
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.LastName + " " + data.Initials;
+                }
             }, //3
             {
-                data: "ComponentStatus_", name: "ComponentStatus_",
-                render: function (data, type, full, meta) { return data.CompStatusName }
+                data: "ComponentStatus_",
+                name: "ComponentStatus_",
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.CompStatusName;
+                }
             }, //4
             {
-                data: "AssignedToProject_", name: "AssignedToProject_",
-                render: function (data, type, full, meta) { return data.ProjectName + " " + data.ProjectCode }
+                data: "AssignedToProject_",
+                name: "AssignedToProject_",
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.ProjectName + " " + data.ProjectCode;
+                }
             }, //5
             {
-                data: "AssignedToAssemblyDb_", name: "AssignedToAssemblyDb_",
-                render: function (data, type, full, meta) { return data.AssyName }
+                data: "AssignedToAssemblyDb_",
+                name: "AssignedToAssemblyDb_",
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.AssyName;
+                }
             }, //6
             { data: "LastCalibrationDate", name: "LastCalibrationDate" },//7
             { data: "Comments", name: "Comments" },//8
@@ -144,7 +89,7 @@ $(document).ready(function () {
             { targets: [0, 1, 7, 9, 10, 11, 12, 13, 14], searchable: false },
             // - first set of columns
             { targets: [3, 4], className: "hidden-xs" },
-            { targets: [5, 6], className: "hidden-xs hidden-sm" }, 
+            { targets: [5, 6], className: "hidden-xs hidden-sm" },
             { targets: [7, 8], className: "hidden-xs hidden-sm hidden-md" }
         ],
         order: [[1, "asc"]],
@@ -158,74 +103,100 @@ $(document).ready(function () {
             infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
-    });
-    //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    }),
 
-    //---------------------------------------EditFormView----------------------------------------//
-
-    //Initialize DateTimePicker
-    $("#LogEntryDateTime").datetimepicker({ format: "YYYY-MM-DD HH:mm" })
-        .on("dp.change", function (e) { $(this).data("ismodified", true); });
-
-    //Enable DateTimePicker
-    $("#LastCalibrationDate").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("dp.change", function (e) { $(this).data("ismodified", true); });
-
-    //Initialize MagicSuggest Array
-    msAddToMsArray(MagicSuggests, "Component_Id", "/ComponentSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "ComponentStatus_Id", "/ComponentStatusSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "AssignedToProject_Id", "/ProjectSrv/Lookup", 1);
-    msAddToMsArray(MagicSuggests, "AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup", 1);
-
-    //--------------------------------------View Initialization------------------------------------//
-
-    fillFiltersFromRequestParams().done(refreshMainView);
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
-
-    //--------------------------------End of execution at Start-----------
+    labelTextCreate: "Create Log Entry",
+    labelTextEdit: "Edit Log Entry",
+    urlFillForEdit : "/ComponentLogEntrySrv/GetByIds",
+    urlEdit : "/ComponentLogEntrySrv/Edit",
+    urlDelete : "/ComponentLogEntrySrv/Delete"
 });
 
+//fillFiltersFromRequestParams
+sddb.fillFiltersFromRequestParams = function () {
+    "use strict";
+    $("#filterDateStart").val(moment().format("YYYY-MM-DD"));
+    $("#filterDateEnd").val(moment().format("YYYY-MM-DD"));
 
-//--------------------------------------Main Methods---------------------------------------//
+    if (!ComponentId) { return $.Deferred().resolve(); }
+
+    return sddb.modalWaitWrapper(function () {
+        return $.ajax({
+            type: "POST",
+            url: "/ComponentSrv/GetByIds",
+            timeout: 120000,
+            data: { ids: [ComponentId], getActive: true },
+            dataType: "json"
+        })
+            .then(function (data) {
+                if (!data || data.length === 0) { return; }
+                sddb.msSetSelectionSilent(sddb.msFilterByComponent, [{ id: data[0].Id, name: data[0].CompName }]);
+            });
+    });
+};
 
 //refresh Main view 
-function refreshMainView() {
-    TableMain.clear().search("").draw();
-    if ($("#FilterDateStart").val() == "" || $("#FilterDateEnd").val() == "") { return $.Deferred().resolve(); }
+sddb.refreshMainView = function () {
+    "use strict";
 
-    var endDate = ($("#FilterDateEnd").val() == "") ? "": moment($("#FilterDateEnd").val())
+    sddb.cfg.tableMain.clear().search("").draw();
+    if ($("#filterDateStart").val() === "" || $("#filterDateEnd").val() === "") { return $.Deferred().resolve(); }
+
+    var endDate = ($("#filterDateEnd").val() === "") ? "" : moment($("#filterDateEnd").val())
         .hour(23).minute(59).format("YYYY-MM-DD HH:mm");
 
-    return modalWaitWrapper(function () {
-        return refreshTableGeneric(TableMain, "/ComponentLogEntrySrv/GetByAltIds",
+    return sddb.modalWaitWrapper(function () {
+        return sddb.refreshTableGeneric(sddb.cfg.tableMain, "/ComponentLogEntrySrv/GetByAltIds",
         {
-            projectIds: MsFilterByProject.getValue(),
-            componentIds: MsFilterByComponent.getValue(),
-            compTypeIds: MsFilterByCompType.getValue(),
-            personIds: MsFilterByPerson.getValue(),
-            startDate: $("#FilterDateStart").val(),
+            projectIds: sddb.msFilterByProject.getValue(),
+            componentIds: sddb.msFilterByComponent.getValue(),
+            compTypeIds: sddb.msFilterByCompType.getValue(),
+            personIds: sddb.msFilterByPerson.getValue(),
+            startDate: $("#filterDateStart").val(),
             endDate: endDate,
-            getActive: GetActive
+            getActive: sddb.cfg.currentActive
         },
         "POST");
     });
-}
+};
 
-//fillFiltersFromRequestParams
-function fillFiltersFromRequestParams() {
-    $("#FilterDateStart").val(moment().format("YYYY-MM-DD"));
-    $("#FilterDateEnd").val(moment().format("YYYY-MM-DD"));
-    if (ComponentId) {
-        return modalWaitWrapper(function () {
-            return $.ajax({type: "POST", url: "/ComponentSrv/GetByIds", timeout: 120000,
-                    data: { ids: [ComponentId], getActive: true }, dataType: "json"})
-                .then(function (data) {
-                    msSetSelectionSilent(MsFilterByComponent, [{ id: data[0].Id, name: data[0].CompName, }]);
-                });
-            });
-    }
-    return $.Deferred().resolve();
-}
+//----------------------------------------------setup after page load------------------------------------------------//
+$(document).ready(function () {
+    "use strict";
+    //-----------------------------------------mainView------------------------------------------//
 
-//---------------------------------------Helper Methods--------------------------------------//
+    //filterDateStart event dp.hide
+    $("#filterDateStart").on("dp.hide", function (e) { sddb.refreshMainView(); });
+
+    //filterDateEnd event dp.hide
+    $("#filterDateEnd").on("dp.hide", function (e) { sddb.refreshMainView(); });
+
+    //Initialize MagicSuggest sddb.msFilterByProject
+    sddb.msFilterByProject = sddb.msSetFilter("msFilterByProject", "/ProjectSrv/Lookup");
+
+    //Initialize MagicSuggest sddb.msFilterByAssembly
+    sddb.msFilterByComponent = sddb.msSetFilter("msFilterByComponent", "/ComponentSrv/Lookup");
+
+    //Initialize MagicSuggest sddb.msFilterByAssyType
+    sddb.msFilterByCompType = sddb.msSetFilter("msFilterByCompType", "/ComponentTypeSrv/Lookup");
+
+    //Initialize MagicSuggest sddb.msFilterByPerson
+    sddb.msFilterByPerson = sddb.msSetFilter("msFilterByPerson", "/PersonSrv/LookupFromProject");
+
+    //---------------------------------------editFormView----------------------------------------//
+
+    //Initialize MagicSuggest Array
+    sddb.msAddToArray("Component_Id", "/ComponentSrv/Lookup");
+    sddb.msAddToArray("ComponentStatus_Id", "/ComponentStatusSrv/Lookup");
+    sddb.msAddToArray("AssignedToProject_Id", "/ProjectSrv/Lookup");
+    sddb.msAddToArray("AssignedToAssemblyDb_Id", "/AssemblyDbSrv/Lookup");
+
+    //--------------------------------------View Initialization------------------------------------//
+
+    sddb.fillFiltersFromRequestParams().done(sddb.refreshMainView);
+    sddb.switchView();
+
+    //--------------------------------End of setup after page load---------------------------------//   
+});
+
+

@@ -22,7 +22,7 @@ namespace SDDB.UnitTests
             mockEfDbContext.Object.SaveChangesWithRetryAsync().Wait();
 
             //Assert
-            
+            mockEfDbContext.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
 
         [TestMethod]

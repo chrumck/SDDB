@@ -1,160 +1,35 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
-/// <reference path="../modernizr-2.8.3.js" />
-/// <reference path="../bootstrap.js" />
-/// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
-/// <reference path="../jquery-2.1.4.js" />
-/// <reference path="../jquery-2.1.4.intellisense.js" />
-/// <reference path="../MagicSuggest/magicsuggest.js" />
-/// <reference path="Shared.js" />
+﻿/*global sddb */
+/// <reference path="Shared_Views.js" />
 
-//--------------------------------------Global Properties------------------------------------//
+//----------------------------------------------additional sddb setup------------------------------------------------//
 
-var TableProjectsAdd = {},
-    TableProjectsRemove = {},
-    TablePersonGroupsAdd = {},
-    TablePersonGroupsRemove = {},
-    TableManagedGroupsAdd = {},
-    TableManagedGroupsRemove = {};
+//setting up sddb
+sddb.setConfig({
+    recordTemplate: {
+        Id: "RecordTemplateId",
+        FirstName: null,
+        LastName: null,
+        Initials: null,
+        Phone: null,
+        PhoneMobile: null,
+        Email: null,
+        Comments: null,
+        IsCurrentEmployee_bl: null,
+        EmployeePosition: null,
+        IsSalaried_bl: null,
+        EmployeeStart: null,
+        EmployeeEnd: null,
+        EmployeeDetails: null,
+        IsActive_bl: null
+    },
 
-var RecordTemplate = {
-    Id: "RecordTemplateId",
-    FirstName: null,
-    LastName: null,
-    Initials: null,
-    Phone: null,
-    PhoneMobile: null,
-    Email: null,
-    Comments: null,
-    IsCurrentEmployee_bl: null,
-    EmployeePosition: null,
-    IsSalaried_bl: null,
-    EmployeeStart: null,
-    EmployeeEnd: null,
-    EmployeeDetails: null,
-    IsActive_bl: null
-};
-
-LabelTextCreate = "Create Person";
-LabelTextEdit = "Edit Person";
-UrlFillForEdit = "/PersonSrv/GetAllByIds";
-UrlEdit = "/PersonSrv/Edit";
-UrlDelete = "/PersonSrv/Delete";
-urlRefreshMainView = "/PersonSrv/GetAll";
-
-$(document).ready(function () {
-
-    //-----------------------------------------MainView------------------------------------------//
-
-    //Wire Up BtnEditPrsProj 
-    $("#BtnEditPrsProj").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length === 0) {
-            showModalNothingSelected();
-            return;
-        }
-
-        if (CurrIds.length === 1) {
-            var selectedRecord = TableMain.row(".ui-selected", { page: "current" }).data();
-            $("#PrsProjViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
-        }
-        else { 
-            $("#PrsProjViewPanel").text("_MULTIPLE_"); 
-        }
-
-        modalWaitWrapper(function () {
-            return fillFormForRelatedGeneric(
-                TableProjectsAdd, TableProjectsRemove, CurrIds,
-                "GET", "/PersonSrv/GetPersonProjects", { id: CurrIds[0] },
-                "GET", "/PersonSrv/GetPersonProjectsNot", { id: CurrIds[0] },
-                "GET", "/ProjectSrv/Get", { getActive: true });
-        })
-            .done(function () {
-                saveViewSettings(TableMain);
-                switchView("MainView", "PrsProjView", "tdo-btngroup-prsproj");
-            });
-
-    });
-
-    //Wire Up BtnEditPersonGroups 
-    $("#BtnEditPersonGroups").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length === 0) {
-            showModalNothingSelected();
-            return;
-        }
-
-        if (CurrIds.length == 1) {
-            var selectedRecord = TableMain.row(".ui-selected", { page: "current" }).data();
-            $("#PersonGroupsViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
-        }
-        else {
-            $("#PersonGroupsViewPanel").text("_MULTIPLE_");
-        }
-
-        modalWaitWrapper(function () {
-            return fillFormForRelatedGeneric(
-                TablePersonGroupsAdd, TablePersonGroupsRemove, CurrIds,
-                "GET", "/PersonSrv/GetPersonGroups", { id: CurrIds[0] },
-                "GET", "/PersonSrv/GetPersonGroupsNot", { id: CurrIds[0] },
-                "GET", "/PersonGroupSrv/Get", { getActive: true });
-        })
-            .done(function () {
-                saveViewSettings(TableMain);
-                switchView("MainView", "PersonGroupsView", "tdo-btngroup-prsgroups");
-            });
-    });
-
-    //Wire Up BtnEditManagedGroups 
-    $("#BtnEditManagedGroups").click(function () {
-        CurrIds = TableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (CurrIds.length === 0) {
-            showModalNothingSelected();
-            return;
-        }
-
-        if (CurrIds.length == 1) {
-            var selectedRecord = TableMain.row(".ui-selected", { page: "current" }).data();
-            $("#ManagedGroupsViewPanel").text(selectedRecord.FirstName + " " + selectedRecord.LastName);
-        }
-        else {
-            $("#ManagedGroupsViewPanel").text("_MULTIPLE_");
-        }
-
-        modalWaitWrapper(function () {
-            return fillFormForRelatedGeneric(
-                TableManagedGroupsAdd, TableManagedGroupsRemove, CurrIds,
-                "GET", "/PersonSrv/GetManagedGroups", { id: CurrIds[0] },
-                "GET", "/PersonSrv/GetManagedGroupsNot", { id: CurrIds[0] },
-                "GET", "/PersonGroupSrv/Get", { getActive: true });
-        })
-            .done(function () {
-                saveViewSettings(TableMain);
-                switchView("MainView", "ManagedGroupsView", "tdo-btngroup-managedgroups");
-            });
-    });
-
-    //wire up dropdownId1
-    $("#dropdownId1").click(function (event) {
-        event.preventDefault();
-        var noOfRows = TableMain.rows(".ui-selected", { page: "current" }).data().length;
-        if (noOfRows != 1) { showModalSelectOne(); }
-        else {
-            window.open("/PersonLogEntry?PersonId=" +
-                TableMain.cell(".ui-selected", "Id:name", { page: "current"}).data());
-        }
-    });
-
-    //---------------------------------------DataTables------------
-
-    //TableMainColumnSets
-    TableMainColumnSets = [
+    tableMainColumnSets: [
         [1, 2],
         [3, 4, 5, 6, 7],
         [8, 9, 10, 11, 12, 13]
-    ];
-        
-    //TableMain Persons
-    TableMain = $("#TableMain").DataTable({
+    ],
+
+    tableMain: $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LastName", name: "LastName" },//1
@@ -196,47 +71,30 @@ $(document).ready(function () {
             infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
-    });
-    //showing the first Set of columns on startup;
-    showColumnSet(TableMainColumnSets, 1);
+    }),
 
-    //---------------------------------------EditFormView----------------------------------------//
+    labelTextCreate: "Create Person",
+    labelTextEdit: "Edit Person",
+    urlFillForEdit: "/PersonSrv/GetAllByIds",
+    urlEdit: "/PersonSrv/Edit",
+    urlDelete: "/PersonSrv/Delete",
+    urlRefreshMainView: "/PersonSrv/GetAll"
 
-    //Enable DatePicker
-    $("[data-val-dbisdateiso]").datetimepicker({ format: "YYYY-MM-DD" })
-        .on("dp.change", function (e) { $(this).data("ismodified", true); });
-            
-    //----------------------------------------PrsProjView----------------------------------------//
+});
 
-    //Wire Up PrsProjViewBtnCancel
-    $("#PrsProjViewBtnCancel").click(function () {
-        switchView("PrsProjView", "MainView", "tdo-btngroup-main", TableMain);
-    });
+sddb.callBackBeforeCopy = function () {
+    "use strict";
+    return sddb.showModalConfirm("NOTE: Person groups and projects are not copied.", "Confirm Copy");
+};
 
-    //Wire Up PrsProjViewBtnOk
-    $("#PrsProjViewBtnOk").click(function () {
-        var idsAdd = TableProjectsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-            idsRemove = TableProjectsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+//----------------------------------------------setup after page load------------------------------------------------//
 
-        if (idsAdd.length + idsRemove.length === 0) {
-            showModalNothingSelected();
-            return;
-        }
-        modalWaitWrapper(function () {
-            return submitEditsForRelatedGeneric(CurrIds, idsAdd, idsRemove, "/PersonSrv/EditPersonProjects");
-        })
-            .then(function () {
-                return refreshMainView();
-            })
-            .done(function () {
-                switchView("PrsProjView", "MainView", "tdo-btngroup-main", TableMain);
-            });
-    });
+$(document).ready(function () {
+    "use strict";
+    //--------------------------------------personProjectsCfg--------------------------------------//
 
-    //---------------------------------------DataTables------------
-
-    //TableProjectsAdd
-    TableProjectsAdd = $("#TableProjectsAdd").DataTable({
+    //tableProjectsAdd
+    sddb.tableProjectsAdd = $("#tableProjectsAdd").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "ProjectName", name: "ProjectName" },//1
@@ -259,8 +117,8 @@ $(document).ready(function () {
         pageLength: 100
     });
 
-    //TableProjectsRemove
-    TableProjectsRemove = $("#TableProjectsRemove").DataTable({
+    //tableProjectsRemove
+    sddb.tableProjectsRemove = $("#tableProjectsRemove").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "ProjectName", name: "ProjectName" },//1
@@ -283,38 +141,30 @@ $(document).ready(function () {
         pageLength: 100
     });
 
-    //----------------------------------------PersonGroupsView----------------------------------------//
+    //personProjectsCfg
+    sddb.personProjectsCfg = {
+        tableAdd: sddb.tableProjectsAdd,
+        tableRemove: sddb.tableProjectsRemove,
+        url: "/PersonSrv/GetPersonProjects",
+        urlNot: "/PersonSrv/GetPersonProjectsNot",
+        relatedViewId: "prsProjView",
+        relatedViewBtnGroupClass: "tdo-btngroup-prsproj",
+        relatedViewPanelId: "prsProjViewPanel",
+        relatedViewPanelText: function (selectedRecord) {
+            return selectedRecord.FirstName + " " + selectedRecord.LastName;
+        },
+        urlEdit: "/PersonSrv/EditPersonProjects",
+        btnEditId: "btnEditPrsProj",
+        btnCancelId: "prsProjViewBtnCancel",
+        btnOkId: "prsProjViewBtnOk"
+    };
 
-    //Wire Up PersonGroupsViewBtnCancel
-    $("#PersonGroupsViewBtnCancel").click(function () {
-        switchView("PersonGroupsView", "MainView", "tdo-btngroup-main", TableMain);
-    });
+    sddb.wireButtonsForRelated(sddb.personProjectsCfg);
 
-    //Wire Up PersonGroupsViewBtnOk
-    $("#PersonGroupsViewBtnOk").click(function () {
-        var idsAdd = TablePersonGroupsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-            idsRemove = TablePersonGroupsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+    //--------------------------------------personGroupsCfg--------------------------------------//
 
-        if (idsAdd.length + idsRemove.length === 0) {
-            showModalNothingSelected();
-            return;
-        }
-
-        modalWaitWrapper(function () {
-            return submitEditsForRelatedGeneric(CurrIds, idsAdd, idsRemove, "/PersonSrv/EditPersonGroups");
-        })
-            .then(function () {
-                return refreshMainView();
-            })
-            .done(function () {
-                switchView("PersonGroupsView", "MainView", "tdo-btngroup-main", TableMain);
-            });
-    });
-    
-    //---------------------------------------DataTables------------
-
-    //TablePersonGroupsAdd
-    TablePersonGroupsAdd = $("#TablePersonGroupsAdd").DataTable({
+    //tablePersonGroupsAdd
+    sddb.tablePersonGroupsAdd = $("#tablePersonGroupsAdd").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "PrsGroupName", name: "PrsGroupName" },//1
@@ -337,8 +187,8 @@ $(document).ready(function () {
         pageLength: 100
     });
 
-    //TablePersonGroupsRemove
-    TablePersonGroupsRemove = $("#TablePersonGroupsRemove").DataTable({
+    //tablePersonGroupsRemove
+    sddb.tablePersonGroupsRemove = $("#tablePersonGroupsRemove").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "PrsGroupName", name: "PrsGroupName" },//1
@@ -361,38 +211,30 @@ $(document).ready(function () {
         pageLength: 100
     });
 
-    //----------------------------------------ManagedGroupsView----------------------------------------//
+    //personGroupsCfg
+    sddb.personGroupsCfg = {
+        tableAdd: sddb.tablePersonGroupsAdd,
+        tableRemove: sddb.tablePersonGroupsRemove,
+        url: "/PersonSrv/GetPersonGroups",
+        urlNot: "/PersonSrv/GetPersonGroupsNot",
+        relatedViewId: "personGroupsView",
+        relatedViewBtnGroupClass: "tdo-btngroup-prsgroups",
+        relatedViewPanelId: "personGroupsViewPanel",
+        relatedViewPanelText: function (selectedRecord) {
+            return selectedRecord.FirstName + " " + selectedRecord.LastName;
+        },
+        urlEdit: "/PersonSrv/EditPersonGroups",
+        btnEditId: "btnEditPersonGroups",
+        btnCancelId: "personGroupsViewBtnCancel",
+        btnOkId: "personGroupsViewBtnOk"
+    };
 
-    //Wire Up ManagedGroupsViewBtnCancel
-    $("#ManagedGroupsViewBtnCancel").click(function () {
-        switchView("ManagedGroupsView", "MainView", "tdo-btngroup-main", TableMain);
-    });
+    sddb.wireButtonsForRelated(sddb.personGroupsCfg);
 
-    //Wire Up ManagedGroupsViewBtnOk
-    $("#ManagedGroupsViewBtnOk").click(function () {
-        var idsAdd = TableManagedGroupsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-            idsRemove = TableManagedGroupsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
+    //--------------------------------------managedGroupsCfg--------------------------------------//
 
-        if (idsAdd.length + idsRemove.length === 0) {
-            showModalNothingSelected();
-            return;
-        }
-
-        modalWaitWrapper(function () {
-            return submitEditsForRelatedGeneric(CurrIds, idsAdd, idsRemove, "/PersonSrv/EditManagedGroups");
-        })
-            .then(function () {
-                return refreshMainView();
-            })
-            .done(function () {
-                switchView("ManagedGroupsView", "MainView", "tdo-btngroup-main", TableMain);
-            });
-    });
-
-    //---------------------------------------DataTables------------
-
-    //TableManagedGroupsAdd
-    TableManagedGroupsAdd = $("#TableManagedGroupsAdd").DataTable({
+    //tableManagedGroupsAdd
+    sddb.tableManagedGroupsAdd = $("#tableManagedGroupsAdd").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "PrsGroupName", name: "PrsGroupName" },//1
@@ -415,8 +257,8 @@ $(document).ready(function () {
         pageLength: 100
     });
 
-    //TableManagedGroupsRemove
-    TableManagedGroupsRemove = $("#TableManagedGroupsRemove").DataTable({
+    //tableManagedGroupsRemove
+    sddb.tableManagedGroupsRemove = $("#tableManagedGroupsRemove").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "PrsGroupName", name: "PrsGroupName" },//1
@@ -439,19 +281,42 @@ $(document).ready(function () {
         pageLength: 100
     });
 
+    //managedGroupsCfg
+    sddb.managedGroupsCfg = {
+        tableAdd: sddb.tableManagedGroupsAdd,
+        tableRemove: sddb.tableManagedGroupsRemove,
+        url: "/PersonSrv/GetManagedGroups",
+        urlNot: "/PersonSrv/GetManagedGroupsNot",
+        relatedViewId: "managedGroupsView",
+        relatedViewBtnGroupClass: "tdo-btngroup-managedgroups",
+        relatedViewPanelId: "managedGroupsViewPanel",
+        relatedViewPanelText: function (selectedRecord) {
+            return selectedRecord.FirstName + " " + selectedRecord.LastName;
+        },
+        urlEdit: "/PersonSrv/EditManagedGroups",
+        btnEditId: "btnEditManagedGroups",
+        btnCancelId: "managedGroupsViewBtnCancel",
+        btnOkId: "managedGroupsViewBtnOk"
+    };
+
+    sddb.wireButtonsForRelated(sddb.managedGroupsCfg);
+        
+    //-----------------------------------------mainView------------------------------------------//
+
+    //wire up dropdownId1
+    $("#dropdownId1").click(function (event) {
+        event.preventDefault();
+        sddb.sendSingleIdToNewWindow("/PersonLogEntry?PersonId=");
+    });
+
+    //---------------------------------------editFormView----------------------------------------//
+        
 
     //--------------------------------------View Initialization------------------------------------//
 
-    refreshMainView();
-    switchView(InitialViewId, MainViewId, MainViewBtnGroupClass);
+    sddb.refreshMainView();
+    sddb.switchView();
 
-    //--------------------------------End of execution at Start-----------
+    //--------------------------------End of setup after page load---------------------------------//   
 });
-
-
-//--------------------------------------Main Methods---------------------------------------//
-
-//---------------------------------------Helper Methods--------------------------------------//
-
-
 

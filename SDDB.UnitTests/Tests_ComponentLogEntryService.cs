@@ -64,7 +64,7 @@ namespace SDDB.UnitTests
         }
 
         [TestMethod]
-        public void ComponentLogEntryService_GetAsync_DoeNotReturnFromWrongProject()
+        public void ComponentLogEntryService_GetAsync_ReturnsFromNotManagedProject()
         {
             //Arrange
             var mockDbContextScopeFac = new Mock<IDbContextScopeFactory>();
@@ -103,7 +103,7 @@ namespace SDDB.UnitTests
             var resultComponentLogEntrys = compLogEntryService.GetAsync(new string[] { "dummyEntryId1", "dummyEntryId2" }).Result;
             
             //Assert
-            Assert.IsTrue(resultComponentLogEntrys.Count == 0);
+            Assert.IsTrue(resultComponentLogEntrys.Count == 1);
         }
 
         [TestMethod]
