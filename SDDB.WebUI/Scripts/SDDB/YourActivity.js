@@ -285,6 +285,9 @@ $(document).ready(function () {
             return;
         }
         sddb.modalWaitWrapper(function () {
+            if (!sddb.cfg.currentIds.length) {
+                return sddb.refreshTableGeneric(sddb.tableLogEntryPersonsAdd, "/PersonSrv/Get", { getActive: true }, "GET");
+            }
             return sddb.fillFormForRelatedGeneric(sddb.tableLogEntryPersonsAdd, sddb.tableLogEntryPersonsRemove,
                 sddb.cfg.currentIds,
                 "POST", "/PersonLogEntrySrv/GetPrsLogEntryPersons",

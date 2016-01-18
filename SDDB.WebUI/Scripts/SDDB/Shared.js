@@ -732,16 +732,15 @@ var sddbConstructor = function (customCfg) {
         tableAdd.clear().search("").draw();
         tableRemove.clear().search("").draw();
 
-        return sddbObj.modalWaitWrapper(function () {
-            return $.when(
-                $.ajax({ type: httpTypeNot, url: urlNot, timeout: 120000, data: dataNot, dataType: "json" }),
-                $.ajax({ type: httpType, url: url, timeout: 120000, data: data, dataType: "json" })
-            )
-                .then(function (done1, done2) {
-                    tableAdd.rows.add(done1[0]).order([sortColumn, "asc"]).draw();
-                    tableRemove.rows.add(done2[0]).order([sortColumn, "asc"]).draw();
-                });
-        });
+        return $.when(
+            $.ajax({ type: httpTypeNot, url: urlNot, timeout: 120000, data: dataNot, dataType: "json" }),
+            $.ajax({ type: httpType, url: url, timeout: 120000, data: data, dataType: "json" })
+        )
+            .then(function (done1, done2) {
+                tableAdd.rows.add(done1[0]).order([sortColumn, "asc"]).draw();
+                tableRemove.rows.add(done2[0]).order([sortColumn, "asc"]).draw();
+            });
+        
     };
         
     //Submit Edits for n:n related table - generic version
