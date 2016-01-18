@@ -12,7 +12,7 @@
 //sddbConstructor
 var sddbConstructor = function (customCfg) {
     "use strict";
-
+    
     //private variables----------------------------------------------------------------------------------------------//
     var windowYpos = 0,
     tablePage = 0,
@@ -119,6 +119,7 @@ var sddbConstructor = function (customCfg) {
         filesIframeId: "filesIframe",
         maxUploadSize: 20971520,
         btnFilesId: "btnFiles",
+        btnOkAndFilesId: "editFormBtnOkFiles",
         btnBackId: "filesViewBtnBack",
         btnUloadId: "filesBtnUpload",
         btnUloadAbortId: "modalUploadFilesBtnAbort",
@@ -1087,22 +1088,17 @@ var sddbConstructor = function (customCfg) {
 
         callBackAfter = callBackAfter || sddbObj.callBackAfterCreate;
 
-        var deferred0 = $.Deferred();
+        var labelText = ($.isFunction(cfg.labelTextCreate)) ? cfg.labelTextCreate() : cfg.labelTextCreate;
 
         cfg.currentIds = [];
         cfg.currentRecords = [];
         cfg.currentRecords[0] = $.extend(true, {}, cfg.recordTemplate);
-        sddbObj.fillFormForCreateGeneric(cfg.editFormId, cfg.magicSuggests,
-            cfg.labelTextCreate, cfg.mainViewId);
-        callBackAfter()
-            .done(function () {
+        sddbObj.fillFormForCreateGeneric(cfg.editFormId, cfg.magicSuggests, labelText, cfg.mainViewId);
+        return callBackAfter()
+            .then(function () {
                 sddbObj.saveViewSettings(cfg.tableMain);
                 sddbObj.switchView(cfg.mainViewId, cfg.editFormViewId, cfg.editFormBtnGroupCreateClass);
-                deferred0.resolve();
-            })
-            .fail(deferred0.reject);
-
-        return deferred0.promise();
+            });
     };
 
     //prepareFormForEdit
@@ -1110,10 +1106,11 @@ var sddbConstructor = function (customCfg) {
         if (!sddbObj.updateIdsReturnIsManySelected()) { return $.Deferred().reject(); } 
 
         callBackAfter = callBackAfter || sddbObj.callBackAfterEdit;
-
+                
         return sddbObj.modalWaitWrapper(function () {
+            var labelText = ($.isFunction(cfg.labelTextEdit)) ? cfg.labelTextEdit() : cfg.labelTextEdit;
             return sddbObj.fillFormForEditGeneric(cfg.currentIds, cfg.httpTypeFillForEdit, cfg.urlFillForEdit,
-                cfg.currentActive, cfg.editFormId, cfg.labelTextEdit, cfg.magicSuggests);
+                cfg.currentActive, cfg.editFormId, labelText, cfg.magicSuggests);
         })
             .then(function (dbEntries) {
                 cfg.currentRecords = dbEntries;
@@ -1131,13 +1128,14 @@ var sddbConstructor = function (customCfg) {
 
         callBackBefore = callBackBefore || sddbObj.callBackBeforeCopy;
         callBackAfter = callBackAfter || sddbObj.callBackAfterCopy;
-      
+
         return callBackBefore()
             .then(function () {
                 return sddbObj.modalWaitWrapper(function () {
+                    var labelText = ($.isFunction(cfg.labelTextCopy)) ? cfg.labelTextCopy() : cfg.labelTextCopy;
                     return sddbObj.fillFormForCopyGeneric(cfg.currentIds,
                         cfg.httpTypeFillForEdit, cfg.urlFillForEdit, cfg.currentActive,
-                        cfg.editFormId, cfg.labelTextCopy, cfg.magicSuggests);
+                        cfg.editFormId, labelText, cfg.magicSuggests);
                 });
             })
             .then(function (dbEntries) {
@@ -1177,6 +1175,7 @@ var sddbConstructor = function (customCfg) {
                 cfg.currentRecords = dbEntries;
                 if (cfg.currentIds.length === 0 && data.newEntryIds) {
                     cfg.currentIds = data.newEntryIds;
+                    tableSelectedIds = data.newEntryIds;
                     for (var i = 0; i < cfg.currentIds.length; i += 1) {
                         cfg.currentRecords[i].Id = cfg.currentIds[i];
                     }
@@ -1186,7 +1185,7 @@ var sddbConstructor = function (customCfg) {
             .then(function () {
                 if (!doNotSwitchToMainView) { return sddbObj.refreshMainView(); }
             })
-            .done(function () {
+            .then(function () {
                 if (!doNotSwitchToMainView) {
                     sddbObj.switchView(cfg.editFormViewId, cfg.mainViewId,
                         cfg.mainViewBtnGroupClass, cfg.tableMain);
@@ -1228,9 +1227,8 @@ var sddbConstructor = function (customCfg) {
     //-----------------------------------------------------------------------------
     
     //prepareRelatedFormForEdit 
-    sddbObj.prepareRelatedFormForEdit = function (customFnCfg) {
-        var fnCfg = $.extend(true, {}, defaultCfgRelated, customFnCfg),
-        selectedRecord;
+    sddbObj.prepareRelatedFormForEdit = function (fnCfg) {
+        var selectedRecord;
 
         if (!sddbObj.updateIdsReturnIsManySelected()) { return; }
         
@@ -1256,9 +1254,8 @@ var sddbConstructor = function (customCfg) {
     };
 
     //submitRelatedEditForm
-    sddbObj.submitRelatedEditForm = function (customFnCfg) {
-        var fnCfg = $.extend(true, {}, defaultCfgRelated, customFnCfg),
-            idsAdd = fnCfg.tableAdd
+    sddbObj.submitRelatedEditForm = function (fnCfg) {
+        var idsAdd = fnCfg.tableAdd
                 .cells(".ui-selected", fnCfg.selectColumn + ":name", { page: "current" }).data().toArray(),
             idsRemove = fnCfg.tableRemove
                 .cells(".ui-selected", fnCfg.selectColumn + ":name", { page: "current" }).data().toArray();
@@ -1284,7 +1281,7 @@ var sddbConstructor = function (customCfg) {
 
         $("#" + fnCfg.btnEditId).click(function (event) {
             event.preventDefault();
-            sddbObj.prepareRelatedFormForEdit(customFnCfg);
+            sddbObj.prepareRelatedFormForEdit(fnCfg);
         });
 
         $("#" + fnCfg.btnCancelId).click(function (event) {
@@ -1294,20 +1291,24 @@ var sddbConstructor = function (customCfg) {
 
         $("#" + fnCfg.btnOkId).click(function (event) {
             event.preventDefault();
-            sddbObj.submitRelatedEditForm(customFnCfg);
+            sddbObj.submitRelatedEditForm(fnCfg);
         });
     };
 
     //-----------------------------------------------------------------------------
 
     //prepareFilesForm 
-    sddbObj.prepareFilesForm = function (fnCfg) {
+    sddbObj.prepareFilesForm = function (fnCfg, isNewEntry) {
         var selectedRecord;
 
-        if (!sddbObj.updateIdsReturnIsOneSelected()) { return; }
+        if (!isNewEntry && !sddbObj.updateIdsReturnIsOneSelected()) { return; }
         
-        selectedRecord = cfg.tableMain.row(".ui-selected", { page: "current" }).data();
-        $("#" + fnCfg.filesViewPanelId).text(fnCfg.filesViewPanelText(selectedRecord));
+        if (isNewEntry) {
+            $("#" + fnCfg.filesViewPanelId).text("New Entry");
+        } else {
+            selectedRecord = cfg.tableMain.row(".ui-selected", { page: "current" }).data();
+            $("#" + fnCfg.filesViewPanelId).text(fnCfg.filesViewPanelText(selectedRecord));
+        }
         $("#" + fnCfg.filesViewLabelId).text(fnCfg.filesViewLabelText);
 
         sddbObj.modalWaitWrapper(function () {
@@ -1380,7 +1381,7 @@ var sddbConstructor = function (customCfg) {
     sddbObj.abortUploadFiles = function (fnCfg) {
         ulFilesXHR.abort();
         $("#" + fnCfg.filesUploadModalId).modal("hide");
-        sddbObj.showModalWait()
+        sddbObj.showModalWait();
         setTimeout(function () {
             sddbObj.modalWaitWrapper(function () {
                 return sddbObj.refreshTableGeneric(fnCfg.filesTable, fnCfg.listFilesUrl,
@@ -1401,7 +1402,7 @@ var sddbConstructor = function (customCfg) {
             //getCookieHelper
             var getCookieHelper = function (name) {
                 var parts = document.cookie.split(name + "=");
-                if (parts.length === 2) { return parseInt(parts.pop().split(";").shift()); }
+                if (parts.length === 2) { return parseInt(parts.pop().split(";").shift(), 10); }
             },
             //expireCookieHelper
             expireCookieHelper = function (name) {
@@ -1488,9 +1489,16 @@ var sddbConstructor = function (customCfg) {
             sddbObj.prepareFilesForm(fnCfg);
         });
 
+        $("#" + fnCfg.btnOkAndFilesId).click(function (event) {
+            event.preventDefault();
+            sddbObj.submitEditForm().then(function () { sddbObj.prepareFilesForm(fnCfg, true); });
+        });
+
         $("#" + fnCfg.btnBackId).click(function (event) {
             event.preventDefault();
-            sddbObj.switchView(fnCfg.filesViewId, cfg.mainViewId, cfg.mainViewBtnGroupClass, cfg.tableMain);
+            sddbObj.refreshMainView().done(function () { 
+                sddbObj.switchView(fnCfg.filesViewId, cfg.mainViewId, cfg.mainViewBtnGroupClass, cfg.tableMain);
+            });
         });
         
         $("#" + fnCfg.btnUloadId).on("change", function (event) {

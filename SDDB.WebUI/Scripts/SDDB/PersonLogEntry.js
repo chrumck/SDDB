@@ -103,7 +103,10 @@ sddb.setConfig({
 
     labelTextCreate: "Create Activity",
     labelTextEdit : "Edit Activity",
-    labelTextCopy : "Copy Activity"
+    labelTextCopy: "Copy Activity",
+
+    urlFillForEdit : "/PersonLogEntrySrv/GetByIds"
+
 });
 
 //callBackAfterCreate
@@ -262,18 +265,18 @@ $(document).ready(function () {
     sddb.msAddToArray("EnteredByPerson_Id", "/PersonSrv/Lookup");
     sddb.msAddToArray("PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup");
     sddb.msAddToArray("AssignedToProject_Id", "/ProjectSrv/Lookup", {}, function () {
-            sddb.cfg.magicSuggests[3].clear();
-            sddb.cfg.magicSuggests[4].clear();
-            sddb.tableLogEntryAssysAdd.clear().search("").draw();
-            if (this.getValue().length === 0) {
-                sddb.cfg.magicSuggests[3].disable();
-                sddb.cfg.magicSuggests[4].disable();
-            }
-            else {
-                sddb.cfg.magicSuggests[3].enable();
-                sddb.cfg.magicSuggests[4].enable();
-            }
-        });
+        sddb.cfg.magicSuggests[3].clear();
+        sddb.cfg.magicSuggests[4].clear();
+        sddb.tableLogEntryAssysAdd.clear().search("").draw();
+        if (this.getValue().length === 0) {
+            sddb.cfg.magicSuggests[3].disable();
+            sddb.cfg.magicSuggests[4].disable();
+        }
+        else {
+            sddb.cfg.magicSuggests[3].enable();
+            sddb.cfg.magicSuggests[4].enable();
+        }
+    });
     sddb.msAddToArray("AssignedToLocation_Id", "/LocationSrv/LookupByProj",
         { dataUrlParams: { projectIds: sddb.cfg.magicSuggests[2].getValue } }, function () {
             sddb.tableLogEntryAssysAdd.clear().search("").draw();

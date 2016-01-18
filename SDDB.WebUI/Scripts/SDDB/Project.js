@@ -1,87 +1,26 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
-/// <reference path="../modernizr-2.8.3.js" />
-/// <reference path="../bootstrap.js" />
-/// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
-/// <reference path="../jquery-2.1.4.js" />
-/// <reference path="../jquery-2.1.4.intellisense.js" />
-/// <reference path="../MagicSuggest/magicsuggest.js" />
-/// <reference path="Shared.js" />
+﻿/*global sddb */
+/// <reference path="Shared_Views.js" />
 
-"use strict";
+//----------------------------------------------additional sddb setup------------------------------------------------//
 
-//--------------------------------------Global Properties------------------------------------//
+//setting up sddb
+sddb.setConfig({
+    recordTemplate: {
+        Id: "RecordTemplateId",
+        ProjectName: null,
+        ProjectAltName: null,
+        ProjectCode: null,
+        Comments: null,
+        IsActive_bl: null,
+        ProjectManager_Id: null
+    },
 
-var tableProjectPersonsAdd = {},
-    tableProjectPersonsRemove = {};
-
-var recordTemplate = {
-    Id: "RecordTemplateId",
-    ProjectName: null,
-    ProjectAltName: null,
-    ProjectCode: null,
-    Comments: null,
-    IsActive_bl: null,
-    ProjectManager_Id: null
-};
-
-labelTextCreate = "Create Project";
-labelTextEdit = "Edit Project";
-urlFillForEdit = "/ProjectSrv/GetByIds";
-urlEdit = "/ProjectSrv/Edit";
-urlDelete = "/ProjectSrv/Delete";
-urlRefreshMainView = "/ProjectSrv/Get";
-
-$(document).ready(function () {
-
-    //-----------------------------------------mainView------------------------------------------//
-    
-    //Wire Up btnEditProjectPersons
-    $("#btnEditProjectPersons").click(function () {
-        currentIds = tableMain.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray();
-        if (currentIds.length === 0) {
-            sddb.showModalNothingSelected();
-            return;
-        }
-        if (currentIds.length == 1) {
-            var selectedRecord = tableMain.row(".ui-selected", { page: "current" }).data();
-            $("#projectPersonsViewPanel").text(selectedRecord.ProjectName + " " + selectedRecord.ProjectCode);
-        }
-        else { $("#projectPersonsViewPanel").text("_MULTIPLE_"); }
-
-        sddb.showModalWait();
-        sddb.fillFormForRelatedGeneric(tableProjectPersonsAdd, tableProjectPersonsRemove, currentIds,
-                "POST", "/ProjectSrv/GetProjectPersons", { ids: currentIds },
-                "POST", "/ProjectSrv/GetProjectPersonsNot", { ids: currentIds })
-            .always(sddb.hideModalWait)
-            .done(function () {
-                sddb.saveViewSettings(tableMain);
-                sddb.switchView("mainView", "projectPersonsView", "tdo-btngroup-projectpersons");
-            })
-            .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
-    });
-    
-    //wire up dropdownId1
-    $("#dropdownId1").click(function (event) {
-        event.preventDefault();
-        var noOfRows = tableMain.rows(".ui-selected", { page: "current" }).data().length;
-        if (noOfRows != 1) {
-            sddb.showModalSelectOne();
-            return;
-        }
-        window.open("/Location?ProjectId=" +
-            tableMain.cell(".ui-selected", "Id:name", { page: "current" }).data());
-    });
-
-    //---------------------------------------DataTables------------
-
-    //tableMainColumnSets
-    tableMainColumnSets = [
+    tableMainColumnSets: [
         [1],
         [2, 3, 4, 5]
-    ];
-    
-    //tableMain Projects
-    tableMain = $("#tableMain").DataTable({
+    ],
+
+    tableMain: $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "ProjectName", name: "ProjectName" },//1
@@ -90,7 +29,10 @@ $(document).ready(function () {
             {
                 data: "ProjectManager_",
                 name: "ProjectManager_",
-                render: function (data, type, full, meta) { return data.Initials; }
+                render: function (data, type, full, meta) { 
+                    "use strict";
+                    return data.Initials;
+                }
             }, //4
             { data: "Comments", name: "Comments" },//5
             { data: "IsActive_bl", name: "IsActive_bl" },//6
@@ -113,49 +55,30 @@ $(document).ready(function () {
             infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
-    });
-    //showing the first Set of columns on startup;
-    sddb.showColumnSet(1, tableMainColumnSets);
+    }),
 
-    //---------------------------------------editFormView----------------------------------------//
+    labelTextCreate: "Create Project",
+    labelTextEdit: "Edit Project",
+    urlFillForEdit: "/ProjectSrv/GetByIds",
+    urlEdit: "/ProjectSrv/Edit",
+    urlDelete: "/ProjectSrv/Delete",
+    urlRefreshMainView: "/ProjectSrv/Get"
 
-    //Initialize MagicSuggest Array
-    sddb.msAddToArray("ProjectManager_Id", "/PersonSrv/LookupAll");
-    
-    //----------------------------------------projectPersonsView----------------------------------------//
+});
 
-    //Wire Up projectPersonsViewBtnCancel
-    $("#projectPersonsViewBtnCancel").click(function () {
-        sddb.switchView("projectPersonsView", "mainView", "tdo-btngroup-main", tableMain);
-    });
+sddb.callBackBeforeCopy = function () {
+    "use strict";
+    return sddb.showModalConfirm("NOTE: Project people are not copied.", "Confirm Copy");
+};
 
-    //Wire Up projectPersonsViewBtnOk
-    $("#projectPersonsViewBtnOk").click(function () {
-        if (tableProjectPersonsAdd.rows(".ui-selected", { page: "current" }).data().length +
-            tableProjectPersonsRemove.rows(".ui-selected", { page: "current" }).data().length === 0) {
-            sddb.showModalNothingSelected();
-            return;
-        }
-        sddb.showModalWait();
-        sddb.submitEditsForRelatedGeneric(
-                currentIds,
-                tableProjectPersonsAdd.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-                tableProjectPersonsRemove.cells(".ui-selected", "Id:name", { page: "current" }).data().toArray(),
-                "/ProjectSrv/EditProjectPersons")
-            .always(sddb.hideModalWait)
-            .done(function () {
-                sddb.refreshMainView()
-                    .done(function () {
-                        sddb.switchView("projectPersonsView", "mainView", "tdo-btngroup-main", tableMain);
-                    });
-            })
-            .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
-    });
+//----------------------------------------------setup after page load------------------------------------------------//
 
-    //---------------------------------------DataTables------------
+$(document).ready(function () {
+    "use strict";
+    //--------------------------------------projectPersonsCfg--------------------------------------//
 
     //tableProjectPersonsAdd
-    tableProjectPersonsAdd = $("#tableProjectPersonsAdd").DataTable({
+    sddb.tableProjectPersonsAdd = $("#tableProjectPersonsAdd").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LastName", name: "LastName" },//1
@@ -180,7 +103,7 @@ $(document).ready(function () {
     });
 
     //tableProjectPersonsRemove
-    tableProjectPersonsRemove = $("#tableProjectPersonsRemove").DataTable({
+    sddb.tableProjectPersonsRemove = $("#tableProjectPersonsRemove").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "LastName", name: "LastName" },//1
@@ -203,20 +126,45 @@ $(document).ready(function () {
         },
         pageLength: 100
     });
+
+    //projectPersonsCfg
+    sddb.projectPersonsCfg = {
+        tableAdd: sddb.tableProjectPersonsAdd,
+        tableRemove: sddb.tableProjectPersonsRemove,
+        url: "/ProjectSrv/GetProjectPersons",
+        urlNot: "/ProjectSrv/GetProjectPersonsNot",
+        relatedViewId: "projectPersonsView",
+        relatedViewBtnGroupClass: "tdo-btngroup-projectpersons",
+        relatedViewPanelId: "projectPersonsViewPanel",
+        relatedViewPanelText: function (selectedRecord) {
+            return selectedRecord.ProjectName + " " + selectedRecord.ProjectCode;
+        },
+        urlEdit: "/ProjectSrv/EditProjectPersons",
+        btnEditId: "btnEditProjectPersons",
+        btnCancelId: "projectPersonsViewBtnCancel",
+        btnOkId: "projectPersonsViewBtnOk"
+    };
+
+    sddb.wireButtonsForRelated(sddb.projectPersonsCfg);
     
+    //-----------------------------------------mainView------------------------------------------//
+
+    //wire up dropdownId1
+    $("#dropdownId1").click(function (event) {
+        event.preventDefault();
+        sddb.sendSingleIdToNewWindow("/Location?ProjectId=");
+    });
+
+    //---------------------------------------editFormView----------------------------------------//
+
+    sddb.msAddToArray("ProjectManager_Id", "/PersonSrv/LookupAll");
+
     //--------------------------------------View Initialization------------------------------------//
 
     sddb.refreshMainView();
-    sddb.switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
+    sddb.switchView();
 
-    //--------------------------------End of execution at Start-----------
+    //--------------------------------End of setup after page load---------------------------------//   
 });
-
-
-//--------------------------------------Main Methods---------------------------------------//
-
-
-//---------------------------------------Helper Methods--------------------------------------//
-
 
 

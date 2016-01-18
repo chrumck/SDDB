@@ -65,14 +65,7 @@
     <!------------ Main Section ---------------->
     @RenderBody()
         
-    <!--------------------- Footer ------------------->
-    <footer class="footer">
-        <div class="container-fluid">
-            <hr />
-            <p class="text-muted text-center"> Version @Html.GetAppVersion() &nbsp;<span class="glyphicon glyphicon-th"></span>&nbsp; Design By TDO</p>
-        </div>
-    </footer>
-    
+        
     <!------------ modalInfo dialog ------------>
     <div class="modal" id="modalInfo" tabindex="-1" role="dialog">
         <div class="modal-dialog">
@@ -228,6 +221,15 @@
 
     <!----------------- filesIframe ------------------>
     <iframe class="hidden" id="filesIframe" name="filesIframe"></iframe>
+
+
+    <!--------------------- Footer ------------------->
+    <footer class="footer">
+        <div class="container-fluid">
+            <hr />
+            <p class="text-muted text-center"> Version @Html.GetAppVersion() &nbsp;<span class="glyphicon glyphicon-th"></span>&nbsp; Design By TDO</p>
+        </div>
+    </footer>
     
     <!------------------Scripts and CSS--------------->
     @Scripts.Render("~/bundles/jquery")

@@ -1,69 +1,29 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
-/// <reference path="../modernizr-2.8.3.js" />
-/// <reference path="../bootstrap.js" />
-/// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
-/// <reference path="../jquery-2.1.4.js" />
-/// <reference path="../jquery-2.1.4.intellisense.js" />
-/// <reference path="../MagicSuggest/magicsuggest.js" />
-/// <reference path="Shared.js" />
+﻿/*global sddb, ProjectId*/
+/// <reference path="Shared_Views.js" />
 
-"use strict";
+//----------------------------------------------additional sddb setup------------------------------------------------//
 
-//--------------------------------------Global Properties------------------------------------//
+//setting up sddb
+sddb.setConfig({
+    recordTemplate: {
+        Id: "RecordTemplateId",
+        EventName: null,
+        EventAltName: null,
+        EventCreated: null,
+        EventClosed: null,
+        Comments: null,
+        IsActive_bl: null,
+        AssignedToProject_Id: null,
+        CreatedByPerson_Id: null,
+        ClosedByPerson_Id: null
+    },
 
-var msFilterByProject = {};
-
-var recordTemplate = {
-    Id: "RecordTemplateId",
-    EventName: null,
-    EventAltName: null,
-    EventCreated: null,
-    EventClosed: null,
-    Comments: null,
-    IsActive_bl: null,
-    AssignedToProject_Id: null,
-    CreatedByPerson_Id: null,
-    ClosedByPerson_Id: null
-};
-
-labelTextCreate = "Create Event";
-labelTextEdit = "Edit Event";
-urlFillForEdit = "/ProjectEventSrv/GetByIds";
-urlEdit = "/ProjectEventSrv/Edit";
-urlDelete = "/ProjectEventSrv/Delete";
-
-var urlRefreshMainView = "/ProjectEventSrv/GetByProjectIds";
-var dataRefreshMainView = function () { return { projectIds: msFilterByProject.getValue(), getActive: currentActive }; };
-var httpTypeRefreshMainView = "POST";
-
-$(document).ready(function () {
-
-    //-----------------------------------------mainView------------------------------------------//
-
-    //Initialize MagicSuggest msFilterByProject
-    msFilterByProject = $("#msFilterByProject").magicSuggest({
-        data: "/ProjectSrv/Lookup",
-        allowFreeEntries: false,
-        ajaxConfig: {
-            error: function (xhr, status, error) { sddb.showModalFail(xhr, status, error); }
-        },
-        infoMsgCls: "hidden",
-        style: "min-width: 240px;"
-    });
-    //Wire up on change event for msFilterByProject
-    $(msFilterByProject).on("selectionchange", function (e, m) { sddb.refreshMainView(); });
-
-
-    //---------------------------------------DataTables------------
-    
-    //tableMainColumnSets
-    tableMainColumnSets = [
+    tableMainColumnSets: [
         [1],
         [2, 3, 4, 5, 6, 7, 8]
-    ];
-    
-    //tableMain ProjectEvents
-    tableMain = $("#tableMain").DataTable({
+    ],
+
+    tableMain: $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             { data: "EventName", name: "EventName" },//1
@@ -72,19 +32,28 @@ $(document).ready(function () {
             {
                 data: "AssignedToProject_",
                 name: "AssignedToProject_",
-                render: function (data, type, full, meta) { return data.ProjectName; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.ProjectName; 
+                }
             }, //3
             { data: "EventCreated", name: "EventCreated" },//4
             {
                 data: "CreatedByPerson_",
                 name: "CreatedByPerson_",
-                render: function (data, type, full, meta) { return data.Initials; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.Initials; 
+                }
             },//5
             { data: "EventClosed", name: "EventClosed" },//6
             {
                 data: "ClosedByPerson_",
                 name: "ClosedByPerson_",
-                render: function (data, type, full, meta) { return data.Initials; }
+                render: function (data, type, full, meta) { 
+                    "use strict";
+                    return data.Initials; 
+                }
             }, //7
             { data: "Comments", name: "Comments" },//8
             //------------------------------------------------never visible
@@ -111,9 +80,30 @@ $(document).ready(function () {
             infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
-    });
-    //showing the first Set of columns on startup;
-    sddb.showColumnSet(1, tableMainColumnSets);
+    }),
+
+    labelTextCreate: "Create Event",
+    labelTextEdit: "Edit Event",
+    urlFillForEdit: "/ProjectEventSrv/GetByIds",
+    urlEdit: "/ProjectEventSrv/Edit",
+    urlDelete: "/ProjectEventSrv/Delete",
+
+    urlRefreshMainView: "/ProjectEventSrv/GetByProjectIds",
+    dataRefreshMainView: function () {
+        "use strict";
+        return { projectIds: sddb.msFilterByProject.getValue(), getActive: sddb.cfg.currentActive };
+    },
+    httpTypeRefreshMainView: "POST"
+
+});
+
+//----------------------------------------------setup after page load------------------------------------------------//
+$(document).ready(function () {
+    "use strict";
+    //-----------------------------------------mainView------------------------------------------//
+
+    //Initialize MagicSuggest sddb.msFilterByProject
+    sddb.msFilterByProject = sddb.msSetFilter("msFilterByProject", "/ProjectSrv/Lookup");
 
     //---------------------------------------editFormView----------------------------------------//
 
@@ -125,14 +115,10 @@ $(document).ready(function () {
     //--------------------------------------View Initialization------------------------------------//
 
     sddb.refreshMainView();
-    sddb.switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
+    sddb.switchView();
 
-    //--------------------------------End of execution at Start-----------
+    //--------------------------------End of setup after page load---------------------------------//   
 });
 
 
-//--------------------------------------Main Methods---------------------------------------//
-
-
-//---------------------------------------Helper Methods--------------------------------------//
 

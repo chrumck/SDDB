@@ -30,8 +30,8 @@ textarea,
 }*/
 
 /*DataTables tweaks*/
-div.dataTables_filter input[type=search] {
-	width: 8em;
+div.dataTables_wrapper div.dataTables_filter input[type=search] {
+	width: 11em;
 }
 
 /*magicsuggest custom*/

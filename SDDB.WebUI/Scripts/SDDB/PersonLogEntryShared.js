@@ -20,7 +20,6 @@ sddb.setConfig({
         IsActive_bl: null
     },
 
-    urlFillForEdit : "/PersonLogEntrySrv/GetByIds",
     urlEdit : "/PersonLogEntrySrv/Edit",
     urlDelete : "/PersonLogEntrySrv/Delete"
 
@@ -175,9 +174,8 @@ $(document).ready(function () {
             sddb.showModalConfirm("Adding/Removing Assemblies requires saving the Entry. Save Entry?",
                     "Confirm Saving Entry", "yes")
                 .done(function () {
-                    return sddb.submitEditForm(sddb.doNothingAndResolve, function () {
-                        sddb.addRemoveAssembliesNow();
-                    }, true);
+                    sddb.submitEditForm(sddb.doNothingAndResolve,
+                        function () { sddb.addRemoveAssembliesNow(); }, true);
                 });
             return;
         }

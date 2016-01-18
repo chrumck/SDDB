@@ -1,157 +1,71 @@
-﻿/// <reference path="../DataTables/jquery.dataTables.js" />
-/// <reference path="../modernizr-2.8.3.js" />
-/// <reference path="../bootstrap.js" />
-/// <reference path="../BootstrapToggle/bootstrap-toggle.js" />
-/// <reference path="../jquery-2.1.4.js" />
-/// <reference path="../jquery-2.1.4.intellisense.js" />
-/// <reference path="../MagicSuggest/magicsuggest.js" />
-/// <reference path="Shared.js" />
-/// <reference path="PersonLogEntryFiles.js" />
+﻿/*global sddb, UserFullName, UserId */
 /// <reference path="Shared_Views.js" />
 /// <reference path="PersonLogEntryShared.js" />
 
-"use strict";
+//----------------------------------------------additional sddb setup------------------------------------------------//
+//moveToDate needed for copying to another date
+sddb.moveToDate = {};
 
-//--------------------------------------Global Properties------------------------------------//
+//setting up sddb
+sddb.setConfig({
 
-labelTextCreate = function () { return "New Activity for " + $("#filterDateStart").val(); };
-labelTextEdit = function () { return "Edit Activity for " + $("#filterDateStart").val(); };
-labelTextCopy = function () { return "Copy Activity to " + moveToDate.format("YYYY-MM-DD"); };
-
-var tableMainPanelClassActive = "panel-tdo-success";
-
-callBackAfterCreate = function () {
-    $("#editFormBtnOkFiles").prop("disabled", false);
-    $("#logEntryPersonsView").addClass("hidden");
-    var logEntryDT = moment($("#filterDateStart").val()).hour(moment().hour()).minute(0);
-    $("#entryDTPicker").data("DateTimePicker").date(logEntryDT);
-    $("#LogEntryDateTime").val(logEntryDT.format("YYYY-MM-DD HH:mm"));
-    $("#hoursWorkedPicker").data("DateTimePicker").date("00:00");
-    $("#ManHours").val(0);
-    magicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
-    magicSuggests[3].disable();
-    magicSuggests[4].disable();
-    tableLogEntryAssysAdd.clear().search("").draw();
-    tableLogEntryAssysRemove.clear().search("").draw();
-    tableLogEntryPersonsAdd.clear().search("").draw();
-    tableLogEntryPersonsRemove.clear().search("").draw();
-
-    return $.Deferred().resolve();
-};
-
-callBackAfterEdit = function (currRecords) {
-    if (currentIds.length > 1) { $("#editFormBtnOkFiles").prop("disabled", true); }
-    else { $("#editFormBtnOkFiles").prop("disabled", false); }
-    $("#logEntryPersonsView").addClass("hidden");
-    tableLogEntryPersonsAdd.clear().search("").draw();
-    tableLogEntryPersonsRemove.clear().search("").draw();
-    $("#entryDTPicker").data("DateTimePicker").date(moment($("#LogEntryDateTime").val()));
-    $("#LogEntryDateTime").data("ismodified", false);
-    $("#hoursWorkedPicker").data("DateTimePicker").date(moment($("#ManHours").val(), "HH"));
-    $("#ManHours").data("ismodified", false);
-
-    return sddb.modalWaitWrapper(function () {
-        return sddb.fillFormForRelatedGeneric(
-                    tableLogEntryAssysAdd, tableLogEntryAssysRemove, currentIds,
-                    "POST", "/PersonLogEntrySrv/GetPrsLogEntryAssys",
-                    { ids: currentIds },
-                    "POST", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
-                    { ids: currentIds, locId: magicSuggests[3].getValue()[0] });
-    });
-};
-
-callBackBeforeCopy = function () {
-    return sddb.showModalDatePrompt("NOTE: Assemblies, People and Files are not copied!",
-                "Copy To Date:", $("#filterDateStart").val())
-        .then(function (outputDate) { moveToDate = outputDate; });
-};
-
-callBackAfterCopy = function () {
-    $("#editFormBtnOkFiles").prop("disabled", false);
-    $("#logEntryPersonsView").addClass("hidden");
-    tableLogEntryAssysAdd.clear().search("").draw();
-    tableLogEntryAssysRemove.clear().search("").draw();
-    tableLogEntryPersonsAdd.clear().search("").draw();
-    tableLogEntryPersonsRemove.clear().search("").draw();
-
-    var copyToDateTime = moment($("#LogEntryDateTime").val())
-            .year(moveToDate.year()).dayOfYear(moveToDate.dayOfYear());
-    $("#entryDTPicker").data("DateTimePicker").date(copyToDateTime);
-    $("#LogEntryDateTime").val(copyToDateTime.format("YYYY-MM-DD HH:mm"));
-    $("#hoursWorkedPicker").data("DateTimePicker").date(moment($("#ManHours").val(), "HH"));
-    magicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
-
-    return sddb.modalWaitWrapper(function () {
-        return sddb.refreshTableGeneric(tableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
-            { getActive: true, locId: magicSuggests[3].getValue()[0] }, "GET");
-    });
-};
-
-refreshMainView = function () {
-    tableMain.clear().search("").draw();
-    if ($("#filterDateStart").val() === "") { return $.Deferred().resolve(); }
-
-    var endDate = moment($("#filterDateStart").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
-    return sddb.modalWaitWrapper(function () {
-        return sddb.refreshTableGeneric(tableMain, "/PersonLogEntrySrv/GetByAltIds",
-        {
-            personIds: [UserId],
-            startDate: $("#filterDateStart").val(),
-            endDate: endDate,
-            getActive: currentActive,
-            filterForPLEView: false
-        },
-        "POST");
-    });
-}
-
-$(document).ready(function () {
-
-    //-----------------------------------------mainView------------------------------------------//
-        
-    //---------------------------------------DataTables------------
-    
-    //tableMainColumnSets
-    tableMainColumnSets = [
+    tableMainColumnSets: [
         [1],
         [2, 3, 4, 5, 6, 7, 8, 9]
-    ];
+    ],
 
-    //tableMain PersonLogEntrys
-    tableMain = $("#tableMain").DataTable({
+    tableMain: $("#tableMain").DataTable({
         columns: [
             { data: "Id", name: "Id" },//0
             {
                 data: "LogEntryDateTime",
                 name: "LogEntryDateTime",
-                render: function (data, type, full, meta) { return moment(data).format("HH:mm"); }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return moment(data).format("HH:mm");
+                }
             },//1
             //------------------------------------------------first set of columns
             {
                 data: "EnteredByPerson_",
                 name: "EnteredByPerson_",
-                render: function (data, type, full, meta) { return data.Initials; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.Initials; 
+                }
             }, //2
             {
                 data: "PersonActivityType_",
                 name: "PersonActivityType_",
-                render: function (data, type, full, meta) { return data.ActivityTypeName; }
+                render: function (data, type, full, meta) { 
+                    "use strict";
+                    return data.ActivityTypeName; 
+                }
             }, //3
             { data: "ManHours", name: "ManHours" },//4
             {
                 data: "AssignedToProject_",
                 name: "AssignedToProject_",
-                render: function (data, type, full, meta) { return data.ProjectName; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.ProjectName;
+                }
             }, //5
             {
                 data: "AssignedToLocation_",
                 name: "AssignedToLocation_",
-                render: function (data, type, full, meta) { return data.LocName; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.LocName;
+                }
             }, //6
             {
                 data: "AssignedToProjectEvent_",
                 name: "AssignedToProjectEvent_",
-                render: function (data, type, full, meta) { return data.EventName; }
+                render: function (data, type, full, meta) {
+                    "use strict";
+                    return data.EventName; 
+                }
             }, //7
             { data: "Comments", name: "Comments" },//8
             { data: "PrsLogEntryFilesCount", name: "PrsLogEntryFilesCount" },//9
@@ -183,9 +97,132 @@ $(document).ready(function () {
             infoFiltered: "(filtered)",
             paginate: { previous: "", next: "" }
         }
+    }),
+
+    tableMainPanelClassActive: "panel-tdo-success",
+
+
+    labelTextCreate: function () {
+        "use strict";
+        return "New Activity for " + $("#filterDateStart").val();
+    },
+    labelTextEdit: function () {
+        "use strict";
+        return "Edit Activity for " + $("#filterDateStart").val();
+    },
+    labelTextCopy: function () {
+        "use strict";
+        return "Copy Activity to " + sddb.moveToDate.format("YYYY-MM-DD");
+    },
+
+    urlFillForEdit: "/PersonLogEntrySrv/GetYourByIds"
+});
+
+//callBackAfterCreate
+sddb.callBackAfterCreate = function () {
+    "use strict";
+    var newLogEntryDT = moment($("#filterDateStart").val()).hour(moment().hour()).minute(0);
+    $("#editFormBtnOkFiles").prop("disabled", false);
+    $("#logEntryPersonsView").addClass("hidden");
+    $("#LogEntryDateTime").val(newLogEntryDT.format("YYYY-MM-DD HH:mm"));
+    $("#entryDTPicker").data("DateTimePicker").date(newLogEntryDT);
+    $("#ManHours").val(0);
+    $("#hoursWorkedPicker").data("DateTimePicker").date("00:00");
+    sddb.cfg.magicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
+    sddb.cfg.magicSuggests[3].disable();
+    sddb.cfg.magicSuggests[4].disable();
+    sddb.tableLogEntryAssysAdd.clear().search("").draw();
+    sddb.tableLogEntryAssysRemove.clear().search("").draw();
+    sddb.tableLogEntryPersonsAdd.clear().search("").draw();
+    sddb.tableLogEntryPersonsRemove.clear().search("").draw();
+
+    return $.Deferred().resolve();
+};
+//callBackAfterEdit
+sddb.callBackAfterEdit = function (currRecords) {
+    "use strict";
+    var newLogEntryDT = moment($("#filterDateStart").val()).hour(moment().hour()).minute(0);
+
+    if (sddb.cfg.currentIds.length > 1) { $("#editFormBtnOkFiles").prop("disabled", true); }
+    else { $("#editFormBtnOkFiles").prop("disabled", false); }
+
+    $("#logEntryPersonsView").addClass("hidden");
+    sddb.tableLogEntryPersonsAdd.clear().search("").draw();
+    sddb.tableLogEntryPersonsRemove.clear().search("").draw();
+
+    if ($("#LogEntryDateTime").val() === "_VARIES_") {
+        $("#LogEntryDateTime").val(newLogEntryDT.format("YYYY-MM-DD HH:mm"));
+    }
+    $("#entryDTPicker").data("DateTimePicker").date(moment($("#LogEntryDateTime").val()));
+    $("#LogEntryDateTime").data("ismodified", false);
+
+    if ($("#ManHours").val() === "_VARIES_") {
+        $("#ManHours").val(0);
+    }
+    $("#hoursWorkedPicker").data("DateTimePicker").date(moment($("#ManHours").val(), "HH"));
+    $("#ManHours").data("ismodified", false);
+
+    return sddb.modalWaitWrapper(function () {
+        return sddb.fillFormForRelatedGeneric(sddb.tableLogEntryAssysAdd, sddb.tableLogEntryAssysRemove,
+                sddb.cfg.currentIds,
+                "POST", "/PersonLogEntrySrv/GetPrsLogEntryAssys",
+                { ids: sddb.cfg.currentIds },
+                "POST", "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
+                { ids: sddb.cfg.currentIds, locId: sddb.cfg.magicSuggests[3].getValue()[0] });
     });
-    //showing the first Set of columns on startup;
-    sddb.showColumnSet(1, tableMainColumnSets);
+};
+//callBackBeforeCopy
+sddb.callBackBeforeCopy = function () {
+    "use strict";
+    return sddb.showModalDatePrompt("NOTE: Assemblies, People and Files are not copied!",
+                "Copy To Date:", $("#filterDateStart").val())
+        .then(function (outputDate) { sddb.moveToDate = outputDate; });
+};
+//callBackAfterCopy
+sddb.callBackAfterCopy = function () {
+    "use strict";
+    $("#editFormBtnOkFiles").prop("disabled", false);
+    $("#logEntryPersonsView").addClass("hidden");
+    sddb.tableLogEntryAssysAdd.clear().search("").draw();
+    sddb.tableLogEntryAssysRemove.clear().search("").draw();
+    sddb.tableLogEntryPersonsAdd.clear().search("").draw();
+    sddb.tableLogEntryPersonsRemove.clear().search("").draw();
+
+    var copyToDateTime = moment($("#LogEntryDateTime").val())
+            .year(sddb.moveToDate.year()).dayOfYear(sddb.moveToDate.dayOfYear());
+    $("#LogEntryDateTime").val(copyToDateTime.format("YYYY-MM-DD HH:mm"));
+    $("#entryDTPicker").data("DateTimePicker").date(copyToDateTime);
+    $("#hoursWorkedPicker").data("DateTimePicker").date(moment($("#ManHours").val(), "HH"));
+    sddb.cfg.magicSuggests[0].setSelection([{ id: UserId, name: UserFullName }]);
+
+    return sddb.modalWaitWrapper(function () {
+        return sddb.refreshTableGeneric(sddb.tableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
+            { getActive: true, locId: sddb.cfg.magicSuggests[3].getValue()[0] });
+    });
+};
+//refreshMainView
+sddb.refreshMainView = function () {
+    "use strict";
+    sddb.cfg.tableMain.clear().search("").draw();
+    if ($("#filterDateStart").val() === "") { return $.Deferred().resolve(); }
+
+    var endDate = moment($("#filterDateStart").val()).hour(23).minute(59).format("YYYY-MM-DD HH:mm");
+    return sddb.modalWaitWrapper(function () {
+        return sddb.refreshTableGeneric(sddb.cfg.tableMain, "/PersonLogEntrySrv/GetYourByAltIds",
+        {
+            personIds: [UserId],
+            startDate: $("#filterDateStart").val(),
+            endDate: endDate,
+            getActive: sddb.cfg.currentActive
+        },
+        "POST");
+    });
+};
+
+//----------------------------------------------setup after page load------------------------------------------------//
+$(document).ready(function () {
+    "use strict";
+    //-----------------------------------------mainView------------------------------------------//
 
     //---------------------------------------editFormView----------------------------------------//
 
@@ -209,82 +246,64 @@ $(document).ready(function () {
     sddb.msAddToArray("EnteredByPerson_Id", "/PersonSrv/Lookup");
     sddb.msAddToArray("PersonActivityType_Id", "/PersonActivityTypeSrv/Lookup", { editable: false });
     sddb.msAddToArray("AssignedToProject_Id", "/ProjectSrv/Lookup", {}, function () {
-        //TODO
-        });
+        sddb.cfg.magicSuggests[3].clear();
+        sddb.cfg.magicSuggests[4].clear();
+        sddb.tableLogEntryAssysAdd.clear().search("").draw();
+        if (this.getValue().length === 0) {
+            sddb.cfg.magicSuggests[3].disable();
+            sddb.cfg.magicSuggests[4].disable();
+        }
+        else {
+            sddb.cfg.magicSuggests[3].enable();
+            sddb.cfg.magicSuggests[4].enable();
+        }
+    });
     sddb.msAddToArray("AssignedToLocation_Id", "/LocationSrv/LookupByProj",
-        { dataUrlParams: { projectIds: magicSuggests[2].getValue } }, function () {
-            //TODO
+        { dataUrlParams: { projectIds: sddb.cfg.magicSuggests[2].getValue } }, function () {
+            sddb.tableLogEntryAssysAdd.clear().search("").draw();
+            if (this.getValue().length === 0) { return; }
+            sddb.modalWaitWrapper(function () {
+                if (sddb.cfg.currentIds.length !== 0) {
+                    return sddb.refreshTableGeneric(sddb.tableLogEntryAssysAdd,
+                        "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
+                        { ids: sddb.cfg.currentIds, locId: sddb.cfg.magicSuggests[3].getValue()[0] }, "POST");
+                }
+                return sddb.refreshTableGeneric(sddb.tableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
+                        { getActive: true, locId: sddb.cfg.magicSuggests[3].getValue()[0] });
+            })
+                .done(function () { $("#AssignedToLocation_Id input").focus(); });
         });
     sddb.msAddToArray("AssignedToProjectEvent_Id", "/ProjectEventSrv/LookupByProj",
-        { dataUrlParams: { projectIds: magicSuggests[2].getValue } });
-
-    //Initialize MagicSuggest Array Event - AssignedToProject_Id
-    $(magicSuggests[2]).on("selectionchange", function (e, m) {
-        magicSuggests[3].clear();
-        magicSuggests[4].clear();
-        tableLogEntryAssysAdd.clear().search("").draw();
-        if (this.getValue().length === 0) {
-            magicSuggests[3].disable(); 
-            magicSuggests[4].disable();
-        }
-        else {
-            magicSuggests[3].enable(); 
-            magicSuggests[4].enable();
-        }
-    });
-
-    //Initialize MagicSuggest Array Event - AssignedToLocation_Id
-    $(magicSuggests[3]).on("selectionchange", function (e, m) {
-        if (this.getValue().length === 0) {
-            tableLogEntryAssysAdd.clear().search("").draw();
-            return;
-        }
-        if (currentIds.length == 1) {
-            sddb.refreshTblGenWrp(tableLogEntryAssysAdd, "/PersonLogEntrySrv/GetPrsLogEntryAssysNot",
-                { logEntryId: currentIds[0], locId: magicSuggests[3].getValue()[0] }, "GET")
-                .done(function () { $("#AssignedToLocation_Id input").focus(); });
-        }
-        else {
-            sddb.refreshTblGenWrp(tableLogEntryAssysAdd, "AssemblyDbSrv/LookupByLocDTables",
-            { getActive: true, locId: magicSuggests[3].getValue()[0] }, "GET")
-            .done(function () { $("#AssignedToLocation_Id input").focus(); });
-        }
-    });
-
+        { dataUrlParams: { projectIds: sddb.cfg.magicSuggests[2].getValue } });
+    
     //Wire Up editFormBtnPrsAddRemove
     $("#editFormBtnPrsAddRemove").click(function () {
-        tableLogEntryPersonsAdd.clear().search("").draw();
-        tableLogEntryPersonsRemove.clear().search("").draw();
-
-        if ($("#logEntryPersonsView").hasClass("hidden")) {
-            sddb.showModalWait();
-            sddb.fillFormForRelatedGeneric(tableLogEntryPersonsAdd, tableLogEntryPersonsRemove, currentIds,
-                "POST", "/PersonLogEntrySrv/GetPrsLogEntryPersons", { ids: currentIds },
-                "POST", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot", { ids: currentIds })
-                .always(sddb.hideModalWait)
-                .done(function () {
-                    $("#logEntryPersonsView").removeClass("hidden");
-                })
-                .fail(function (xhr, status, error) { sddb.showModalFail(xhr, status, error); });
-        }
-        else {
+        sddb.tableLogEntryPersonsAdd.clear().search("").draw();
+        sddb.tableLogEntryPersonsRemove.clear().search("").draw();
+        if (!$("#logEntryPersonsView").hasClass("hidden")) {
             $("#logEntryPersonsView").addClass("hidden");
+            return;
         }
+        sddb.modalWaitWrapper(function () {
+            return sddb.fillFormForRelatedGeneric(sddb.tableLogEntryPersonsAdd, sddb.tableLogEntryPersonsRemove,
+                sddb.cfg.currentIds,
+                "POST", "/PersonLogEntrySrv/GetPrsLogEntryPersons",
+                { ids: sddb.cfg.currentIds },
+                "POST", "/PersonLogEntrySrv/GetPrsLogEntryPersonsNot",
+                { ids: sddb.cfg.currentIds });
+        })
+            .done(function () {
+                $("#logEntryPersonsView").removeClass("hidden");
+            });
+
     });
-           
+
     //--------------------------------------View Initialization------------------------------------//
 
     $("#filterDateStart").val(moment().format("YYYY-MM-DD"));
     sddb.refreshMainView();
-    sddb.switchView(initialViewId, mainViewId, mainViewBtnGroupClass);
-  
+    sddb.switchView();
 
-    //--------------------------------End of execution at Start-----------
+    //--------------------------------End of setup after page load---------------------------------//   
 });
 
-
-//--------------------------------------Main Methods---------------------------------------//
-
-
-
-//---------------------------------------Helper Methods--------------------------------------//
