@@ -9,4 +9,4 @@ Locations are in turn collections of **Assemblies**. Assemblies are monitoring s
 Assemblies are also collections of **Components**. Components represent any piece of hardware which is a part of an installation or a subsystem mentioned above and has one or more of the following attributes: it is reusable and can be moved between Assemblies (including changing Projects); is valuable enough to be tracked and maintained; is uniquely distinguishable by a serial number or other tag; needs to be calibrated on regular basis.
 
 ###Demo Version
-A demo is available [here on Azure](https://sddb.azurewebsites.net/) . You can use guest / gu3st credentials to log in.
+A demo copy of SDDB is available [here on Azure](https://sddb.azurewebsites.net/) . You can use guest / gu3st credentials to log in.
