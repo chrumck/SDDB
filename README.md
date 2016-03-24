@@ -1,4 +1,4 @@
-##SDDB Help Files
+##SDDB
 
 ###General Description
 **SDDB** is a database with a web user interface which purpose is to help track progress of the company's projects, track hardware usage belonging to the company, as well as  record people activities and training progress.
